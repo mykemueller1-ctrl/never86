@@ -50,9 +50,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const userId = req.nextUrl.searchParams.get('userId') || 'default';
-    const results = await db.select().from(invoices).where(
-      // Simple filter — in production, use eq() from drizzle
-    );
+    const results = await db.select().from(invoices);
     return NextResponse.json({ invoices: results });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { waitlist } from '@/db/schema';
 import { sendWelcomeEmail, sendNotification } from '@/lib/email';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const waitlistInput = z.object({
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
     await db
       .update(waitlist)
       .set({ welcomeEmailSent: true })
-      .where(/* eq(waitlist.id, entry.id) */);
+      .where(eq(waitlist.id, entry.id));
 
     return NextResponse.json({ success: true, message: 'You\'re on the list!' });
   } catch (error: any) {

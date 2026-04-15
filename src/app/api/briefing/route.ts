@@ -3,7 +3,7 @@ import { db } from '@/db';
 import { briefings, zReports, invoices } from '@/db/schema';
 import { generateBriefing } from '@/lib/anthropic';
 import { sendMorningBriefing } from '@/lib/email';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 // GET /api/briefing — Trigger morning briefing (called by Vercel Cron)
 export async function GET(req: NextRequest) {
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     await db
       .update(briefings)
       .set({ sentAt: new Date() })
-      .where(/* eq(briefings.id, briefing.id) */);
+      .where(eq(briefings.id, briefing.id));
 
     return NextResponse.json({ success: true, briefingId: briefing.id });
   } catch (error: any) {
