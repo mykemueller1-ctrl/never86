@@ -1,9 +1,22 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResendClient() {
+  if (resendClient) return resendClient;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+
+  resendClient = new Resend(apiKey);
+  return resendClient;
+}
 
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = escapeHtml(name?.split(' ')[0] || 'there');
+  const resend = getResendClient();
 
   return resend.emails.send({
     from: 'Never 86\'d <hello@never86.ai>',
@@ -46,6 +59,7 @@ export async function sendWelcomeEmail(email: string, name?: string) {
 }
 
 export async function sendMorningBriefing(email: string, htmlContent: string) {
+  const resend = getResendClient();
   return resend.emails.send({
     from: 'Never 86\'d <briefing@never86.ai>',
     to: email,
@@ -55,6 +69,7 @@ export async function sendMorningBriefing(email: string, htmlContent: string) {
 }
 
 export async function sendNotification(email: string, subject: string, message: string) {
+  const resend = getResendClient();
   return resend.emails.send({
     from: 'Never 86\'d <alerts@never86.ai>',
     to: email,
