@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendWelcomeEmail(email: string, name?: string) {
-  const firstName = name?.split(' ')[0] || 'there';
+  const firstName = escapeHtml(name?.split(' ')[0] || 'there');
 
   return resend.emails.send({
     from: 'Never 86\'d <hello@never86.ai>',
@@ -58,7 +58,7 @@ export async function sendNotification(email: string, subject: string, message: 
   return resend.emails.send({
     from: 'Never 86\'d <alerts@never86.ai>',
     to: email,
-    subject,
+    subject: escapeHtml(subject),
     html: `
 <!DOCTYPE html>
 <html>
@@ -71,4 +71,13 @@ export async function sendNotification(email: string, subject: string, message: 
 </body>
 </html>`,
   });
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

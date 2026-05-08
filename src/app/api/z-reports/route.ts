@@ -1,19 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { zReports } from '@/db/schema';
 import { parseZReport } from '@/lib/anthropic';
+import {
+  checkRateLimit,
+  requireBearerTokenFromEnv,
+  requireUserIdHeader,
+  responseInternalError,
+} from '@/lib/security';
 import { z } from 'zod';
 
 const zReportInput = z.object({
   rawText: z.string().min(1),
-  userId: z.string().default('default'),
 });
 
 // POST /api/z-reports — Upload and process a Z-Report
 export async function POST(req: NextRequest) {
+  const auth = requireBearerTokenFromEnv(req, 'INTERNAL_API_KEY');
+  if (!auth.ok) return auth.response;
+
+  const userScope = requireUserIdHeader(req);
+  if (!userScope.ok) return userScope.response;
+
+  const rateLimit = checkRateLimit(req, `z-reports-post:${userScope.userId}`, 20, 60_000);
+  if (rateLimit) return rateLimit;
+
   try {
+    const db = getDb();
     const body = await req.json();
-    const { rawText, userId } = zReportInput.parse(body);
+    const { rawText } = zReportInput.parse(body);
 
     // Claude parses the Z-Report
     const parsed = await parseZReport(rawText);
@@ -33,7 +48,7 @@ export async function POST(req: NextRequest) {
     const [report] = await db
       .insert(zReports)
       .values({
-        userId,
+        userId: userScope.userId,
         reportDate: parsed.reportDate ? new Date(parsed.reportDate) : new Date(),
         grossSales: parsed.grossSales?.toString(),
         netSales: parsed.netSales?.toString(),
@@ -55,9 +70,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, report });
   } catch (error: any) {
     console.error('Z-Report processing error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to process Z-Report' },
-      { status: 400 }
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid request payload' }, { status: 400 });
+    }
+    return responseInternalError();
   }
 }

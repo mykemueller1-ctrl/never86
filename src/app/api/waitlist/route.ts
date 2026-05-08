@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { waitlist } from '@/db/schema';
 import { sendWelcomeEmail, sendNotification } from '@/lib/email';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/security';
 
 const waitlistInput = z.object({
   email: z.string().email(),
@@ -14,9 +15,17 @@ const waitlistInput = z.object({
 
 // POST /api/waitlist — Join the waitlist
 export async function POST(req: NextRequest) {
+  const rateLimit = checkRateLimit(req, 'waitlist-post', 10, 60_000);
+  if (rateLimit) return rateLimit;
+
   try {
+    const db = getDb();
     const body = await req.json();
     const data = waitlistInput.parse(body);
+    const escapedName = escapeHtml(data.name || '');
+    const escapedEmail = escapeHtml(data.email);
+    const escapedRestaurant = escapeHtml(data.restaurantName || '');
+    const escapedRole = escapeHtml(data.role || '');
 
     // Insert into waitlist
     const [entry] = await db
@@ -35,11 +44,11 @@ export async function POST(req: NextRequest) {
     // Notify Myke
     await sendNotification(
       process.env.OWNER_EMAIL || 'myke@n86.app',
-      `New waitlist signup: ${data.name || data.email}`,
-      `<strong>${data.name || 'Someone'}</strong> just joined the Never 86'd waitlist.<br/><br/>
-       Email: ${data.email}<br/>
-       ${data.restaurantName ? `Restaurant: ${data.restaurantName}<br/>` : ''}
-       ${data.role ? `Role: ${data.role}` : ''}`
+      `New waitlist signup: ${escapedName || escapedEmail}`,
+      `<strong>${escapedName || 'Someone'}</strong> just joined the Never 86'd waitlist.<br/><br/>
+       Email: ${escapedEmail}<br/>
+       ${escapedRestaurant ? `Restaurant: ${escapedRestaurant}<br/>` : ''}
+       ${escapedRole ? `Role: ${escapedRole}` : ''}`
     );
 
     // Mark welcome email as sent
@@ -55,8 +64,17 @@ export async function POST(req: NextRequest) {
     }
     console.error('Waitlist error:', error);
     return NextResponse.json(
-      { error: error.message || 'Something went wrong' },
+      { error: 'Something went wrong' },
       { status: 400 }
     );
   }
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

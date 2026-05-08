@@ -54,7 +54,9 @@ Repo: `github.com/mykemueller1-ctrl/never86`
    - `DATABASE_URL` = your Neon connection string
    - `ANTHROPIC_API_KEY` = your Claude API key
    - `RESEND_API_KEY` = your Resend key
-   - `CRON_SECRET` = any random string (e.g. `n86-cron-2024`)
+   - `CRON_SECRET` = long random secret for cron authorization
+   - `INTERNAL_API_KEY` = long random secret for protected API endpoints
+   - `BRIEFING_USER_ID` = user/tenant id to generate daily briefings for
    - `OWNER_EMAIL` = `myke@n86.app`
 4. Click Deploy
 

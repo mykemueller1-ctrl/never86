@@ -1,23 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { briefings, zReports, invoices } from '@/db/schema';
 import { generateBriefing } from '@/lib/anthropic';
 import { sendMorningBriefing } from '@/lib/email';
 import { desc, eq } from 'drizzle-orm';
+import {
+  checkRateLimit,
+  requireBearerTokenFromEnv,
+  responseInternalError,
+} from '@/lib/security';
 
 // GET /api/briefing — Trigger morning briefing (called by Vercel Cron)
 export async function GET(req: NextRequest) {
+  const auth = requireBearerTokenFromEnv(req, 'CRON_SECRET');
+  if (!auth.ok) return auth.response;
+
+  const rateLimit = checkRateLimit(req, 'briefing-get', 10, 60_000);
+  if (rateLimit) return rateLimit;
+
   try {
-    // Verify cron secret
-    const authHeader = req.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const db = getDb();
+    const briefingUserId = process.env.BRIEFING_USER_ID;
+    const ownerEmail = process.env.OWNER_EMAIL;
+    if (!briefingUserId || !ownerEmail) {
+      return responseInternalError();
     }
 
     // Get yesterday's Z-report
     const recentReports = await db
       .select()
       .from(zReports)
+      .where(eq(zReports.userId, briefingUserId))
       .orderBy(desc(zReports.reportDate))
       .limit(7);
 
@@ -27,6 +40,7 @@ export async function GET(req: NextRequest) {
     const recentInvoices = await db
       .select()
       .from(invoices)
+      .where(eq(invoices.userId, briefingUserId))
       .orderBy(desc(invoices.createdAt))
       .limit(20);
 
@@ -51,17 +65,14 @@ export async function GET(req: NextRequest) {
     const [briefing] = await db
       .insert(briefings)
       .values({
-        userId: 'default',
+        userId: briefingUserId,
         briefingDate: new Date(),
         htmlContent,
       })
       .returning();
 
     // Send email
-    await sendMorningBriefing(
-      process.env.OWNER_EMAIL || 'myke@n86.app',
-      htmlContent
-    );
+    await sendMorningBriefing(ownerEmail, htmlContent);
 
     // Update sent timestamp
     await db
@@ -72,6 +83,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, briefingId: briefing.id });
   } catch (error: any) {
     console.error('Briefing error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return responseInternalError();
   }
 }
