@@ -4,7 +4,7 @@ import { waitlist } from '@/db/schema';
 import { sendWelcomeEmail, sendNotification } from '@/lib/email';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { checkRateLimit } from '@/lib/security';
+import { checkRateLimit, escapeHtml } from '@/lib/security';
 
 const waitlistInput = z.object({
   email: z.string().email(),
@@ -68,13 +68,4 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
 }

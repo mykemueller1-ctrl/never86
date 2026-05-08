@@ -19,6 +19,7 @@ const globalRateLimitStore = globalThis as typeof globalThis & {
 
 const rateLimitStore = globalRateLimitStore.__never86RateLimits ?? new Map<string, RateLimitEntry>();
 globalRateLimitStore.__never86RateLimits = rateLimitStore;
+let lastRateLimitCleanupAt = Date.now();
 
 function extractBearerToken(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
@@ -62,6 +63,15 @@ export function responseInternalError() {
   return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 }
 
+export function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 export function requireBearerTokenFromEnv(req: NextRequest, envName: string) {
   const expected = process.env[envName];
   if (!expected) {
@@ -78,17 +88,39 @@ export function requireBearerTokenFromEnv(req: NextRequest, envName: string) {
 
 export function requireUserIdHeader(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
-  const parsed = USER_ID_SCHEMA.safeParse(userId);
-  if (!parsed.success) {
-    return { ok: false as const, response: responseBadRequest('Missing or invalid x-user-id header') };
+  const validatedUserId = validateUserId(userId);
+  if (!validatedUserId) {
+    return { ok: false as const, response: responseBadRequest('Invalid request') };
   }
-  return { ok: true as const, userId: parsed.data };
+  return { ok: true as const, userId: validatedUserId };
+}
+
+export function validateUserId(userId: string | null | undefined) {
+  const parsed = USER_ID_SCHEMA.safeParse(userId);
+  return parsed.success ? parsed.data : null;
 }
 
 export function checkRateLimit(req: NextRequest, key: string, max: number, windowMs: number) {
   const forwardedFor = req.headers.get('x-forwarded-for');
-  const ip = forwardedFor?.split(',')[0]?.trim() || 'unknown';
+  const forwardedIp = forwardedFor?.split(',')[0]?.trim();
+  let ip = forwardedIp || req.ip?.trim();
+  if (!ip) {
+    if (process.env.NODE_ENV === 'production') {
+      return responseBadRequest('Unable to determine client identity');
+    }
+    ip = 'local-dev';
+  }
+
   const now = Date.now();
+  if (now - lastRateLimitCleanupAt >= windowMs) {
+    rateLimitStore.forEach((entry, entryKey) => {
+      if (now >= entry.resetAt) {
+        rateLimitStore.delete(entryKey);
+      }
+    });
+    lastRateLimitCleanupAt = now;
+  }
+
   const storeKey = `${key}:${ip}`;
   const existing = rateLimitStore.get(storeKey);
 

@@ -8,6 +8,7 @@ import {
   checkRateLimit,
   requireBearerTokenFromEnv,
   responseInternalError,
+  validateUserId,
 } from '@/lib/security';
 
 // GET /api/briefing — Trigger morning briefing (called by Vercel Cron)
@@ -20,9 +21,13 @@ export async function GET(req: NextRequest) {
 
   try {
     const db = getDb();
-    const briefingUserId = process.env.BRIEFING_USER_ID;
+    const briefingUserId = validateUserId(process.env.BRIEFING_USER_ID);
     const ownerEmail = process.env.OWNER_EMAIL;
     if (!briefingUserId || !ownerEmail) {
+      console.error('Briefing configuration incomplete', {
+        hasBriefingUserId: Boolean(briefingUserId),
+        hasOwnerEmail: Boolean(ownerEmail),
+      });
       return responseInternalError();
     }
 
