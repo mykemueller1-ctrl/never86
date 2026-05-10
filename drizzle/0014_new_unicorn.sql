@@ -1,0 +1,1 @@
+ALTER TABLE `checklists` ADD `dayOfWeek` varchar(20);

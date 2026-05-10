@@ -1,0 +1,1196 @@
+/**
+ * ScheduleScreen — Night Shift Design System
+ * Manager: Weekly grid builder (create/edit/delete shifts)
+ * Staff: "My Schedule" view (upcoming shifts, request time off, set availability)
+ */
+import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "@/components/ui/sonner";
+import type { SafeStaff } from "../../../shared/types";
+import {
+  ChevronLeft, ChevronRight, Plus, Calendar, Clock, X,
+  Check, AlertTriangle, Loader2, Users, Trash2, Edit3,
+  Copy, Save, Send, DollarSign, BarChart3, Shield, MoreVertical
+} from "lucide-react";
+
+interface Props {
+  staffUser: SafeStaff;
+  allStaff: SafeStaff[];
+  onBack: () => void;
+}
+
+const MANAGER_ROLES = ["owner", "key_manager", "kitchen_manager", "bar_manager"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DEPARTMENTS: Array<"bar" | "dining_room" | "kitchen_line" | "pizza_side" | "driver" | "dishwasher" | "management"> = ["bar", "dining_room", "kitchen_line", "pizza_side", "driver", "dishwasher", "management"];
+
+function getWeekDates(offset: number): Date[] {
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - now.getDay() + 1 + offset * 7);
+  monday.setHours(0, 0, 0, 0);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function formatWeekLabel(dates: Date[]): string {
+  const start = dates[0];
+  const end = dates[6];
+  return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — ${end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+export default function ScheduleScreen({ staffUser, allStaff, onBack }: Props) {
+  const isManager = MANAGER_ROLES.includes(staffUser.jobRole);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [tab, setTab] = useState<"schedule" | "availability" | "requests" | "hours">(isManager ? "schedule" : "schedule");
+  const [showAddShift, setShowAddShift] = useState(false);
+  const [editingShift, setEditingShift] = useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [showManagerMenu, setShowManagerMenu] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showLaborDash, setShowLaborDash] = useState(false);
+
+  const weekDates = useMemo(() => getWeekDates(weekOffset), [weekOffset]);
+  const startDate = weekDates[0];
+  const endDate = new Date(weekDates[6]);
+  endDate.setHours(23, 59, 59, 999);
+
+  // Queries
+  const scheduleQuery = isManager
+    ? trpc.schedule.getWeek.useQuery({ startDate, endDate })
+    : trpc.schedule.getByStaff.useQuery({ staffId: staffUser.id, startDate, endDate });
+
+  const myAvailability = trpc.availability.getByStaff.useQuery();
+  const myTimeOff = trpc.timeOff.myRequests.useQuery();
+  const pendingTimeOff = isManager ? trpc.timeOff.pending.useQuery() : null;
+  const pendingSwaps = isManager ? trpc.shiftSwaps.pending.useQuery() : null;
+
+  const utils = trpc.useUtils();
+
+  // Mutations
+  const createShift = trpc.schedule.create.useMutation({
+    onSuccess: () => { utils.schedule.getWeek.invalidate(); utils.schedule.getByStaff.invalidate(); toast.success("Shift added"); setShowAddShift(false); },
+    onError: (e) => toast.error(e.message),
+  });
+  const updateShift = trpc.schedule.update.useMutation({
+    onSuccess: () => { utils.schedule.getWeek.invalidate(); utils.schedule.getByStaff.invalidate(); toast.success("Shift updated"); setEditingShift(null); },
+    onError: (e) => toast.error(e.message),
+  });
+  const deleteShift = trpc.schedule.delete.useMutation({
+    onSuccess: () => { utils.schedule.getWeek.invalidate(); utils.schedule.getByStaff.invalidate(); toast.success("Shift removed"); },
+    onError: (e) => toast.error(e.message),
+  });
+  const approveTimeOffMut = trpc.timeOff.approve.useMutation({
+    onSuccess: () => { pendingTimeOff?.refetch(); toast.success("Approved"); },
+  });
+  const denyTimeOffMut = trpc.timeOff.deny.useMutation({
+    onSuccess: () => { pendingTimeOff?.refetch(); toast.success("Denied"); },
+  });
+  const requestTimeOff = trpc.timeOff.request.useMutation({
+    onSuccess: () => { myTimeOff.refetch(); toast.success("Request submitted"); },
+    onError: (e) => toast.error(e.message),
+  });
+  const setAvailability = trpc.availability.set.useMutation({
+    onSuccess: () => { myAvailability.refetch(); toast.success("Availability updated"); },
+  });
+
+  // New scheduling mutations
+  const copyWeek = trpc.schedule.copyWeek.useMutation({
+    onSuccess: (data) => { utils.schedule.getWeek.invalidate(); toast.success(`Copied ${data.copied} shifts to next week`); },
+    onError: (e) => toast.error(e.message),
+  });
+  const publishWeek = trpc.schedule.publishWeek.useMutation({
+    onSuccess: (data) => { toast.success(`Published ${data.published} shifts • ${data.totalHours}h • $${data.projectedLaborCost} labor`); },
+    onError: (e) => toast.error(e.message),
+  });
+  const saveTemplate = trpc.schedule.saveAsTemplate.useMutation({
+    onSuccess: (data) => { toast.success(`Saved "${data.name}" template (${data.saved} shifts)`); setShowTemplateModal(false); },
+    onError: (e) => toast.error(e.message),
+  });
+  const applyTemplate = trpc.schedule.applyTemplate.useMutation({
+    onSuccess: (data) => { utils.schedule.getWeek.invalidate(); toast.success(`Applied "${data.template}" (${data.applied} shifts)`); },
+    onError: (e) => toast.error(e.message),
+  });
+  const deleteTemplate = trpc.schedule.deleteTemplate.useMutation({
+    onSuccess: () => { templatesQuery?.refetch(); toast.success("Template deleted"); },
+  });
+
+  // New queries
+  const templatesQuery = isManager ? trpc.schedule.getTemplates.useQuery() : null;
+  const conflictsQuery = isManager ? trpc.schedule.conflicts.useQuery({ weekStart: startDate }) : null;
+  const laborQuery = isManager ? trpc.schedule.laborBreakdown.useQuery({ weekStart: startDate }) : null;
+  const weekMetaQuery = isManager ? trpc.schedule.getWeekMeta.useQuery({ weekStart: startDate }) : null;
+
+  const shifts = (scheduleQuery.data ?? []) as any[];
+
+  // Group shifts by date for the grid
+  const shiftsByDate = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    for (const d of weekDates) {
+      const key = d.toISOString().split("T")[0];
+      map[key] = [];
+    }
+    for (const s of shifts) {
+      const key = new Date(s.date).toISOString().split("T")[0];
+      if (map[key]) map[key].push(s);
+    }
+    return map;
+  }, [shifts, weekDates]);
+
+  return (
+    <div className="h-screen bg-black flex flex-col screen-enter">
+      {/* Header */}
+      <div className="px-6 pt-10 pb-2">
+        <button onClick={onBack} className="text-amber-500 type-caption mb-3 flex items-center gap-1 hover:text-amber-400 transition-colors">
+          <ChevronLeft size={16} /> Back
+        </button>
+        <div className="flex items-center justify-between">
+          <h2 className="type-display text-white">{isManager ? "Schedule" : "My Schedule"}</h2>
+          {isManager && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedDay(weekDates[0]); setShowAddShift(true); }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 text-black type-caption font-semibold hover:bg-amber-400 transition-colors active:scale-95">
+                <Plus size={14} /> Add Shift
+              </button>
+              <div className="relative">
+                <button onClick={() => setShowManagerMenu(!showManagerMenu)}
+                  className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                  <MoreVertical size={18} />
+                </button>
+                {showManagerMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
+                    <button onClick={() => { copyWeek.mutate({ sourceWeekStart: startDate, targetWeekStart: new Date(startDate.getTime() + 7 * 86400000), createdBy: staffUser.id }); setShowManagerMenu(false); }}
+                      className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-zinc-800 transition-colors">
+                      <Copy size={16} className="text-amber-500" />
+                      <div><p className="type-caption text-white">Copy to Next Week</p><p className="type-micro text-zinc-500">Duplicate all shifts +7 days</p></div>
+                    </button>
+                    <button onClick={() => { publishWeek.mutate({ weekStart: startDate, publishedBy: staffUser.id }); setShowManagerMenu(false); }}
+                      className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-zinc-800 transition-colors">
+                      <Send size={16} className="text-green-400" />
+                      <div><p className="type-caption text-white">Publish Week</p><p className="type-micro text-zinc-500">Make visible to all staff</p></div>
+                    </button>
+                    <button onClick={() => { setShowTemplateModal(true); setShowManagerMenu(false); }}
+                      className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-zinc-800 transition-colors">
+                      <Save size={16} className="text-blue-400" />
+                      <div><p className="type-caption text-white">Templates</p><p className="type-micro text-zinc-500">Save or apply schedule templates</p></div>
+                    </button>
+                    <button onClick={() => { setShowLaborDash(true); setShowManagerMenu(false); }}
+                      className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-zinc-800 transition-colors">
+                      <DollarSign size={16} className="text-emerald-400" />
+                      <div><p className="type-caption text-white">Labor Dashboard</p><p className="type-micro text-zinc-500">Cost breakdown by department</p></div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Conflict Alerts */}
+        {isManager && conflictsQuery?.data && conflictsQuery.data.length > 0 && (
+          <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+            <div className="flex items-center gap-2 mb-1">
+              <Shield size={14} className="text-red-400" />
+              <span className="type-caption text-red-400 font-semibold">{conflictsQuery.data.length} Conflict{conflictsQuery.data.length > 1 ? "s" : ""} Detected</span>
+            </div>
+            <div className="space-y-1">
+              {conflictsQuery.data.slice(0, 3).map((c: any, i: number) => (
+                <p key={i} className="type-micro text-red-300/80">• {c.message}</p>
+              ))}
+              {conflictsQuery.data.length > 3 && (
+                <p className="type-micro text-red-400/60">+{conflictsQuery.data.length - 3} more</p>
+              )}
+            </div>
+          </div>
+        )}
+        {/* Week Status Badge */}
+        {isManager && weekMetaQuery?.data && (
+          <div className="mt-2 flex items-center gap-2">
+            <span className={`type-micro px-2 py-0.5 rounded-full ${
+              weekMetaQuery.data.status === "published" ? "bg-green-500/10 text-green-400" : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {weekMetaQuery.data.status === "published" ? "✓ Published" : "Draft"}
+            </span>
+            {weekMetaQuery.data.totalScheduledHours && (
+              <span className="type-micro text-zinc-500">{weekMetaQuery.data.totalScheduledHours}h scheduled</span>
+            )}
+            {weekMetaQuery.data.projectedLaborCost && (
+              <span className="type-micro text-zinc-500">• ${weekMetaQuery.data.projectedLaborCost} labor</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="px-6 py-3 flex gap-2 overflow-x-auto">
+        {(["schedule", "availability", "requests", ...(isManager ? ["hours"] : [])] as const).map(t => (
+          <button key={t} onClick={() => setTab(t as any)}
+            className={`px-4 py-2 rounded-lg type-caption font-medium transition-colors whitespace-nowrap ${
+              tab === t ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" : "text-zinc-500 hover:text-zinc-300"
+            }`}>
+            {t === "schedule" ? "Schedule" : t === "availability" ? "Availability" : t === "requests" ? "Requests" : "Hours"}
+          </button>
+        ))}
+      </div>
+
+      {/* Week Navigation */}
+      {tab === "schedule" && (
+        <div className="px-6 pb-3 flex items-center justify-between">
+          <button onClick={() => setWeekOffset(o => o - 1)} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+            <ChevronLeft size={18} />
+          </button>
+          <div className="text-center">
+            <p className="type-caption text-zinc-300 font-medium">{formatWeekLabel(weekDates)}</p>
+            {weekOffset !== 0 && (
+              <button onClick={() => setWeekOffset(0)} className="type-micro text-amber-500 mt-0.5">Today</button>
+            )}
+          </div>
+          <button onClick={() => setWeekOffset(o => o + 1)} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-6 pb-8">
+        {tab === "schedule" && (
+          <ScheduleGrid
+            weekDates={weekDates}
+            shiftsByDate={shiftsByDate}
+            staffUser={staffUser}
+            allStaff={allStaff}
+            isManager={isManager}
+            onEdit={(id) => setEditingShift(id)}
+            onDelete={(id) => deleteShift.mutate({ id })}
+            isLoading={scheduleQuery.isLoading}
+          />
+        )}
+
+        {tab === "availability" && (
+          <AvailabilityView
+            availability={myAvailability.data ?? []}
+            onSet={(data) => setAvailability.mutate(data)}
+          />
+        )}
+
+        {tab === "requests" && (
+          <RequestsView
+            staffUser={staffUser}
+            isManager={isManager}
+            myTimeOff={myTimeOff.data ?? []}
+            pendingTimeOff={pendingTimeOff?.data ?? []}
+            pendingSwaps={pendingSwaps?.data ?? []}
+            onRequestTimeOff={(data) => requestTimeOff.mutate(data)}
+            onApproveTimeOff={(id) => approveTimeOffMut.mutate({ id, approvedBy: staffUser.id })}
+            onDenyTimeOff={(id) => denyTimeOffMut.mutate({ id, approvedBy: staffUser.id })}
+          />
+        )}
+
+        {tab === "hours" && isManager && (
+          <WeeklyHoursReport allStaff={allStaff} />
+        )}
+      </div>
+
+      {/* Add Shift Modal */}
+      {showAddShift && (
+        <AddShiftModal
+          allStaff={allStaff}
+          selectedDay={selectedDay}
+          weekDates={weekDates}
+          createdBy={staffUser.id}
+          onClose={() => setShowAddShift(false)}
+          onSubmit={(data) => createShift.mutate(data)}
+          isPending={createShift.isPending}
+        />
+      )}
+
+      {/* Edit Shift Modal */}
+      {editingShift !== null && (
+        <EditShiftModal
+          shift={shifts.find(s => s.id === editingShift)}
+          allStaff={allStaff}
+          onClose={() => setEditingShift(null)}
+          onSubmit={(data) => updateShift.mutate(data)}
+          isPending={updateShift.isPending}
+        />
+      )}
+
+      {/* Template Modal */}
+      {showTemplateModal && (
+        <TemplateModal
+          templates={templatesQuery?.data ?? []}
+          weekStart={startDate}
+          createdBy={staffUser.id}
+          onSave={(name) => saveTemplate.mutate({ templateName: name, weekStart: startDate, createdBy: staffUser.id })}
+          onApply={(templateName) => applyTemplate.mutate({ templateName, targetWeekStart: startDate, createdBy: staffUser.id })}
+          onDelete={(name) => deleteTemplate.mutate({ name })}
+          onClose={() => setShowTemplateModal(false)}
+          isSaving={saveTemplate.isPending}
+          isApplying={applyTemplate.isPending}
+        />
+      )}
+
+      {/* Labor Dashboard Modal */}
+      {showLaborDash && (
+        <LaborDashboard
+          data={laborQuery?.data}
+          isLoading={laborQuery?.isLoading ?? false}
+          onClose={() => setShowLaborDash(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Schedule Grid ──────────────────────────────────────────────────────────
+function ScheduleGrid({ weekDates, shiftsByDate, staffUser, allStaff, isManager, onEdit, onDelete, isLoading }: {
+  weekDates: Date[];
+  shiftsByDate: Record<string, any[]>;
+  staffUser: SafeStaff;
+  allStaff: SafeStaff[];
+  isManager: boolean;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  isLoading: boolean;
+}) {
+  const today = new Date().toISOString().split("T")[0];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="skeleton h-16 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  const totalShifts = Object.values(shiftsByDate).reduce((s, arr) => s + arr.length, 0);
+
+  if (totalShifts === 0 && !isManager) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Calendar size={40} className="text-zinc-700 mb-4" />
+        <p className="type-heading text-zinc-400 mb-2">No shifts scheduled</p>
+        <p className="type-body text-zinc-600 text-center">Your schedule for this week hasn't been posted yet. Check back later or ask your manager.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {weekDates.map(date => {
+        const key = date.toISOString().split("T")[0];
+        const dayShifts = shiftsByDate[key] || [];
+        const isToday = key === today;
+        const isPast = key < today;
+        const dayLabel = date.toLocaleDateString("en-US", { weekday: "short" });
+        const dateLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+        return (
+          <div key={key} className={`rounded-xl p-4 transition-colors ${
+            isToday ? "bg-amber-500/5 border border-amber-500/15" : "surface-base"
+          } ${isPast ? "opacity-60" : ""}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`type-caption font-semibold ${isToday ? "text-amber-500" : "text-zinc-300"}`}>
+                  {dayLabel}
+                </span>
+                <span className="type-caption text-zinc-500">{dateLabel}</span>
+                {isToday && <span className="type-micro text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">Today</span>}
+              </div>
+              <span className="type-micro text-zinc-600">{dayShifts.length} shift{dayShifts.length !== 1 ? "s" : ""}</span>
+            </div>
+
+            {dayShifts.length === 0 ? (
+              <p className="type-caption text-zinc-600 italic">No shifts</p>
+            ) : (
+              <div className="space-y-1.5">
+                {dayShifts.map((shift: any) => {
+                  const staff = allStaff.find(s => s.id === shift.staffId);
+                  const isMe = shift.staffId === staffUser.id;
+                  return (
+                    <div key={shift.id} className={`flex items-center justify-between py-2 px-3 rounded-lg ${
+                      isMe ? "bg-amber-500/8 border border-amber-500/10" : "bg-zinc-900/50"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center type-micro font-semibold ${
+                          isMe ? "bg-amber-500 text-black" : "bg-zinc-800 text-zinc-400"
+                        }`}>
+                          {staff?.firstName?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <p className={`type-caption font-medium ${isMe ? "text-amber-500" : "text-zinc-200"}`}>
+                            {staff ? `${staff.firstName} ${staff.lastName || ""}`.trim() : `Staff #${shift.staffId}`}
+                            {isMe && <span className="text-amber-600 ml-1">(You)</span>}
+                          </p>
+                          <p className="type-micro text-zinc-500 normal-case">
+                            {shift.startTime} – {shift.endTime}
+                            {shift.position && <span className="ml-2 text-zinc-600">· {shift.position}</span>}
+                          </p>
+                        </div>
+                      </div>
+                      {isManager && (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => onEdit(shift.id)} className="p-1.5 rounded-md text-zinc-600 hover:text-amber-500 hover:bg-zinc-800 transition-colors">
+                            <Edit3 size={13} />
+                          </button>
+                          <button onClick={() => onDelete(shift.id)} className="p-1.5 rounded-md text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Availability View ──────────────────────────────────────────────────────
+function AvailabilityView({ availability, onSet }: {
+  availability: any[];
+  onSet: (data: { dayOfWeek: number; startTime: string; endTime: string; preference?: "preferred" | "available" | "unavailable" }) => void;
+}) {
+  const FULL_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  const getAvailForDay = (dow: number) => availability.find((a: any) => a.dayOfWeek === dow);
+
+  const [editing, setEditing] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("22:00");
+  const [preference, setPreference] = useState<"preferred" | "available" | "unavailable">("available");
+
+  const handleSave = (dow: number) => {
+    onSet({ dayOfWeek: dow, startTime, endTime, preference });
+    setEditing(null);
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="type-caption text-zinc-500 mb-4">Set your weekly availability so managers know when you can work.</p>
+      {FULL_DAYS.map((day, dow) => {
+        const avail = getAvailForDay(dow);
+        const isEditing = editing === dow;
+
+        return (
+          <div key={dow} className="surface-base p-4 rounded-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="type-caption font-medium text-zinc-200">{day}</p>
+                {avail ? (
+                  <p className="type-micro text-zinc-500 normal-case">
+                    {avail.startTime} – {avail.endTime}
+                    <span className={`ml-2 ${
+                      avail.preference === "preferred" ? "text-green-400" :
+                      avail.preference === "unavailable" ? "text-red-400" : "text-zinc-400"
+                    }`}>({avail.preference})</span>
+                  </p>
+                ) : (
+                  <p className="type-micro text-zinc-600 normal-case">Not set</p>
+                )}
+              </div>
+              <button onClick={() => {
+                if (avail) { setStartTime(avail.startTime); setEndTime(avail.endTime); setPreference(avail.preference); }
+                setEditing(isEditing ? null : dow);
+              }} className="text-amber-500 type-caption hover:text-amber-400 transition-colors">
+                {isEditing ? "Cancel" : "Edit"}
+              </button>
+            </div>
+
+            {isEditing && (
+              <div className="mt-3 pt-3 border-t border-zinc-800 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="type-micro text-zinc-500 mb-1 block">Start</label>
+                    <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white type-caption" />
+                  </div>
+                  <div>
+                    <label className="type-micro text-zinc-500 mb-1 block">End</label>
+                    <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white type-caption" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {(["preferred", "available", "unavailable"] as const).map(p => (
+                    <button key={p} onClick={() => setPreference(p)}
+                      className={`flex-1 py-2 rounded-lg type-micro font-medium transition-colors ${
+                        preference === p
+                          ? p === "preferred" ? "bg-green-500/15 text-green-400 border border-green-500/30"
+                            : p === "unavailable" ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                            : "bg-amber-500/15 text-amber-500 border border-amber-500/30"
+                          : "bg-zinc-800 text-zinc-500"
+                      }`}>
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => handleSave(dow)}
+                  className="w-full py-2.5 rounded-lg bg-amber-500 text-black type-caption font-semibold hover:bg-amber-400 transition-colors active:scale-[0.98]">
+                  Save
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Requests View ──────────────────────────────────────────────────────────
+function RequestsView({ staffUser, isManager, myTimeOff, pendingTimeOff, pendingSwaps, onRequestTimeOff, onApproveTimeOff, onDenyTimeOff }: {
+  staffUser: SafeStaff;
+  isManager: boolean;
+  myTimeOff: any[];
+  pendingTimeOff: any[];
+  pendingSwaps: any[];
+  onRequestTimeOff: (data: { startDate: Date; endDate: Date; reason?: string }) => void;
+  onApproveTimeOff: (id: number) => void;
+  onDenyTimeOff: (id: number) => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [reason, setReason] = useState("");
+
+  const handleSubmit = () => {
+    if (!startDate || !endDate) { toast.error("Select both dates"); return; }
+    onRequestTimeOff({
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      reason: reason || undefined,
+    });
+    setShowForm(false);
+    setStartDate("");
+    setEndDate("");
+    setReason("");
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* My Requests */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="type-caption font-medium text-zinc-300">My Time Off Requests</p>
+          <button onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-1 text-amber-500 type-caption hover:text-amber-400 transition-colors">
+            <Plus size={14} /> Request
+          </button>
+        </div>
+
+        {showForm && (
+          <div className="surface-base p-4 rounded-xl mb-3 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="type-micro text-zinc-500 mb-1 block">Start Date</label>
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white type-caption" />
+              </div>
+              <div>
+                <label className="type-micro text-zinc-500 mb-1 block">End Date</label>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white type-caption" />
+              </div>
+            </div>
+            <div>
+              <label className="type-micro text-zinc-500 mb-1 block">Reason (optional)</label>
+              <input value={reason} onChange={e => setReason(e.target.value)} placeholder="Family event, appointment, etc."
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white type-caption placeholder:text-zinc-600" />
+            </div>
+            <button onClick={handleSubmit}
+              className="w-full py-2.5 rounded-lg bg-amber-500 text-black type-caption font-semibold hover:bg-amber-400 transition-colors active:scale-[0.98]">
+              Submit Request
+            </button>
+          </div>
+        )}
+
+        {myTimeOff.length === 0 ? (
+          <div className="surface-base p-6 rounded-xl text-center">
+            <p className="type-caption text-zinc-600">No time off requests</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {myTimeOff.map((req: any) => (
+              <div key={req.id} className="surface-base p-4 rounded-xl flex items-center justify-between">
+                <div>
+                  <p className="type-caption text-zinc-200">
+                    {new Date(req.startDate).toLocaleDateString()} – {new Date(req.endDate).toLocaleDateString()}
+                  </p>
+                  {req.reason && <p className="type-micro text-zinc-500 normal-case">{req.reason}</p>}
+                </div>
+                <span className={`type-micro px-2 py-1 rounded-full ${
+                  req.status === "approved" ? "bg-green-500/15 text-green-400" :
+                  req.status === "denied" ? "bg-red-500/15 text-red-400" :
+                  "bg-amber-500/10 text-amber-500"
+                }`}>{req.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Manager: Pending Approvals */}
+      {isManager && pendingTimeOff.length > 0 && (
+        <div>
+          <p className="type-caption font-medium text-zinc-300 mb-3">Pending Approvals ({pendingTimeOff.length})</p>
+          <div className="space-y-2">
+            {pendingTimeOff.map((req: any) => (
+              <div key={req.id} className="surface-base p-4 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="type-caption text-zinc-200 font-medium">Staff #{req.staffId}</p>
+                  <p className="type-micro text-zinc-500 normal-case">
+                    {new Date(req.startDate).toLocaleDateString()} – {new Date(req.endDate).toLocaleDateString()}
+                  </p>
+                </div>
+                {req.reason && <p className="type-caption text-zinc-500 mb-3">{req.reason}</p>}
+                <div className="flex gap-2">
+                  <button onClick={() => onApproveTimeOff(req.id)}
+                    className="flex-1 py-2 rounded-lg bg-green-500/15 text-green-400 type-caption font-medium hover:bg-green-500/25 transition-colors">
+                    <Check size={13} className="inline mr-1" />Approve
+                  </button>
+                  <button onClick={() => onDenyTimeOff(req.id)}
+                    className="flex-1 py-2 rounded-lg bg-red-500/15 text-red-400 type-caption font-medium hover:bg-red-500/25 transition-colors">
+                    <X size={13} className="inline mr-1" />Deny
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Add Shift Modal ────────────────────────────────────────────────────────
+function AddShiftModal({ allStaff, selectedDay, weekDates, createdBy, onClose, onSubmit, isPending }: {
+  allStaff: SafeStaff[];
+  selectedDay: Date | null;
+  weekDates: Date[];
+  createdBy: number;
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+  isPending: boolean;
+}) {
+  const [staffId, setStaffId] = useState<number>(allStaff[0]?.id || 0);
+  const [date, setDate] = useState(selectedDay?.toISOString().split("T")[0] || weekDates[0].toISOString().split("T")[0]);
+  const [startTime, setStartTime] = useState("11:00");
+  const [endTime, setEndTime] = useState("19:00");
+  const [position, setPosition] = useState("");
+  const [department, setDepartment] = useState<string>("");
+
+  const handleSubmit = () => {
+    if (!staffId || !date || !startTime || !endTime) { toast.error("Fill required fields"); return; }
+    onSubmit({
+      staffId,
+      date: new Date(date + "T00:00:00"),
+      startTime,
+      endTime,
+      position: position || undefined,
+      department: (department || undefined) as any,
+      createdBy,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center" onClick={onClose}>
+      <div className="w-full max-w-md bg-zinc-900 rounded-t-2xl p-6 space-y-4 screen-enter" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="type-heading text-white">Add Shift</h3>
+          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors"><X size={20} /></button>
+        </div>
+
+        <div>
+          <label className="type-micro text-zinc-500 mb-1 block">Staff Member</label>
+          <select value={staffId} onChange={e => setStaffId(Number(e.target.value))}
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption">
+            {allStaff.filter(s => s.status === "active").map(s => (
+              <option key={s.id} value={s.id}>{s.firstName} {s.lastName || ""} — {s.department}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="type-micro text-zinc-500 mb-1 block">Date</label>
+          <select value={date} onChange={e => setDate(e.target.value)}
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption">
+            {weekDates.map(d => (
+              <option key={d.toISOString()} value={d.toISOString().split("T")[0]}>
+                {d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">Start Time</label>
+            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption" />
+          </div>
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">End Time</label>
+            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">Position (optional)</label>
+            <input value={position} onChange={e => setPosition(e.target.value)} placeholder="Bar, Grill, Register..."
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption placeholder:text-zinc-600" />
+          </div>
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">Department</label>
+            <select value={department} onChange={e => setDepartment(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption">
+              <option value="">Auto</option>
+              {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <button onClick={handleSubmit} disabled={isPending}
+          className="w-full py-3 rounded-xl bg-amber-500 text-black font-semibold type-body hover:bg-amber-400 transition-colors active:scale-[0.98] disabled:opacity-50">
+          {isPending ? <Loader2 size={16} className="animate-spin mx-auto" /> : "Add Shift"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Edit Shift Modal ───────────────────────────────────────────────────────
+function EditShiftModal({ shift, allStaff, onClose, onSubmit, isPending }: {
+  shift: any;
+  allStaff: SafeStaff[];
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+  isPending: boolean;
+}) {
+  if (!shift) return null;
+
+  const [startTime, setStartTime] = useState(shift.startTime);
+  const [endTime, setEndTime] = useState(shift.endTime);
+  const [position, setPosition] = useState(shift.position || "");
+  const [status, setStatus] = useState(shift.status);
+
+  const handleSubmit = () => {
+    onSubmit({
+      id: shift.id,
+      startTime,
+      endTime,
+      position: position || undefined,
+      status,
+    });
+  };
+
+  const staff = allStaff.find(s => s.id === shift.staffId);
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center" onClick={onClose}>
+      <div className="w-full max-w-md bg-zinc-900 rounded-t-2xl p-6 space-y-4 screen-enter" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="type-heading text-white">Edit Shift</h3>
+          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors"><X size={20} /></button>
+        </div>
+
+        <div className="surface-base p-3 rounded-lg">
+          <p className="type-caption text-zinc-300 font-medium">{staff ? `${staff.firstName} ${staff.lastName || ""}`.trim() : `Staff #${shift.staffId}`}</p>
+          <p className="type-micro text-zinc-500 normal-case">{new Date(shift.date).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">Start Time</label>
+            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption" />
+          </div>
+          <div>
+            <label className="type-micro text-zinc-500 mb-1 block">End Time</label>
+            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption" />
+          </div>
+        </div>
+
+        <div>
+          <label className="type-micro text-zinc-500 mb-1 block">Position</label>
+          <input value={position} onChange={e => setPosition(e.target.value)} placeholder="Bar, Grill, Register..."
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption placeholder:text-zinc-600" />
+        </div>
+
+        <div>
+          <label className="type-micro text-zinc-500 mb-1 block">Status</label>
+          <select value={status} onChange={e => setStatus(e.target.value)}
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white type-caption">
+            <option value="scheduled">Scheduled</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="no_show">No Show</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <button onClick={handleSubmit} disabled={isPending}
+          className="w-full py-3 rounded-xl bg-amber-500 text-black font-semibold type-body hover:bg-amber-400 transition-colors active:scale-[0.98] disabled:opacity-50">
+          {isPending ? <Loader2 size={16} className="animate-spin mx-auto" /> : "Save Changes"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Weekly Hours Report (Manager) ─────────────────────────────────────────
+function WeeklyHoursReport({ allStaff }: { allStaff: SafeStaff[] }) {
+  const hoursQuery = trpc.timeClock.allWeeklyHours.useQuery();
+  const activeQuery = trpc.timeClock.allActive.useQuery();
+
+  const hoursData = hoursQuery.data ?? [];
+  const activeClocks = activeQuery.data ?? [];
+
+  // Merge hours data with staff names
+  const staffHours = useMemo(() => {
+    const result = allStaff.map(s => {
+      const hours = hoursData.find(h => h.staffId === s.id);
+      const isActive = activeClocks.some((c: any) => c.staffId === s.id);
+      return {
+        ...s,
+        totalHours: hours?.totalHours ?? 0,
+        overtime: hours?.overtime ?? 0,
+        shifts: hours?.shifts ?? 0,
+        isActive,
+      };
+    });
+    // Sort by hours descending
+    return result.sort((a, b) => b.totalHours - a.totalHours);
+  }, [allStaff, hoursData, activeClocks]);
+
+  const totalLabor = staffHours.reduce((sum, s) => sum + s.totalHours, 0);
+  const totalOvertime = staffHours.reduce((sum, s) => sum + s.overtime, 0);
+  const activeClockedIn = staffHours.filter(s => s.isActive).length;
+
+  if (hoursQuery.isLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3, 4, 5].map(i => (
+          <div key={i} className="h-16 rounded-xl bg-zinc-900 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="surface-base rounded-xl p-3 text-center">
+          <p className="type-micro text-zinc-500">Total Hours</p>
+          <p className="type-heading text-white">{totalLabor.toFixed(1)}</p>
+        </div>
+        <div className={`surface-base rounded-xl p-3 text-center ${totalOvertime > 0 ? "border border-red-500/30" : ""}`}>
+          <p className="type-micro text-zinc-500">Overtime</p>
+          <p className={`type-heading ${totalOvertime > 0 ? "text-red-400" : "text-white"}`}>{totalOvertime.toFixed(1)}</p>
+        </div>
+        <div className="surface-base rounded-xl p-3 text-center">
+          <p className="type-micro text-zinc-500">Clocked In</p>
+          <p className="type-heading text-green-400">{activeClockedIn}</p>
+        </div>
+      </div>
+
+      {/* Staff List */}
+      <div className="space-y-2">
+        {staffHours.map(s => {
+          const pct = Math.min(100, (s.totalHours / 40) * 100);
+          const isOvertime = s.overtime > 0;
+          const isApproaching = s.totalHours >= 35 && !isOvertime;
+
+          return (
+            <div key={s.id} className="surface-base rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center type-micro font-bold ${
+                    s.isActive ? "bg-green-500/20 text-green-400" : "bg-zinc-800 text-zinc-400"
+                  }`}>
+                    {s.firstName[0]}
+                  </div>
+                  <div>
+                    <p className="type-caption text-white font-medium">{s.firstName} {s.lastName}</p>
+                    <p className="type-micro text-zinc-500">{s.shifts} shifts • {s.department}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`type-body font-semibold ${isOvertime ? "text-red-400" : isApproaching ? "text-amber-400" : "text-white"}`}>
+                    {s.totalHours.toFixed(1)}h
+                  </p>
+                  {isOvertime && (
+                    <p className="type-micro text-red-400 flex items-center gap-1">
+                      <AlertTriangle size={10} /> +{s.overtime.toFixed(1)} OT
+                    </p>
+                  )}
+                  {isApproaching && (
+                    <p className="type-micro text-amber-400">Approaching 40</p>
+                  )}
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    isOvertime ? "bg-red-500" : isApproaching ? "bg-amber-500" : "bg-amber-500/60"
+                  }`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+
+        {staffHours.length === 0 && (
+          <div className="text-center py-12">
+            <Clock className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
+            <p className="type-caption text-zinc-500">No hours logged this week</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ─── Template Modal ──────────────────────────────────────────────────────────
+function TemplateModal({ templates, weekStart, createdBy, onSave, onApply, onDelete, onClose, isSaving, isApplying }: {
+  templates: any[];
+  weekStart: Date;
+  createdBy: number;
+  onSave: (name: string) => void;
+  onApply: (templateName: string) => void;
+  onDelete: (name: string) => void;
+  onClose: () => void;
+  isSaving: boolean;
+  isApplying: boolean;
+}) {
+  const [newName, setNewName] = useState("");
+  const [mode, setMode] = useState<"list" | "save">("list");
+
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-zinc-800 flex items-center justify-between">
+          <h3 className="type-heading text-white">Schedule Templates</h3>
+          <button onClick={onClose} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* Toggle */}
+          <div className="flex gap-2">
+            <button onClick={() => setMode("list")}
+              className={`flex-1 py-2 rounded-lg type-caption font-medium transition-colors ${mode === "list" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" : "text-zinc-500 hover:text-zinc-300 bg-zinc-800"}`}>
+              Apply Template
+            </button>
+            <button onClick={() => setMode("save")}
+              className={`flex-1 py-2 rounded-lg type-caption font-medium transition-colors ${mode === "save" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" : "text-zinc-500 hover:text-zinc-300 bg-zinc-800"}`}>
+              Save Current Week
+            </button>
+          </div>
+
+          {mode === "list" && (
+            <div className="space-y-2">
+              {templates.length === 0 ? (
+                <div className="text-center py-8">
+                  <Save size={32} className="text-zinc-700 mx-auto mb-3" />
+                  <p className="type-caption text-zinc-500">No templates saved yet</p>
+                  <p className="type-micro text-zinc-600 mt-1">Save this week's schedule as a template to reuse it later</p>
+                </div>
+              ) : (
+                templates.map((t: any) => (
+                  <div key={t.id} className="surface-base rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                      <p className="type-caption text-white font-medium">{t.name}</p>
+                      <p className="type-micro text-zinc-500">{t.shiftCount} shifts • Created {new Date(t.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => onApply(t.name)} disabled={isApplying}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500 text-black type-micro font-semibold hover:bg-amber-400 transition-colors disabled:opacity-50">
+                        {isApplying ? <Loader2 size={12} className="animate-spin" /> : "Apply"}
+                      </button>
+                      <button onClick={() => onDelete(t.name)}
+                        className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {mode === "save" && (
+            <div className="space-y-4">
+              <div>
+                <label className="type-micro text-zinc-400 block mb-2">Template Name</label>
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="e.g., Typical Week, Summer Schedule, Holiday Coverage"
+                  className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white type-caption placeholder:text-zinc-600 focus:border-amber-500/50 focus:outline-none"
+                />
+              </div>
+              <p className="type-micro text-zinc-500">
+                This will save all shifts from the current week ({weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })}) as a reusable template.
+              </p>
+              <button onClick={() => { if (newName.trim()) onSave(newName.trim()); }} disabled={!newName.trim() || isSaving}
+                className="w-full py-3 rounded-xl bg-amber-500 text-black type-caption font-semibold hover:bg-amber-400 transition-colors disabled:opacity-50 active:scale-[0.98]">
+                {isSaving ? <Loader2 size={16} className="animate-spin mx-auto" /> : "Save as Template"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Labor Dashboard ──────────────────────────────────────────────────────────
+function LaborDashboard({ data, isLoading, onClose }: {
+  data: any;
+  isLoading: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-zinc-800 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <DollarSign size={20} className="text-emerald-400" />
+            </div>
+            <div>
+              <h3 className="type-heading text-white">Labor Dashboard</h3>
+              <p className="type-micro text-zinc-500">Cost breakdown this week</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-20 rounded-xl bg-zinc-800 animate-pulse" />)}
+            </div>
+          ) : !data ? (
+            <div className="text-center py-12">
+              <BarChart3 size={40} className="text-zinc-700 mx-auto mb-4" />
+              <p className="type-caption text-zinc-500">No labor data available for this week</p>
+            </div>
+          ) : (
+            <>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="surface-base rounded-xl p-4 text-center">
+                  <p className="type-micro text-zinc-500">Total Labor Cost</p>
+                  <p className="type-display text-emerald-400">${data.totalCost?.toFixed(0) ?? "0"}</p>
+                </div>
+                <div className="surface-base rounded-xl p-4 text-center">
+                  <p className="type-micro text-zinc-500">Total Hours</p>
+                  <p className="type-display text-white">{data.totalHours?.toFixed(1) ?? "0"}</p>
+                </div>
+                <div className="surface-base rounded-xl p-4 text-center">
+                  <p className="type-micro text-zinc-500">Avg $/Hour</p>
+                  <p className="type-heading text-white">${data.avgRate?.toFixed(2) ?? "0"}</p>
+                </div>
+                <div className={`surface-base rounded-xl p-4 text-center ${data.laborPct > 30 ? "border border-red-500/30" : ""}`}>
+                  <p className="type-micro text-zinc-500">Labor %</p>
+                  <p className={`type-heading ${data.laborPct > 30 ? "text-red-400" : data.laborPct > 25 ? "text-amber-400" : "text-green-400"}`}>
+                    {data.laborPct?.toFixed(1) ?? "—"}%
+                  </p>
+                </div>
+              </div>
+
+              {/* Department Breakdown */}
+              {data.byDepartment && data.byDepartment.length > 0 && (
+                <div>
+                  <h4 className="type-caption text-zinc-300 font-semibold mb-3">By Department</h4>
+                  <div className="space-y-2">
+                    {data.byDepartment.map((dept: any) => (
+                      <div key={dept.department} className="surface-base rounded-xl p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-8 rounded-full bg-amber-500/60" />
+                          <div>
+                            <p className="type-caption text-white capitalize">{dept.department.replace("_", " ")}</p>
+                            <p className="type-micro text-zinc-500">{dept.shifts} shifts • {dept.hours.toFixed(1)}h</p>
+                          </div>
+                        </div>
+                        <p className="type-body text-white font-semibold">${dept.cost.toFixed(0)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Daily Breakdown */}
+              {data.byDay && data.byDay.length > 0 && (
+                <div>
+                  <h4 className="type-caption text-zinc-300 font-semibold mb-3">By Day</h4>
+                  <div className="space-y-1.5">
+                    {data.byDay.map((day: any) => {
+                      const maxCost = Math.max(...data.byDay.map((d: any) => d.cost));
+                      const pct = maxCost > 0 ? (day.cost / maxCost) * 100 : 0;
+                      return (
+                        <div key={day.day} className="flex items-center gap-3">
+                          <span className="type-micro text-zinc-500 w-10">{day.day}</span>
+                          <div className="flex-1 h-6 bg-zinc-800 rounded-lg overflow-hidden relative">
+                            <div className="h-full bg-amber-500/30 rounded-lg transition-all" style={{ width: `${pct}%` }} />
+                            <span className="absolute inset-0 flex items-center px-2 type-micro text-zinc-300">
+                              {day.hours.toFixed(1)}h • ${day.cost.toFixed(0)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Overtime Alert */}
+              {data.overtimeStaff && data.overtimeStaff.length > 0 && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle size={14} className="text-red-400" />
+                    <span className="type-caption text-red-400 font-semibold">Overtime Alert</span>
+                  </div>
+                  <div className="space-y-1">
+                    {data.overtimeStaff.map((s: any) => (
+                      <p key={s.name} className="type-micro text-red-300/80">
+                        {s.name}: {s.hours.toFixed(1)}h ({(s.hours - 40).toFixed(1)}h overtime = +${((s.hours - 40) * s.rate * 0.5).toFixed(0)} extra)
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
