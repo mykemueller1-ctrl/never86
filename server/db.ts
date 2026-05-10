@@ -672,38 +672,43 @@ export async function searchKnowledge(query: string, station?: string, limit = 2
   const db = await getDb();
   if (!db) return [];
   
-  // Stop words that match too broadly
-  const stopWords = new Set(['what', 'how', 'when', 'where', 'why', 'who', 'which', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'it', 'this', 'that', 'my', 'our', 'we', 'i', 'me', 'you', 'can', 'should', 'would', 'could']);
+  // Only filter truly meaningless filler words — keep question words like "how", "what", "where"
+  // because they are part of the stored Q&A format (e.g. "How do I..." matches stored questions)
+  const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+    'of', 'with', 'by', 'it', 'this', 'that', 'my', 'our', 'we', 'i', 'me', 'you']);
   
-  // Split query into keywords, remove stop words for individual matching
-  const allWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+  const fullQuery = query.toLowerCase().trim();
+  const allWords = fullQuery.split(/\s+/).filter(w => w.length >= 2);
   const contentWords = allWords.filter(w => !stopWords.has(w));
-  // If all words are stop words, use all words anyway
   const words = contentWords.length > 0 ? contentWords : allWords;
-  const fullQuery = query.toLowerCase();
-  
+
   // Generate search term variants (handle apostrophes, common abbreviations)
   const variants: string[] = [];
   for (const word of words) {
     variants.push(word);
-    // Add apostrophe variants: 86d -> 86'd, 86'd -> 86d
     if (!word.includes("'")) variants.push(word.replace(/(\d)([a-z])/g, "$1'$2"));
     if (word.includes("'")) variants.push(word.replace(/'/g, ''));
   }
+
+  // Also add bigrams (two-word phrases) for better phrase matching
+  for (let i = 0; i < words.length - 1; i++) {
+    variants.push(`${words[i]} ${words[i + 1]}`);
+  }
+
   const uniqueVariants = Array.from(new Set(variants));
-  
-  // Build search conditions - match full query OR any keyword/variant
-  const searchTerms = [fullQuery, ...uniqueVariants.slice(0, 8)];
-  
-  // Use drizzle's sql template for reliable execution
-  const searchConditions = searchTerms.map(term => 
+
+  // Build search conditions — match full query OR any keyword/variant/bigram
+  // Use up to 15 terms (up from 8) for broader coverage
+  const searchTerms = [fullQuery, ...uniqueVariants.slice(0, 15)];
+
+  const searchConditions = searchTerms.map(term =>
     or(
       sql`LOWER(${knowledgeEntries.question}) LIKE ${'%' + term + '%'}`,
       sql`LOWER(${knowledgeEntries.answer}) LIKE ${'%' + term + '%'}`,
       sql`LOWER(COALESCE(JSON_UNQUOTE(${knowledgeEntries.tags}), '')) LIKE ${'%' + term + '%'}`
     )
   );
-  
+
   const conditions: any[] = [or(...searchConditions)!];
   if (station && station !== "general") {
     conditions.push(

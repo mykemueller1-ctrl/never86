@@ -886,3 +886,15 @@
 - [x] Redirect old "Photo Missions" screen to new "Photo Intel" screen in CTapHub
 - [x] Remove Photo Missions QuickAction button (replaced by Photo Intel)
 - [x] Save checkpoint
+
+## Codebase Unification — May 2026
+- [ ] Remove ComponentShowcase.tsx (dev-only testing page, not needed in production)
+- [ ] Fix Ask AI Brain — searchKnowledge stop words too aggressive, missing results
+- [ ] Fix Ask AI Brain — LLM system prompt double semicolon syntax artifact on line 665
+- [ ] Fix Ask AI Brain — auth errors on initial page load (queries fire before session)
+- [ ] Fix Ask AI Brain — suggested questions fire before station auto-detect completes
+- [ ] Improve Ask AI Brain — better fallback when no knowledge entries match
+- [ ] Remove dead seed scripts superseded by later waves
+- [ ] Verify all imports clean after removals
+- [ ] Build passes with zero errors
+- [ ] Push clean unified codebase to GitHub

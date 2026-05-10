@@ -59,8 +59,19 @@ interface ChatMessage {
   entryId?: number;
 }
 
+function detectStation(dept: string | undefined): Station {
+  if (dept === "bar") return "bar";
+  if (dept === "kitchen_line") return "fry_line";
+  if (dept === "pizza_side") return "pizza_line";
+  if (dept === "dining_room") return "waitstaff";
+  if (dept === "dishwasher") return "dish_pit";
+  return "general";
+}
+
 export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeStaff; onBack: () => void }) {
-  const [station, setStation] = useState<Station | null>(null);
+  // Compute initial station synchronously so suggested questions work on first render
+  const [station, setStation] = useState<Station>(() => detectStation(staffUser.department));
+  const [showStationPicker, setShowStationPicker] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isAsking, setIsAsking] = useState(false);
@@ -77,16 +88,10 @@ export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeS
     }
   }, [messages]);
 
-  // Auto-detect station from department
+  // Re-sync station if staffUser changes (e.g. after auth refresh)
   useEffect(() => {
-    if (staffUser.department === "bar") setStation("bar");
-    else if (staffUser.department === "kitchen_line") setStation("fry_line");
-    else if (staffUser.department === "pizza_side") setStation("pizza_line");
-    else if (staffUser.department === "dining_room") setStation("waitstaff");
-    else if (staffUser.department === "dishwasher") setStation("dish_pit");
-    else if (staffUser.department === "driver") setStation("general");
-    else setStation("general");
-  }, [staffUser]);
+    setStation(detectStation(staffUser.department));
+  }, [staffUser.department]);
 
   const handleSend = async (question?: string) => {
     const q = question || input.trim();
@@ -107,10 +112,13 @@ export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeS
         station: result.station,
         sourcesUsed: result.sourcesUsed,
       }]);
-    } catch (err) {
+    } catch (err: any) {
+      const isAuthError = err?.message?.includes('UNAUTHORIZED') || err?.data?.code === 'UNAUTHORIZED';
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "Sorry, I couldn't find an answer right now. Try asking a manager.",
+        content: isAuthError
+          ? "Session expired — please log back in and try again."
+          : "Couldn't reach the brain right now. Check your connection or ask a manager.",
       }]);
     } finally {
       setIsAsking(false);
@@ -138,12 +146,12 @@ export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeS
   const hour = new Date().getHours();
   const timeContext = hour < 11 ? "morning prep" : hour < 14 ? "lunch rush" : hour < 17 ? "afternoon" : hour < 21 ? "dinner rush" : "closing";
 
-  // Station picker
-  if (!station) {
+  // Station picker overlay (shown when user taps the station label)
+  if (showStationPicker) {
     return (
       <div className="h-screen bg-black flex flex-col">
         <div className="p-4 flex items-center gap-3 border-b border-zinc-900">
-          <button onClick={onBack} className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center">
+          <button onClick={() => setShowStationPicker(false)} className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center">
             <ChevronLeft size={14} className="text-zinc-400" />
           </button>
           <div>
@@ -153,7 +161,9 @@ export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeS
         </div>
         <div className="p-4 grid grid-cols-2 gap-3">
           {(Object.entries(STATION_CONFIG) as [Station, typeof STATION_CONFIG[Station]][]).map(([key, cfg]) => (
-            <button key={key} onClick={() => setStation(key)} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/30 transition-all">
+            <button key={key} onClick={() => { setStation(key as Station); setShowStationPicker(false); }} className={`flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border transition-all ${
+              station === key ? 'border-amber-500' : 'border-zinc-800 hover:border-amber-500/30'
+            }`}>
               <div className={`w-10 h-10 rounded-lg ${cfg.bg} flex items-center justify-center`}>
                 <cfg.icon size={18} className={cfg.color} />
               </div>
@@ -177,7 +187,7 @@ export default function KnowledgeBrain({ staffUser, onBack }: { staffUser: SafeS
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-black text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>KNOWLEDGE BRAIN</h1>
           <div className="flex items-center gap-2 text-[10px]">
-            <button onClick={() => setStation(null)} className="flex items-center gap-1 text-amber-500 hover:text-amber-400">
+            <button onClick={() => setShowStationPicker(true)} className="flex items-center gap-1 text-amber-500 hover:text-amber-400">
               <MapPin size={8} />{stationCfg.label} ▾
             </button>
             <span className="text-zinc-600">·</span>

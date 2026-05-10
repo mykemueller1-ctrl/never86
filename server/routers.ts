@@ -648,7 +648,7 @@ export const appRouter = router({
 - Talking to: ${staffName}
 
 ## KNOWLEDGE BASE (TRUST THESE — they are verified facts about THIS restaurant)
-${knowledgeContext || "No specific entries matched. Use your general restaurant knowledge but note you're less certain."}
+${knowledgeContext || `No specific knowledge entries matched this exact question. However, you still know this restaurant deeply — use your expertise about Community Tap & Pizza in Fort Dodge, Iowa to give the best answer you can. If you genuinely don't know, say "I don't have that one locked in — grab a manager" rather than guessing.`}
 
 ${memoryContext ? `## RECENT MEMORIES\n${memoryContext}` : ""}
 ${salesContext ? `## SALES DATA\n${salesContext}` : ""}
@@ -662,7 +662,7 @@ ${salesContext ? `## SALES DATA\n${salesContext}` : ""}
 6. For sales questions: reference the actual numbers from sales data above
 7. Keep it SHORT — 2-4 sentences max unless they ask for a full recipe/procedure
 8. If multiple entries are relevant, synthesize them into one clear answer
-9. For food safety: give the exact temp/time from our knowledge, never guess`;;
+9. For food safety: give the exact temp/time from our knowledge, never guess`;
 
       const response = await invokeLLM({
         messages: [
@@ -671,7 +671,13 @@ ${salesContext ? `## SALES DATA\n${salesContext}` : ""}
         ],
       });
 
-      const answer = response.choices?.[0]?.message?.content || "I don't have that in my brain yet. Ask a manager or tell them to add it.";
+      // Extract answer — handle both standard and thinking-model response formats
+      const rawAnswer = response.choices?.[0]?.message?.content
+        || (response.choices?.[0]?.message as any)?.text
+        || null;
+      const answer = rawAnswer && rawAnswer.trim().length > 0
+        ? rawAnswer.trim()
+        : "I don't have that one locked in right now — grab a manager or ask them to add it to the brain.";
       return { answer, sourcesUsed: relevantKnowledge.length, station: input.station || "general" };
     }),
     // Submit a correction to a knowledge entry
