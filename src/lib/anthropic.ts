@@ -1,11 +1,35 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { parseModelJson } from './json';
+import type { InvoiceLineItem } from '../db/schema';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
+export type ParsedInvoice = {
+  vendorName: string | null;
+  invoiceNumber: string | null;
+  invoiceDate: string | null;
+  totalAmount: number | null;
+  category: string | null;
+  lineItems: InvoiceLineItem[] | null;
+};
+
+export type ParsedZReport = {
+  reportDate: string | null;
+  grossSales: number | null;
+  netSales: number | null;
+  foodSales: number | null;
+  liquorSales: number | null;
+  beerSales: number | null;
+  wineSales: number | null;
+  laborCost: number | null;
+  guestCount: number | null;
+  checkAverage: number | null;
+};
+
 // ── Invoice OCR ──
-export async function parseInvoice(text: string) {
+export async function parseInvoice(text: string): Promise<ParsedInvoice> {
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
@@ -41,13 +65,13 @@ ${text}`,
 
   const content = response.content[0];
   if (content.type === 'text') {
-    return JSON.parse(content.text);
+    return parseModelJson<ParsedInvoice>(content.text);
   }
   throw new Error('Unexpected response format');
 }
 
 // ── Z-Report Processing ──
-export async function parseZReport(text: string) {
+export async function parseZReport(text: string): Promise<ParsedZReport> {
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
@@ -80,12 +104,7 @@ ${text}`,
 
   const content = response.content[0];
   if (content.type === 'text') {
-    const data = JSON.parse(content.text);
-    // Calculate cost percentages
-    if (data.foodSales && data.netSales) {
-      // Food cost % requires COGS from invoices — placeholder for now
-    }
-    return data;
+    return parseModelJson<ParsedZReport>(content.text);
   }
   throw new Error('Unexpected response format');
 }
