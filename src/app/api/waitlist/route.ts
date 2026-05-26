@@ -3,14 +3,7 @@ import { db } from '@/db';
 import { waitlist } from '@/db/schema';
 import { sendWelcomeEmail, sendNotification } from '@/lib/email';
 import { eq } from 'drizzle-orm';
-import { z } from 'zod';
-
-const waitlistInput = z.object({
-  email: z.string().email(),
-  name: z.string().optional(),
-  restaurantName: z.string().optional(),
-  role: z.string().optional(),
-});
+import { waitlistInput } from '@/lib/validation';
 
 // POST /api/waitlist — Join the waitlist
 export async function POST(req: NextRequest) {
