@@ -15,7 +15,9 @@ export async function POST(req: Request) {
     );
   }
 
-  if (password !== expected) {
+  const a = crypto.createHash('sha256').update(password).digest();
+  const b = crypto.createHash('sha256').update(expected).digest();
+  if (!crypto.timingSafeEqual(a, b)) {
     return NextResponse.json({ success: false, error: 'Incorrect password.' }, { status: 401 });
   }
 

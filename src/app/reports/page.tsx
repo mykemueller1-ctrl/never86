@@ -1,37 +1,74 @@
 import Link from 'next/link';
+import { listReportableOperators } from '@/lib/toastReports';
+import { opsDbConfigured } from '@/lib/opsDb';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export const metadata = {
   title: "Reports | Never 86'd",
   description: 'Operator reports.',
 };
 
-const reports = [
-  {
-    href: '/reports/taco-bamba',
-    title: 'Taco Bamba',
-    detail: '16 locations · live Toast net sales',
-  },
-];
+const usd = (n: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
-export default function ReportsIndex() {
+// Operator 3 keeps its friendly URL; everyone else uses /reports/o/[id].
+function hrefFor(operatorId: number) {
+  return operatorId === 3 ? '/reports/taco-bamba' : `/reports/o/${operatorId}`;
+}
+
+function nameFor(operatorId: number, name: string) {
+  return operatorId === 3 ? 'Taco Bamba' : name;
+}
+
+export default async function ReportsIndex() {
+  let operators: Awaited<ReturnType<typeof listReportableOperators>> = [];
+  let connected = opsDbConfigured();
+  if (connected) {
+    try {
+      operators = await listReportableOperators();
+    } catch {
+      connected = false;
+    }
+  }
+
   return (
     <main className="min-h-screen bg-dark-800 px-6 py-12">
       <div className="max-w-2xl mx-auto">
         <p className="text-dark-300 text-sm uppercase tracking-wider mb-1">Never 86&apos;d</p>
         <h1 className="text-4xl font-bold text-gold-500 mb-8">Reports</h1>
 
-        <div className="space-y-3">
-          {reports.map((r) => (
-            <Link
-              key={r.href}
-              href={r.href}
-              className="block bg-dark-700 hover:border-gold-500 border border-dark-600 rounded-xl p-5 transition-colors"
-            >
-              <p className="text-white font-semibold text-lg">{r.title}</p>
-              <p className="text-dark-300 text-sm">{r.detail}</p>
-            </Link>
-          ))}
-        </div>
+        {!connected ? (
+          <div className="bg-dark-700 border border-dark-600 rounded-xl p-6">
+            <p className="text-white font-semibold mb-2">Not connected to the ops database yet.</p>
+            <p className="text-dark-300 text-sm">
+              Set <code className="text-gold-300">OPS_DATABASE_URL</code> in Vercel, then redeploy.
+            </p>
+          </div>
+        ) : operators.length === 0 ? (
+          <p className="text-dark-300">No operators with Toast data yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {operators.map((op) => (
+              <Link
+                key={op.operatorId}
+                href={hrefFor(op.operatorId)}
+                className="block bg-dark-700 hover:border-gold-500 border border-dark-600 rounded-xl p-5 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-white font-semibold text-lg">{nameFor(op.operatorId, op.name)}</p>
+                    <p className="text-dark-300 text-sm">
+                      {op.locations} location{op.locations === 1 ? '' : 's'} · live Toast net sales
+                    </p>
+                  </div>
+                  <p className="text-gold-300 font-semibold tabular-nums">{usd(op.netSales)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
