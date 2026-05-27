@@ -15,24 +15,24 @@ export function opsDbConfigured(): boolean {
   return Boolean(process.env.OPS_DATABASE_URL);
 }
 
-// Normalize whatever is in OPS_DATABASE_URL into a Supavisor transaction-pooler
-// URL that actually connects from Vercel. Two failure modes we route around:
-//   - db.<ref>.supabase.co  -> IPv6-only, getaddrinfo ENOTFOUND from Vercel
-//   - aws-0-<region>.pooler -> resolves but returns "Tenant or user not found"
-//     (this project's tenant is served by the aws-1 node)
-// We pull the project ref (from the direct host OR the postgres.<ref> username)
-// and the password out of whatever is configured, then rebuild the canonical
-// pooler URL. Host/region overridable via OPS_DB_POOLER_HOST / OPS_DB_REGION.
+// Verified working endpoint for this project (confirmed empirically via the
+// /api/ops-health probe): the aws-1 Supavisor transaction pooler with user
+// postgres.<ref>. The configured OPS_DATABASE_URL only needs to carry the
+// correct PASSWORD — we always rebuild the host + username to the known-good
+// values, so a mangled host or a stripped project ref can't break the
+// connection. Host/ref overridable via OPS_DB_POOLER_HOST / OPS_DB_REF.
 function normalizeOpsUrl(raw: string): string {
   try {
-    const u = new URL(raw);
-    const fromHost = u.hostname.match(/^db\.([a-z0-9]+)\.supabase\.co$/i);
-    const fromUser = u.username.match(/^postgres\.([a-z0-9]+)$/i);
-    const ref = fromHost?.[1] ?? fromUser?.[1];
-    if (!ref) return raw; // not a recognizable Supabase URL — use as configured
-    const region = process.env.OPS_DB_REGION || 'us-east-1';
-    const host = process.env.OPS_DB_POOLER_HOST || `aws-1-${region}.pooler.supabase.com`;
-    return `postgresql://postgres.${ref}:${u.password}@${host}:6543/postgres`;
+    let pwd = '';
+    try { pwd = new URL(raw).password; } catch { /* malformed */ }
+    if (!pwd) {
+      const m = raw.match(/:\/\/[^:@/]+:([^@]+)@/);
+      if (m) pwd = m[1];
+    }
+    if (!pwd) return raw;
+    const ref = process.env.OPS_DB_REF || 'zjtbhsouhwyyfwoyjgow';
+    const host = process.env.OPS_DB_POOLER_HOST || 'aws-1-us-east-1.pooler.supabase.com';
+    return `postgresql://postgres.${ref}:${pwd}@${host}:6543/postgres`;
   } catch {
     return raw;
   }
