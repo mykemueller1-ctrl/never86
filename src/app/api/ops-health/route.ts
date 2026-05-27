@@ -4,10 +4,12 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-// Diagnostic: try every plausible Supabase connection from inside Vercel and
-// report which one actually connects. Returns hosts + ok/error only — never the
-// password and never any operator data. Temporary; remove once the live string
-// is confirmed.
+// Diagnostic: report what OPS_DATABASE_URL is set to (password masked) and probe
+// candidate Supabase pooler endpoints to find which one actually connects.
+// Password comes from the env var, or a ?pw= override for testing. Returns only
+// connection results — never the password, never operator data. Temporary.
+const REF = 'zjtbhsouhwyyfwoyjgow';
+
 async function probe(label: string, url: string) {
   const sql = postgres(url, { ssl: 'require', prepare: false, max: 1, idle_timeout: 1, connect_timeout: 5 });
   const t0 = Date.now();
@@ -21,21 +23,27 @@ async function probe(label: string, url: string) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const raw = process.env.OPS_DATABASE_URL || '';
-  let ref = '';
-  let pwd = '';
+  let pUser = '', pHost = '', pPort = '', envPwd = '';
   try {
     const u = new URL(raw);
-    ref = u.hostname.match(/^db\.([a-z0-9]+)\.supabase\.co$/i)?.[1] || (u.username.includes('.') ? u.username.split('.')[1] : '');
-    pwd = u.password;
-  } catch { /* ignore */ }
-
-  if (!ref || !pwd) {
-    return Response.json({ ok: false, reason: 'could not parse ref/password from OPS_DATABASE_URL', hasUrl: Boolean(raw) });
+    pUser = u.username; pHost = u.hostname; pPort = u.port; envPwd = decodeURIComponent(u.password);
+  } catch { /* malformed */ }
+  if (!envPwd) {
+    const m = raw.match(/:\/\/[^:@/]+:([^@]+)@/);
+    if (m) { try { envPwd = decodeURIComponent(m[1]); } catch { envPwd = m[1]; } }
   }
+  const ref = pHost.match(/^db\.([a-z0-9]+)\.supabase\.co$/i)?.[1]
+    || (pUser.includes('.') ? pUser.split('.')[1] : '')
+    || REF;
 
-  const enc = encodeURIComponent(decodeURIComponent(pwd));
+  const configured = { user: pUser, host: pHost, port: pPort, hasEnvPwd: Boolean(envPwd) };
+
+  const pwd = new URL(request.url).searchParams.get('pw') || envPwd;
+  if (!pwd) return Response.json({ ok: false, reason: 'no password available', configured });
+
+  const enc = encodeURIComponent(pwd);
   const candidates: { label: string; url: string }[] = [
     { label: 'as-configured', url: raw },
     { label: 'aws-0 tx 6543', url: `postgresql://postgres.${ref}:${enc}@aws-0-us-east-1.pooler.supabase.com:6543/postgres` },
@@ -45,6 +53,5 @@ export async function GET() {
   ];
 
   const results = await Promise.all(candidates.map((c) => probe(c.label, c.url)));
-  const winner = results.find((r) => r.ok)?.label ?? null;
-  return Response.json({ ref, winner, results });
+  return Response.json({ ref, configured, winner: results.find((r) => r.ok)?.label ?? null, results });
 }
