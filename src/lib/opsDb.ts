@@ -15,6 +15,29 @@ export function opsDbConfigured(): boolean {
   return Boolean(process.env.OPS_DATABASE_URL);
 }
 
+// Verified working endpoint for this project (confirmed empirically via the
+// /api/ops-health probe): the aws-1 Supavisor transaction pooler with user
+// postgres.<ref>. The configured OPS_DATABASE_URL only needs to carry the
+// correct PASSWORD — we always rebuild the host + username to the known-good
+// values, so a mangled host or a stripped project ref can't break the
+// connection. Host/ref overridable via OPS_DB_POOLER_HOST / OPS_DB_REF.
+function normalizeOpsUrl(raw: string): string {
+  try {
+    let pwd = '';
+    try { pwd = new URL(raw).password; } catch { /* malformed */ }
+    if (!pwd) {
+      const m = raw.match(/:\/\/[^:@/]+:([^@]+)@/);
+      if (m) pwd = m[1];
+    }
+    if (!pwd) return raw;
+    const ref = process.env.OPS_DB_REF || 'zjtbhsouhwyyfwoyjgow';
+    const host = process.env.OPS_DB_POOLER_HOST || 'aws-1-us-east-1.pooler.supabase.com';
+    return `postgresql://postgres.${ref}:${pwd}@${host}:6543/postgres`;
+  } catch {
+    return raw;
+  }
+}
+
 export function opsDb() {
   const url = process.env.OPS_DATABASE_URL;
   if (!url) {
@@ -24,7 +47,7 @@ export function opsDb() {
     );
   }
   if (!client) {
-    client = postgres(url, {
+    client = postgres(normalizeOpsUrl(url), {
       ssl: 'require',
       max: 3,
       idle_timeout: 20,
