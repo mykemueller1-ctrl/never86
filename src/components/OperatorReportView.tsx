@@ -129,7 +129,7 @@ export default async function OperatorReportView({
       </div>
 
       <p className="text-dark-400 text-xs">
-        Source: <code className="text-dark-300">toast_location_breakdown</code> +{' '}
+        Source: <code className="text-dark-300">v_first_party_digital</code> (de-duplicated) +{' '}
         <code className="text-dark-300">toast_employee_performance</code> (never86 ops database) · Last Toast data
         loaded {report.lastIngest ? prettyDate(report.lastIngest) : '—'} · Rendered{' '}
         {new Date(report.generatedAt).toLocaleString('en-US')}
