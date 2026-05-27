@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // Gate every /reports/* page behind a shared password. The marketing site is
 // public; operator reports (real sales data) must not be.
-export const config = { matcher: ['/reports/:path*', '/command-center/:path*'] };
+export const config = { matcher: ['/reports/:path*', '/command-center/:path*', '/tools/:path*'] };
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
