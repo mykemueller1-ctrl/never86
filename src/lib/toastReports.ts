@@ -126,3 +126,121 @@ export async function getOperatorReport(
     generatedAt: new Date().toISOString(),
   };
 }
+
+export type CommandCenterStore = {
+  locationId: number;
+  name: string;
+  net: number;
+  firstParty: number;
+  thirdParty: number;
+  catering: number;
+  firstPartyPct: number | null;
+  weeks: number;
+};
+
+export type CommandCenter = {
+  operatorId: number;
+  operatorName: string;
+  totalLocations: number;
+  storesLoaded: number;
+  weeksLoaded: number;
+  periodStart: string | null;
+  periodEnd: string | null;
+  lastIngest: string | null;
+  networkNet: number;
+  networkFirstParty: number;
+  networkThirdParty: number;
+  networkCatering: number;
+  networkFirstPartyPct: number | null;
+  fullyLoaded: boolean;
+  stores: CommandCenterStore[];
+  generatedAt: string;
+};
+
+// Multi-tenant command center. Reads ONLY from v_first_party_digital — the
+// de-duplicated, leaf-level channel view — so a number can never double-count
+// the way the raw breakdown table did. Fills in store-by-store as the backfill
+// lands; a partial load is always reported as partial, never as the full network.
+export async function getOperatorCommandCenter(
+  operatorId: number,
+  displayNameOverride?: string
+): Promise<CommandCenter> {
+  const sql = opsDb();
+
+  const [nameRows, totalRows, storeRows, metaRows] = await Promise.all([
+    sql<{ name: string | null }[]>`
+      select coalesce(restaurant_name, name) as name from operator_users where id = ${operatorId}`,
+    sql<{ total: number }[]>`
+      select count(*)::int as total from operator_locations where operator_id = ${operatorId}`,
+    sql<
+      {
+        location_id: number;
+        name: string;
+        net: number;
+        first_party: number;
+        third_party: number;
+        catering: number;
+        weeks: number;
+      }[]
+    >`
+      select l.id as location_id, l.name,
+             round(sum(v.all_channels_net))::float8 as net,
+             round(sum(v.first_party_net))::float8 as first_party,
+             round(sum(v.third_party_net))::float8 as third_party,
+             round(sum(v.catering_net))::float8 as catering,
+             count(distinct v.period_start)::int as weeks
+      from v_first_party_digital v
+      join operator_locations l on l.id = v.location_id
+      where v.operator_id = ${operatorId}
+      group by l.id, l.name
+      order by net desc nulls last`,
+    sql<
+      { period_start: string | null; period_end: string | null; last_ingest: string | null; weeks: number }[]
+    >`
+      select min(period_start)::text as period_start,
+             max(period_end)::text as period_end,
+             max(created_at)::date::text as last_ingest,
+             count(distinct period_start)::int as weeks
+      from toast_dining_options where operator_id = ${operatorId}`,
+  ]);
+
+  const stores: CommandCenterStore[] = storeRows.map((r) => {
+    const fp = Number(r.first_party) || 0;
+    const tp = Number(r.third_party) || 0;
+    const digital = fp + tp;
+    return {
+      locationId: r.location_id,
+      name: r.name,
+      net: Number(r.net) || 0,
+      firstParty: fp,
+      thirdParty: tp,
+      catering: Number(r.catering) || 0,
+      firstPartyPct: digital > 0 ? Math.round((1000 * fp) / digital) / 10 : null,
+      weeks: Number(r.weeks) || 0,
+    };
+  });
+
+  const networkFirstParty = stores.reduce((s, x) => s + x.firstParty, 0);
+  const networkThirdParty = stores.reduce((s, x) => s + x.thirdParty, 0);
+  const digital = networkFirstParty + networkThirdParty;
+  const totalLocations = Number(totalRows[0]?.total) || 0;
+
+  return {
+    operatorId,
+    operatorName: displayNameOverride ?? nameRows[0]?.name ?? `Operator ${operatorId}`,
+    totalLocations,
+    storesLoaded: stores.length,
+    weeksLoaded: Number(metaRows[0]?.weeks) || 0,
+    periodStart: metaRows[0]?.period_start ?? null,
+    periodEnd: metaRows[0]?.period_end ?? null,
+    lastIngest: metaRows[0]?.last_ingest ?? null,
+    networkNet: stores.reduce((s, x) => s + x.net, 0),
+    networkFirstParty,
+    networkThirdParty,
+    networkCatering: stores.reduce((s, x) => s + x.catering, 0),
+    networkFirstPartyPct: digital > 0 ? Math.round((1000 * networkFirstParty) / digital) / 10 : null,
+    fullyLoaded: totalLocations > 0 && stores.length >= totalLocations,
+    stores,
+    generatedAt: new Date().toISOString(),
+  };
+}
