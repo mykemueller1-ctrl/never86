@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 // (or the driver error) — never operator data. Confirms the live connection.
 export async function GET() {
   if (!opsDbConfigured()) {
-    return Response.json({ ok: false, reason: 'OPS_DATABASE_URL not set' });
+    return Response.json({ ok: false, reason: 'data source not configured' });
   }
   const t0 = Date.now();
   try {

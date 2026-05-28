@@ -52,12 +52,8 @@ export default async function CommandCenter({
     return (
       <Shell title="Command Center">
         <Notice
-          title="Not connected to the ops database yet."
-          body={
-            <>
-              Set <code className="text-gold-300">OPS_DATABASE_URL</code> in Vercel, then redeploy.
-            </>
-          }
+          title="Your live data isn’t connected yet."
+          body={<>If you’re seeing this, contact the team and we’ll bring you online.</>}
         />
       </Shell>
     );
@@ -70,7 +66,7 @@ export default async function CommandCenter({
     const msg = err instanceof Error ? err.message : String(err);
     return (
       <Shell title="Command Center">
-        <Notice title="Couldn’t reach the ops database." body={<span className="font-mono text-xs break-all">{msg}</span>} />
+        <Notice title="Couldn’t reach your live data." body={<span className="font-mono text-xs break-all">{msg}</span>} />
       </Shell>
     );
   }
@@ -141,10 +137,9 @@ export default async function CommandCenter({
       </div>
 
       <p className="text-dark-400 text-xs">
-        Source: <code className="text-dark-300">v_first_party_digital</code> ←{' '}
-        <code className="text-dark-300">toast_dining_options</code> (leaf-level, de-duplicated — each order counted
-        once). Every figure is SQL-computed from real rows; nothing estimated. Last ingest {prettyDate(cc.lastIngest)} ·
-        rendered {new Date(cc.generatedAt).toLocaleString('en-US')}.
+        From your POS data, de-duplicated to the leaf channel (each order counted once). Every figure is computed
+        from real rows; nothing estimated. Last data refresh {prettyDate(cc.lastIngest)} · rendered{' '}
+        {new Date(cc.generatedAt).toLocaleString('en-US')}.
       </p>
     </Shell>
   );

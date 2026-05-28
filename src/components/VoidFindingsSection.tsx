@@ -94,8 +94,8 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
       ) : null}
 
       <p className="text-dark-400 text-xs">
-        Source: <code className="text-dark-300">void_hunter_findings</code> · analysis {prettyDate(d.analysisDate)} ·{' '}
-        period {prettyDate(d.periodStart)} – {prettyDate(d.periodEnd)} · every figure traces to a row in this table.
+        From your void data · {d.totalFindings} measured findings · analysis {prettyDate(d.analysisDate)} ·{' '}
+        period {prettyDate(d.periodStart)} – {prettyDate(d.periodEnd)} · each figure traceable on request.
       </p>
     </div>
   );
