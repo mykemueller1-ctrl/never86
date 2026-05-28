@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { getCommandCenterData, type CommandCenterData } from '@/lib/commandCenter';
+import { getVoidFindings, type VoidFindings } from '@/lib/voidFindings';
 import { opsDbConfigured } from '@/lib/opsDb';
 import { SourceTag } from './SourceTag';
+import { VoidFindingsSection } from './VoidFindingsSection';
 import { tagCounts, METRIC_REGISTRY, type TagLevel } from '@/lib/sourceTags';
 
 export type Role = 'ceo' | 'cfo' | 'coo' | 'cto' | 'data';
@@ -182,6 +184,15 @@ export default async function RoleView({
     );
   }
 
+  // Void Hunter findings — best-effort. If the analysis layer hasn't produced
+  // rows for this operator, the section is skipped silently rather than
+  // surfacing an empty card.
+  let voidFindings: VoidFindings | null = null;
+  try {
+    const v = await getVoidFindings(operatorId);
+    if (v.totalFindings > 0) voidFindings = v;
+  } catch { /* skip section */ }
+
   const tc = tagCounts();
 
   if (role === 'cfo') {
@@ -207,6 +218,7 @@ export default async function RoleView({
           <Kpi label="Network net sales" value={usd(d.networkNet)} level="verified" />
         </div>
         <Section title="Operations & labor by unit"><ExceptionList exceptions={d.exceptions} /></Section>
+        {voidFindings ? <VoidFindingsSection data={voidFindings} /> : null}
         <Section title="Area wage benchmark"><Pending label="Pay vs BLS market wage by role & metro" source="BLS OEWS — seeding into /seed/external-data/bls_wages.json" /></Section>
       </Shell>
     );
@@ -288,6 +300,7 @@ export default async function RoleView({
         <Kpi label="Open exceptions" value={String(d.exceptions.length)} level="verified" />
       </div>
       <Section title="What needs your attention"><ExceptionList exceptions={d.exceptions} /></Section>
+      {voidFindings ? <VoidFindingsSection data={voidFindings} /> : null}
       <Section title="Stores by net sales"><StoreTable stores={d.stores} /></Section>
     </Shell>
   );
