@@ -12,3 +12,10 @@ body {
   color: #ffffff;
   font-family: system-ui, -apple-system, sans-serif;
 }
+
+/* Logic mode — operator-only provenance overlay. Hidden by default; revealed
+   when LogicToggle sets data-logic-mode="true" on the body. */
+.logic-only,
+.logic-only-inline { display: none; }
+body[data-logic-mode="true"] .logic-only { display: block; }
+body[data-logic-mode="true"] .logic-only-inline { display: inline; }

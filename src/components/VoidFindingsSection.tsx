@@ -20,6 +20,14 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
         Void Hunter — {d.totalFindings} measured findings
       </h3>
 
+      <div className="logic-only bg-amber-500/5 border border-amber-500/30 rounded-lg p-3 mb-3 text-xs font-mono text-amber-200">
+        <div className="text-amber-300 uppercase tracking-wider font-semibold mb-1">🔍 logic · provenance</div>
+        <div>source: <code>void_hunter_findings</code> · operator_id=3 · analysis {prettyDate(d.analysisDate)}</div>
+        <div>buckets: network_rollup({network ? 1 : 0}) · location_voids_measured({d.byLocation.length}) · top_employee_offenders({d.topOffenders ? 1 : 0}) · data_gap_note({d.dataGaps.length})</div>
+        {network ? <div>network row: id={network.id} · ${network.dollarAmount} · {network.count} events · top={network.topOffender}</div> : null}
+        {d.topOffenders ? <div>top-offenders row: id={d.topOffenders.id} · {d.topOffenders.topOffender}</div> : null}
+      </div>
+
       {network ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <div className="bg-dark-700 rounded-xl p-5 border border-dark-600">
@@ -76,7 +84,10 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
                 const isHot = /[2-9]\d\.\d|100/.test(offender);
                 return (
                   <tr key={row.id} className="border-b border-dark-600/60 last:border-0">
-                    <td className="px-4 py-2 text-white">{row.location ?? '—'}</td>
+                    <td className="px-4 py-2 text-white">
+                      <span className="logic-only-inline mr-2 text-[10px] font-mono text-amber-300/70">id={row.id}</span>
+                      {row.location ?? '—'}
+                    </td>
                     <td className="px-4 py-2">
                       <span className="flex items-center gap-3">
                         <span className="relative inline-block h-1.5 w-20 sm:w-28 rounded bg-white/5 overflow-hidden align-middle">
