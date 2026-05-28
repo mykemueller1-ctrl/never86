@@ -95,26 +95,47 @@ function Shell({ role, children }: { role: Role; children: React.ReactNode }) {
 }
 
 function StoreTable({ stores }: { stores: CommandCenterData['stores'] }) {
+  const max = Math.max(1, ...stores.map((s) => s.net));
   return (
     <div className="bg-dark-700 rounded-xl border border-dark-600 overflow-hidden">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-dark-600 text-dark-300">
             <th className="px-4 py-2 font-medium">Store</th>
-            <th className="px-4 py-2 font-medium text-right">Net</th>
+            <th className="px-4 py-2 font-medium">Net sales</th>
             <th className="px-4 py-2 font-medium text-right">First-party %</th>
             <th className="px-4 py-2 font-medium text-right">3P</th>
           </tr>
         </thead>
         <tbody>
-          {stores.map((s) => (
-            <tr key={s.name} className="border-b border-dark-600/60 last:border-0">
-              <td className="px-4 py-2 text-white">{s.name}</td>
-              <td className="px-4 py-2 text-right text-gold-300 tabular-nums">{usd(s.net)}</td>
-              <td className="px-4 py-2 text-right text-white tabular-nums">{s.firstPartyPct != null ? `${s.firstPartyPct}%` : '—'}</td>
-              <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.thirdParty)}</td>
-            </tr>
-          ))}
+          {stores.map((s) => {
+            const lowFp = s.firstPartyPct != null && s.firstPartyPct < 50;
+            const w = Math.max(4, Math.round((s.net / max) * 100));
+            return (
+              <tr key={s.name} className="border-b border-dark-600/60 last:border-0">
+                <td className="px-4 py-2 text-white">
+                  <span className="flex items-center gap-2">
+                    {s.name}
+                    {lowFp ? (
+                      <span className="text-[10px] uppercase tracking-wide text-gold-300 bg-gold-500/15 rounded-full px-2 py-0.5">low 1P</span>
+                    ) : null}
+                  </span>
+                </td>
+                <td className="px-4 py-2">
+                  <span className="flex items-center gap-3">
+                    <span className="relative inline-block h-1.5 w-24 sm:w-32 rounded bg-white/5 overflow-hidden align-middle">
+                      <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-gold-700 to-gold-500" style={{ width: `${w}%` }} />
+                    </span>
+                    <span className="text-gold-300 tabular-nums font-semibold">{usd(s.net)}</span>
+                  </span>
+                </td>
+                <td className={`px-4 py-2 text-right tabular-nums ${lowFp ? 'text-gold-300 font-semibold' : 'text-white'}`}>
+                  {s.firstPartyPct != null ? `${s.firstPartyPct}%` : '—'}
+                </td>
+                <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.thirdParty)}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
