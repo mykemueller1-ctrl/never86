@@ -113,7 +113,7 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
         <span>
           {sample
             ? 'Sample dataset · illustrative only'
-            : `3P revenue: toast_dining_options · fees: estimated · Toast last sync ${prettyDate(d.lastIngest)}`}
+            : `3P revenue: from your POS · fees: estimated (assumed take rate) · last refresh ${prettyDate(d.lastIngest)}`}
         </span>
       </div>
     </>

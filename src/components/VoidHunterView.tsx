@@ -151,7 +151,7 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
         <span>
           {sample
             ? 'Sample dataset · illustrative only'
-            : `toast_employee_performance · latest period · Toast last sync ${prettyDate(d.lastIngest)}`}
+            : `From your POS · latest period · last refresh ${prettyDate(d.lastIngest)}`}
         </span>
       </div>
     </>

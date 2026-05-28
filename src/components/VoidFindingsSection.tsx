@@ -61,20 +61,36 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
           <thead>
             <tr className="border-b border-dark-600 text-dark-300">
               <th className="px-4 py-2 font-medium">Store</th>
-              <th className="px-4 py-2 font-medium text-right">Voids</th>
+              <th className="px-4 py-2 font-medium">Voids</th>
               <th className="px-4 py-2 font-medium text-right">Events</th>
               <th className="px-4 py-2 font-medium">Top offender</th>
             </tr>
           </thead>
           <tbody>
-            {d.byLocation.map((row) => (
-              <tr key={row.id} className="border-b border-dark-600/60 last:border-0">
-                <td className="px-4 py-2 text-white">{row.location ?? '—'}</td>
-                <td className="px-4 py-2 text-right text-gold-300 tabular-nums">{usd(row.dollarAmount ?? 0)}</td>
-                <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{count(row.count ?? 0)}</td>
-                <td className="px-4 py-2 text-dark-200 text-xs break-words">{row.topOffender ?? '—'}</td>
-              </tr>
-            ))}
+            {(() => {
+              const maxAmt = Math.max(1, ...d.byLocation.map((r) => r.dollarAmount ?? 0));
+              return d.byLocation.map((row) => {
+                const amt = row.dollarAmount ?? 0;
+                const w = Math.max(4, Math.round((amt / maxAmt) * 100));
+                const offender = row.topOffender ?? '—';
+                const isHot = /[2-9]\d\.\d|100/.test(offender);
+                return (
+                  <tr key={row.id} className="border-b border-dark-600/60 last:border-0">
+                    <td className="px-4 py-2 text-white">{row.location ?? '—'}</td>
+                    <td className="px-4 py-2">
+                      <span className="flex items-center gap-3">
+                        <span className="relative inline-block h-1.5 w-20 sm:w-28 rounded bg-white/5 overflow-hidden align-middle">
+                          <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-amber-700 to-amber-400" style={{ width: `${w}%` }} />
+                        </span>
+                        <span className="text-gold-300 tabular-nums font-semibold">{usd(amt)}</span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{count(row.count ?? 0)}</td>
+                    <td className={`px-4 py-2 text-xs break-words ${isHot ? 'text-amber-300 font-semibold' : 'text-dark-200'}`}>{offender}</td>
+                  </tr>
+                );
+              });
+            })()}
           </tbody>
         </table>
       </div>
@@ -94,8 +110,8 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
       ) : null}
 
       <p className="text-dark-400 text-xs">
-        Source: <code className="text-dark-300">void_hunter_findings</code> · analysis {prettyDate(d.analysisDate)} ·{' '}
-        period {prettyDate(d.periodStart)} – {prettyDate(d.periodEnd)} · every figure traces to a row in this table.
+        From your void data · {d.totalFindings} measured findings · analysis {prettyDate(d.analysisDate)} ·{' '}
+        period {prettyDate(d.periodStart)} – {prettyDate(d.periodEnd)} · each figure traceable on request.
       </p>
     </div>
   );

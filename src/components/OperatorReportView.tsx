@@ -27,11 +27,9 @@ function NotConnected({ error }: { error?: string }) {
   return (
     <Shell title="Live Toast Report">
       <div className="bg-dark-700 border border-dark-600 rounded-xl p-6">
-        <p className="text-white font-semibold mb-2">Not connected to the ops database yet.</p>
+        <p className="text-white font-semibold mb-2">Your live data isn&apos;t connected yet.</p>
         <p className="text-dark-300 text-sm mb-4">
-          This page reads live from the Supabase <code className="text-gold-300">never86</code> database. Set the{' '}
-          <code className="text-gold-300">OPS_DATABASE_URL</code> environment variable in Vercel (Project Settings →
-          Database → Connection string → <em>Transaction</em> pooler), then redeploy.
+          If you&apos;re seeing this, contact the team and we&apos;ll bring you online.
         </p>
         {error ? <p className="text-dark-400 text-xs font-mono break-all">{error}</p> : null}
       </div>
@@ -129,9 +127,8 @@ export default async function OperatorReportView({
       </div>
 
       <p className="text-dark-400 text-xs">
-        Source: <code className="text-dark-300">v_first_party_digital</code> (de-duplicated) +{' '}
-        <code className="text-dark-300">toast_employee_performance</code> (never86 ops database) · Last Toast data
-        loaded {report.lastIngest ? prettyDate(report.lastIngest) : '—'} · Rendered{' '}
+        Source: your POS data, reconciled across all locations · Last data refresh{' '}
+        {report.lastIngest ? prettyDate(report.lastIngest) : '—'} · Rendered{' '}
         {new Date(report.generatedAt).toLocaleString('en-US')}
       </p>
     </Shell>
