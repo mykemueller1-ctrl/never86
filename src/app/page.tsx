@@ -40,12 +40,59 @@ const BUILT_FOR = [
   { h: 'Single & small operators', p: 'One store or three. The same honest math, none of the enterprise bloat or the enterprise price.' },
 ];
 
+// Three dropdowns the visitor sees from the homepage — what the platform covers,
+// without revealing any operator's data. Marketing surface only.
+const AGENTS_MENU: { group: string; items: { name: string; tag?: string }[] }[] = [
+  { group: 'POS', items: [{ name: 'Toast', tag: 'live' }, { name: 'Square' }, { name: 'Clover' }, { name: 'Aloha' }, { name: 'Lightspeed' }] },
+  { group: '3rd-party delivery', items: [{ name: 'DoorDash' }, { name: 'Uber Eats' }, { name: 'GrubHub' }] },
+  { group: 'Loyalty + digital', items: [{ name: 'Thanx' }, { name: 'Marqii (listings)' }, { name: 'Looker (BI)' }] },
+  { group: 'Store ops', items: [{ name: 'End-of-night reports' }, { name: 'Excel / CSV / PDF drop', tag: 'universal' }] },
+  { group: 'Scheduling + payroll', items: [{ name: '7shifts' }, { name: 'HotSchedules' }, { name: 'Homebase' }, { name: 'ADP' }, { name: 'Gusto' }] },
+  { group: 'Roll-ups + interpreters', items: [{ name: '3P Aggregator' }, { name: 'Restaurant Accountant' }, { name: 'Trade Area / Customer Intelligence' }, { name: 'Per-location agents' }] },
+  { group: 'Governance', items: [{ name: 'Source-tag enforcer' }, { name: 'HR / legal red-team' }, { name: 'Brand-voice enforcer' }] },
+];
+
+const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string }[] = [
+  { name: 'Void Hunter', line: 'Voids vs your own peer median, by store and by name. Flags patterns, never verdicts.', href: '/demo/void-hunter', tag: 'live · try the demo' },
+  { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo' },
+  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '#', tag: 'coming' },
+  { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming' },
+];
+
+const OUTSIDE_STACK_MENU: { group: string; items: { name: string; line: string }[] }[] = [
+  { group: 'Demographics', items: [
+    { name: 'Census ACS (block-group)', line: 'Income, age, education, household — the trade-area baseline' },
+    { name: 'Census Pulse', line: 'Recent shifts — DMV migration, fed-workforce moves' },
+    { name: 'Census LODES', line: 'Workplace employment density — your lunch crowd' },
+  ]},
+  { group: 'Public peers + benchmarks', items: [
+    { name: 'SEC EDGAR XBRL', line: 'Cava · Chipotle · Sweetgreen · Shake Shack · Wingstop — your CFO benchmark strip' },
+    { name: 'BLS OEWS', line: 'Wage by metro × role — what your line cooks should make' },
+  ]},
+  { group: 'Place + traffic', items: [
+    { name: 'Google Places / Yelp Fusion', line: 'Halo anchors + heat map — the operator-judgment site rubric' },
+    { name: 'OpenStreetMap POIs', line: 'Free fallback when Google quotas tighten' },
+    { name: 'State DOT AADT', line: 'Annual average daily traffic — corridor strength per store' },
+  ]},
+  { group: 'Local context', items: [
+    { name: 'NOAA weather', line: 'Government-canonical · the dine-in / delivery shift on a rainy day' },
+    { name: 'Sports leagues + venues', line: 'Commanders · Wizards · Capitals · Nationals · Titans · Predators · NC State · venue iCal feeds' },
+    { name: 'County open-data permits', line: 'New restaurants breaking ground in your ring · road closures · gentrification signals' },
+    { name: 'State ABC alcohol licenses', line: 'New entrants in your 1-mile ring' },
+  ]},
+  { group: 'Commodity + supply', items: [
+    { name: 'USDA Market News', line: 'Ground beef · avocado · corn · dairy weekly index' },
+  ]},
+];
+
 export default function Home() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [openMenu, setOpenMenu] = useState<'agents' | 'wins' | 'outside' | null>(null);
+  const toggle = (k: 'agents' | 'wins' | 'outside') => setOpenMenu((cur) => (cur === k ? null : k));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,15 +119,83 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-dark-800 text-white">
       {/* Nav */}
-      <header className="border-b border-dark-700">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-dark-700 sticky top-0 z-40 bg-dark-800/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <span className="text-gold-500 font-bold text-lg tracking-tight">Never 86&apos;d</span>
-          <div className="flex items-center gap-4 text-sm">
-            <a href="#stack" className="text-dark-300 hover:text-white hidden sm:inline">What it does</a>
-            <a href="#proof" className="text-dark-300 hover:text-white hidden sm:inline">The proof</a>
-            <a href="/reports/login" className="text-dark-200 hover:text-gold-400 border border-dark-600 rounded-lg px-3 py-1.5">Sign in</a>
+          <div className="flex items-center gap-1 sm:gap-2 text-sm">
+            <button type="button" onClick={() => toggle('wins')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'wins' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Quick wins <span className="text-dark-500">▾</span></button>
+            <button type="button" onClick={() => toggle('agents')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'agents' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Agents <span className="text-dark-500">▾</span></button>
+            <button type="button" onClick={() => toggle('outside')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'outside' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Outside the stack <span className="text-dark-500">▾</span></button>
+            <a href="/reports/login" className="text-dark-200 hover:text-gold-400 border border-dark-600 rounded-lg px-3 py-1.5 ml-1">Sign in</a>
           </div>
         </div>
+
+        {/* Dropdown panel */}
+        {openMenu === 'wins' ? (
+          <div className="border-t border-dark-700 bg-dark-800">
+            <div className="max-w-6xl mx-auto px-6 py-5">
+              <p className="text-gold-500 text-xs uppercase tracking-widest mb-3">Quick wins · drop-in tools, guardrailed</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {QUICK_WINS_MENU.map((q) => (
+                  <a key={q.name} href={q.href} onClick={() => setOpenMenu(null)} className="block bg-dark-700 hover:border-gold-500 border border-dark-600 rounded-xl p-4">
+                    <div className="flex items-center justify-between gap-3 mb-1">
+                      <span className="text-white font-semibold">{q.name}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-gold-300">{q.tag}</span>
+                    </div>
+                    <p className="text-dark-300 text-sm">{q.line}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {openMenu === 'agents' ? (
+          <div className="border-t border-dark-700 bg-dark-800">
+            <div className="max-w-6xl mx-auto px-6 py-5">
+              <p className="text-gold-500 text-xs uppercase tracking-widest mb-3">Agents · one specialist per system, deep not light</p>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {AGENTS_MENU.map((g) => (
+                  <div key={g.group}>
+                    <p className="text-dark-400 text-[10px] uppercase tracking-wider mb-2">{g.group}</p>
+                    <ul className="space-y-1.5">
+                      {g.items.map((it) => (
+                        <li key={it.name} className="text-white text-sm flex items-center gap-2">
+                          <span>{it.name}</span>
+                          {it.tag ? <span className="text-[9px] uppercase tracking-wider text-green-400">{it.tag}</span> : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {openMenu === 'outside' ? (
+          <div className="border-t border-dark-700 bg-dark-800">
+            <div className="max-w-6xl mx-auto px-6 py-5">
+              <p className="text-gold-500 text-xs uppercase tracking-widest mb-1">Outside the stack · we sit next to your POS, not inside it</p>
+              <p className="text-dark-300 text-sm mb-4">Every external feed source-tagged. Free, public, government-canonical where possible. No source wired without operator approval.</p>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {OUTSIDE_STACK_MENU.map((g) => (
+                  <div key={g.group}>
+                    <p className="text-dark-400 text-[10px] uppercase tracking-wider mb-2">{g.group}</p>
+                    <ul className="space-y-2">
+                      {g.items.map((it) => (
+                        <li key={it.name}>
+                          <p className="text-white text-sm font-medium">{it.name}</p>
+                          <p className="text-dark-400 text-xs">{it.line}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </header>
 
       {/* Hero */}
