@@ -1,11 +1,19 @@
 import Link from 'next/link';
 import { SourceTag } from '@/components/SourceTag';
-import type { ThreePFees } from '@/lib/threePFees';
+import type { ThreePFees, PartnerRateCard } from '@/lib/threePFees';
 
 const usd = (v: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
+const pct = (v: number) => `${(v * 100).toFixed(v * 100 < 10 ? 1 : 0)}%`;
 const prettyDate = (iso: string | null) =>
   iso ? new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+
+function blendedEffective(p: PartnerRateCard): number {
+  if (p.premiumRate != null && p.premiumShareEstimate != null) {
+    return p.contractDelivery * (1 - p.premiumShareEstimate) + p.premiumRate * p.premiumShareEstimate;
+  }
+  return p.contractDelivery;
+}
 
 function Kpi({ label, value, sub, level }: { label: string; value: string; sub?: string; level: 'verified' | 'estimated' }) {
   return (
@@ -64,6 +72,67 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
           in and these turn exact. First-party % is the lever: the more digital you own, the less of this bill you pay.
         </p>
       </div>
+
+      {d.partnerRates && d.partnerRates.length > 0 ? (
+        <div className="mb-8">
+          <h3 className="text-gold-500 text-xs uppercase tracking-wider font-semibold mb-3">By partner · contract vs blended effective</h3>
+          <div className="bg-dark-700 rounded-xl border border-dark-600 overflow-hidden">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-dark-600 text-dark-300">
+                  <th className="px-4 py-2 font-medium">Partner</th>
+                  <th className="px-4 py-2 font-medium text-right">Delivery</th>
+                  <th className="px-4 py-2 font-medium text-right">Pickup</th>
+                  <th className="px-4 py-2 font-medium text-right">Premium</th>
+                  <th className="px-4 py-2 font-medium text-right">Blended effective</th>
+                </tr>
+              </thead>
+              <tbody>
+                {d.partnerRates.map((p) => {
+                  const eff = blendedEffective(p);
+                  const drift = eff - p.contractDelivery;
+                  return (
+                    <tr key={p.partner} className="border-b border-dark-600/60 last:border-0">
+                      <td className="px-4 py-2 text-white">
+                        <span className="flex items-center gap-2">
+                          {p.partner}
+                          <SourceTag level={p.source} />
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-right text-dark-50 tabular-nums">{pct(p.contractDelivery)}</td>
+                      <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{p.contractPickup != null ? pct(p.contractPickup) : '—'}</td>
+                      <td className="px-4 py-2 text-right text-dark-200 tabular-nums">
+                        {p.premiumLabel && p.premiumRate != null
+                          ? `${p.premiumLabel} ${pct(p.premiumRate)}${p.premiumShareEstimate != null ? ` · ~${Math.round(p.premiumShareEstimate * 100)}% of orders` : ''}`
+                          : '—'}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <span className={`tabular-nums font-semibold ${drift > 0 ? 'text-amber-300' : 'text-green-300'}`}>{pct(eff)}</span>
+                        {drift > 0 ? <span className="ml-2 text-[10px] font-mono uppercase tracking-wider rounded-full px-2 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-700/40">+{(drift * 100).toFixed(1)}pp</span> : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-dark-300 text-xs mt-2 leading-relaxed">
+            Blended effective = (delivery × non-premium share) + (premium × premium share). For DoorDash, a 10% contract blends to ~11.2% if DashPass is ~30% of orders. The drift chip shows how many percentage points above contract the blended rate sits.
+          </p>
+        </div>
+      ) : null}
+
+      {d.renegotiationLever ? (
+        <div className="mb-8 rounded-2xl border border-gold-500/40 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-copper-500/[0.08] p-6">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <p className="text-gold-300 text-[10px] uppercase tracking-[0.22em] font-mono">The lever · {d.renegotiationLever.precedentLabel}</p>
+            <SourceTag level="estimated" />
+          </div>
+          <p className="text-3xl md:text-4xl font-bold font-mono tabular-nums text-white mb-1">{usd(d.renegotiationLever.annualSavingsEstimate)}<span className="text-dark-300 text-base font-normal"> / year</span></p>
+          <p className="text-dark-200 text-sm mb-3">{usd(d.renegotiationLever.fourWeekSavingsEstimate)} / 4 weeks at this volume</p>
+          <p className="text-dark-200 text-sm leading-relaxed">{d.renegotiationLever.basis}</p>
+        </div>
+      ) : null}
 
       <div className="mb-8">
         <h3 className="text-gold-500 text-xs uppercase tracking-wider font-semibold mb-3">Fee exposure by store</h3>

@@ -8,6 +8,31 @@ export type ThreePStore = {
   firstPartyPct: number | null;
   flagged: boolean;
 };
+
+// Per-partner contract rate card. Optional on the type — only populated when
+// the operator has shared their actual contract (via Merchant Portal or
+// email confirmation, as Rik did on May 8, 2026). Otherwise we fall back to
+// the generic 20-25% blended estimate.
+export type PartnerRateCard = {
+  partner: 'DoorDash' | 'Uber Eats' | 'GrubHub';
+  contractDelivery: number; // e.g. 0.10 = 10% delivery
+  contractPickup?: number; // e.g. 0.06 = 6% pickup
+  premiumLabel?: string; // e.g. "DashPass" or "Uber Eats Pass"
+  premiumRate?: number; // e.g. 0.14 = 14% on premium-tier orders
+  premiumShareEstimate?: number; // e.g. 0.30 = 30% of partner volume on premium tier
+  fourWeekRevenue?: number; // operator-side 4-week revenue through this partner (for the "lever" math)
+  source: 'verified' | 'estimated'; // verified if we've seen the rate card in writing
+};
+
+export type RenegotiationLever = {
+  // If UE+GH were renegotiated down to the DD-precedent rate, what's the annualized save?
+  precedentLabel: string; // e.g. "DoorDash 10% precedent"
+  precedentRate: number; // e.g. 0.10
+  annualSavingsEstimate: number;
+  fourWeekSavingsEstimate: number;
+  basis: string; // human-readable explanation
+};
+
 export type ThreePFees = {
   lastIngest: string | null;
   networkTpRevenueYr: number;
@@ -17,6 +42,9 @@ export type ThreePFees = {
   storesBelowTarget: number;
   firstPartyTarget: number;
   stores: ThreePStore[];
+  // Optional: per-partner rate card when the operator has shared it
+  partnerRates?: PartnerRateCard[];
+  renegotiationLever?: RenegotiationLever;
 };
 
 const n = (v: unknown) => (v == null ? 0 : Number(v));

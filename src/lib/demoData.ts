@@ -49,6 +49,41 @@ export const DEMO_THREE_P: ThreePFees = {
     { name: 'Riverside', tpRevenueYr: 540_000, fees20: 108_000, fees25: 135_000, firstPartyPct: 58, flagged: false },
     { name: 'Airport', tpRevenueYr: 410_000, fees20: 82_000, fees25: 102_500, firstPartyPct: 33, flagged: true },
   ],
+  // Per-partner rates shaped like the real chef-led 16-unit operator card
+  // (confirmed via Rik May 8 2026). Lets the demo render the contract-vs-effective
+  // story the platform is actually built to find.
+  partnerRates: [
+    {
+      partner: 'DoorDash',
+      contractDelivery: 0.10,
+      contractPickup: 0.06,
+      premiumLabel: 'DashPass',
+      premiumRate: 0.14,
+      premiumShareEstimate: 0.30,
+      fourWeekRevenue: 184_000,
+      source: 'verified',
+    },
+    {
+      partner: 'Uber Eats',
+      contractDelivery: 0.18,
+      contractPickup: 0.06,
+      fourWeekRevenue: 89_800,
+      source: 'verified',
+    },
+    {
+      partner: 'GrubHub',
+      contractDelivery: 0.18,
+      fourWeekRevenue: 11_400,
+      source: 'verified',
+    },
+  ],
+  renegotiationLever: {
+    precedentLabel: 'DoorDash 10% precedent',
+    precedentRate: 0.10,
+    fourWeekSavingsEstimate: 45_000,
+    annualSavingsEstimate: 585_000,
+    basis: "UE at 18% costs ~$89.8K/4wk + GH at 18% costs ~$11.4K/4wk on chain volume. If both landed at DD's 10% precedent, savings ≈ $45K / 4 weeks ≈ $585K / year. One conversation per partner, chain volume as leverage, DD precedent already inside the house.",
+  },
 };
 
 export const DEMO_LABOR_LEAK: LaborLeak = {

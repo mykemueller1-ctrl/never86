@@ -14,7 +14,11 @@ Uber Eats is the second 3P leg of the operator delivery stack. Different settlem
 - **Marketplace vs Storefront** — Uber Eats sells two products: **Marketplace** (Uber owns the customer) and **Storefront** (operator's branded white-label running on Uber's network). Storefront has lower fees but operator owns the marketing. **Most operators don't realize they have both.** Big leak source.
 
 ### Fee structure (the leak surface)
-- **Service fee** — base commission on the order subtotal (typically 15–30% depending on plan)
+- **Generic service fee** — base commission on the order subtotal (typically 15–30% depending on plan)
+- **The chef-led 16-unit group rate card (confirmed by Rik, May 8 2026 email)**:
+  - **Delivery commission: 18%** — eight points above the DoorDash equivalent (10%)
+  - **Pickup commission: 6%** — matches DD pickup
+- **The lever (operator's May 8 math)** — UE delivery at 18% costs ~$89.8K / 4 weeks on chain volume. If landed at DD's 10% precedent, savings ≈ **$45K / 4 weeks ≈ $585K / year** (UE+GH combined). One conversation per partner, chain volume as leverage, DD precedent already inside the house.
 - **Delivery fee split** — Uber Eats keeps part of the customer's delivery fee; operator may share part
 - **Marketing / promotion billing** — sponsored placements, in-app promos
 - **Courier tip math** — Uber's tip flow is different from DD's. In some markets, courier tip is part of the operator's reported revenue then deducted; in others it's not. Drives reconciliation mismatches.
@@ -42,7 +46,7 @@ Uber Eats is the second 3P leg of the operator delivery stack. Different settlem
 - per-store dispute / cancellation rate
 
 ## Cannot claim (must `Estimated`)
-- "contracted service fee" until we've seen the rate card
+- ~~"contracted service fee" until we've seen the rate card~~ **Verified May 8: 18% delivery / 6% pickup.**
 - promotion incrementality (which orders were incremental vs cannibalized) — modeled
 
 ## Cannot claim (refuse)

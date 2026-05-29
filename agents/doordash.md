@@ -14,11 +14,15 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 - The **Drive** product (DoorDash white-label delivery) settles differently than the marketplace product — flat per-delivery fee vs % commission.
 
 ### Fee structure (the leak surface)
-- **Commission tier** — 15% / 25% / 30% partnership plans. Most operators end up at 25% after promo periods expire.
+- **Generic commission tiers** — 15% / 25% / 30% partnership plans. Most generic operators end up at 25% after promo periods expire.
+- **The chef-led 16-unit group rate card (confirmed by Rik, May 8 2026 email)**:
+  - **Delivery commission: 10%** — well below generic; product of negotiation
+  - **Pickup commission: 6%** — DD's standard pickup price
+  - **DashPass commission: 14%** — premium-subscription orders charged higher
+- **Effective vs contracted rate** — even at a 10% delivery contract, if DashPass orders are ~30% of DD volume, the blended effective rate is closer to **11.2%**, not 10%. The platform must surface contract rate, DashPass mix, and the blended effective rate separately. This is the **DashPass blended-rate gotcha** the operator surfaced May 8: "If Dash Pass is the typical ~30% of DD orders, blended DD is closer to 11.2% than 10% — worth ~$73K/year. Worth pulling from the DD merchant portal."
 - **Marketing fee** — auto-applied for sponsored listings / "promo-of-the-day" placements. Often **not** opted-in explicitly; it accrues silently.
 - **Small-order fee** — sub-$12 orders get an additional charge to the customer; this affects perceived take rate but doesn't hit the operator's payout.
 - **Adjustment categories** — refunds (full / partial), partner-error chargebacks (missing items eaten by the operator), promotion participation, courier-tip adjustments.
-- **DashPass** — DD's subscription. DashPass orders have different fee math; promo participation is opt-in but auto-enrolled in some plans.
 
 ### The contract clauses to watch
 - **Tier escalation on volume** — some plans auto-tier up after a volume threshold without renegotiation
@@ -41,7 +45,7 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 - per-store adjustment categories breakdown (refunds, chargebacks, marketing fees)
 
 ## Cannot claim (must `Estimated`)
-- "what the contracted take rate is" — we know what was charged, not what's contracted, until we see the rate card
+- DashPass share of DD volume per store — Toast can't isolate the DashPass dimension; the operator must pull it from the DD merchant portal. Until then, the blended effective rate uses an industry assumption (~30% DashPass share, blended ~11.2%).
 - promotion ROAS (which orders are incremental vs cannibalized from first-party) — modeled, not measured
 
 ## Cannot claim (refuse)
@@ -49,10 +53,10 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 - to advise on legal contract terms (defer to operator's lawyer)
 
 ## Calibration questions (for Rik intake)
-1. What's the operator's current DD contract — commission tier per store?
+1. ~~What's the operator's current DD contract — commission tier per store?~~ **Confirmed May 8: 10% delivery, 6% pickup, 14% DashPass.**
 2. Are stores opted into any marketing-fee programs?
 3. Who at the operator has Merchant Portal access (read-only would be fine for us)?
-4. Is there a recent DD rate card we can compare effective rate against?
+4. **DashPass share of DD orders** — must be pulled from the DD merchant portal; routes through Rik's team or Michael's? (raised May 8, still open)
 
 ## Cross-references
 - **Toast** — POS-side gross 3P revenue cross-check; the dining-options view captures this
