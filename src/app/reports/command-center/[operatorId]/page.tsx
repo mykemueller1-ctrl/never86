@@ -11,7 +11,8 @@ export const metadata = {
 export default function CommandCenterPage({ params }: { params: { operatorId: string } }) {
   const operatorId = Number.parseInt(params.operatorId, 10);
   if (!Number.isInteger(operatorId) || operatorId <= 0) notFound();
-  // Operator 3 = Taco Bamba; friendly label, everyone else uses their own.
-  const displayName = operatorId === 3 ? 'Taco Bamba' : undefined;
-  return <CommandCenter operatorId={operatorId} displayName={displayName} />;
+  // No displayName override — every operator renders from the scrubbed
+  // restaurant_name in operator_users. Real customer names never appear in
+  // public-repo source code.
+  return <CommandCenter operatorId={operatorId} />;
 }

@@ -5,5 +5,5 @@ export const runtime = 'nodejs';
 export const metadata = { title: "Data Lead · Command Center | Never 86'd" };
 
 export default function DataLeadPage() {
-  return <RoleView operatorId={3} role="data" displayName="Taco Bamba" />;
+  return <RoleView operatorId={3} role="data" />;
 }

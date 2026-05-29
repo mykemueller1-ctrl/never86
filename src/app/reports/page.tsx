@@ -13,15 +13,6 @@ export const metadata = {
 const usd = (n: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
-// Operator 3 keeps its friendly URL; everyone else uses /reports/o/[id].
-function hrefFor(operatorId: number) {
-  return operatorId === 3 ? '/reports/taco-bamba' : `/reports/o/${operatorId}`;
-}
-
-function nameFor(operatorId: number, name: string) {
-  return operatorId === 3 ? 'Taco Bamba' : name;
-}
-
 export default async function ReportsIndex() {
   let operators: Awaited<ReturnType<typeof listReportableOperators>> = [];
   let connected = opsDbConfigured();
@@ -45,20 +36,20 @@ export default async function ReportsIndex() {
             <p className="text-dark-300 text-sm">If you&apos;re seeing this, contact the team and we&apos;ll bring you online.</p>
           </div>
         ) : operators.length === 0 ? (
-          <p className="text-dark-300">No operators with Toast data yet.</p>
+          <p className="text-dark-300">No operators with data yet.</p>
         ) : (
           <div className="space-y-3">
             {operators.map((op) => (
               <Link
                 key={op.operatorId}
-                href={hrefFor(op.operatorId)}
+                href={`/reports/o/${op.operatorId}`}
                 className="block bg-dark-700 hover:border-gold-500 border border-dark-600 rounded-xl p-5 transition-colors"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-white font-semibold text-lg">{nameFor(op.operatorId, op.name)}</p>
+                    <p className="text-white font-semibold text-lg">{op.name}</p>
                     <p className="text-dark-300 text-sm">
-                      {op.locations} location{op.locations === 1 ? '' : 's'} · live Toast net sales
+                      {op.locations} location{op.locations === 1 ? '' : 's'} · live net sales
                     </p>
                   </div>
                   <p className="text-gold-300 font-semibold tabular-nums">{usd(op.netSales)}</p>
