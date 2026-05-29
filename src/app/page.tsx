@@ -83,9 +83,9 @@ const PRODUCTS: { kicker: string; name: string; line: string; bullets: string[];
 
 // Three audiences the platform serves at once.
 const AUDIENCE: { h: string; p: string; wins: string[] }[] = [
-  { h: 'Owners', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Trade-Area scorecard'] },
-  { h: 'Managers', p: 'Tonight’s shift in one screen. Labor before payroll closes.', wins: ['Labor Leak', 'Shift Pulse', 'Tip Variance'] },
-  { h: 'Front-line crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Knowledge Brain', 'Achievements', 'Frontline coach'] },
+  { h: 'Owners', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Catering Leak'] },
+  { h: 'Managers', p: 'Labor before payroll closes. Tip slippage as the leading indicator.', wins: ['Labor Leak', 'Tip Variance', 'EOD reconciler'] },
+  { h: 'Front-line crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Shift Pulse', 'Knowledge Brain', 'Achievements'] },
 ];
 
 const OUTSIDE_STACK_MENU: { group: string; items: { name: string; line: string }[] }[] = [
