@@ -56,7 +56,7 @@ const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string; 
   { name: 'Void Hunter', line: 'Voids vs your own peer median, by store and by name. Flags patterns, never verdicts.', href: '/demo/void-hunter', tag: 'live · try the demo', aud: 'owners' },
   { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo', aud: 'owners' },
   { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps. The labor screen managers actually want.', href: '/demo/labor-leak', tag: 'live · try the demo', aud: 'managers' },
-  { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, the one thing to fix.', href: '#', tag: 'coming', aud: 'frontline' },
+  { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, your goal, your streak.', href: '/demo/shift-pulse', tag: 'live · try the demo', aud: 'frontline' },
   { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '#', tag: 'coming', aud: 'owners' },
   { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming', aud: 'managers' },
 ];

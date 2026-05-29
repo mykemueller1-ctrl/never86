@@ -1,6 +1,7 @@
 import type { VoidHunter } from './voidHunter';
 import type { ThreePFees } from './threePFees';
 import type { LaborLeak } from './laborLeak';
+import type { ShiftPulse } from './shiftPulse';
 
 // Clearly-fictional sample data for the public demo tools at /demo/*.
 // NOT a real operator — invented numbers for a made-up 5-unit pizza group,
@@ -70,5 +71,37 @@ export const DEMO_LABOR_LEAK: LaborLeak = {
     { store: 'Midtown', name: 'Dishwasher #2', role: 'kitchen', scheduled: 35, clocked: 44, overtime: 4, drift: 9 },
     { store: 'University', name: 'Manager #1', role: 'salaried', scheduled: 45, clocked: 58, overtime: 0, drift: 13 },
     { store: 'Midtown', name: 'Server #22', role: 'foh', scheduled: 28, clocked: 35.5, overtime: 0, drift: 7.5 },
+  ],
+};
+
+export const DEMO_SHIFT_PULSE: ShiftPulse = {
+  store: 'Downtown',
+  shift: 'Friday Dinner',
+  startedAt: '5:00 PM',
+  forecastCovers: 240,
+  actualCovers: 178,
+  forecastNet: 6_800,
+  actualNet: 5_220,
+  shiftGoalLabel: 'Hit $1,800 in shareable apps',
+  shiftGoalTarget: 1_800,
+  shiftGoalActual: 1_245,
+  voidMedian: 0.0051,
+  topAchievements: [
+    { name: 'Voids under the line', crew: 'Jordan (Server)', description: '3 shifts running below station median · streak goes hot at 5' },
+    { name: 'Upsell streak', crew: 'Aaron (Server)', description: '4 consecutive shifts above $14 ticket average' },
+    { name: 'Zero comp shift', crew: 'Sam (Manager)', description: 'No manager comp punches this entire shift so far' },
+  ],
+  stations: [
+    { name: 'Pizza line', net: 1_840, voids: 12, voidRate: 12 / 1_840, stationMedianVoidRate: 0.0048, flagged: true },
+    { name: 'Salad / cold', net: 720, voids: 3, voidRate: 3 / 720, stationMedianVoidRate: 0.0051, flagged: false },
+    { name: 'Bar', net: 1_410, voids: 6, voidRate: 6 / 1_410, stationMedianVoidRate: 0.0042, flagged: false },
+    { name: 'FOH', net: 1_250, voids: 4, voidRate: 4 / 1_250, stationMedianVoidRate: 0.0049, flagged: false },
+  ],
+  crew: [
+    { name: 'Jordan', role: 'server', station: 'FOH', covers: 41, net: 1_320, voidRate: 0.0019, achievementCount: 4, streakDays: 3 },
+    { name: 'Aaron', role: 'server', station: 'FOH', covers: 36, net: 1_180, voidRate: 0.0034, achievementCount: 3, streakDays: 4 },
+    { name: 'Sam', role: 'manager', station: 'Mgmt', covers: 0, net: 0, voidRate: 0, achievementCount: 2, streakDays: 1 },
+    { name: 'Cam', role: 'line cook', station: 'Pizza line', covers: 88, net: 1_540, voidRate: 0.0061, achievementCount: 1, streakDays: 1 },
+    { name: 'Riley', role: 'bar', station: 'Bar', covers: 22, net: 1_180, voidRate: 0.0042, achievementCount: 2, streakDays: 2 },
   ],
 };
