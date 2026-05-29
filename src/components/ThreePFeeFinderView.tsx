@@ -20,18 +20,13 @@ function Kpi({ label, value, sub, level }: { label: string; value: string; sub?:
   );
 }
 
+import { DemoChrome } from '@/components/DemoChrome';
+
 export function ThreePFeeFinderFrame({ sample, children }: { sample?: boolean; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">
-          Never 86&apos;d · {sample ? 'Demo' : 'Quick Win'}
-        </p>
-        <h1 className="text-3xl font-bold text-gold-500 mb-1">3P Fee Finder</h1>
-        <p className="text-dark-200 mb-8">What the marketplaces take off the top — by store.</p>
-        {children}
-      </div>
-    </main>
+    <DemoChrome audience="owner" sample={sample} title="3P Fee Finder" tagline="What the marketplaces take off the top — by store. First-party % as the lever.">
+      {children}
+    </DemoChrome>
   );
 }
 

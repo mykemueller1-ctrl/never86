@@ -20,18 +20,13 @@ function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: 
   );
 }
 
+import { DemoChrome } from '@/components/DemoChrome';
+
 export function LaborLeakFrame({ sample, children }: { sample?: boolean; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">
-          Never 86&apos;d · {sample ? 'Demo' : 'Quick Win'} · For managers
-        </p>
-        <h1 className="text-3xl font-bold text-gold-500 mb-1">Labor Leak</h1>
-        <p className="text-dark-200 mb-8">Where labor dollars are bleeding — overtime drift, ghost shifts, schedule-vs-clocked gaps. One screen.</p>
-        {children}
-      </div>
-    </main>
+    <DemoChrome audience="manager" sample={sample} title="Labor Leak" tagline="Where labor dollars are bleeding — overtime drift, ghost shifts, schedule-vs-clocked gaps. One screen.">
+      {children}
+    </DemoChrome>
   );
 }
 

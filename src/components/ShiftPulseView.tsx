@@ -21,18 +21,13 @@ function Kpi({ label, value, sub, tone, bar }: { label: string; value: string; s
   );
 }
 
+import { DemoChrome } from '@/components/DemoChrome';
+
 export function ShiftPulseFrame({ sample, children }: { sample?: boolean; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">
-          Never 86&apos;d · {sample ? 'Demo' : 'Quick Win'} · For the crew
-        </p>
-        <h1 className="text-3xl font-bold text-gold-500 mb-1">Shift Pulse</h1>
-        <p className="text-dark-200 mb-8">Tonight&apos;s shift in one screen — your covers, your goal, your streak. The standup that helps.</p>
-        {children}
-      </div>
-    </main>
+    <DemoChrome audience="frontline" sample={sample} title="Shift Pulse" tagline="Tonight's shift in one screen — your covers, your goal, your streak. The standup that helps.">
+      {children}
+    </DemoChrome>
   );
 }
 

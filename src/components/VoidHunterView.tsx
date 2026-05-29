@@ -21,18 +21,13 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
   );
 }
 
+import { DemoChrome } from '@/components/DemoChrome';
+
 export function VoidHunterFrame({ sample, children }: { sample?: boolean; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">
-          Never 86&apos;d · {sample ? 'Demo' : 'Quick Win'}
-        </p>
-        <h1 className="text-3xl font-bold text-gold-500 mb-1">Void Hunter</h1>
-        <p className="text-dark-200 mb-8">Where voids run hot — by store, then by name.</p>
-        {children}
-      </div>
-    </main>
+    <DemoChrome audience="owner" sample={sample} title="Void Hunter" tagline="Where voids run hot — by store, then by name.">
+      {children}
+    </DemoChrome>
   );
 }
 

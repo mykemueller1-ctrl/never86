@@ -62,30 +62,40 @@ export default async function AdminNever86() {
   const ideas = snap.quickWins.filter((w: QuickWin) => w.status !== 'live');
 
   return (
-    <main className="min-h-screen bg-dark-800 text-white">
-      <header className="border-b border-dark-700 sticky top-0 z-40 bg-dark-800/95 backdrop-blur">
+    <main className="min-h-screen text-dark-50">
+      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-baseline gap-3">
-            <span className="text-gold-500 font-bold text-lg tracking-tight">Never 86&apos;d</span>
-            <span className="text-dark-400 text-xs uppercase tracking-widest">CEO Command Center</span>
+          <div className="flex items-center gap-3">
+            <span className="brand-monogram">N86</span>
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-display font-semibold tracking-tight text-dark-50 text-lg">Never 86&apos;d</span>
+              <span className="text-gold-400 text-[10px] uppercase tracking-[0.22em] font-mono">CEO Command Center</span>
+            </div>
           </div>
-          <nav className="flex items-center gap-1 text-xs">
-            <a href="#focus" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">Focus</a>
-            <a href="#aeo" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">AEO drafts</a>
-            <a href="#team" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">Team</a>
-            <a href="#pipeline" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">Pipeline</a>
-            <a href="#wins" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">Quick wins</a>
-            <a href="#ops" className="hidden sm:inline px-2.5 py-1.5 text-dark-300 hover:text-white">Ops</a>
-            <a href="/" className="border border-dark-600 hover:border-gold-500 text-dark-200 hover:text-white rounded-lg px-3 py-1.5 ml-2">Site</a>
-            <a href="/command-center" className="border border-dark-600 hover:border-gold-500 text-dark-200 hover:text-white rounded-lg px-3 py-1.5">Operator view</a>
+          <nav className="flex items-center gap-0.5 text-xs">
+            <a href="#focus" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Focus</a>
+            <a href="#aeo" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">AEO drafts</a>
+            <a href="#team" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Team</a>
+            <a href="#pipeline" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Pipeline</a>
+            <a href="#wins" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Quick wins</a>
+            <a href="#ops" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Ops</a>
+            <a href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</a>
+            <a href="/command-center" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Operator view</a>
           </nav>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
-        <p className="text-dark-400 text-xs uppercase tracking-widest mb-2">Today · {today}</p>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Myke Mueller — Daily focus</h1>
-        <p className="text-dark-300 mt-2 max-w-2xl">The honest ledger. What you said you&apos;d do, what got done, what&apos;s blocked, what ships next. Drop entries here through the day — they roll up into the weekly view.</p>
+      <div className="relative overflow-hidden">
+        <div className="bg-grid absolute inset-0 opacity-40 pointer-events-none" />
+        <div className="hero-orb pointer-events-none" />
+        <div className="relative max-w-6xl mx-auto px-6 pt-12 pb-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 mb-4">
+            <span className="live-dot" />
+            <span className="text-[10px] uppercase tracking-[0.18em] font-mono text-dark-100">Today · {today}</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">Myke Mueller — Daily focus</h1>
+          <p className="text-dark-200 mt-3 max-w-2xl leading-relaxed">The honest ledger. What you said you&apos;d do, what got done, what&apos;s blocked, what ships next. Drop entries here through the day — they roll up into the weekly view.</p>
+        </div>
       </div>
 
       {/* DAILY FOCUS */}

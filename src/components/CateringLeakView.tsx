@@ -20,18 +20,13 @@ function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: 
   );
 }
 
+import { DemoChrome } from '@/components/DemoChrome';
+
 export function CateringLeakFrame({ sample, children }: { sample?: boolean; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">
-          Never 86&apos;d · {sample ? 'Demo' : 'Quick Win'} · For owners
-        </p>
-        <h1 className="text-3xl font-bold text-gold-500 mb-1">Catering Leak</h1>
-        <p className="text-dark-200 mb-8">Per-store catering economics + invoice-vs-POS reconciliation gap. Where the orders ran but the receipts didn&apos;t.</p>
-        {children}
-      </div>
-    </main>
+    <DemoChrome audience="owner" sample={sample} title="Catering Leak" tagline="Per-store catering economics + invoice-vs-POS reconciliation gap. Where the orders ran but the receipts didn't.">
+      {children}
+    </DemoChrome>
   );
 }
 
