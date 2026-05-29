@@ -2,6 +2,7 @@ import type { VoidHunter } from './voidHunter';
 import type { ThreePFees } from './threePFees';
 import type { LaborLeak } from './laborLeak';
 import type { ShiftPulse } from './shiftPulse';
+import type { CateringLeak } from './cateringLeak';
 
 // Clearly-fictional sample data for the public demo tools at /demo/*.
 // NOT a real operator — invented numbers for a made-up 5-unit pizza group,
@@ -103,5 +104,30 @@ export const DEMO_SHIFT_PULSE: ShiftPulse = {
     { name: 'Sam', role: 'manager', station: 'Mgmt', covers: 0, net: 0, voidRate: 0, achievementCount: 2, streakDays: 1 },
     { name: 'Cam', role: 'line cook', station: 'Pizza line', covers: 88, net: 1_540, voidRate: 0.0061, achievementCount: 1, streakDays: 1 },
     { name: 'Riley', role: 'bar', station: 'Bar', covers: 22, net: 1_180, voidRate: 0.0042, achievementCount: 2, streakDays: 2 },
+  ],
+};
+
+export const DEMO_CATERING_LEAK: CateringLeak = {
+  lastIngest: '2026-05-25',
+  networkCateringNet: 612_400,
+  networkCateringOrders: 1_840,
+  networkAvgTicket: 333,
+  inStoreAvgTicket: 32,
+  ticketMultiplier: 10.4,
+  reconciledGapDollars: 38_100,
+  reconciledGapPct: 0.062,
+  storesFlagged: 2,
+  channels: [
+    { name: 'In-house (phone / email)', net: 268_400, orders: 720, feePct: 0 },
+    { name: 'Toast Catering', net: 184_200, orders: 612, feePct: 0.029 },
+    { name: 'EzCater / Foodja (3P)', net: 122_300, orders: 408, feePct: 0.18 },
+    { name: 'Walk-in trays', net: 37_500, orders: 100, feePct: 0 },
+  ],
+  stores: [
+    { name: 'Downtown', cateringNet: 184_500, cateringOrders: 510, avgTicket: 362, invoicedNet: 168_700, reconciledGap: 15_800, flagged: true },
+    { name: 'University', cateringNet: 142_300, cateringOrders: 480, avgTicket: 296, invoicedNet: 134_200, reconciledGap: 8_100, flagged: false },
+    { name: 'Midtown', cateringNet: 118_400, cateringOrders: 340, avgTicket: 348, invoicedNet: 107_900, reconciledGap: 10_500, flagged: true },
+    { name: 'Riverside', cateringNet: 96_200, cateringOrders: 320, avgTicket: 300, invoicedNet: 94_500, reconciledGap: 1_700, flagged: false },
+    { name: 'Airport', cateringNet: 71_000, cateringOrders: 190, avgTicket: 374, invoicedNet: 69_000, reconciledGap: 2_000, flagged: false },
   ],
 };

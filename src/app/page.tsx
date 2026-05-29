@@ -57,7 +57,7 @@ const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string; 
   { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo', aud: 'owners' },
   { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps. The labor screen managers actually want.', href: '/demo/labor-leak', tag: 'live · try the demo', aud: 'managers' },
   { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, your goal, your streak.', href: '/demo/shift-pulse', tag: 'live · try the demo', aud: 'frontline' },
-  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '#', tag: 'coming', aud: 'owners' },
+  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap. The off-prem leak nobody catches.', href: '/demo/catering-leak', tag: 'live · try the demo', aud: 'owners' },
   { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming', aud: 'managers' },
 ];
 
