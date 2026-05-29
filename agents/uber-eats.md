@@ -1,11 +1,11 @@
 # Uber Eats (Tier 1 — 3P delivery)
 
-**Status:** scaffold — confirmed in TB's stack (referenced in daily operator briefs as a real 3P channel)
+**Status:** scaffold — confirmed in the operator's stack (referenced in daily operator briefs as a real 3P channel)
 **Reports to:** 3P Aggregator (Tier 2)
 
 ## What this agent knows
 
-Uber Eats is the second 3P leg of the TB delivery stack. Different settlement format than DoorDash, different fee structure, distinct leak surfaces.
+Uber Eats is the second 3P leg of the operator delivery stack. Different settlement format than DoorDash, different fee structure, distinct leak surfaces.
 
 ### Settlement / payout mechanics
 - **Uber Eats Manager / Merchant Dashboard** — payouts, performance, marketing.
@@ -49,7 +49,7 @@ Uber Eats is the second 3P leg of the TB delivery stack. Different settlement fo
 - predictions of platform-side fee changes (Uber changes their rate card unpredictably; we surface, we don't forecast)
 
 ## Calibration questions (for Rik intake)
-1. Does TB run both Marketplace and Storefront, or just Marketplace?
+1. Does the operator run both Marketplace and Storefront, or just Marketplace?
 2. What's the contracted service fee tier per store?
 3. Is there a monthly promo budget cap set?
 4. Who has Uber Eats Manager access?

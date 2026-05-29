@@ -66,7 +66,7 @@ The specialists must conform to this shape; the aggregator does the cross-platfo
 ## Dependencies (Tier 1)
 - `doordash.md` — must be live with data
 - `uber-eats.md` — must be live with data
-- `grubhub.md` — TB doesn't currently use GH; the aggregator handles missing-platform gracefully ("only 2 of 3 platforms reporting")
+- `grubhub.md` — the operator doesn't currently use GH; the aggregator handles missing-platform gracefully ("only 2 of 3 platforms reporting")
 
 ## Calibration questions
 - None directly for the operator; this agent calibrates from the three Tier 1 specialists

@@ -54,7 +54,7 @@ If any of those contain a real named individual + a financial / behavioral claim
 
 ## The intake sheet asks (for Rik) tied to this agent
 
-- "What's TB's HR posture on surfacing employee-level performance data internally?"
+- "What's the operator's HR posture on surfacing employee-level performance data internally?"
 - "Are there specific stores where the union or works-council rules add extra constraints?"
 - "Who do we route a flagged individual to — store GM directly, area director, or HR central?"
 

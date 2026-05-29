@@ -1,11 +1,11 @@
 # Per-Location Agent Template (Tier 2 — one instance per store)
 
-**Status:** template — instantiates 16 times for Taco Bamba; pattern is reusable for any operator
+**Status:** template — instantiates 16 times for the chef-led 16-unit group; pattern is reusable for any operator
 **Reports to:** the Network Aggregator (cross-store comparison) + the operator's role-views
 
 ## What this agent is
 
-A digital twin of a store GM. Each location gets one instance, calibrated to that store's specific trade area, jurisdiction, anchor presence, and historical performance pattern. The 16 instances for Taco Bamba:
+A digital twin of a store GM. Each location gets one instance, calibrated to that store's specific trade area, jurisdiction, anchor presence, and historical performance pattern. The 16 instances for the chef-led 16-unit group:
 
 | Store | Jurisdiction | Notes |
 |---|---|---|
@@ -78,7 +78,7 @@ All Tier 1 source specialists feed each instance for its location_id:
 - to recommend closing a store
 - to recommend a manager change based on data alone — surfaces, doesn't decide
 
-## Pre-requisite blockers (TB-specific)
+## Pre-requisite blockers (operator-specific)
 - **16 store addresses + geocodes** (NULL in `operator_locations` today) — backfill needed before any per-location agent fires
 - **Jurisdiction registry** built (DC + 6 counties for VA + Montgomery MD + Wake NC + Davidson TN) — Socrata-based for 4 of these, custom for VA counties
 

@@ -1,12 +1,12 @@
 # End of Night Reports (EONR) (Tier 1 — store-level closing form)
 
-**Status:** scaffold — confirmed in TB's stack (Rik forwarded a real Shirlington EONR submission on May 20)
-**Owner contact at TB:** Rik Reinhardt (Executive Director of Technology) — system owner
+**Status:** scaffold — confirmed in the operator's stack (Rik forwarded a real Shirlington EONR submission on May 20)
+**Owner contact at the operator:** Rik Reinhardt (Executive Director of Technology) — system owner
 **Reports to:** Restaurant Accountant (Tier 2) + Customer Success Watcher (Tier 3)
 
 ## What this agent knows
 
-The **End of Night Report** is TB's internal store-level closing form — a structured submission a manager fills out at end-of-shift that consolidates ops data the POS doesn't natively roll up. Captured fields from the real submission Rik forwarded (Shirlington, May 20):
+The **End of Night Report** is the operator's internal store-level closing form — a structured submission a manager fills out at end-of-shift that consolidates ops data the POS doesn't natively roll up. Captured fields from the real submission Rik forwarded (Shirlington, May 20):
 
 ### Captured fields (Verified from email body)
 - **Daily total food cost**
@@ -55,7 +55,7 @@ The **End of Night Report** is TB's internal store-level closing form — a stru
 
 EONR is the **bridge** between what the POS measures (sales, voids, discounts) and what an operator actually needs to manage (food cost %, manager-reported issues, daily reconciliation). It's the cheapest path to a real prime-cost calculation **before** we wire invoice ingestion. Once we know what's in it and how to read it, every store-level finding gets richer.
 
-The "generic" form of this agent: a `store-closing-form` adapter that any operator can attach — TB's EONR is v1, but the shape is universal.
+The "generic" form of this agent: a `store-closing-form` adapter that any operator can attach — the operator's EONR is v1, but the shape is universal.
 
 ## Cross-references
 - **Toast** — sales / voids / discounts reconcile against EONR's reported sales total

@@ -38,9 +38,9 @@ The single canonical "what's deployed and what isn't" file. Replaces having to r
 | Source-tag system | Live · Verified / Estimated / Unverified pills on every figure |
 | Repo | `mykemueller1-ctrl/never86` · default working branch `claude/never86-website-review-gFMgK` |
 
-## Confirmed in Taco Bamba's actual stack (per emails)
+## Confirmed in the chef-led 16-unit group's actual stack (per emails)
 
-| System | Owner at TB | Agent status |
+| System | Owner at the operator | Agent status |
 |---|---|---|
 | Toast (POS) | Rik | `toast.md` scaffold + live pipeline |
 | Thanx (loyalty) | Charissa | `thanx.md` scaffold |
@@ -50,14 +50,14 @@ The single canonical "what's deployed and what isn't" file. Replaces having to r
 | DoorDash (3P) | — | `doordash.md` scaffold |
 | Uber Eats (3P) | — | `uber-eats.md` scaffold |
 
-## NOT confirmed in TB's stack (yet)
+## NOT confirmed in the operator's stack (yet)
 
 - GrubHub — no evidence in emails; don't assume
-- 7shifts / HotSchedules — appear only in Myke's F5Bot Reddit watch feed, not TB usage
-- Restaurant365 / MarketMan — same — F5Bot competitive watch, not TB stack
+- 7shifts / HotSchedules — appear only in Myke's F5Bot Reddit watch feed, not the operator using it
+- Restaurant365 / MarketMan — same — F5Bot competitive watch, not the operator stack
 - Payroll system — not yet identified
 
-## Taco Bamba leadership (verified)
+## the chef-led 16-unit group leadership (verified)
 
 | Name | Title (verified from signature) | Lane |
 |---|---|---|
@@ -71,7 +71,7 @@ The single canonical "what's deployed and what isn't" file. Replaces having to r
 | Amin Seddiq | Beverage Director | Bar program |
 | Justin Rude | Director, Marketing Comms | PR |
 
-**IMC partnership context:** Taco Bamba is majority-owned by **Investors Management Corporation** (parent of Golden Corral) as of 2024–25. Pereira was brought in specifically to scale nationally.
+**IMC partnership context:** the chef-led 16-unit group is majority-owned by **Investors Management Corporation** (parent of Golden Corral) as of 2024–25. Pereira was brought in specifically to scale nationally.
 
 **Roles missing in public record (Rik intake sheet items):** CFO, CMO, Head of HR, Head of Supply Chain, Head of Catering (exec-level), NC/TN area directors.
 
@@ -97,17 +97,17 @@ The single canonical "what's deployed and what isn't" file. Replaces having to r
 - 🔍 Logic toggle on `/command-center` — operator-only provenance overlay
 - Rik intake sheet (markdown — fills the leadership / system gaps)
 - Charissa intake sheet (her lane: digital, loyalty, catering pipeline)
-- Per-location agent stubs — 16 manifests, one per TB store; blocked on address backfill + geocode
+- Per-location agent stubs — 16 manifests, one per operator store; blocked on address backfill + geocode
 - Trade Area / Customer Intelligence agent UI stub
 - Excel / CSV parser agent — universal fallback ingest
 
 ## Known gaps / honest "don't know yet"
 
 - No invoice ingestion → no real food cost % (EONR is the bridge)
-- No labor / scheduling system identified for TB → no real labor %
+- No labor / scheduling system identified for the operator → no real labor %
 - No 3P rate cards seen → 3P fees marked Estimated, not Verified
 - 16 store addresses are NULL in `operator_locations` → per-location agents blocked until backfilled
-- Thanx cohort retention not measurable yet — TB is in first 90 days of loyalty
+- Thanx cohort retention not measurable yet — the operator is in first 90 days of loyalty
 
 ---
 

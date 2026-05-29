@@ -9,7 +9,7 @@ The classic restaurant P&L lens applied to live data — but **operator-language
 
 ### Core ratios it computes (when inputs exist)
 
-| Ratio | Inputs needed | Today's status for TB |
+| Ratio | Inputs needed | Today's status for the operator |
 |---|---|---|
 | **Net sales** | Toast (deduped channel view) | ✅ Live — $15.72M reconciled |
 | **Food cost %** | Net sales + invoice ingestion **OR** EONR-reported food cost | ⏸ blocked — invoices not loaded; EONR fallback once Rik confirms shape |
@@ -18,7 +18,7 @@ The classic restaurant P&L lens applied to live data — but **operator-language
 | **Contribution margin** | Net − (food + labor + 3P fees + occupancy) | ⏸ partial — need occupancy |
 | **3P take rate effective** | 3P Aggregator output | ✅ Estimated today; Verified once specialists land |
 | **First-party % of digital** | Toast deduped channel view | ✅ Live — 38.7% network |
-| **Repeat-customer rate** | Thanx | ⏸ partial — TB in first 90 days of loyalty data |
+| **Repeat-customer rate** | Thanx | ⏸ partial — the operator in first 90 days of loyalty data |
 | **Check average** | Toast | ✅ Live |
 | **Catering as % of net** | Toast catering dining-option | ✅ Live |
 

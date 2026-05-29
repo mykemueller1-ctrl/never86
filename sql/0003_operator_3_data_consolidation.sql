@@ -1,22 +1,22 @@
 -- 0003_taco_bamba_data_consolidation.sql
 --
 -- One-time data cleanup (applied 2026-05-26 to Supabase project `never86`).
--- Goal: consolidate Taco Bamba's real numbers under a single operator account and
+-- Goal: consolidate Chef-Led 16-Unit Group's real numbers under a single operator account and
 -- correct two confirmed double-counts in the imported Toast data.
 --
 -- Before this change the data was scattered:
 --   * operator 3 "Chef-Led 16-Unit Group"  -> the real Toast data (16 stores, 1045
 --     location-breakdown rows, 426 employee-performance rows, 205 agent findings)
---   * operator 4 "Taco Bamba" (partner acct) -> empty except 7 placeholder stores and
+--   * operator 4 "Chef-Led 16-Unit Group" (partner acct) -> empty except 7 placeholder stores and
 --     6 decision rules that duplicated operator 3's
 --   * operator 1 "Community Pizza & Tap" (owner) -> held a misfiled April 2026 Toast
---     sales import (101 rows) that actually belongs to Taco Bamba
+--     sales import (101 rows) that actually belongs to Chef-Led 16-Unit Group
 --
 -- A full snapshot of every modified table was taken first into zz_backup_20260526_*.
 
 begin;
 
--- 1. Move the misfiled April 2026 Toast import off Community Pizza onto Taco Bamba.
+-- 1. Move the misfiled April 2026 Toast import off Community Pizza onto Chef-Led 16-Unit Group.
 --    It is a 16-store monthly aggregate, so it is not tied to a single store.
 update operator_sales_transactions set operator_id = 3, location_id = null where operator_id = 1;
 
@@ -26,17 +26,17 @@ delete from mm_decision_rules where operator_id = 4;
 -- 3. Drop operator 4's 7 empty placeholder stores (nothing references locations 18-24).
 delete from operator_locations where operator_id = 4;
 
--- 4. Remove the empty duplicate Taco Bamba stub, freeing the partner email.
+-- 4. Remove the empty duplicate Chef-Led 16-Unit Group stub, freeing the partner email.
 delete from operator_users where id = 4;
 
--- 5. Promote the data-holding account (operator 3) to the real Taco Bamba partner account.
+-- 5. Promote the data-holding account (operator 3) to the real Chef-Led 16-Unit Group partner account.
 update operator_users
-  set name = 'Taco Bamba', restaurant_name = 'Taco Bamba', email = 'partner-tacobamba@n86.app'
+  set name = 'Chef-Led 16-Unit Group', restaurant_name = 'Chef-Led 16-Unit Group', email = 'partner-operator3@n86.app'
   where id = 3;
 
 -- 6. Give the 16 real stores proper names (city + original Toast store code).
 update operator_locations
-  set name = 'Taco Bamba — ' || city || ' (#' || substring(name from 'Store ([0-9]+)') || ')'
+  set name = 'Chef-Led 16-Unit Group — ' || city || ' (#' || substring(name from 'Store ([0-9]+)') || ')'
   where operator_id = 3 and name like 'Store %';
 
 commit;

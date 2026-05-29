@@ -1,6 +1,6 @@
 # DoorDash (Tier 1 — 3P delivery)
 
-**Status:** scaffold — confirmed in TB's stack (DoorDash MFS tax-breakdown reports per store visible in inbox, e.g. `STORE-2298691`)
+**Status:** scaffold — confirmed in the operator's stack (DoorDash MFS tax-breakdown reports per store visible in inbox, e.g. `STORE-2298691`)
 **Reports to:** 3P Aggregator (Tier 2)
 
 ## What this agent knows
@@ -9,7 +9,7 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 
 ### Settlement / payout mechanics
 - **DoorDash Merchant Portal** — daily / weekly payout statements, broken down by store.
-- **MFS (Merchant Financial Services) reports** — the **tax breakdown report** TB receives in s3 with per-store IDs; lists per-order subtotal, tax, tips, commission, marketing fee, partner contribution.
+- **MFS (Merchant Financial Services) reports** — the **tax breakdown report** the operator receives in s3 with per-store IDs; lists per-order subtotal, tax, tips, commission, marketing fee, partner contribution.
 - **Daily payout reconciliation is notoriously 5–15% off** vs the operator's POS for the same period without a rebuild (timing windows, refunds posted to the wrong day, marketing-fee accruals).
 - The **Drive** product (DoorDash white-label delivery) settles differently than the marketplace product — flat per-delivery fee vs % commission.
 
@@ -32,7 +32,7 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 
 ## Data sources required
 - DoorDash **Merchant Portal API** (paid tier; not all features available without enterprise account)
-- **MFS report CSVs** (already arriving in TB's inbox per store)
+- **MFS report CSVs** (already arriving in the operator's inbox per store)
 - **Toast POS** for the same-period reconciliation cross-check
 
 ## Can claim (`Verified`)
@@ -49,9 +49,9 @@ DoorDash is the largest US 3P delivery channel. The platform's economics are mur
 - to advise on legal contract terms (defer to operator's lawyer)
 
 ## Calibration questions (for Rik intake)
-1. What's TB's current DD contract — commission tier per store?
+1. What's the operator's current DD contract — commission tier per store?
 2. Are stores opted into any marketing-fee programs?
-3. Who at TB has Merchant Portal access (read-only would be fine for us)?
+3. Who at the operator has Merchant Portal access (read-only would be fine for us)?
 4. Is there a recent DD rate card we can compare effective rate against?
 
 ## Cross-references

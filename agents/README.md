@@ -32,16 +32,16 @@ The Checker (Tier 0) enforces these declarations on every output.
 - `checker.md` — the rule enforcer
 - `myke-mueller-logic.md` — operator wisdom + veto
 
-### Tier 1 — Source specialists (confirmed in Taco Bamba's stack)
+### Tier 1 — Source specialists (confirmed in the chef-led 16-unit group's stack)
 - `toast.md` — POS
 - `thanx.md` — loyalty
 - `marqii.md` — listings management *(new — caught from Rik email)*
 - `looker.md` — BI middleware *(new — Thanx reports flow through it)*
-- `end-of-night-reports.md` — store-level closing forms *(new — TB's internal system)*
+- `end-of-night-reports.md` — store-level closing forms *(new — the operator's internal system)*
 - `doordash.md` — 3P delivery (MFS settlement)
 - `uber-eats.md` — 3P delivery
 
-### Tier 1 — Source specialists (stubs, not yet in TB's stack)
+### Tier 1 — Source specialists (stubs, not yet in the operator's stack)
 - `grubhub.md`, `square.md`, `clover.md`, `aloha.md`, `lightspeed.md` — additional POS / 3P; lit up when a future operator uses them
 - Scheduling/payroll specialists (`7shifts`, `hotschedules`, `homebase`, `adp`, `gusto`) — same
 

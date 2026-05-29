@@ -1,6 +1,6 @@
 # Toast (Tier 1 — POS)
 
-**Status:** live — TB's primary POS; data flowing into the platform via Toast IQ export pipeline
+**Status:** live — the operator's primary POS; data flowing into the platform via Toast IQ export pipeline
 **Reports to:** every Tier 2 aggregator (this is the trunk of the data tree)
 
 ## What this agent knows
@@ -25,7 +25,7 @@ Toast is the dominant fast-casual / casual POS in the US. The platform's deepest
 - **Discount codes** are separate from voids — comps, promos, employee meal, manager comp.
 
 ### Toast export pipeline (`toast_iq_export`)
-- TB's Toast data flows through a scheduled export → S3 → our ingest job → the `toast_*` tables in our ops DB.
+- the operator's Toast data flows through a scheduled export → S3 → our ingest job → the `toast_*` tables in our ops DB.
 - Ingest cadence: nightly.
 - **Freshness check is part of every render** — the rendered page shows "last data refresh: <date>" (genericized for customers).
 
@@ -40,7 +40,7 @@ Toast is the dominant fast-casual / casual POS in the US. The platform's deepest
 These are the shapes the **Excel/CSV parser** agent reads for operators not on the Toast IQ export pipeline.
 
 ## Data sources required
-- Toast IQ export bucket (TB) — already wired
+- Toast IQ export bucket (the operator) — already wired
 - Per-operator Toast API credentials (longer-term, for real-time)
 
 ## Can claim (`Verified`)

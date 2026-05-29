@@ -1,7 +1,7 @@
 # Marqii (Tier 1 — listings management)
 
-**Status:** scaffold — confirmed in Taco Bamba's stack (Rik, May 28, 2026: "Charissa will act as your contact for Marqii data. First round of reports 6/1")
-**Owner contact at TB:** Charissa Costa (Director of Digital Sales)
+**Status:** scaffold — confirmed in the chef-led 16-unit group's stack (Rik, May 28, 2026: "Charissa will act as your contact for Marqii data. First round of reports 6/1")
+**Owner contact at the operator:** Charissa Costa (Director of Digital Sales)
 **Reports to:** Restaurant Accountant (Tier 2) + Trade Area agent (Tier 2)
 
 ## What this agent knows
@@ -45,8 +45,8 @@ Marqii is a **multi-location listings + reviews + menus management** platform. I
 
 ## Calibration questions (for Charissa / Rik intake)
 1. Which channels are connected via Marqii today? (Google + Yelp confirmed; Apple? TripAdvisor? Facebook?)
-2. Who at TB approves listing edits (per-store managers or central)?
-3. Is there a current menu drift backlog Marqii is flagging that TB hasn't acted on?
+2. Who at the operator approves listing edits (per-store managers or central)?
+3. Is there a current menu drift backlog Marqii is flagging that the operator hasn't acted on?
 4. What's the cadence of the 6/1 reports — daily / weekly / monthly?
 
 ## Cross-references

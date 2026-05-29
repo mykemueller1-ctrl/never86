@@ -7,7 +7,7 @@
 
 The site-selection lens applied retrospectively to every store, and forward to any new store the operator considers. Encodes the **operator's** site logic — not academic real-estate dogma.
 
-### The scoring rubric (Myke Mueller Logic v1.3, locked for TB)
+### The scoring rubric (Myke Mueller Logic v1.3, locked for the operator)
 
 | Signal | Free source | Weight |
 |---|---|---|
@@ -44,13 +44,13 @@ Tier within each zone: chef-driven Mexican > casual chain (Chipotle, Qdoba) > lo
 ### The market-aware override pattern
 
 Default: evening nightlife (closes by ~11) = good; 2am late-night = penalty.
-**Nashville override** for TB Store #301: late-night is **bonus** (Broadway crowd is part of the play).
+**Nashville override** for the operator Store #301: late-night is **bonus** (Broadway crowd is part of the play).
 This pattern generalizes — every operator gets an exception map per store.
 
 ## What it produces per store
 
 - **Trade Area score (0–100)** + the named anchors found within 1 mi
-- **One-sentence verdict in operator voice** ("Falls Church — premium grocery + retail cluster + dense office daytime + closes-by-11 nightlife = textbook Taco Bamba fit.")
+- **One-sentence verdict in operator voice** ("Falls Church — premium grocery + retail cluster + dense office daytime + closes-by-11 nightlife = textbook the chef-led 16-unit group fit.")
 - **Halo anchor list** found
 - **Mexican Heat Map** with 5-mile dots and tier classification
 - **Gap-vs-ideal flag** when a store deviates from the operator's site pattern
@@ -79,7 +79,7 @@ This pattern generalizes — every operator gets an exception map per store.
 - to advise on lease terms or new-store-opening go/no-go without operator decision
 
 ## Pre-requisite blockers
-- 16 store addresses + geocodes (NULL in `operator_locations` today) — backfill needed before this agent fires for TB
+- 16 store addresses + geocodes (NULL in `operator_locations` today) — backfill needed before this agent fires for the operator
 - Myke approval on each data source per the gate rule
 
 ## Cross-references

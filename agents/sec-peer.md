@@ -7,7 +7,7 @@
 
 Pulls public-company filings from SEC EDGAR for the operator's competitive peer set, normalizes the comparable margin metrics, and produces a side-by-side benchmark on the CFO dashboard.
 
-For Taco Bamba's peer set, this overlaps with the locked Tier 1 halo brands:
+For the chef-led 16-unit group's peer set, this overlaps with the locked Tier 1 halo brands:
 
 | Peer | Ticker | Why this peer for fast-casual Mexican |
 |---|---|---|

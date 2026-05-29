@@ -1,6 +1,6 @@
 # Thanx (Tier 1 — loyalty)
 
-**Status:** scaffold — confirmed in TB's stack; Charissa Costa is the owner; TB is "in the first 90 days" of Thanx (per recent emails)
+**Status:** scaffold — confirmed in the operator's stack; Charissa Costa is the owner; the operator is "in the first 90 days" of Thanx (per recent emails)
 **Reports to:** Restaurant Accountant (Tier 2) + 3P Aggregator (Tier 2 — Thanx Pickup/Delivery is a first-party channel)
 **Delivery layer:** Looker (see `looker.md`) — Charissa receives Thanx reports through Looker email schedules
 
@@ -10,7 +10,7 @@ Thanx is an enterprise loyalty + CRM platform for restaurants. Drives **first-pa
 
 ### Thanx primitives
 - **Loyalty members** — signed-up customers with profile + transaction history
-- **Tiers** — TB has at least a **Bamba Ultra** tier (high-value members); standard tier below
+- **Tiers** — the operator runs a **high-value "Ultra"** tier (high-value members); standard tier below
 - **Rewards** — earn-and-redeem mechanics, points or punches depending on configuration
 - **Channels** — Thanx Pickup (member places order, picks up at store) and Thanx Delivery (member orders, Thanx-managed delivery)
 - **Campaigns** — automated lifecycle emails, win-backs, birthday offers, churn-prevention pushes
@@ -41,7 +41,7 @@ Thanx is an enterprise loyalty + CRM platform for restaurants. Drives **first-pa
 - per-member transaction frequency + average ticket
 
 ## Cannot claim (must `Estimated`)
-- **Cohort retention curves** until we have enough membership history (Charissa noted TB is in "first 90 days" — not enough cohort data yet)
+- **Cohort retention curves** until we have enough membership history (Charissa noted the operator is in "first 90 days" — not enough cohort data yet)
 - **Lifetime value (LTV)** projections — modeled, not measured until cohorts mature
 - **Acquisition-cost-per-member** unless we have the marketing spend tied to acquisition (which lives outside Thanx)
 
@@ -51,9 +51,9 @@ Thanx is an enterprise loyalty + CRM platform for restaurants. Drives **first-pa
 
 ## Calibration questions (for Charissa / Rik intake)
 1. Which Thanx Looker reports does Charissa receive today? (subjects + cadence)
-2. What's the current opt-in rate at TB's best store vs worst — directional?
+2. What's the current opt-in rate at the operator's best store vs worst — directional?
 3. Is there a defined "win-back" campaign running, and does Thanx report attribution back to it?
-4. Are TB's marketing spend dollars (Google / Meta / local) tracked anywhere alongside Thanx acquisition, so we can compute CAC?
+4. Are the operator's marketing spend dollars (Google / Meta / local) tracked anywhere alongside Thanx acquisition, so we can compute CAC?
 
 ## Cross-references
 - **Looker** — the delivery layer; the Looker agent owns email parsing of scheduled Thanx reports
