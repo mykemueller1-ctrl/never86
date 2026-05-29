@@ -19,7 +19,10 @@ export default function ReportsLogin() {
       const data = await res.json();
       if (data.success) {
         const next = new URLSearchParams(window.location.search).get('next');
-        window.location.href = next && next.startsWith('/reports') ? next : '/reports/taco-bamba';
+        const fallback = data.defaultNext || '/command-center';
+        const isSafe = (p: string | null): p is string =>
+          !!p && (p.startsWith('/reports') || p.startsWith('/command-center') || p.startsWith('/tools') || p.startsWith('/admin'));
+        window.location.href = isSafe(next) ? next : fallback;
         return;
       }
       setStatus('error');
@@ -34,7 +37,7 @@ export default function ReportsLogin() {
     <main className="min-h-screen bg-dark-800 flex flex-col items-center justify-center px-6">
       <div className="max-w-sm w-full text-center">
         <h1 className="text-3xl font-bold text-gold-500 mb-2">Never 86&apos;d</h1>
-        <p className="text-dark-300 text-sm mb-8">Operator reports — sign in to continue.</p>
+        <p className="text-dark-300 text-sm mb-8">Sign in to continue.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="password"
@@ -53,6 +56,9 @@ export default function ReportsLogin() {
           </button>
           {status === 'error' ? <p className="text-red-400 text-sm">{message}</p> : null}
         </form>
+        <p className="text-dark-400 text-xs mt-8">
+          Not an operator yet? <a href="/operators" className="text-gold-400 hover:underline">Start here</a>
+        </p>
       </div>
     </main>
   );

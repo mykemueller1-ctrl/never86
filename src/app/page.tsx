@@ -52,11 +52,40 @@ const AGENTS_MENU: { group: string; items: { name: string; tag?: string }[] }[] 
   { group: 'Governance', items: [{ name: 'Source-tag enforcer' }, { name: 'HR / legal red-team' }, { name: 'Brand-voice enforcer' }] },
 ];
 
-const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string }[] = [
-  { name: 'Void Hunter', line: 'Voids vs your own peer median, by store and by name. Flags patterns, never verdicts.', href: '/demo/void-hunter', tag: 'live · try the demo' },
-  { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo' },
-  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '#', tag: 'coming' },
-  { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming' },
+const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string; aud?: string }[] = [
+  { name: 'Void Hunter', line: 'Voids vs your own peer median, by store and by name. Flags patterns, never verdicts.', href: '/demo/void-hunter', tag: 'live · try the demo', aud: 'owners' },
+  { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo', aud: 'owners' },
+  { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps. The labor screen managers actually want.', href: '/demo/labor-leak', tag: 'live · try the demo', aud: 'managers' },
+  { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, the one thing to fix.', href: '#', tag: 'coming', aud: 'frontline' },
+  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '#', tag: 'coming', aud: 'owners' },
+  { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming', aud: 'managers' },
+];
+
+// Two-product framing — what never86 sells.
+const PRODUCTS: { kicker: string; name: string; line: string; bullets: string[]; status: 'live' | 'coming'; href: string }[] = [
+  {
+    kicker: 'Product 01',
+    name: 'Financial intelligence',
+    line: 'For owners and CFOs. Every dollar your restaurants move, read, reconciled, source-tagged.',
+    bullets: ['Command Center · role-based one-screen view', 'Void Hunter · 3P Fee Finder · Labor Leak', 'Per-location agents + Trade-Area scorecards', 'Source-tag discipline on every figure'],
+    status: 'live',
+    href: '/operators',
+  },
+  {
+    kicker: 'Product 02',
+    name: 'People-native AI · end-to-end',
+    line: 'For managers and the crew. Gamified shifts, knowledge brain, daily standup that helps. Built on a real restaurant.',
+    bullets: ['Shift Pulse · station medians, tonight’s goal', 'Knowledge Brain · recipes + specs + service rules', 'Gamified achievements & streaks', 'Manager + frontline coach loop'],
+    status: 'coming',
+    href: '/operators#talk',
+  },
+];
+
+// Three audiences the platform serves at once.
+const AUDIENCE: { h: string; p: string; wins: string[] }[] = [
+  { h: 'Owners', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Trade-Area scorecard'] },
+  { h: 'Managers', p: 'Tonight’s shift in one screen. Labor before payroll closes.', wins: ['Labor Leak', 'Shift Pulse', 'Tip Variance'] },
+  { h: 'Front-line crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Knowledge Brain', 'Achievements', 'Frontline coach'] },
 ];
 
 const OUTSIDE_STACK_MENU: { group: string; items: { name: string; line: string }[] }[] = [
@@ -126,6 +155,7 @@ export default function Home() {
             <button type="button" onClick={() => toggle('wins')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'wins' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Quick wins <span className="text-dark-500">▾</span></button>
             <button type="button" onClick={() => toggle('agents')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'agents' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Agents <span className="text-dark-500">▾</span></button>
             <button type="button" onClick={() => toggle('outside')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border ${openMenu === 'outside' ? 'border-gold-500 text-white' : 'border-transparent text-dark-300 hover:text-white'}`}>Outside the stack <span className="text-dark-500">▾</span></button>
+            <a href="/operators" className="hidden sm:inline text-dark-300 hover:text-white px-3 py-1.5">For operators</a>
             <a href="/reports/login" className="text-dark-200 hover:text-gold-400 border border-dark-600 rounded-lg px-3 py-1.5 ml-1">Sign in</a>
           </div>
         </div>
@@ -142,6 +172,7 @@ export default function Home() {
                       <span className="text-white font-semibold">{q.name}</span>
                       <span className="text-[10px] uppercase tracking-wider text-gold-300">{q.tag}</span>
                     </div>
+                    {q.aud ? <p className="text-gold-400 text-[10px] uppercase tracking-wider mb-1">for {q.aud}</p> : null}
                     <p className="text-dark-300 text-sm">{q.line}</p>
                   </a>
                 ))}
@@ -272,6 +303,56 @@ export default function Home() {
             recovery surface, we corrected it down to the figure we can defend to the penny. The discipline is the
             product — and it&apos;s why operators can trust what we put on the screen.
           </p>
+        </div>
+      </section>
+
+      {/* Two products — what never86 sells */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-gold-500 text-xs uppercase tracking-widest mb-2 text-center">Two products · one platform</h2>
+        <p className="text-3xl font-bold text-center mb-10">For the back office AND the people on the floor.</p>
+        <div className="grid md:grid-cols-2 gap-5">
+          {PRODUCTS.map((p) => (
+            <div key={p.name} className="bg-dark-700 border border-dark-600 rounded-2xl p-7 flex flex-col">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-gold-500 text-[10px] uppercase tracking-widest">{p.kicker}</p>
+                <span className={`text-[10px] uppercase tracking-wider font-semibold rounded-full px-2.5 py-0.5 ${p.status === 'live' ? 'bg-green-500/10 text-green-300 border border-green-700/40' : 'bg-gold-500/10 text-gold-300 border border-gold-700/40'}`}>
+                  {p.status === 'live' ? 'Live · in production' : 'Coming · in build'}
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-white mb-2">{p.name}</p>
+              <p className="text-dark-300 leading-relaxed mb-4">{p.line}</p>
+              <ul className="space-y-1.5 mb-5 flex-1">
+                {p.bullets.map((b) => (
+                  <li key={b} className="text-white text-sm flex items-start gap-2">
+                    <span className="text-gold-500 mt-0.5">·</span> <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href={p.href} className="inline-block text-gold-400 hover:text-gold-300 text-sm font-semibold">{p.status === 'live' ? 'See it →' : 'Get on the list →'}</a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Three audiences */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-gold-500 text-xs uppercase tracking-widest mb-2 text-center">Three audiences</h2>
+        <p className="text-3xl font-bold text-center mb-10">The back office isn&apos;t the only one that runs the restaurant.</p>
+        <div className="grid md:grid-cols-3 gap-5">
+          {AUDIENCE.map((a) => (
+            <div key={a.h} className="bg-dark-700 border border-dark-600 rounded-2xl p-7">
+              <p className="text-gold-400 font-semibold text-lg mb-2">{a.h}</p>
+              <p className="text-dark-300 leading-relaxed mb-4">{a.p}</p>
+              <p className="text-dark-400 text-[10px] uppercase tracking-wider mb-1.5">Quick wins built for them</p>
+              <ul className="space-y-1">
+                {a.wins.map((w) => (
+                  <li key={w} className="text-white text-sm flex items-center gap-2">
+                    <span className="text-gold-500">·</span> {w}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
