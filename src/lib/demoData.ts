@@ -3,6 +3,7 @@ import type { ThreePFees } from './threePFees';
 import type { LaborLeak } from './laborLeak';
 import type { ShiftPulse } from './shiftPulse';
 import type { CateringLeak } from './cateringLeak';
+import type { TipVariance } from './tipVariance';
 
 // Clearly-fictional sample data for the public demo tools at /demo/*.
 // NOT a real operator — invented numbers for a made-up 5-unit pizza group,
@@ -129,5 +130,28 @@ export const DEMO_CATERING_LEAK: CateringLeak = {
     { name: 'Midtown', cateringNet: 118_400, cateringOrders: 340, avgTicket: 348, invoicedNet: 107_900, reconciledGap: 10_500, flagged: true },
     { name: 'Riverside', cateringNet: 96_200, cateringOrders: 320, avgTicket: 300, invoicedNet: 94_500, reconciledGap: 1_700, flagged: false },
     { name: 'Airport', cateringNet: 71_000, cateringOrders: 190, avgTicket: 374, invoicedNet: 69_000, reconciledGap: 2_000, flagged: false },
+  ],
+};
+
+export const DEMO_TIP_VARIANCE: TipVariance = {
+  lastIngest: '2026-05-25',
+  weekLabel: 'Week of May 19',
+  networkTotalTips: 84_200,
+  networkAvgPerCover: 4.72,
+  networkVariancePct: -0.082,
+  storesFlagged: 2,
+  stores: [
+    { name: 'Downtown', totalTips: 24_100, perCoverAvg: 5.41, weekVariance: -0.121, flagged: true },
+    { name: 'Midtown', totalTips: 18_600, perCoverAvg: 4.92, weekVariance: -0.094, flagged: true },
+    { name: 'University', totalTips: 15_400, perCoverAvg: 4.51, weekVariance: -0.045, flagged: false },
+    { name: 'Riverside', totalTips: 14_800, perCoverAvg: 4.62, weekVariance: 0.018, flagged: false },
+    { name: 'Airport', totalTips: 11_300, perCoverAvg: 3.81, weekVariance: -0.032, flagged: false },
+  ],
+  movers: [
+    { store: 'Downtown', name: 'Server #14', role: 'server', tipsThisWeek: 980, tipsLastWeek: 1_420, deltaPct: -0.31 },
+    { store: 'Downtown', name: 'Bartender #2', role: 'bar', tipsThisWeek: 1_120, tipsLastWeek: 1_540, deltaPct: -0.27 },
+    { store: 'Midtown', name: 'Server #9', role: 'server', tipsThisWeek: 840, tipsLastWeek: 1_180, deltaPct: -0.29 },
+    { store: 'Riverside', name: 'Server #6', role: 'server', tipsThisWeek: 1_290, tipsLastWeek: 1_080, deltaPct: 0.19 },
+    { store: 'University', name: 'Server #11', role: 'server', tipsThisWeek: 1_140, tipsLastWeek: 1_050, deltaPct: 0.09 },
   ],
 };

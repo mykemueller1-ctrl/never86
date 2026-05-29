@@ -58,7 +58,7 @@ const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string; 
   { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps. The labor screen managers actually want.', href: '/demo/labor-leak', tag: 'live · try the demo', aud: 'managers' },
   { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, your goal, your streak.', href: '/demo/shift-pulse', tag: 'live · try the demo', aud: 'frontline' },
   { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap. The off-prem leak nobody catches.', href: '/demo/catering-leak', tag: 'live · try the demo', aud: 'owners' },
-  { name: 'Tip Variance', line: 'Tip pool variance week-over-week; the leading indicator the POS misses.', href: '#', tag: 'coming', aud: 'managers' },
+  { name: 'Tip Variance', line: 'Week-over-week tip movement per store and by name. Service slipping shows up here before sales do.', href: '/demo/tip-variance', tag: 'live · try the demo', aud: 'managers' },
 ];
 
 // Two-product framing — what never86 sells.
