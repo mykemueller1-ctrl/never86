@@ -164,6 +164,7 @@ export default function Home() {
             <button type="button" onClick={() => toggle('agents')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'agents' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Agents <span className="text-dark-400">▾</span></button>
             <button type="button" onClick={() => toggle('outside')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'outside' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Outside the stack <span className="text-dark-400">▾</span></button>
             <a href="/operators" className="hidden sm:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</a>
+            <a href="/answers" className="hidden md:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Answers</a>
             <a href="/reports/login" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 ml-1 transition-colors">Sign in</a>
           </div>
         </div>
@@ -227,7 +228,7 @@ export default function Home() {
                 <span className="accent-rule flex-1" />
                 <span className="text-dark-300 text-xs">we sit next to your POS, not inside it</span>
               </div>
-              <p className="text-dark-200 text-sm mb-5">Every external feed source-tagged. Free, public, government-canonical where possible. No source wired without operator approval.</p>
+              <p className="text-dark-200 text-sm mb-5">We don&apos;t replace Toast, R365, 7shifts, or Thanx. We sit on top and tell you when one of them is lying to you. Every external feed source-tagged. Free, public, government-canonical where possible. No source wired without operator approval.</p>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
                 {OUTSIDE_STACK_MENU.map((g) => (
                   <div key={g.group}>
@@ -262,9 +263,15 @@ export default function Home() {
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 via-gold-400 to-copper-400">Name who owns it.</span><br className="hidden sm:block" />
             Keep the receipt.
           </h1>
-          <p className="text-dark-200 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-dark-200 text-lg md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed">
             We read every dollar your restaurants move, find where it&apos;s leaking, and show our work on every number —
             so you act on facts, not hunches.
+          </p>
+          <p className="text-dark-100 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            Every number ships tagged <span className="text-green-300 font-semibold">Verified</span>,
+            <span className="text-gold-300 font-semibold"> Estimated</span>, or
+            <span className="text-red-300 font-semibold"> Unverified</span>.
+            <span className="text-dark-300"> Ask us why.</span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
             <a href="/operators" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
@@ -398,16 +405,16 @@ export default function Home() {
         <div className="relative overflow-hidden rounded-3xl border border-gold-700/40 bg-gradient-to-br from-dark-800 via-dark-800 to-dark-900 p-10 md:p-14 text-center">
           <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(212,154,14,0.18), transparent 60%)' }} />
           <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(226,92,18,0.15), transparent 60%)' }} />
-          <p className="relative text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-5">The trust move</p>
+          <p className="relative text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-5">Last quarter we said $8.3M. The honest number was $1.81M.</p>
           <p className="relative text-4xl md:text-6xl font-bold tabular-nums font-mono tracking-tight mb-6">
             <span className="text-dark-100">$8.3M</span>
             <span className="text-dark-500 mx-3">→</span>
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 to-copper-400">$1.81M</span>
           </p>
           <p className="relative text-dark-200 max-w-2xl mx-auto leading-relaxed">
-            Most vendors inflate the number to look impressive. We did the opposite. When our model overstated the
-            recovery surface, we corrected it down to the figure we can defend to the penny. The discipline is the
-            product — and it&apos;s why operators can trust what we put on the screen.
+            Every other vendor brags about accuracy gains. We do the opposite — we publish the corrections.
+            When our model overstated the recovery surface, we walked it back to the figure we can defend to the penny.
+            That walk-back is the product. No competitor has published one. <a href="/answers/walked-the-number-back" className="text-gold-300 hover:text-gold-200 underline">Here&apos;s how we caught it</a>.
           </p>
         </div>
       </section>
@@ -463,7 +470,9 @@ export default function Home() {
             <span>Never 86&apos;d · Built by an operator, for operators</span>
           </div>
           <div className="flex items-center gap-5">
+            <a href="/answers" className="hover:text-gold-300 transition-colors">Answers</a>
             <a href="/operators" className="hover:text-gold-300 transition-colors">For operators</a>
+            <a href="/press" className="hover:text-gold-300 transition-colors">Press</a>
             <a href="/reports/login" className="hover:text-gold-300 transition-colors">Sign in</a>
           </div>
         </div>
