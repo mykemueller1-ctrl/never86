@@ -196,6 +196,7 @@ export default function Home() {
           <div className="flex items-center gap-5">
             <Link href="/for" className="hover:text-ink-800 transition-colors">Seats</Link>
             <Link href="/answers" className="hover:text-ink-800 transition-colors">Answers</Link>
+            <Link href="/mcp" className="hover:text-ink-800 transition-colors">For AI</Link>
             <Link href="/press" className="hover:text-ink-800 transition-colors">Press</Link>
             <Link href="/reports/login" className="hover:text-ink-800 transition-colors">Sign in</Link>
           </div>
