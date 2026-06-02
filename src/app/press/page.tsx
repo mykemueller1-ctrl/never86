@@ -49,14 +49,14 @@ const FACTS = [
 export default function PressKit() {
   return (
     <main className="min-h-screen text-dark-50">
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl print:hidden">
+      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell print:hidden">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <span className="brand-monogram">N86</span>
             <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Home</Link>
+            <Link href="/" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Home</Link>
             <a href="javascript:window.print()" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Save as PDF</a>
           </div>
         </div>
@@ -66,14 +66,14 @@ export default function PressKit() {
         <div className="flex items-center gap-3 mb-8">
           <span className="brand-monogram" style={{ width: '2.5rem', height: '2.5rem', fontSize: '0.85rem', borderRadius: '0.65rem' }}>N86</span>
           <div>
-            <p className="text-3xl font-bold text-white tracking-tight">Never 86&apos;d</p>
+            <p className="text-3xl font-bold text-ink-800 tracking-tight">Never 86&apos;d</p>
             <p className="text-gold-400 text-sm">Restaurant financial intelligence · built by an operator, for operators</p>
           </div>
         </div>
 
         <section className="mb-12">
           <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Positioning</p>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-white mb-5">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-ink-800 mb-5">
             Find the leak. Name who owns it. Keep the receipt.
           </h1>
           <p className="text-dark-200 text-lg leading-relaxed max-w-3xl">
@@ -103,7 +103,7 @@ export default function PressKit() {
             {PRODUCTS.map((p) => (
               <div key={p.name} className="elevated-card rounded-2xl p-6">
                 <p className="text-[10px] uppercase tracking-[0.18em] font-mono mb-1.5 text-dark-300">{p.status}</p>
-                <p className="text-xl font-semibold text-white mb-2 tracking-tight">{p.name}</p>
+                <p className="text-xl font-semibold text-ink-800 mb-2 tracking-tight">{p.name}</p>
                 <p className="text-dark-200 text-sm leading-relaxed">{p.body}</p>
               </div>
             ))}
@@ -116,7 +116,7 @@ export default function PressKit() {
             {QUICK_WINS.map((q) => (
               <div key={q.name} className="elevated-card rounded-xl p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-white font-semibold">{q.name}</p>
+                  <p className="text-ink-800 font-semibold">{q.name}</p>
                   <span className="text-copper-300 text-[10px] uppercase tracking-[0.18em] font-mono">For {q.aud}</span>
                 </div>
                 <p className="text-dark-200 text-sm leading-relaxed">{q.line}</p>
@@ -130,7 +130,7 @@ export default function PressKit() {
           <p className="text-dark-100 text-base leading-relaxed">
             Most vendors inflate the number to look impressive. We did the opposite. When our model overstated the
             recovery surface, we corrected it down to the figure we can defend to the penny:
-            <span className="font-mono tabular-nums text-white"> $8.3M → $1.81M</span>. That walk-back is the product —
+            <span className="font-mono tabular-nums text-ink-800"> $8.3M → $1.81M</span>. That walk-back is the product —
             the discipline of correcting your own number is the moat.
           </p>
         </section>
@@ -138,7 +138,7 @@ export default function PressKit() {
         <section className="mb-12">
           <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Founder</p>
           <div className="elevated-card rounded-2xl p-6">
-            <p className="text-xl font-semibold text-white tracking-tight mb-1">Myke Mueller · Founder &amp; CEO</p>
+            <p className="text-xl font-semibold text-ink-800 tracking-tight mb-1">Myke Mueller · Founder &amp; CEO</p>
             <p className="text-gold-400 text-sm mb-4">Operator first. Founder second.</p>
             <p className="text-dark-200 leading-relaxed">
               Myke runs Community Tap &amp; Pizza in Storm Lake, Iowa, a 41-staff people-first restaurant — and built never86&apos;d on the back of two decades of operator pain.

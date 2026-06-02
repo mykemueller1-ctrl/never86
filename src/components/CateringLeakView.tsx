@@ -7,11 +7,11 @@ const usd = (v: number) =>
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
 function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'red' | 'gold' | 'green' }) {
-  const v = tone === 'red' ? 'text-red-300' : tone === 'green' ? 'text-green-300' : tone === 'gold' ? 'text-gold-300' : 'text-white';
+  const v = tone === 'red' ? 'text-red-300' : tone === 'green' ? 'text-green-300' : tone === 'gold' ? 'text-warning-500' : 'text-ink-800';
   return (
-    <div className="bg-dark-700 rounded-xl p-5 border border-dark-600">
+    <div className="card rounded-xl p-5">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-dark-300 text-xs uppercase tracking-wide">{label}</p>
+        <p className="text-ink-500 text-xs uppercase tracking-wide">{label}</p>
         <SourceTag level="verified" />
       </div>
       <p className={`text-2xl font-bold leading-tight ${v}`}>{value}</p>
@@ -34,10 +34,10 @@ function SampleBanner() {
   return (
     <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
-        <p className="text-gold-300 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
+        <p className="text-warning-500 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
         <p className="text-dark-200 text-sm">Made-up numbers for a 5-unit demo. Wire your POS + invoice ingest to reconcile catering live.</p>
       </div>
-      <Link href="/operators#talk" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-dark-900 font-semibold rounded-lg px-4 py-2 text-sm">
+      <Link href="/operators#talk" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-lg px-4 py-2 text-sm">
         Connect your data
       </Link>
     </div>
@@ -56,8 +56,8 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
         <Kpi label="Stores above 5% gap" value={`${d.storesFlagged} of ${d.stores.length}`} sub="needs invoice reconciliation" tone="gold" />
       </div>
 
-      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-8">
-        <p className="text-amber-300 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
+      <div className="bg-warning-500/5 border border-warning-500/30 rounded-xl p-4 mb-8">
+        <p className="text-warning-500 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
         <p className="text-dark-200 text-sm">
           A reconciliation gap is the difference between what was invoiced and what the POS recorded. Some gaps are
           legitimate (paid by check after the fact, in-house deposit handling). Others are orders that ran but never
@@ -66,11 +66,11 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
       </div>
 
       <div className="mb-8">
-        <h3 className="text-gold-500 text-xs uppercase tracking-wider font-semibold mb-3">By channel</h3>
-        <div className="bg-dark-700 rounded-xl border border-dark-600 overflow-hidden">
+        <h3 className="text-ink-800 text-xs uppercase tracking-wider font-semibold mb-3">By channel</h3>
+        <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-dark-600 text-dark-300">
+              <tr className="border-b border-ink-200 text-dark-300">
                 <th className="px-4 py-2 font-medium">Channel</th>
                 <th className="px-4 py-2 font-medium text-right">Net</th>
                 <th className="px-4 py-2 font-medium text-right">Orders</th>
@@ -79,13 +79,13 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
             </thead>
             <tbody>
               {d.channels.map((c) => (
-                <tr key={c.name} className="border-b border-dark-600/60 last:border-0">
-                  <td className="px-4 py-2 text-white">{c.name}</td>
+                <tr key={c.name} className="border-b border-ink-200/60 last:border-0">
+                  <td className="px-4 py-2 text-ink-800">{c.name}</td>
                   <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(c.net)}</td>
                   <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{c.orders}</td>
                   <td className="px-4 py-2 text-right">
                     {c.feePct > 0 ? (
-                      <span className={`tabular-nums ${c.feePct > 0.1 ? 'text-amber-300' : 'text-dark-200'}`}>{pct(c.feePct)}</span>
+                      <span className={`tabular-nums ${c.feePct > 0.1 ? 'text-warning-500' : 'text-dark-200'}`}>{pct(c.feePct)}</span>
                     ) : (
                       <span className="text-green-300 tabular-nums">0%</span>
                     )}
@@ -98,11 +98,11 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
       </div>
 
       <div className="mb-8">
-        <h3 className="text-gold-500 text-xs uppercase tracking-wider font-semibold mb-3">Stores · catering net vs invoiced</h3>
-        <div className="bg-dark-700 rounded-xl border border-dark-600 overflow-hidden">
+        <h3 className="text-ink-800 text-xs uppercase tracking-wider font-semibold mb-3">Stores · catering net vs invoiced</h3>
+        <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-dark-600 text-dark-300">
+              <tr className="border-b border-ink-200 text-dark-300">
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium text-right">Net</th>
                 <th className="px-4 py-2 font-medium text-right">Orders</th>
@@ -116,22 +116,22 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
                 const gapPct = s.reconciledGap / s.cateringNet;
                 const barPos = Math.min(100, (s.cateringNet / 200_000) * 100);
                 return (
-                  <tr key={s.name} className="border-b border-dark-600/60 last:border-0">
-                    <td className="px-4 py-2 text-white">{s.name}</td>
+                  <tr key={s.name} className="border-b border-ink-200/60 last:border-0">
+                    <td className="px-4 py-2 text-ink-800">{s.name}</td>
                     <td className="px-4 py-2 text-right">
                       <span className="flex items-center justify-end gap-3">
-                        <span className="relative inline-block h-1.5 w-20 rounded bg-white/5 overflow-hidden align-middle">
+                        <span className="relative inline-block h-1.5 w-20 rounded bg-ink-200 overflow-hidden align-middle">
                           <span className="absolute left-0 top-0 h-full bg-gradient-to-r from-gold-700 to-gold-400" style={{ width: `${barPos}%` }} />
                         </span>
-                        <span className="tabular-nums text-white">{usd(s.cateringNet)}</span>
+                        <span className="tabular-nums text-ink-800">{usd(s.cateringNet)}</span>
                       </span>
                     </td>
                     <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{s.cateringOrders}</td>
                     <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.avgTicket)}</td>
                     <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.invoicedNet)}</td>
                     <td className="px-4 py-2 text-right">
-                      <span className={`tabular-nums ${s.flagged ? 'text-amber-300' : 'text-dark-200'}`}>{usd(s.reconciledGap)}</span>
-                      {s.flagged ? <span className="ml-2 text-[10px] font-semibold rounded-full px-2 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-700/40">+{pct(gapPct)}</span> : null}
+                      <span className={`tabular-nums ${s.flagged ? 'text-warning-500' : 'text-dark-200'}`}>{usd(s.reconciledGap)}</span>
+                      {s.flagged ? <span className="ml-2 text-[10px] font-semibold rounded-full px-2 py-0.5 bg-amber-500/10 text-warning-500 border border-amber-700/40">+{pct(gapPct)}</span> : null}
                     </td>
                   </tr>
                 );
@@ -141,8 +141,8 @@ export function CateringLeakBody({ data: d, sample }: { data: CateringLeak; samp
         </div>
       </div>
 
-      <div className="bg-dark-700 border border-dark-600 rounded-xl p-5">
-        <p className="text-gold-500 text-xs uppercase tracking-widest mb-2">What to do next</p>
+      <div className="card rounded-xl p-5">
+        <p className="text-ink-800 text-xs uppercase tracking-widest mb-2">What to do next</p>
         <ul className="text-dark-200 text-sm space-y-1.5 list-disc list-inside">
           <li>Pull the invoice list for each flagged store and reconcile against POS catering tickets line-by-line.</li>
           <li>Shift volume off EzCater / Foodja (18% fee) into Toast Catering (2.9%) or in-house. Same revenue, dramatically better margin.</li>

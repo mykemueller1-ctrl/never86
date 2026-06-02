@@ -21,15 +21,15 @@ export default async function AnswersIndex() {
 
   return (
     <main className="min-h-screen text-dark-50">
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
+      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <span className="brand-monogram">N86</span>
             <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Home</Link>
-            <Link href="/operators" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</Link>
+            <Link href="/" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Home</Link>
+            <Link href="/operators" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</Link>
             <Link href="/reports/login" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Sign in</Link>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default async function AnswersIndex() {
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 mb-6">
             <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-dark-100">Operator answers · source-tagged</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.04] mb-5 text-white">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.04] mb-5 text-ink-800">
             Answers, not <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 to-copper-400">opinions</span>.
           </h1>
           <p className="text-dark-200 text-lg max-w-2xl leading-relaxed">
@@ -69,7 +69,7 @@ export default async function AnswersIndex() {
                   ) : <span />}
                   <span className="text-dark-400 text-[10px] uppercase tracking-[0.18em] font-mono">{a.publishedAt?.slice(0, 10) ?? ''}</span>
                 </div>
-                <h2 className="text-xl md:text-2xl font-semibold text-white tracking-tight mb-2">{a.title}</h2>
+                <h2 className="text-xl md:text-2xl font-semibold text-ink-800 tracking-tight mb-2">{a.title}</h2>
                 {a.question ? <p className="text-dark-300 text-sm italic mb-2">Q: {a.question}</p> : null}
                 <p className="text-dark-200 text-sm leading-relaxed line-clamp-3">{a.answer}</p>
                 <p className="text-gold-300 hover:text-gold-200 text-sm font-semibold mt-3 inline-flex items-center gap-1">

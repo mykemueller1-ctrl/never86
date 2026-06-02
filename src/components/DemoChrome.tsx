@@ -1,4 +1,15 @@
 import Link from 'next/link';
+import { Track } from '@/components/Track';
+import { AgentUnlock } from '@/components/AgentUnlock';
+
+const ALL_AGENTS = [
+  { name: 'Void Hunter', href: '/demo/void-hunter' },
+  { name: '3P Fee Finder', href: '/demo/3p-fee-finder' },
+  { name: 'Labor Leak', href: '/demo/labor-leak' },
+  { name: 'Tip Variance', href: '/demo/tip-variance' },
+  { name: 'Catering Leak', href: '/demo/catering-leak' },
+  { name: 'Shift Pulse', href: '/demo/shift-pulse' },
+];
 
 export function DemoChrome({
   audience,
@@ -13,38 +24,63 @@ export function DemoChrome({
   tagline: string;
   children: React.ReactNode;
 }) {
-  const audLabel = audience === 'owner' ? 'For owners' : audience === 'manager' ? 'For managers' : 'For the crew';
+  const others = ALL_AGENTS.filter((a) => a.name !== title);
+
   return (
-    <main className="min-h-screen text-dark-50">
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="brand-monogram">N86</span>
-            <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
+    <main className="min-h-screen text-ink-800">
+      <Track eventType="agent_view" agentName={title} audience={audience} />
+      <header className="nav-shell sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
+            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
           </Link>
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">All quick wins</Link>
-            <Link href="/operators#talk" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Talk to us</Link>
-          </div>
+          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
+            <Link href="/" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">All agents</Link>
+            <Link href="/operators#talk" className="btn-primary py-1.5 px-4 text-[13px]">Connect your data →</Link>
+          </nav>
         </div>
       </header>
 
-      <div className="relative overflow-hidden">
-        <div className="bg-grid absolute inset-0 opacity-40 pointer-events-none" />
-        <div className="hero-orb pointer-events-none" />
-        <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 mb-4">
-            <span className="live-dot" />
-            <span className="text-[10px] uppercase tracking-[0.18em] font-mono text-dark-100">
-              {sample ? 'Demo · sample data' : 'Live · your data'} · {audLabel}
-            </span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-2">{title}</h1>
-          <p className="text-dark-200 text-lg leading-relaxed max-w-2xl">{tagline}</p>
+      {/* Demo title — minimal */}
+      <section className="pt-16 md:pt-20 pb-6 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="display text-4xl md:text-6xl tracking-tighter">{title}</h1>
+          {sample ? <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mt-3">Sample data · live demo</p> : null}
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-5xl mx-auto px-6 pt-8 pb-16">{children}</div>
+      {/* Demo body */}
+      <div className="max-w-5xl mx-auto px-6 pb-12">{children}</div>
+
+      {/* Unlock this agent — the tripwire */}
+      <AgentUnlock agentName={title} />
+
+      {/* Hop between agents */}
+      <section className="border-t border-ink-200 bg-ink-100 px-6 py-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+            {others.map((a) => (
+              <Link key={a.name} href={a.href} className="card group p-4 block text-center hover:-translate-y-0.5">
+                <p className="text-ink-800 font-semibold text-[14px] tracking-tighter">{a.name}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-ink-200 py-8 px-6 bg-white">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
+          <div className="flex items-center gap-2">
+            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
+            <span>Never 86&apos;d</span>
+          </div>
+          <div className="flex items-center gap-5">
+            <Link href="/for" className="hover:text-ink-800 transition-colors">Seats</Link>
+            <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

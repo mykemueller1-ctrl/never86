@@ -1,9 +1,3 @@
-import RoleView from '@/components/RoleView';
-
+import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-export const metadata = { title: "COO · Command Center | Never 86'd" };
-
-export default function CooPage() {
-  return <RoleView operatorId={3} role="coo" />;
-}
+export default function Page() { redirect('/command-center#coo'); }
