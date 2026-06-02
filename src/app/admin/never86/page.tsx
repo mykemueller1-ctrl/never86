@@ -1,5 +1,5 @@
 import { loadAdminSnapshot, type DailyFocus, type AeoDraft, type TeamNote, type PipelineRow, type QuickWin } from '@/lib/adminDb';
-import { addFocus, updateFocusStatus, addAeoDraft, addTeamNote, addPipelineRow, updatePipelineStage, sendFollowupNow } from './actions';
+import { addFocus, updateFocusStatus, addAeoDraft, addTeamNote, addPipelineRow, updatePipelineStage, sendFollowupNow, markOutboundSent, markOutboundReplied, markOutboundPassed } from './actions';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -80,6 +80,7 @@ export default async function AdminNever86() {
             <a href="#wins" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Quick wins</a>
             <a href="#leads" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Leads</a>
             <a href="#activity" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Activity</a>
+            <a href="#outbound" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Outbound</a>
             <a href="#ops" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Ops</a>
             <a href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</a>
             <a href="/command-center" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Operator view</a>
@@ -459,9 +460,91 @@ export default async function AdminNever86() {
         </div>
       </section>
 
+      {/* OUTBOUND */}
+      <section id="outbound" className="max-w-6xl mx-auto px-6 py-8">
+        <SectionHeader id="outbound" kicker="Section 08" title="Outbound campaign" />
+        <p className="text-dark-300 text-sm mb-4">Cold-email targets researched, queued, and tracked. Status pipeline: <span className="text-dark-200">queued → sent → replied / passed</span>. {snap.outboundTemplates.length} templates ready in <span className="font-mono text-xs">admin.outbound_templates</span>.</p>
+        {snap.outboundTargets.length === 0 ? (
+          <p className="text-dark-300 text-sm bg-dark-700 border border-dark-600 rounded-2xl p-6">No targets queued yet.</p>
+        ) : (
+          <div className="bg-dark-700 border border-dark-600 rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-dark-600 text-dark-400 text-[10px] uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 font-medium">Operator</th>
+                  <th className="text-left px-4 py-3 font-medium">HQ · units</th>
+                  <th className="text-left px-4 py-3 font-medium">Contact</th>
+                  <th className="text-left px-4 py-3 font-medium">Why</th>
+                  <th className="text-left px-4 py-3 font-medium">Status</th>
+                  <th className="text-left px-4 py-3 font-medium">Mark</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snap.outboundTargets.map((t) => {
+                  const statusColor =
+                    t.status === 'replied' ? 'bg-green-500/10 text-green-300 border-green-700/40' :
+                    t.status === 'sent' ? 'bg-gold-500/10 text-gold-300 border-gold-700/40' :
+                    t.status === 'passed' ? 'bg-dark-600 text-dark-300 border-dark-500' :
+                    'bg-dark-600 text-dark-200 border-dark-500';
+                  return (
+                    <tr key={t.id} className="border-b border-dark-600/60 last:border-0 align-top">
+                      <td className="px-4 py-3 text-white">
+                        <p className="font-medium">{t.operator}</p>
+                        {t.source_url ? <a href={t.source_url} target="_blank" rel="noopener" className="text-dark-400 text-[10px] hover:text-gold-400 underline">source</a> : null}
+                      </td>
+                      <td className="px-4 py-3 text-dark-200">
+                        <p>{t.hq_city ?? '—'}</p>
+                        <p className="text-dark-400 text-xs">{t.units ?? '—'} units{t.cuisine ? ` · ${t.cuisine}` : ''}</p>
+                      </td>
+                      <td className="px-4 py-3 text-dark-200 text-xs">{t.founder_or_ceo ?? '—'}</td>
+                      <td className="px-4 py-3 text-dark-300 text-xs max-w-xs leading-relaxed">{t.fit_reason ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-[10px] uppercase tracking-wider font-semibold rounded-full border px-2.5 py-0.5 ${statusColor}`}>{t.status}</span>
+                        {t.sent_at ? <p className="text-dark-400 text-[10px] mt-1">sent {t.sent_at.slice(0, 10)}{t.template_used ? ` · ${t.template_used}` : ''}</p> : null}
+                        {t.replied_at ? <p className="text-green-400 text-[10px] mt-1">replied {t.replied_at.slice(0, 10)}</p> : null}
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        {t.status === 'queued' ? (
+                          <div className="flex flex-col gap-1.5">
+                            {snap.outboundTemplates.map((tpl) => (
+                              <form key={tpl.id} action={markOutboundSent}>
+                                <input type="hidden" name="id" value={t.id} />
+                                <input type="hidden" name="template" value={tpl.name} />
+                                <button type="submit" className="text-gold-400 hover:text-gold-300 underline whitespace-nowrap">Sent · {tpl.name}</button>
+                              </form>
+                            ))}
+                            <form action={markOutboundPassed}>
+                              <input type="hidden" name="id" value={t.id} />
+                              <button type="submit" className="text-dark-400 hover:text-dark-200 underline">Pass</button>
+                            </form>
+                          </div>
+                        ) : t.status === 'sent' ? (
+                          <div className="flex flex-col gap-1.5">
+                            <form action={markOutboundReplied}>
+                              <input type="hidden" name="id" value={t.id} />
+                              <button type="submit" className="text-green-400 hover:text-green-300 underline">Replied</button>
+                            </form>
+                            <form action={markOutboundPassed}>
+                              <input type="hidden" name="id" value={t.id} />
+                              <button type="submit" className="text-dark-400 hover:text-dark-200 underline">No reply</button>
+                            </form>
+                          </div>
+                        ) : (
+                          <span className="text-dark-500">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       {/* OPS HEALTH */}
       <section id="ops" className="max-w-6xl mx-auto px-6 py-8">
-        <SectionHeader id="ops" kicker="Section 08" title="Ops health" />
+        <SectionHeader id="ops" kicker="Section 09" title="Ops health" />
         <div className="grid md:grid-cols-3 gap-4">
           <a href="/api/ops-health" className="bg-dark-700 border border-dark-600 hover:border-gold-500 rounded-2xl p-5 block">
             <p className="text-white font-semibold mb-1">Database</p>

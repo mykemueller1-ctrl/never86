@@ -135,3 +135,44 @@ export async function sendFollowupNow(formData: FormData) {
   }
   revalidatePath('/admin/never86');
 }
+
+export async function markOutboundSent(formData: FormData) {
+  requireAdmin();
+  const id = Number(formData.get('id'));
+  const templateUsed = asString(formData.get('template'));
+  if (!id) return;
+  const sql = opsDb();
+  await sql`
+    UPDATE admin.outbound_targets
+       SET status = 'sent', sent_at = NOW(), template_used = ${templateUsed || null}, updated_at = NOW()
+     WHERE id = ${id}
+  `;
+  revalidatePath('/admin/never86');
+}
+
+export async function markOutboundReplied(formData: FormData) {
+  requireAdmin();
+  const id = Number(formData.get('id'));
+  if (!id) return;
+  const sql = opsDb();
+  await sql`
+    UPDATE admin.outbound_targets
+       SET status = 'replied', replied_at = NOW(), updated_at = NOW()
+     WHERE id = ${id}
+  `;
+  revalidatePath('/admin/never86');
+}
+
+export async function markOutboundPassed(formData: FormData) {
+  requireAdmin();
+  const id = Number(formData.get('id'));
+  const reason = asString(formData.get('reason'));
+  if (!id) return;
+  const sql = opsDb();
+  await sql`
+    UPDATE admin.outbound_targets
+       SET status = 'passed', notes_internal = ${reason || null}, updated_at = NOW()
+     WHERE id = ${id}
+  `;
+  revalidatePath('/admin/never86');
+}

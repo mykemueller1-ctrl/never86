@@ -80,6 +80,32 @@ export type AgentRollup = {
   last_seen: string;
 };
 
+export type OutboundTarget = {
+  id: number;
+  operator: string;
+  units: number | null;
+  hq_city: string | null;
+  cuisine: string | null;
+  founder_or_ceo: string | null;
+  fit_reason: string | null;
+  source_url: string | null;
+  priority: number | null;
+  status: string;
+  sent_at: string | null;
+  replied_at: string | null;
+  template_used: string | null;
+  notes_internal: string | null;
+};
+
+export type OutboundTemplate = {
+  id: number;
+  name: string;
+  subject: string;
+  body: string;
+  angle: string | null;
+  word_count: number | null;
+};
+
 export type AdminSnapshot = {
   focus: DailyFocus[];
   aeo: AeoDraft[];
@@ -89,15 +115,17 @@ export type AdminSnapshot = {
   leads: Lead[];
   events: VisitorEventRow[];
   agentRollup: AgentRollup[];
+  outboundTargets: OutboundTarget[];
+  outboundTemplates: OutboundTemplate[];
   configured: boolean;
 };
 
 export async function loadAdminSnapshot(): Promise<AdminSnapshot> {
   if (!opsDbConfigured()) {
-    return { focus: [], aeo: [], team: [], pipeline: [], quickWins: [], leads: [], events: [], agentRollup: [], configured: false };
+    return { focus: [], aeo: [], team: [], pipeline: [], quickWins: [], leads: [], events: [], agentRollup: [], outboundTargets: [], outboundTemplates: [], configured: false };
   }
   const sql = opsDb();
-  const [focus, aeo, team, pipeline, quickWins, leads, events, agentRollup] = await Promise.all([
+  const [focus, aeo, team, pipeline, quickWins, leads, events, agentRollup, outboundTargets, outboundTemplates] = await Promise.all([
     sql<DailyFocus[]>`SELECT id, author, entry_date::text, body, status, updated_at::text
                       FROM admin.daily_focus
                       ORDER BY entry_date DESC, id DESC
@@ -130,6 +158,19 @@ export async function loadAdminSnapshot(): Promise<AdminSnapshot> {
                        GROUP BY agent_name
                        ORDER BY views DESC, last_seen DESC
                        LIMIT 25`,
+    sql<OutboundTarget[]>`SELECT id, operator, units, hq_city, cuisine, founder_or_ceo, fit_reason, source_url, priority, status,
+                                 sent_at::text, replied_at::text, template_used, notes_internal
+                          FROM admin.outbound_targets
+                          ORDER BY CASE status
+                            WHEN 'queued' THEN 0
+                            WHEN 'sent' THEN 1
+                            WHEN 'replied' THEN 2
+                            WHEN 'passed' THEN 3
+                            ELSE 4 END,
+                            priority NULLS LAST, operator`,
+    sql<OutboundTemplate[]>`SELECT id, name, subject, body, angle, word_count
+                            FROM admin.outbound_templates
+                            ORDER BY id`,
   ]);
-  return { focus, aeo, team, pipeline, quickWins, leads, events, agentRollup, configured: true };
+  return { focus, aeo, team, pipeline, quickWins, leads, events, agentRollup, outboundTargets, outboundTemplates, configured: true };
 }
