@@ -69,7 +69,7 @@ export default function Home() {
       {/* Hero */}
       <section className="pt-28 md:pt-40 pb-24 md:pb-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="display text-6xl md:text-8xl lg:text-[112px] mb-10">
+          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-10">
             Find the leak.<br />
             Name who owns it.<br />
             Keep the receipt.

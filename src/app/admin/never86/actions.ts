@@ -98,3 +98,40 @@ export async function updatePipelineStage(formData: FormData) {
   await sql`UPDATE admin.operator_pipeline SET stage = ${stage}, updated_at = NOW() WHERE id = ${id}`;
   revalidatePath('/admin/never86');
 }
+
+import { sendFollowupEmail } from '@/lib/email';
+
+export async function sendFollowupNow(formData: FormData) {
+  requireAdmin();
+  const leadId = Number(formData.get('leadId'));
+  const kind = (formData.get('kind') as '24h' | '7d') || '24h';
+  if (!leadId) return;
+  const sql = opsDb();
+  const rows = await sql<{ email: string; name: string | null; requested_agent: string | null }[]>`
+    SELECT email, name, requested_agent FROM admin.leads WHERE id = ${leadId} LIMIT 1
+  `;
+  const lead = rows[0];
+  if (!lead?.email) return;
+  try {
+    await sendFollowupEmail({
+      to: lead.email,
+      firstName: lead.name ?? undefined,
+      agentName: lead.requested_agent ?? undefined,
+      kind,
+    });
+    if (kind === '24h') {
+      await sql`UPDATE admin.leads SET followup_24h_sent_at = NOW() WHERE id = ${leadId}`;
+    } else {
+      await sql`UPDATE admin.leads SET followup_7d_sent_at = NOW() WHERE id = ${leadId}`;
+    }
+    // Mark the queued row sent too so cron doesn't double-send.
+    await sql`
+      UPDATE admin.followup_queue
+         SET status = 'sent', sent_at = NOW(), notes = 'manual-send-from-admin'
+       WHERE lead_id = ${leadId} AND kind = ${kind} AND status IN ('pending', 'sending')
+    `;
+  } catch (err) {
+    console.error('sendFollowupNow failed', err);
+  }
+  revalidatePath('/admin/never86');
+}

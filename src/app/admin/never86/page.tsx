@@ -1,5 +1,5 @@
 import { loadAdminSnapshot, type DailyFocus, type AeoDraft, type TeamNote, type PipelineRow, type QuickWin } from '@/lib/adminDb';
-import { addFocus, updateFocusStatus, addAeoDraft, addTeamNote, addPipelineRow, updatePipelineStage } from './actions';
+import { addFocus, updateFocusStatus, addAeoDraft, addTeamNote, addPipelineRow, updatePipelineStage, sendFollowupNow } from './actions';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -364,6 +364,7 @@ export default async function AdminNever86() {
                   <th className="text-left px-4 py-3 font-medium">Units</th>
                   <th className="text-left px-4 py-3 font-medium">From</th>
                   <th className="text-left px-4 py-3 font-medium">Status</th>
+                  <th className="text-left px-4 py-3 font-medium">Send now</th>
                 </tr>
               </thead>
               <tbody>
@@ -379,6 +380,21 @@ export default async function AdminNever86() {
                     <td className="px-4 py-3 text-dark-400 text-xs">{l.source_page ?? '—'}</td>
                     <td className="px-4 py-3">
                       <span className="text-[10px] uppercase tracking-wider font-semibold rounded-full border bg-gold-500/10 text-gold-300 border-gold-700/40 px-2.5 py-0.5">{l.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      <div className="flex items-center gap-2">
+                        <form action={sendFollowupNow}>
+                          <input type="hidden" name="leadId" value={l.id} />
+                          <input type="hidden" name="kind" value="24h" />
+                          <button type="submit" className="text-gold-400 hover:text-gold-300 underline">24h</button>
+                        </form>
+                        <span className="text-dark-500">·</span>
+                        <form action={sendFollowupNow}>
+                          <input type="hidden" name="leadId" value={l.id} />
+                          <input type="hidden" name="kind" value="7d" />
+                          <button type="submit" className="text-gold-400 hover:text-gold-300 underline">7d</button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 ))}

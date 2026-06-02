@@ -18,14 +18,23 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Never 86'd — Restaurant Financial Intelligence",
+  metadataBase: new URL('https://never86.ai'),
+  title: "Never 86'd — Find the leak. Name who owns it. Keep the receipt.",
   description:
-    'Built by an operator, for operators. The only restaurant platform that ships every figure source-tagged — and shows its work on every number.',
+    'Restaurant financial intelligence, built by an operator. For operators.',
   openGraph: {
     title: "Never 86'd",
-    description: 'Operator-turned-founder native AI for multi-unit restaurants.',
+    description: 'Restaurant financial intelligence, built by an operator. For operators.',
     url: 'https://never86.ai',
+    siteName: "Never 86'd",
+    type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Never 86'd",
+    description: 'Restaurant financial intelligence, built by an operator. For operators.',
+  },
+  icons: { icon: '/favicon.ico' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
