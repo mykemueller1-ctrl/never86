@@ -3,26 +3,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-const FREE_AGENTS = [
-  { name: 'Void Hunter', href: '/demo/void-hunter' },
-  { name: '3P Fee Finder', href: '/demo/3p-fee-finder' },
-  { name: 'Labor Leak', href: '/demo/labor-leak' },
-  { name: 'Tip Variance', href: '/demo/tip-variance' },
-  { name: 'Catering Leak', href: '/demo/catering-leak' },
-  { name: 'Shift Pulse', href: '/demo/shift-pulse' },
+const PILLARS = [
+  { name: 'Shift Pulse', body: 'Tonight\'s shift in one screen. Covers vs forecast, station median, the goal, the streak.', href: '/demo/shift-pulse', status: 'live' as const },
+  { name: 'Knowledge Brain', body: 'Recipes, specs, service rules, the answers your line asks every shift.', status: 'coming' as const },
+  { name: 'Achievements', body: 'Streaks that mean something. Voids under the line. Upsell records. Zero-comp shifts.', status: 'coming' as const },
 ];
 
-const SEATS = [
-  { h: 'CEO', href: '/for/ceo' },
-  { h: 'CFO', href: '/for/cfo' },
-  { h: 'COO', href: '/for/coo' },
-  { h: 'CTO', href: '/for/cto' },
-  { h: 'Owner', href: '/for/owner' },
-  { h: 'Manager', href: '/for/manager' },
-  { h: 'Crew', href: '/for/crew' },
-];
-
-export default function Home() {
+export default function PeoplePage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
@@ -36,7 +23,13 @@ export default function Home() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, restaurantName }),
+        body: JSON.stringify({
+          email,
+          name,
+          restaurantName,
+          agentRequested: 'CTAP · People platform',
+          sourcePage: '/people',
+        }),
       });
       const data = await res.json();
       if (data.success) {
@@ -67,56 +60,74 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="pt-28 md:pt-40 pb-24 md:pb-32 px-6">
+      <section className="pt-28 md:pt-40 pb-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-10">
-            Find the leak.<br />
-            Name who owns it.<br />
-            Keep the receipt.
+          <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-5">Product 02 · coming</p>
+          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-8">
+            The crew sees<br />
+            what the back office sees.
           </h1>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/for" className="btn-primary">Pick your seat</Link>
-            <Link href="/demo/void-hunter" className="btn-secondary">Try a free agent</Link>
-          </div>
+          <p className="text-ink-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
+            Built on a real restaurant. Storm Lake, Iowa. 41 staff, 7 departments, every shift on one screen.
+          </p>
+          <a href="#notify" className="btn-primary">Get notified</a>
         </div>
       </section>
 
-      {/* Free agents */}
+      {/* Three pillars */}
       <section className="py-20 md:py-28 px-6 bg-ink-100">
         <div className="max-w-6xl mx-auto">
-          <h2 className="display text-4xl md:text-6xl text-center mb-14">Try one. Right now.</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FREE_AGENTS.map((a) => (
-              <Link key={a.name} href={a.href} className="card group p-10 block hover:-translate-y-0.5 text-center">
-                <p className="display text-3xl text-ink-800 mb-4">{a.name}</p>
-                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
-              </Link>
-            ))}
+          <h2 className="display text-4xl md:text-6xl text-center mb-14">Three pillars.</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {PILLARS.map((p) =>
+              p.status === 'live' && p.href ? (
+                <Link key={p.name} href={p.href} className="card group p-8 block hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="display text-2xl text-ink-800">{p.name}</p>
+                    <span className="text-[11px] font-medium text-success-500 inline-flex items-center gap-1.5">
+                      <span className="live-dot" style={{ width: '0.4rem', height: '0.4rem', boxShadow: '0 0 0 3px rgba(52,199,89,0.15)' }} />
+                      Live
+                    </span>
+                  </div>
+                  <p className="text-ink-600 leading-relaxed mb-5">{p.body}</p>
+                  <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
+                </Link>
+              ) : (
+                <div key={p.name} className="card p-8">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="display text-2xl text-ink-800">{p.name}</p>
+                    <span className="text-[11px] font-medium text-ink-500 inline-flex items-center gap-1.5">Coming</span>
+                  </div>
+                  <p className="text-ink-600 leading-relaxed">{p.body}</p>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </section>
 
-      {/* Pick your seat */}
+      {/* Why it's different */}
       <section className="py-20 md:py-28 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="display text-4xl md:text-6xl text-center mb-14">Pick your seat.</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            {SEATS.map((s) => (
-              <Link key={s.h} href={s.href} className="card group p-8 block text-center hover:-translate-y-0.5">
-                <p className="display text-2xl text-ink-800">{s.h}</p>
-              </Link>
-            ))}
-          </div>
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-5">The thesis</p>
+          <h2 className="display text-3xl md:text-5xl mb-6">
+            People-native AI.<br />Not back-office software with a chat box.
+          </h2>
+          <p className="text-ink-600 text-lg md:text-xl leading-relaxed">
+            Every other restaurant tool was built for the office. We&apos;re building one for the floor — and giving the office a window into it.
+          </p>
         </div>
       </section>
 
-      {/* Talk to us */}
-      <section id="offer" className="py-20 md:py-28 px-6 bg-ink-100">
+      {/* Notify form */}
+      <section id="notify" className="py-20 md:py-28 px-6 bg-ink-100">
         <div className="max-w-xl mx-auto text-center">
-          <h2 className="display text-4xl md:text-5xl mb-10">15 minutes.</h2>
+          <h2 className="display text-4xl md:text-5xl mb-3">Get notified.</h2>
+          <p className="text-ink-600 text-lg mb-10">We&apos;ll reach out when CTAP opens to a cohort.</p>
           {status === 'success' ? (
             <div className="card p-10">
-              <p className="text-ink-800 text-xl font-semibold">{message}</p>
+              <p className="text-ink-800 text-xl font-semibold mb-2">{message}</p>
+              <p className="text-ink-600">You&apos;re first in line.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="card p-7 space-y-3 text-left">
@@ -124,7 +135,7 @@ export default function Home() {
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
               <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
               <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50">
-                {status === 'loading' ? 'Sending…' : 'Talk to us'}
+                {status === 'loading' ? 'Sending…' : 'Get notified'}
               </button>
               {status === 'error' && <p className="text-danger-500 text-sm text-center">{message}</p>}
             </form>
@@ -133,14 +144,13 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-ink-200 py-10 px-6 bg-white">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between text-ink-500 text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d</span>
           </div>
           <div className="flex items-center gap-5">
             <Link href="/for" className="hover:text-ink-800 transition-colors">Seats</Link>
-            <Link href="/people" className="hover:text-ink-800 transition-colors">People</Link>
             <Link href="/reports/login" className="hover:text-ink-800 transition-colors">Sign in</Link>
           </div>
         </div>
