@@ -35,6 +35,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/answers`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/press`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/mcp`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE}/people`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/case/walked-the-number-back`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
   ];
 
   const dynamicEntries: MetadataRoute.Sitemap = answers.map((a) => ({
