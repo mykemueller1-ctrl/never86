@@ -19,17 +19,17 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
         </div>
       </header>
 
-      {/* Hero — minimal */}
-      <section className="pt-24 md:pt-32 pb-16 px-6">
+      {/* Hero — nothing else */}
+      <section className="pt-28 md:pt-40 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-6">For the {spec.badge}</p>
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-8">
+          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-10">
             {spec.headline.l1}<br />
             {spec.headline.gradient}
           </h1>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href={spec.freeAgents[0].href} className="btn-primary">Try {spec.freeAgents[0].name}</Link>
-            <Link href="/operators#talk" className="btn-secondary">Book 15 minutes</Link>
+            <Link href="/operators#talk" className="btn-secondary">Talk to us</Link>
           </div>
         </div>
       </section>
@@ -37,23 +37,14 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
       {/* Three free agents */}
       <section className="py-16 md:py-24 px-6 bg-ink-100">
         <div className="max-w-5xl mx-auto">
-          <h2 className="display text-3xl md:text-5xl text-center mb-12">Three free agents for you.</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {spec.freeAgents.map((w) => (
-              <Link key={w.name} href={w.href} className="card group p-8 block hover:-translate-y-0.5 text-center">
-                <p className="text-ink-800 font-semibold text-2xl tracking-tighter mb-4">{w.name}</p>
+              <Link key={w.name} href={w.href} className="card group p-10 block hover:-translate-y-0.5 text-center">
+                <p className="display text-2xl text-ink-800 mb-3">{w.name}</p>
                 <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-20 md:py-28 px-6">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="display text-4xl md:text-6xl mb-8">15 minutes.</h2>
-          <Link href="/operators#talk" className="btn-primary">Book it →</Link>
         </div>
       </section>
 
