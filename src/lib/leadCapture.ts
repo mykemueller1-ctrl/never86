@@ -10,6 +10,7 @@ export type LeadInput = {
   referrer?: string;
   userAgent?: string;
   ip?: string;
+  requestedAgent?: string;
   utm?: { source?: string; medium?: string; campaign?: string };
 };
 
@@ -23,7 +24,8 @@ export async function captureLead(input: LeadInput): Promise<{ leadId: number | 
       INSERT INTO admin.leads (
         email, name, restaurant_name, units, role,
         source_page, referrer, user_agent, ip,
-        utm_source, utm_medium, utm_campaign
+        utm_source, utm_medium, utm_campaign,
+        requested_agent, unlocked_at
       ) VALUES (
         ${input.email.toLowerCase()},
         ${input.name ?? null},
@@ -36,14 +38,18 @@ export async function captureLead(input: LeadInput): Promise<{ leadId: number | 
         ${input.ip ?? null},
         ${input.utm?.source ?? null},
         ${input.utm?.medium ?? null},
-        ${input.utm?.campaign ?? null}
+        ${input.utm?.campaign ?? null},
+        ${input.requestedAgent ?? null},
+        ${input.requestedAgent ? new Date() : null}
       )
       ON CONFLICT (LOWER(email)) DO UPDATE SET
         updated_at = NOW(),
         name = COALESCE(EXCLUDED.name, admin.leads.name),
         restaurant_name = COALESCE(EXCLUDED.restaurant_name, admin.leads.restaurant_name),
         units = COALESCE(EXCLUDED.units, admin.leads.units),
-        source_page = COALESCE(EXCLUDED.source_page, admin.leads.source_page)
+        source_page = COALESCE(EXCLUDED.source_page, admin.leads.source_page),
+        requested_agent = COALESCE(EXCLUDED.requested_agent, admin.leads.requested_agent),
+        unlocked_at = COALESCE(admin.leads.unlocked_at, EXCLUDED.unlocked_at)
       RETURNING id
     `;
     const leadId = rows[0]?.id ?? null;

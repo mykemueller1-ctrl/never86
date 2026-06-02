@@ -13,6 +13,7 @@ const waitlistInput = z.object({
   units: z.union([z.string(), z.number()]).optional(),
   role: z.string().optional(),
   sourcePage: z.string().optional(),
+  agentRequested: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
       units: unitsNum,
       role: data.role,
       sourcePage,
+      requestedAgent: data.agentRequested,
       referrer: req.headers.get('referer') ?? undefined,
       userAgent: req.headers.get('user-agent') ?? undefined,
       ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
@@ -56,11 +58,16 @@ export async function POST(req: NextRequest) {
     // 3) Welcome email to the lead
     await sendWelcomeEmail(data.email, data.name);
 
-    // 4) Notify Myke
+    // 4) Notify Myke — agent unlock requests jump the queue
+    const agentLine = data.agentRequested
+      ? `⚡ <strong>UNLOCK REQUEST · ${data.agentRequested}</strong><br/>`
+      : '';
     await sendNotification(
       process.env.OWNER_EMAIL || 'myke@n86.app',
-      `New lead · ${data.name || data.email}${data.restaurantName ? ' · ' + data.restaurantName : ''}`,
-      `<p><strong>${data.name || 'Someone'}</strong> just hit the form.</p>
+      data.agentRequested
+        ? `⚡ ${data.agentRequested} unlock · ${data.name || data.email}`
+        : `New lead · ${data.name || data.email}${data.restaurantName ? ' · ' + data.restaurantName : ''}`,
+      `<p>${agentLine}<strong>${data.name || 'Someone'}</strong> just hit the form.</p>
        <p>Email: ${data.email}<br/>
        ${data.restaurantName ? `Restaurant: ${data.restaurantName}<br/>` : ''}
        ${unitsNum ? `Units: ${unitsNum}<br/>` : ''}

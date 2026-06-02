@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Track } from '@/components/Track';
+import { AgentUnlock } from '@/components/AgentUnlock';
 
 const ALL_AGENTS = [
   { name: 'Void Hunter', href: '/demo/void-hunter' },
@@ -51,6 +52,9 @@ export function DemoChrome({
 
       {/* Demo body */}
       <div className="max-w-5xl mx-auto px-6 pb-12">{children}</div>
+
+      {/* Unlock this agent — the tripwire */}
+      <AgentUnlock agentName={title} />
 
       {/* Hop between agents */}
       <section className="border-t border-ink-200 bg-ink-100 px-6 py-10">
