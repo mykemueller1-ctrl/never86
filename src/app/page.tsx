@@ -1,133 +1,50 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 const STATS = [
-  { v: '16', l: 'stores live' },
+  { v: '$15.72M', l: 'reconciled' },
   { v: '545,677', l: 'orders read' },
-  { v: '$15.72M', l: 'reconciled', hot: true },
   { v: '$1,043,797.69', l: 'canary, to the cent' },
+  { v: '16', l: 'stores live' },
 ];
 
 const RECEIPTS = [
-  {
-    big: '$1,043,797.69',
-    label: 'The canary',
-    body: 'One store, one quarter, matched to the penny against the POS. No rounding, no hand-waving.',
-    accent: 'gold',
-  },
-  {
-    big: '$15.72M',
-    label: 'The network',
-    body: 'A full 16-unit group reconciled to the cent across 545,677 orders.',
-    accent: 'gold',
-  },
-  {
-    big: '$8.3M → $1.81M',
-    label: 'The correction',
-    body: 'We caught our own inflated recovery number and walked it back. The honest figure is the one we ship.',
-    accent: 'copper',
-  },
+  { big: '$1,043,797.69', label: 'The canary', body: 'One store. One quarter. Matched to the penny against the POS. No rounding, no hand-waving.' },
+  { big: '$15.72M', label: 'The network', body: 'A full 16-unit chef-led group, reconciled to the cent across 545,677 orders.' },
+  { big: '$8.3M → $1.81M', label: 'The correction', body: 'We caught our own inflated recovery number and walked it back. The honest figure is the one we ship.' },
+];
+
+const FREE_AGENTS = [
+  { name: 'Void Hunter', line: 'Voids vs each store\'s own peer median, by name.', href: '/demo/void-hunter', aud: 'Owner' },
+  { name: '3P Fee Finder', line: 'Contract vs blended-effective rate, per partner, per store.', href: '/demo/3p-fee-finder', aud: 'CFO' },
+  { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps.', href: '/demo/labor-leak', aud: 'COO' },
+  { name: 'Tip Variance', line: 'Week-over-week tip movement — the leading indicator.', href: '/demo/tip-variance', aud: 'Manager' },
+  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS gap.', href: '/demo/catering-leak', aud: 'Owner' },
+  { name: 'Shift Pulse', line: 'Tonight\'s shift in one screen. Goal. Streak.', href: '/demo/shift-pulse', aud: 'Crew' },
+];
+
+const C_SUITE = [
+  { h: 'CEO', href: '/for/ceo', line: 'Network reconciled. Board-ready figures, source-tagged.' },
+  { h: 'CFO', href: '/for/cfo', line: 'Books that close to the penny — without the death march.' },
+  { h: 'COO', href: '/for/coo', line: 'Labor leak before payroll posts. Voids, named.' },
+  { h: 'CTO', href: '/for/cto', line: 'Sit outside your stack. Reconcile across it.' },
+];
+
+const FRONTLINE = [
+  { h: 'Owner', href: '/for/owner', line: 'Independent operator, 1 to 5 units. The leak, named.' },
+  { h: 'Manager', href: '/for/manager', line: 'Tonight\'s shift in one screen. Labor before payroll.' },
+  { h: 'Crew', href: '/for/crew', line: 'Your shift. Your goal. Your streak.' },
 ];
 
 const STACK = [
-  { name: 'The Dashboard', desc: 'Role-based command center — CEO, CFO, COO, CTO, Data Lead. One screen, ranked by what costs you money.', live: true },
-  { name: 'The Tools', desc: 'Six live quick wins · Void Hunter · 3P Fee Finder · Labor Leak · Shift Pulse · Catering Leak · Tip Variance. Guardrailed.', live: true },
-  { name: 'The Brief', desc: 'A morning email with yesterday’s numbers, week-to-date trends, and what’s off-target.', live: true },
-  { name: 'The Discipline', desc: 'Every number tagged Verified, Estimated, or Unverified. We show our work, always.', live: true },
-  { name: 'The Integration', desc: 'Native Toast today. Square, Clover, and a universal CSV / Excel drop are next.', live: false, badge: 'Toast live · more coming' },
+  { name: 'Command Center', desc: 'Role-based view — CEO, CFO, COO, CTO. One screen, ranked by what costs you money.' },
+  { name: 'Six free agents', desc: 'Void Hunter, 3P Fee Finder, Labor Leak, Shift Pulse, Catering Leak, Tip Variance — try without a login.' },
+  { name: 'Morning brief', desc: 'A short email with yesterday\'s numbers, the drift, and the one thing to fix today.' },
+  { name: 'Source-tag discipline', desc: 'Every number tagged Verified, Estimated, or Unverified. Ask us why.' },
+  { name: 'Outside your stack', desc: 'We don\'t replace Toast, R365, 7shifts, or Thanx. We sit on top and reconcile.' },
 ];
-
-const BUILT_FOR = [
-  { h: 'Multi-unit groups', p: '5 to 50 units. One screen for the whole network, every problem routed to the person who owns it — no walls of pain.' },
-  { h: 'Single & small operators', p: 'One store or three. The same honest math, none of the enterprise bloat or the enterprise price.' },
-];
-
-const AGENTS_MENU: { group: string; items: { name: string; tag?: string }[] }[] = [
-  { group: 'POS', items: [{ name: 'Toast', tag: 'live' }, { name: 'Square' }, { name: 'Clover' }, { name: 'Aloha' }, { name: 'Lightspeed' }] },
-  { group: '3rd-party delivery', items: [{ name: 'DoorDash' }, { name: 'Uber Eats' }, { name: 'GrubHub' }] },
-  { group: 'Loyalty + digital', items: [{ name: 'Thanx' }, { name: 'Marqii (listings)' }, { name: 'Looker (BI)' }] },
-  { group: 'Store ops', items: [{ name: 'End-of-night reports' }, { name: 'Excel / CSV / PDF drop', tag: 'universal' }] },
-  { group: 'Scheduling + payroll', items: [{ name: '7shifts' }, { name: 'HotSchedules' }, { name: 'Homebase' }, { name: 'ADP' }, { name: 'Gusto' }] },
-  { group: 'Roll-ups + interpreters', items: [{ name: '3P Aggregator' }, { name: 'Restaurant Accountant' }, { name: 'Trade Area / Customer Intelligence' }, { name: 'Per-location agents' }] },
-  { group: 'Governance', items: [{ name: 'Source-tag enforcer' }, { name: 'HR / legal red-team' }, { name: 'Brand-voice enforcer' }] },
-];
-
-const QUICK_WINS_MENU: { name: string; line: string; href: string; tag: string; aud?: string }[] = [
-  { name: 'Void Hunter', line: 'Voids vs your own peer median, by store and by name. Flags patterns, never verdicts.', href: '/demo/void-hunter', tag: 'live · try the demo', aud: 'owners' },
-  { name: '3P Fee Finder', line: 'What DoorDash / Uber / GrubHub take off the top, ranked by store. 1st-party % as the lever.', href: '/demo/3p-fee-finder', tag: 'live · try the demo', aud: 'owners' },
-  { name: 'Labor Leak', line: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps. The labor screen managers actually want.', href: '/demo/labor-leak', tag: 'live · try the demo', aud: 'managers' },
-  { name: 'Shift Pulse', line: 'Tonight’s shift in one screen — covers vs forecast, station median, your goal, your streak.', href: '/demo/shift-pulse', tag: 'live · try the demo', aud: 'frontline' },
-  { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap. The off-prem leak nobody catches.', href: '/demo/catering-leak', tag: 'live · try the demo', aud: 'owners' },
-  { name: 'Tip Variance', line: 'Week-over-week tip movement per store and by name. Service slipping shows up here before sales do.', href: '/demo/tip-variance', tag: 'live · try the demo', aud: 'managers' },
-];
-
-const PRODUCTS: { kicker: string; name: string; line: string; bullets: string[]; status: 'live' | 'coming'; href: string }[] = [
-  {
-    kicker: 'Product 01',
-    name: 'Financial intelligence',
-    line: 'For owners and CFOs. Every dollar your restaurants move, read, reconciled, source-tagged.',
-    bullets: ['Command Center · role-based one-screen view', 'Void Hunter · 3P Fee Finder · Labor Leak', 'Per-location agents + Trade-Area scorecards', 'Source-tag discipline on every figure'],
-    status: 'live',
-    href: '/operators',
-  },
-  {
-    kicker: 'Product 02',
-    name: 'People-native AI · end-to-end',
-    line: 'For managers and the crew. Gamified shifts, knowledge brain, daily standup that helps. Built on a real restaurant.',
-    bullets: ['Shift Pulse · station medians, tonight’s goal', 'Knowledge Brain · recipes + specs + service rules', 'Gamified achievements & streaks', 'Manager + frontline coach loop'],
-    status: 'coming',
-    href: '/operators#talk',
-  },
-];
-
-const AUDIENCE: { h: string; href: string; p: string; wins: string[]; tone: 'gold' | 'copper' | 'mixed' }[] = [
-  { h: 'Owners', href: '/for/owner', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Catering Leak'], tone: 'gold' },
-  { h: 'Managers', href: '/for/manager', p: 'Labor before payroll closes. Tip slippage as the leading indicator.', wins: ['Labor Leak', 'Tip Variance', 'EOD reconciler'], tone: 'copper' },
-  { h: 'Front-line crew', href: '/for/crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Shift Pulse', 'Knowledge Brain', 'Achievements'], tone: 'mixed' },
-];
-
-const C_SUITE: { h: string; href: string; line: string }[] = [
-  { h: 'CEO', href: '/for/ceo', line: 'Network reconciled to the cent. One screen ranked by what costs you money this week.' },
-  { h: 'CFO', href: '/for/cfo', line: 'Books that close to the penny. Source-tagged figures on every board doc.' },
-  { h: 'COO', href: '/for/coo', line: 'Labor leak before payroll posts. Void patterns named, not benchmarked to nobody.' },
-  { h: 'CTO', href: '/for/cto', line: "We sit outside the stack. We don't replace Toast or R365 — we reconcile across them." },
-];
-
-const OUTSIDE_STACK_MENU: { group: string; items: { name: string; line: string }[] }[] = [
-  { group: 'Demographics', items: [
-    { name: 'Census ACS (block-group)', line: 'Income, age, education, household — the trade-area baseline' },
-    { name: 'Census Pulse', line: 'Recent shifts — DMV migration, fed-workforce moves' },
-    { name: 'Census LODES', line: 'Workplace employment density — your lunch crowd' },
-  ]},
-  { group: 'Public peers + benchmarks', items: [
-    { name: 'SEC EDGAR XBRL', line: 'Cava · Chipotle · Sweetgreen · Shake Shack · Wingstop — your CFO benchmark strip' },
-    { name: 'BLS OEWS', line: 'Wage by metro × role — what your line cooks should make' },
-  ]},
-  { group: 'Place + traffic', items: [
-    { name: 'Google Places / Yelp Fusion', line: 'Halo anchors + heat map — the operator-judgment site rubric' },
-    { name: 'OpenStreetMap POIs', line: 'Free fallback when Google quotas tighten' },
-    { name: 'State DOT AADT', line: 'Annual average daily traffic — corridor strength per store' },
-  ]},
-  { group: 'Local context', items: [
-    { name: 'NOAA weather', line: 'Government-canonical · the dine-in / delivery shift on a rainy day' },
-    { name: 'Sports leagues + venues', line: 'Commanders · Wizards · Capitals · Nationals · Titans · Predators · NC State · venue iCal feeds' },
-    { name: 'County open-data permits', line: 'New restaurants breaking ground in your ring · road closures · gentrification signals' },
-    { name: 'State ABC alcohol licenses', line: 'New entrants in your 1-mile ring' },
-  ]},
-  { group: 'Commodity + supply', items: [
-    { name: 'USDA Market News', line: 'Ground beef · avocado · corn · dairy weekly index' },
-  ]},
-];
-
-function Brand() {
-  return (
-    <a href="/" className="flex items-center gap-2.5 group">
-      <span className="brand-monogram">N86</span>
-      <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
-    </a>
-  );
-}
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -135,8 +52,6 @@ export default function Home() {
   const [restaurantName, setRestaurantName] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  const [openMenu, setOpenMenu] = useState<'agents' | 'wins' | 'outside' | null>(null);
-  const toggle = (k: 'agents' | 'wins' | 'outside') => setOpenMenu((cur) => (cur === k ? null : k));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -150,7 +65,7 @@ export default function Home() {
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setMessage(data.message || "You're on the list!");
+        setMessage(data.message || "You're on the list.");
       } else {
         throw new Error(data.error);
       }
@@ -161,344 +76,218 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen text-dark-50">
-      {/* Sticky header */}
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <Brand />
-          <div className="flex items-center gap-1 sm:gap-1.5 text-sm">
-            <button type="button" onClick={() => toggle('wins')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'wins' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Quick wins <span className="text-dark-400">▾</span></button>
-            <button type="button" onClick={() => toggle('agents')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'agents' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Agents <span className="text-dark-400">▾</span></button>
-            <button type="button" onClick={() => toggle('outside')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'outside' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Outside the stack <span className="text-dark-400">▾</span></button>
-            <a href="/for" className="hidden sm:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Pick your seat</a>
-            <a href="/operators" className="hidden md:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</a>
-            <a href="/answers" className="hidden md:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Answers</a>
-            <a href="/reports/login" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 ml-1 transition-colors">Sign in</a>
-          </div>
+    <main className="min-h-screen text-ink-800">
+      {/* Sticky nav — Apple shell */}
+      <header className="nav-shell sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
+            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
+          </Link>
+          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
+            <Link href="/for" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">Pick your seat</Link>
+            <Link href="/operators" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden md:inline">Operators</Link>
+            <Link href="/answers" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden md:inline">Answers</Link>
+            <Link href="/press" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden lg:inline">Press</Link>
+            <Link href="/reports/login" className="px-3 py-1.5 rounded-full text-ink-800 hover:bg-black/[0.04] font-medium">Sign in</Link>
+          </nav>
         </div>
-
-        {openMenu === 'wins' ? (
-          <div className="border-t border-white/5 bg-dark-900/95 backdrop-blur-xl">
-            <div className="max-w-6xl mx-auto px-6 py-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-gold-400 text-[10px] font-mono uppercase tracking-[0.2em]">Quick wins</span>
-                <span className="accent-rule flex-1" />
-                <span className="text-dark-300 text-xs">drop-in tools · guardrailed</span>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {QUICK_WINS_MENU.map((q) => (
-                  <a key={q.name} href={q.href} onClick={() => setOpenMenu(null)} className="elevated-card rounded-xl p-4 transition-all hover:-translate-y-0.5">
-                    <div className="flex items-center justify-between gap-3 mb-1">
-                      <span className="text-white font-semibold">{q.name}</span>
-                      <span className="text-[10px] uppercase tracking-wider text-gold-300 font-mono">{q.tag}</span>
-                    </div>
-                    {q.aud ? <p className="text-copper-300 text-[10px] uppercase tracking-[0.18em] mb-1.5 font-mono">for {q.aud}</p> : null}
-                    <p className="text-dark-200 text-sm leading-relaxed">{q.line}</p>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {openMenu === 'agents' ? (
-          <div className="border-t border-white/5 bg-dark-900/95 backdrop-blur-xl">
-            <div className="max-w-6xl mx-auto px-6 py-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-gold-400 text-[10px] font-mono uppercase tracking-[0.2em]">Agents</span>
-                <span className="accent-rule flex-1" />
-                <span className="text-dark-300 text-xs">one specialist per system · deep not light</span>
-              </div>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-                {AGENTS_MENU.map((g) => (
-                  <div key={g.group}>
-                    <p className="text-dark-300 text-[10px] uppercase tracking-[0.2em] font-mono mb-2">{g.group}</p>
-                    <ul className="space-y-1.5">
-                      {g.items.map((it) => (
-                        <li key={it.name} className="text-dark-50 text-sm flex items-center gap-2">
-                          <span>{it.name}</span>
-                          {it.tag ? <span className="text-[9px] uppercase tracking-[0.18em] font-mono text-green-400 border border-green-500/30 rounded px-1.5 py-0.5">{it.tag}</span> : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {openMenu === 'outside' ? (
-          <div className="border-t border-white/5 bg-dark-900/95 backdrop-blur-xl">
-            <div className="max-w-6xl mx-auto px-6 py-6">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-gold-400 text-[10px] font-mono uppercase tracking-[0.2em]">Outside the stack</span>
-                <span className="accent-rule flex-1" />
-                <span className="text-dark-300 text-xs">we sit next to your POS, not inside it</span>
-              </div>
-              <p className="text-dark-200 text-sm mb-5">We don&apos;t replace Toast, R365, 7shifts, or Thanx. We sit on top and tell you when one of them is lying to you. Every external feed source-tagged. Free, public, government-canonical where possible. No source wired without operator approval.</p>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-                {OUTSIDE_STACK_MENU.map((g) => (
-                  <div key={g.group}>
-                    <p className="text-dark-300 text-[10px] uppercase tracking-[0.2em] font-mono mb-2">{g.group}</p>
-                    <ul className="space-y-2.5">
-                      {g.items.map((it) => (
-                        <li key={it.name}>
-                          <p className="text-dark-50 text-sm font-medium">{it.name}</p>
-                          <p className="text-dark-300 text-xs leading-relaxed">{it.line}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="bg-grid absolute inset-0 opacity-60 pointer-events-none" />
-        <div className="hero-orb animate-floatSlow" />
-        <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-20 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 mb-8">
+      {/* Hero — Apple keynote */}
+      <section className="pt-20 md:pt-28 pb-16 md:pb-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-ink-100 border border-ink-200 px-3 py-1 mb-8">
             <span className="live-dot" />
-            <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-dark-100">Live · $15.72M reconciled · 545,677 orders read</span>
+            <span className="text-[12px] font-medium text-ink-600 tracking-tight">Live · $15.72M reconciled across 545,677 orders</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] mb-6 text-white">
-            Find the leak.<br className="hidden sm:block" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 via-gold-400 to-copper-400">Name who owns it.</span><br className="hidden sm:block" />
+          <h1 className="display text-5xl md:text-7xl lg:text-[88px] mb-7">
+            Find the leak.<br />
+            Name who owns it.<br />
             Keep the receipt.
           </h1>
-          <p className="text-dark-200 text-lg md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed">
-            We read every dollar your restaurants move, find where it&apos;s leaking, and show our work on every number —
-            so you act on facts, not hunches.
+          <p className="text-ink-600 text-xl md:text-2xl max-w-2xl mx-auto leading-snug mb-4 tracking-tight">
+            Restaurant financial intelligence, built by an operator. For operators.
           </p>
-          <p className="text-dark-100 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-            Every number ships tagged <span className="text-green-300 font-semibold">Verified</span>,
-            <span className="text-gold-300 font-semibold"> Estimated</span>, or
-            <span className="text-red-300 font-semibold"> Unverified</span>.
-            <span className="text-dark-300"> Ask us why.</span>
+          <p className="text-ink-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
+            Every number ships tagged <span className="text-success-500 font-semibold">Verified</span>,
+            <span className="text-warning-500 font-semibold"> Estimated</span>, or
+            <span className="text-danger-500 font-semibold"> Unverified</span>. Ask us why.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
-            <a href="/for" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
-              Pick your seat →
-            </a>
-            <a href="/demo/void-hunter" className="border border-gold-500/60 hover:border-gold-400 text-gold-300 hover:text-gold-200 rounded-lg px-7 py-3.5 bg-gold-500/[0.06] hover:bg-gold-500/[0.10] transition-all">
-              ⚡ Try a free agent now
-            </a>
-            <a href="/reports/login" className="border border-white/12 hover:border-gold-400/60 text-dark-50 hover:text-white rounded-lg px-7 py-3.5 bg-white/[0.02] hover:bg-white/[0.05] transition-all">
-              Sign in
-            </a>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/for" className="btn-primary">Pick your seat →</Link>
+            <Link href="/demo/void-hunter" className="btn-secondary">⚡ Try a free agent</Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/8">
-            {STATS.map((s) => (
-              <div key={s.l} className={`relative bg-dark-800 px-4 py-6 ${s.hot ? '' : ''}`}>
-                {s.hot ? <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400 to-transparent" /> : null}
-                <p className={`font-mono tabular-nums text-xl md:text-2xl font-bold leading-tight ${s.hot ? 'text-gold-300' : 'text-dark-50'}`}>{s.v}</p>
-                <p className="text-dark-300 text-[10px] uppercase tracking-[0.18em] mt-2 font-mono">{s.l}</p>
-              </div>
+          <p className="text-[12px] text-ink-500 mt-6">No login. No card. 60 seconds to a real screen.</p>
+        </div>
+      </section>
+
+      {/* Free agents grid — primary "try us out" surface */}
+      <section className="py-16 md:py-24 px-6 bg-ink-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-3">Free agents</p>
+            <h2 className="display text-4xl md:text-5xl mb-4">Try one. Right now.</h2>
+            <p className="text-ink-600 text-lg max-w-xl mx-auto">Six live tools. Sample data. No signup, no card, no salesperson.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FREE_AGENTS.map((a) => (
+              <Link key={a.name} href={a.href} className="card group p-7 block hover:-translate-y-0.5">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500">For {a.aud}</p>
+                  <span className="text-[11px] font-medium text-success-500 inline-flex items-center gap-1.5">
+                    <span className="live-dot" style={{ width: '0.4rem', height: '0.4rem', boxShadow: '0 0 0 3px rgba(52,199,89,0.15)' }} />
+                    Live
+                  </span>
+                </div>
+                <p className="text-ink-800 font-semibold text-xl tracking-tighter mb-2">{a.name}</p>
+                <p className="text-ink-600 leading-relaxed mb-5">{a.line}</p>
+                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pick your seat */}
+      <section className="py-16 md:py-28 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-3">Pick your seat</p>
+            <h2 className="display text-4xl md:text-5xl mb-4">Built for the seat you sit in.</h2>
+            <p className="text-ink-600 text-lg max-w-2xl mx-auto">Each role sees the screen they actually need. Each page comes with three free agents to try right now.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            {C_SUITE.map((s) => (
+              <Link key={s.h} href={s.href} className="card group p-7 block hover:-translate-y-0.5">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500 mb-2">For the</p>
+                <p className="display text-3xl text-ink-800 mb-3">{s.h}</p>
+                <p className="text-ink-600 text-[15px] leading-relaxed mb-5">{s.line}</p>
+                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">See your view <span aria-hidden>→</span></p>
+              </Link>
+            ))}
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FRONTLINE.map((s) => (
+              <Link key={s.h} href={s.href} className="card group p-7 block hover:-translate-y-0.5">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500 mb-2">For the</p>
+                <p className="display text-3xl text-ink-800 mb-3">{s.h}</p>
+                <p className="text-ink-600 text-[15px] leading-relaxed mb-5">{s.line}</p>
+                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">See your view <span aria-hidden>→</span></p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* Three receipts */}
-      <section id="proof" className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Three receipts</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">No slides. No promises.</h2>
-          <p className="text-dark-200 max-w-xl mx-auto">Three numbers we can defend line by line.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-5">
-          {RECEIPTS.map((r) => (
-            <div key={r.label} className={`elevated-card rounded-2xl p-7 ${r.accent === 'copper' ? 'hover:border-copper-500/40' : 'hover:border-gold-500/40'} transition-colors`}>
-              <p className={`font-mono tabular-nums text-2xl md:text-3xl font-bold mb-3 ${r.accent === 'copper' ? 'text-copper-300' : 'text-dark-50'}`}>{r.big}</p>
-              <p className={`text-[10px] uppercase tracking-[0.22em] font-mono mb-3 ${r.accent === 'copper' ? 'text-copper-400' : 'text-gold-400'}`}>{r.label}</p>
-              <p className="text-dark-200 text-sm leading-relaxed">{r.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Two products */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Two products · one platform</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">For the back office AND the people on the floor.</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-5">
-          {PRODUCTS.map((p) => (
-            <div key={p.name} className={`relative rounded-2xl p-7 flex flex-col overflow-hidden ${p.status === 'live' ? 'bg-gradient-to-br from-gold-500/[0.08] to-transparent border border-gold-500/30' : 'bg-gradient-to-br from-copper-500/[0.07] to-transparent border border-copper-500/30'}`}>
-              <div className="absolute inset-0 pointer-events-none opacity-30" style={{ background: p.status === 'live' ? 'radial-gradient(50% 50% at 100% 0%, rgba(212,154,14,0.18), transparent 60%)' : 'radial-gradient(50% 50% at 100% 0%, rgba(226,92,18,0.18), transparent 60%)' }} />
-              <div className="relative flex items-center justify-between mb-3">
-                <p className={`text-[10px] uppercase tracking-[0.22em] font-mono ${p.status === 'live' ? 'text-gold-300' : 'text-copper-300'}`}>{p.kicker}</p>
-                <span className={`text-[10px] uppercase tracking-[0.18em] font-mono font-semibold rounded-full px-2.5 py-1 border ${p.status === 'live' ? 'bg-green-500/10 text-green-300 border-green-500/30' : 'bg-copper-500/10 text-copper-300 border-copper-500/30'}`}>
-                  {p.status === 'live' ? 'Live · in production' : 'Coming · in build'}
-                </span>
-              </div>
-              <p className="relative text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">{p.name}</p>
-              <p className="relative text-dark-200 leading-relaxed mb-5">{p.line}</p>
-              <ul className="relative space-y-2 mb-6 flex-1">
-                {p.bullets.map((b) => (
-                  <li key={b} className="text-dark-50 text-sm flex items-start gap-2.5">
-                    <span className={p.status === 'live' ? 'text-gold-400 mt-1' : 'text-copper-400 mt-1'}>◆</span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href={p.href} className={`relative inline-flex items-center gap-1 text-sm font-semibold ${p.status === 'live' ? 'text-gold-300 hover:text-gold-200' : 'text-copper-300 hover:text-copper-200'}`}>
-                {p.status === 'live' ? 'See it' : 'Get on the list'} <span aria-hidden>→</span>
-              </a>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pick your seat — role picker (C-suite) */}
-      <section id="seats" className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/[0.06] px-3 py-1.5 mb-4">
-            <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-gold-300">Built for multi-unit complexity</span>
+      <section className="py-16 md:py-28 px-6 bg-ink-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-3">Three receipts</p>
+            <h2 className="display text-4xl md:text-5xl mb-4">No slides. No promises.</h2>
+            <p className="text-ink-600 text-lg">Three numbers we can defend line by line.</p>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Pick your seat at the table.</h2>
-          <p className="text-dark-200 max-w-2xl mx-auto text-lg leading-relaxed">Each role sees the screen they actually need — never the screen the back office hands them. Each page comes with three free agents you can try right now, no login.</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-          {C_SUITE.map((s) => (
-            <a key={s.h} href={s.href} className="elevated-card rounded-2xl p-6 block transition-all hover:-translate-y-0.5 hover:border-gold-400/60">
-              <div className="flex items-center justify-between mb-2">
-                <p className="font-mono text-gold-300 text-[10px] uppercase tracking-[0.22em]">For the</p>
-                <span className="text-[10px] uppercase tracking-[0.18em] font-mono text-green-300 border border-green-500/30 rounded px-1.5 py-0.5">⚡ 3 free agents</span>
-              </div>
-              <p className="text-3xl font-bold text-white tracking-tight mb-2">{s.h}</p>
-              <p className="text-dark-200 text-sm leading-relaxed mb-4">{s.line}</p>
-              <p className="text-gold-300 text-sm font-semibold inline-flex items-center gap-1">See your view <span aria-hidden>→</span></p>
-            </a>
-          ))}
-        </div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {AUDIENCE.map((a) => (
-            <a key={a.h} href={a.href} className="elevated-card rounded-2xl p-6 block transition-all hover:-translate-y-0.5 hover:border-gold-400/60">
-              <div className="flex items-center gap-3 mb-3">
-                <span className={`inline-block w-1.5 h-6 rounded-full ${a.tone === 'copper' ? 'bg-copper-400' : a.tone === 'mixed' ? 'bg-gradient-to-b from-gold-400 to-copper-400' : 'bg-gold-400'}`} />
-                <p className="text-xl font-semibold text-white tracking-tight">{a.h}</p>
-                <span className="ml-auto text-[10px] uppercase tracking-[0.18em] font-mono text-green-300 border border-green-500/30 rounded px-1.5 py-0.5">⚡ 3 free agents</span>
-              </div>
-              <p className="text-dark-200 leading-relaxed mb-4">{a.p}</p>
-              <p className="text-gold-300 text-sm font-semibold inline-flex items-center gap-1">See your view <span aria-hidden>→</span></p>
-            </a>
-          ))}
-        </div>
-        <div className="text-center mt-10">
-          <a href="/for" className="inline-flex items-center gap-2 text-dark-200 hover:text-gold-300 transition-colors">All 7 roles · pick your seat <span aria-hidden>→</span></a>
-        </div>
-      </section>
-
-      {/* The stack */}
-      <section id="stack" className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">The stack</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Everything in one place.</h2>
-          <p className="text-dark-200 max-w-xl mx-auto">The whole platform, one screen at a time — and we tell you exactly what&apos;s live today.</p>
-        </div>
-        <div className="elevated-card rounded-2xl overflow-hidden">
-          <div className="divide-y divide-white/5">
-            {STACK.map((row) => (
-              <div key={row.name} className="flex items-start gap-4 p-6 hover:bg-white/[0.02] transition-colors">
-                <div className="flex-1">
-                  <p className="text-white font-semibold">{row.name}</p>
-                  <p className="text-dark-200 text-sm mt-1.5 leading-relaxed">{row.desc}</p>
-                </div>
-                <span
-                  className={`shrink-0 text-[10px] uppercase tracking-[0.18em] font-mono font-semibold rounded-full px-3 py-1 border ${
-                    row.live ? 'text-green-300 bg-green-500/10 border-green-500/30' : 'text-copper-300 bg-copper-500/10 border-copper-500/30'
-                  }`}
-                >
-                  {row.badge ?? (row.live ? 'Live' : 'Coming soon')}
-                </span>
+          <div className="grid md:grid-cols-3 gap-4">
+            {RECEIPTS.map((r) => (
+              <div key={r.label} className="card p-8">
+                <p className="font-mono tabular-nums display text-3xl md:text-4xl mb-3 text-ink-800">{r.big}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500 mb-3">{r.label}</p>
+                <p className="text-ink-600 leading-relaxed">{r.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* The trust move */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="relative overflow-hidden rounded-3xl border border-gold-700/40 bg-gradient-to-br from-dark-800 via-dark-800 to-dark-900 p-10 md:p-14 text-center">
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(212,154,14,0.18), transparent 60%)' }} />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(226,92,18,0.15), transparent 60%)' }} />
-          <p className="relative text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-5">Last quarter we said $8.3M. The honest number was $1.81M.</p>
-          <p className="relative text-4xl md:text-6xl font-bold tabular-nums font-mono tracking-tight mb-6">
-            <span className="text-dark-100">$8.3M</span>
-            <span className="text-dark-500 mx-3">→</span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 to-copper-400">$1.81M</span>
+      {/* Stats band */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-ink-200 rounded-2xl overflow-hidden border border-ink-200">
+            {STATS.map((s) => (
+              <div key={s.l} className="bg-white px-6 py-8 text-center">
+                <p className="font-mono tabular-nums text-2xl md:text-3xl font-bold text-ink-800 tracking-tighter">{s.v}</p>
+                <p className="text-ink-500 text-[11px] uppercase tracking-widest font-medium mt-2">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust move */}
+      <section className="py-16 md:py-28 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-5">Last quarter we said $8.3M. The honest number was $1.81M.</p>
+          <p className="display text-5xl md:text-7xl font-mono tabular-nums mb-7">
+            <span className="text-ink-400">$8.3M</span>
+            <span className="text-ink-300 mx-3">→</span>
+            <span className="text-ink-800">$1.81M</span>
           </p>
-          <p className="relative text-dark-200 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-ink-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Every other vendor brags about accuracy gains. We do the opposite — we publish the corrections.
             When our model overstated the recovery surface, we walked it back to the figure we can defend to the penny.
-            That walk-back is the product. No competitor has published one. <a href="/answers/walked-the-number-back" className="text-gold-300 hover:text-gold-200 underline">Here&apos;s how we caught it</a>.
+            <Link href="/answers/walked-the-number-back" className="link-accent ml-1.5">Here&apos;s how we caught it.</Link>
           </p>
         </div>
       </section>
 
-      {/* Built for */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-12">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Built for</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Multi-unit groups and small shops alike.</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-5">
-          {BUILT_FOR.map((b) => (
-            <div key={b.h} className="elevated-card rounded-2xl p-8">
-              <p className="text-gold-300 font-semibold text-lg mb-3 tracking-tight">{b.h}</p>
-              <p className="text-dark-200 leading-relaxed">{b.p}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Offer + waitlist */}
-      <section id="offer" className="max-w-2xl mx-auto px-6 py-24">
-        <div className="text-center mb-10">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Founding cohort</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Get a working demo on your data.</h2>
-          <p className="text-dark-200">
-            We&apos;re onboarding a small group of multi-unit operators as design partners — real data, real numbers,
-            a direct line to the founder.
-          </p>
-        </div>
-        {status === 'success' ? (
-          <div className="elevated-card rounded-2xl p-10 text-center border-gold-500/40">
-            <p className="text-gold-300 text-xl font-semibold mb-2">{message}</p>
-            <p className="text-dark-200">Check your email — we sent you a welcome note.</p>
+      {/* Stack overview */}
+      <section className="py-16 md:py-24 px-6 bg-ink-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-3">The platform</p>
+            <h2 className="display text-4xl md:text-5xl mb-4">Everything in one place.</h2>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-3 elevated-card rounded-2xl p-7">
-            <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <input type="text" placeholder="Restaurant / group name (optional)" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <button type="submit" disabled={status === 'loading'} className="w-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-4 py-3.5 transition-all disabled:opacity-50 shadow-gold-glow">
-              {status === 'loading' ? 'Sending…' : 'Request access'}
-            </button>
-            {status === 'error' && <p className="text-red-400 text-sm">{message}</p>}
-          </form>
-        )}
+          <div className="card divide-y divide-ink-200">
+            {STACK.map((row) => (
+              <div key={row.name} className="p-7 first:rounded-t-[18px] last:rounded-b-[18px]">
+                <p className="text-ink-800 font-semibold text-lg tracking-tighter">{row.name}</p>
+                <p className="text-ink-600 mt-1.5 leading-relaxed">{row.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <footer className="border-t border-white/5 mt-12">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-3 text-dark-300 text-xs">
+      {/* Talk to us */}
+      <section id="offer" className="py-16 md:py-28 px-6">
+        <div className="max-w-xl mx-auto text-center">
+          <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-3">Talk to us</p>
+          <h2 className="display text-4xl md:text-5xl mb-4">15 minutes. Receipts.</h2>
+          <p className="text-ink-600 text-lg mb-10">
+            We onboard a small group of multi-unit operators per cohort. Real data, real numbers, a direct line to the founder.
+          </p>
+          {status === 'success' ? (
+            <div className="card p-10">
+              <p className="text-ink-800 text-xl font-semibold mb-2">{message}</p>
+              <p className="text-ink-600">Check your email — we sent you a welcome note.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="card p-7 space-y-3 text-left">
+              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
+              <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
+              <input type="text" placeholder="Restaurant or group name (optional)" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
+              <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50">
+                {status === 'loading' ? 'Sending…' : 'Request access'}
+              </button>
+              {status === 'error' && <p className="text-danger-500 text-sm text-center">{message}</p>}
+            </form>
+          )}
+        </div>
+      </section>
+
+      <footer className="border-t border-ink-200 py-10 px-6 bg-white">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
           <div className="flex items-center gap-2">
-            <span className="brand-monogram" style={{ width: '1.25rem', height: '1.25rem', fontSize: '0.55rem' }}>N86</span>
+            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by an operator, for operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <a href="/for" className="hover:text-gold-300 transition-colors">Pick your seat</a>
-            <a href="/answers" className="hover:text-gold-300 transition-colors">Answers</a>
-            <a href="/operators" className="hover:text-gold-300 transition-colors">For operators</a>
-            <a href="/press" className="hover:text-gold-300 transition-colors">Press</a>
-            <a href="/reports/login" className="hover:text-gold-300 transition-colors">Sign in</a>
+            <Link href="/for" className="hover:text-ink-800 transition-colors">Pick your seat</Link>
+            <Link href="/answers" className="hover:text-ink-800 transition-colors">Answers</Link>
+            <Link href="/operators" className="hover:text-ink-800 transition-colors">Operators</Link>
+            <Link href="/press" className="hover:text-ink-800 transition-colors">Press</Link>
+            <Link href="/reports/login" className="hover:text-ink-800 transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>

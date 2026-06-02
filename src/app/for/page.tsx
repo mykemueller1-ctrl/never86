@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 export default function ForIndex() {
   return (
     <main className="min-h-screen text-dark-50">
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
+      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <span className="brand-monogram">N86</span>
             <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/answers" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Answers</Link>
+            <Link href="/answers" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">Answers</Link>
             <Link href="/operators#talk" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Talk to us</Link>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default function ForIndex() {
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 mb-6">
             <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-dark-100">Role-routed · pick your seat</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.04] text-white mb-5">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.04] text-ink-800 mb-5">
             Who are you on this network?
           </h1>
           <p className="text-dark-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
@@ -61,7 +61,7 @@ export default function ForIndex() {
                   <span className={`inline-block w-1.5 h-6 rounded-full ${r.tone === 'copper' ? 'bg-copper-400' : r.tone === 'mixed' ? 'bg-gradient-to-b from-gold-400 to-copper-400' : 'bg-gold-400'}`} />
                   <span className="text-[10px] uppercase tracking-[0.18em] font-mono text-dark-300">{r.badge}</span>
                 </div>
-                <p className="text-white font-semibold text-xl tracking-tight mb-2">{r.audience.replace(/^For /, '')}</p>
+                <p className="text-ink-800 font-semibold text-xl tracking-tight mb-2">{r.audience.replace(/^For /, '')}</p>
                 <p className="text-dark-200 text-sm leading-relaxed mb-4 line-clamp-3">{r.intro}</p>
                 <div className="flex items-center justify-between">
                   <p className="text-gold-300 text-sm font-semibold inline-flex items-center gap-1">See your view <span aria-hidden>→</span></p>

@@ -59,14 +59,14 @@ export default async function AnswerPage({ params }: { params: Params }) {
     <main className="min-h-screen text-dark-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
+      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <span className="brand-monogram">N86</span>
             <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/answers" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">All answers</Link>
+            <Link href="/answers" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">All answers</Link>
             <Link href="/operators#talk" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Talk to us</Link>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default async function AnswerPage({ params }: { params: Params }) {
           <Link href="/answers" className="text-gold-300 hover:text-gold-200 text-[10px] uppercase tracking-[0.22em] font-mono">← Answers</Link>
           {a.audience ? <span className="text-copper-300 text-[10px] uppercase tracking-[0.18em] font-mono">For {a.audience}</span> : null}
         </div>
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] text-white mb-4">{a.title}</h1>
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] text-ink-800 mb-4">{a.title}</h1>
         {a.question ? (
           <p className="text-dark-200 text-lg italic mb-8 border-l-2 border-gold-500/60 pl-4">Q: {a.question}</p>
         ) : null}

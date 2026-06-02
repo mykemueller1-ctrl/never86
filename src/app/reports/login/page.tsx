@@ -45,7 +45,7 @@ export default function ReportsLogin() {
         </a>
 
         <div className="glass-card rounded-2xl p-7 shadow-card">
-          <h1 className="text-2xl font-bold text-white mb-1.5 tracking-tight">Welcome back.</h1>
+          <h1 className="text-2xl font-bold text-ink-800 mb-1.5 tracking-tight">Welcome back.</h1>
           <p className="text-dark-300 text-sm mb-6">Sign in to continue.</p>
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
@@ -54,12 +54,12 @@ export default function ReportsLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoFocus
-              className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all"
+              className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-ink-800 placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all"
             />
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="w-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 disabled:opacity-60 text-dark-900 font-semibold rounded-lg px-4 py-3 transition-all shadow-gold-glow"
+              className="w-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 disabled:opacity-60 text-white font-semibold rounded-lg px-4 py-3 transition-all shadow-gold-glow"
             >
               {status === 'loading' ? 'Checking…' : 'Enter'}
             </button>

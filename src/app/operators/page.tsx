@@ -85,14 +85,14 @@ export default function OperatorsLanding() {
 
   return (
     <main className="min-h-screen text-dark-50">
-      <header className="border-b border-white/5 sticky top-0 z-40 bg-dark-900/80 backdrop-blur-xl">
+      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <a href="/" className="flex items-center gap-2.5 group">
             <span className="brand-monogram">N86</span>
             <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
           </a>
           <div className="flex items-center gap-2 text-sm">
-            <a href="/" className="text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Home</a>
+            <a href="/" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Home</a>
             <a href="/reports/login" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Sign in</a>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function OperatorsLanding() {
             <span className="live-dot" />
             <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-dark-100">For multi-unit operators · independent shops · everything in between</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] mb-6 text-white">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] mb-6 text-ink-800">
             Run your restaurants<br className="hidden sm:block" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-300 via-gold-400 to-copper-400">from one screen.</span>
           </h1>
@@ -116,10 +116,10 @@ export default function OperatorsLanding() {
             One screen per role. One source of truth. Zero hand-waving.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
-            <a href="/demo/void-hunter" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
+            <a href="/demo/void-hunter" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-white font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
               Try a quick win — free
             </a>
-            <a href="#talk" className="border border-white/12 hover:border-gold-400/60 text-dark-50 hover:text-white rounded-lg px-7 py-3.5 bg-white/[0.02] hover:bg-white/[0.05] transition-all">
+            <a href="#talk" className="border border-white/12 hover:border-gold-400/60 text-dark-50 hover:text-ink-800 rounded-lg px-7 py-3.5 bg-white/[0.02] hover:bg-white/[0.05] transition-all">
               Talk to the founder
             </a>
           </div>
@@ -145,7 +145,7 @@ export default function OperatorsLanding() {
           {STEPS.map((s) => (
             <div key={s.n} className="elevated-card rounded-2xl p-7 flex flex-col">
               <p className="font-mono tabular-nums text-gold-400 text-3xl font-bold mb-4">{s.n}</p>
-              <p className="text-white font-semibold text-lg mb-2 tracking-tight">{s.title}</p>
+              <p className="text-ink-800 font-semibold text-lg mb-2 tracking-tight">{s.title}</p>
               <p className="text-dark-200 leading-relaxed flex-1">{s.body}</p>
               <a href={s.href} className="mt-6 inline-flex items-center gap-1 text-gold-300 hover:text-gold-200 text-sm font-semibold">{s.cta} <span aria-hidden>→</span></a>
             </div>
@@ -164,7 +164,7 @@ export default function OperatorsLanding() {
             <div key={a.h} className="elevated-card rounded-2xl p-7">
               <div className="flex items-center gap-3 mb-3">
                 <span className={`inline-block w-1.5 h-6 rounded-full ${a.tone === 'copper' ? 'bg-copper-400' : a.tone === 'mixed' ? 'bg-gradient-to-b from-gold-400 to-copper-400' : 'bg-gold-400'}`} />
-                <p className="text-xl font-semibold text-white tracking-tight">{a.h}</p>
+                <p className="text-xl font-semibold text-ink-800 tracking-tight">{a.h}</p>
               </div>
               <p className="text-dark-200 leading-relaxed mb-5">{a.p}</p>
               <ul className="space-y-1.5">
@@ -215,11 +215,11 @@ export default function OperatorsLanding() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3 elevated-card rounded-2xl p-7">
-            <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <input type="text" placeholder="Restaurant / group name" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <input type="number" min="1" placeholder="How many units?" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
-            <button type="submit" disabled={status === 'loading'} className="w-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-4 py-3.5 transition-all disabled:opacity-50 shadow-gold-glow">
+            <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-ink-800 placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
+            <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-ink-800 placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
+            <input type="text" placeholder="Restaurant / group name" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-ink-800 placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
+            <input type="number" min="1" placeholder="How many units?" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-dark-900/60 border border-white/10 rounded-lg px-4 py-3 text-ink-800 placeholder-dark-300 focus:outline-none focus:border-gold-500/60 focus:ring-2 focus:ring-gold-500/15 transition-all" />
+            <button type="submit" disabled={status === 'loading'} className="w-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-white font-semibold rounded-lg px-4 py-3.5 transition-all disabled:opacity-50 shadow-gold-glow">
               {status === 'loading' ? 'Sending…' : 'Talk to us'}
             </button>
             {status === 'error' && <p className="text-red-300 text-sm">{message}</p>}

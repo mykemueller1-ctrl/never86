@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body className="font-sans antialiased bg-dark-900 text-dark-50">
+      <body className="font-sans antialiased bg-ink-50 text-ink-800">
         {children}
         <LogicToggle />
       </body>

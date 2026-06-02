@@ -5,11 +5,28 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        sans: ['var(--font-display)', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
+        // Apple-style neutral palette. ink-* = the new "dark" scale, but applied
+        // to LIGHT mode (light bg, near-black text). Keeps existing `dark-*`
+        // class usages working but maps them to a neutral grayscale that reads
+        // professional + clean.
+        ink: {
+          50: '#fbfbfd',  // page bg (Apple's lightest)
+          100: '#f5f5f7', // section bg (Apple's grouped table bg)
+          200: '#e8e8ed', // card bg subtle
+          300: '#d2d2d7', // borders
+          400: '#a1a1a6', // disabled / muted
+          500: '#86868b', // tertiary text
+          600: '#515154', // secondary text
+          700: '#2c2c2e', // dark surfaces
+          800: '#1d1d1f', // primary text (Apple's exact)
+          900: '#000000', // pure black (Apple uses this for CTAs)
+        },
+        // Brand identity color — kept for monogram + accents only. Restraint.
         gold: {
           50: '#fef9e7',
           100: '#fdf0b9',
@@ -22,57 +39,50 @@ const config: Config = {
           800: '#503a08',
           900: '#2a1e04',
         },
-        copper: {
-          50: '#fff5ec',
-          100: '#ffe6cf',
-          200: '#fdc89e',
-          300: '#fba462',
-          400: '#f78135',
-          500: '#e25c12',
-          600: '#c2410c',
-          700: '#9a3412',
-          800: '#7c2d12',
-          900: '#431407',
+        // Single-restrained-accent color — Apple-finance navy. Used sparingly.
+        accent: {
+          50: '#f0f5ff',
+          100: '#dde9fb',
+          200: '#bdd3f7',
+          300: '#8eb4f0',
+          400: '#5a8de4',
+          500: '#2e69d4',
+          600: '#1d4ed8',
+          700: '#1e3a8a',
+          800: '#1e3263',
+          900: '#0a2540', // primary navy
         },
+        // Compatibility shim — `dark-*` classes used across legacy components
+        // remap to the light/neutral scale so the dark UI flips to light without
+        // a per-file rename. dark-50 → near-black text on light; dark-800/900 → pure black surfaces.
         dark: {
-          50: '#f6f4f1',
-          100: '#e7e3dc',
-          200: '#bdb6ab',
-          300: '#857d72',
-          400: '#5a5249',
-          500: '#3a342d',
-          600: '#28231f',
-          700: '#1d1916',
-          800: '#15120f',
-          900: '#0b0a08',
+          50: '#1d1d1f',  // was light text on dark; now: primary text
+          100: '#2c2c2e', // secondary text
+          200: '#515154',
+          300: '#86868b',
+          400: '#a1a1a6',
+          500: '#d2d2d7',
+          600: '#e8e8ed', // borders
+          700: '#f5f5f7', // card bg
+          800: '#fbfbfd', // page bg
+          900: '#ffffff', // pure white
         },
-      },
-      backgroundImage: {
-        'grid-fade':
-          'linear-gradient(to bottom, rgba(212,154,14,0.07) 1px, transparent 1px), linear-gradient(to right, rgba(212,154,14,0.07) 1px, transparent 1px)',
-        'gold-warm':
-          'radial-gradient(60% 60% at 50% 0%, rgba(212,154,14,0.25), transparent 70%)',
-        'copper-glow':
-          'radial-gradient(50% 50% at 80% 100%, rgba(226,92,18,0.22), transparent 70%)',
+        // Status colors — match Apple HIG
+        success: { 500: '#34c759' },
+        warning: { 500: '#ff9500' },
+        danger: { 500: '#ff3b30' },
+        info: { 500: '#0a84ff' },
       },
       boxShadow: {
-        'gold-glow': '0 0 0 1px rgba(212,154,14,0.20), 0 25px 50px -20px rgba(212,154,14,0.35)',
-        'copper-glow': '0 0 0 1px rgba(226,92,18,0.25), 0 25px 50px -20px rgba(226,92,18,0.35)',
-        'card': '0 1px 0 rgba(255,255,255,0.02) inset, 0 30px 60px -30px rgba(0,0,0,0.6)',
+        // Apple-style soft shadows — flat, no glow
+        'card': '0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
+        'card-hover': '0 2px 4px rgba(0,0,0,0.06), 0 12px 24px rgba(0,0,0,0.08)',
+        'btn': '0 1px 2px rgba(0,0,0,0.08)',
+        'subtle': '0 1px 0 rgba(0,0,0,0.04)',
       },
-      keyframes: {
-        floatSlow: {
-          '0%, 100%': { transform: 'translate3d(0,0,0)' },
-          '50%': { transform: 'translate3d(0,-12px,0)' },
-        },
-        pulseDot: {
-          '0%, 100%': { opacity: '0.9' },
-          '50%': { opacity: '0.35' },
-        },
-      },
-      animation: {
-        floatSlow: 'floatSlow 8s ease-in-out infinite',
-        pulseDot: 'pulseDot 1.8s ease-in-out infinite',
+      letterSpacing: {
+        tightest: '-0.04em',
+        tighter: '-0.022em', // Apple's heading tracking
       },
     },
   },
