@@ -81,10 +81,17 @@ const PRODUCTS: { kicker: string; name: string; line: string; bullets: string[];
   },
 ];
 
-const AUDIENCE: { h: string; p: string; wins: string[]; tone: 'gold' | 'copper' | 'mixed' }[] = [
-  { h: 'Owners', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Catering Leak'], tone: 'gold' },
-  { h: 'Managers', p: 'Labor before payroll closes. Tip slippage as the leading indicator.', wins: ['Labor Leak', 'Tip Variance', 'EOD reconciler'], tone: 'copper' },
-  { h: 'Front-line crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Shift Pulse', 'Knowledge Brain', 'Achievements'], tone: 'mixed' },
+const AUDIENCE: { h: string; href: string; p: string; wins: string[]; tone: 'gold' | 'copper' | 'mixed' }[] = [
+  { h: 'Owners', href: '/for/owner', p: 'The leak, named. Who owns it. What to do tomorrow.', wins: ['Void Hunter', '3P Fee Finder', 'Catering Leak'], tone: 'gold' },
+  { h: 'Managers', href: '/for/manager', p: 'Labor before payroll closes. Tip slippage as the leading indicator.', wins: ['Labor Leak', 'Tip Variance', 'EOD reconciler'], tone: 'copper' },
+  { h: 'Front-line crew', href: '/for/crew', p: 'A daily standup that helps. Station median, shift goal, streak.', wins: ['Shift Pulse', 'Knowledge Brain', 'Achievements'], tone: 'mixed' },
+];
+
+const C_SUITE: { h: string; href: string; line: string }[] = [
+  { h: 'CEO', href: '/for/ceo', line: 'Network reconciled to the cent. One screen ranked by what costs you money this week.' },
+  { h: 'CFO', href: '/for/cfo', line: 'Books that close to the penny. Source-tagged figures on every board doc.' },
+  { h: 'COO', href: '/for/coo', line: 'Labor leak before payroll posts. Void patterns named, not benchmarked to nobody.' },
+  { h: 'CTO', href: '/for/cto', line: "We sit outside the stack. We don't replace Toast or R365 — we reconcile across them." },
 ];
 
 const OUTSIDE_STACK_MENU: { group: string; items: { name: string; line: string }[] }[] = [
@@ -163,7 +170,8 @@ export default function Home() {
             <button type="button" onClick={() => toggle('wins')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'wins' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Quick wins <span className="text-dark-400">▾</span></button>
             <button type="button" onClick={() => toggle('agents')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'agents' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Agents <span className="text-dark-400">▾</span></button>
             <button type="button" onClick={() => toggle('outside')} className={`hidden sm:inline px-3 py-1.5 rounded-lg border transition-colors ${openMenu === 'outside' ? 'border-gold-500/60 text-white bg-gold-500/5' : 'border-transparent text-dark-200 hover:text-white hover:bg-white/[0.03]'}`}>Outside the stack <span className="text-dark-400">▾</span></button>
-            <a href="/operators" className="hidden sm:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</a>
+            <a href="/for" className="hidden sm:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Pick your seat</a>
+            <a href="/operators" className="hidden md:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">For operators</a>
             <a href="/answers" className="hidden md:inline text-dark-200 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/[0.03]">Answers</a>
             <a href="/reports/login" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 ml-1 transition-colors">Sign in</a>
           </div>
@@ -274,11 +282,14 @@ export default function Home() {
             <span className="text-dark-300"> Ask us why.</span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
-            <a href="/operators" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
-              Get started — free quick win
+            <a href="/for" className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-dark-900 font-semibold rounded-lg px-7 py-3.5 shadow-gold-glow transition-all hover:scale-[1.02]">
+              Pick your seat →
+            </a>
+            <a href="/demo/void-hunter" className="border border-gold-500/60 hover:border-gold-400 text-gold-300 hover:text-gold-200 rounded-lg px-7 py-3.5 bg-gold-500/[0.06] hover:bg-gold-500/[0.10] transition-all">
+              ⚡ Try a free agent now
             </a>
             <a href="/reports/login" className="border border-white/12 hover:border-gold-400/60 text-dark-50 hover:text-white rounded-lg px-7 py-3.5 bg-white/[0.02] hover:bg-white/[0.05] transition-all">
-              See the Command Center
+              Sign in
             </a>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/8">
@@ -345,30 +356,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Three audiences */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
+      {/* Pick your seat — role picker (C-suite) */}
+      <section id="seats" className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-12">
-          <p className="text-gold-400 text-[10px] uppercase tracking-[0.25em] font-mono mb-3">Three audiences</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">The back office isn&apos;t the only one that runs the restaurant.</h2>
+          <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/[0.06] px-3 py-1.5 mb-4">
+            <span className="text-[11px] uppercase tracking-[0.18em] font-mono text-gold-300">Built for multi-unit complexity</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Pick your seat at the table.</h2>
+          <p className="text-dark-200 max-w-2xl mx-auto text-lg leading-relaxed">Each role sees the screen they actually need — never the screen the back office hands them. Each page comes with three free agents you can try right now, no login.</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+          {C_SUITE.map((s) => (
+            <a key={s.h} href={s.href} className="elevated-card rounded-2xl p-6 block transition-all hover:-translate-y-0.5 hover:border-gold-400/60">
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-mono text-gold-300 text-[10px] uppercase tracking-[0.22em]">For the</p>
+                <span className="text-[10px] uppercase tracking-[0.18em] font-mono text-green-300 border border-green-500/30 rounded px-1.5 py-0.5">⚡ 3 free agents</span>
+              </div>
+              <p className="text-3xl font-bold text-white tracking-tight mb-2">{s.h}</p>
+              <p className="text-dark-200 text-sm leading-relaxed mb-4">{s.line}</p>
+              <p className="text-gold-300 text-sm font-semibold inline-flex items-center gap-1">See your view <span aria-hidden>→</span></p>
+            </a>
+          ))}
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
           {AUDIENCE.map((a) => (
-            <div key={a.h} className="elevated-card rounded-2xl p-7">
+            <a key={a.h} href={a.href} className="elevated-card rounded-2xl p-6 block transition-all hover:-translate-y-0.5 hover:border-gold-400/60">
               <div className="flex items-center gap-3 mb-3">
                 <span className={`inline-block w-1.5 h-6 rounded-full ${a.tone === 'copper' ? 'bg-copper-400' : a.tone === 'mixed' ? 'bg-gradient-to-b from-gold-400 to-copper-400' : 'bg-gold-400'}`} />
                 <p className="text-xl font-semibold text-white tracking-tight">{a.h}</p>
+                <span className="ml-auto text-[10px] uppercase tracking-[0.18em] font-mono text-green-300 border border-green-500/30 rounded px-1.5 py-0.5">⚡ 3 free agents</span>
               </div>
-              <p className="text-dark-200 leading-relaxed mb-5">{a.p}</p>
-              <p className="text-dark-300 text-[10px] uppercase tracking-[0.22em] font-mono mb-2">Quick wins for them</p>
-              <ul className="space-y-1.5">
-                {a.wins.map((w) => (
-                  <li key={w} className="text-dark-50 text-sm flex items-center gap-2.5">
-                    <span className="text-gold-400">·</span> {w}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              <p className="text-dark-200 leading-relaxed mb-4">{a.p}</p>
+              <p className="text-gold-300 text-sm font-semibold inline-flex items-center gap-1">See your view <span aria-hidden>→</span></p>
+            </a>
           ))}
+        </div>
+        <div className="text-center mt-10">
+          <a href="/for" className="inline-flex items-center gap-2 text-dark-200 hover:text-gold-300 transition-colors">All 7 roles · pick your seat <span aria-hidden>→</span></a>
         </div>
       </section>
 
@@ -470,6 +494,7 @@ export default function Home() {
             <span>Never 86&apos;d · Built by an operator, for operators</span>
           </div>
           <div className="flex items-center gap-5">
+            <a href="/for" className="hover:text-gold-300 transition-colors">Pick your seat</a>
             <a href="/answers" className="hover:text-gold-300 transition-colors">Answers</a>
             <a href="/operators" className="hover:text-gold-300 transition-colors">For operators</a>
             <a href="/press" className="hover:text-gold-300 transition-colors">Press</a>
