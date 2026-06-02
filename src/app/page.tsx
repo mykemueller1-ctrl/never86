@@ -9,6 +9,7 @@ const FREE_AGENTS = [
   { name: 'Labor Leak', href: '/demo/labor-leak' },
   { name: 'Tip Variance', href: '/demo/tip-variance' },
   { name: 'Catering Leak', href: '/demo/catering-leak' },
+  { name: 'Rate Card Audit', href: '/demo/rate-card-audit' },
   { name: 'Shift Pulse', href: '/demo/shift-pulse' },
 ];
 
