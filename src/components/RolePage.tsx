@@ -23,10 +23,11 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
       <section className="pt-28 md:pt-40 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-6">For the {spec.badge}</p>
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-10">
+          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-6">
             {spec.headline.l1}<br />
             {spec.headline.gradient}
           </h1>
+          <p className="text-ink-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">{spec.subhead}</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href={spec.freeAgents[0].href} className="btn-primary">Try {spec.freeAgents[0].name}</Link>
             <Link href="/operators#talk" className="btn-secondary">Talk to us</Link>

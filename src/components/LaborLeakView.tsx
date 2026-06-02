@@ -15,7 +15,7 @@ function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: 
         <SourceTag level="verified" />
       </div>
       <p className={`text-2xl font-bold leading-tight ${v}`}>{value}</p>
-      {sub ? <p className="text-dark-400 text-xs mt-1">{sub}</p> : null}
+      {sub ? <p className="text-ink-500 text-xs mt-1">{sub}</p> : null}
     </div>
   );
 }
@@ -32,12 +32,12 @@ export function LaborLeakFrame({ sample, children }: { sample?: boolean; childre
 
 function SampleBanner() {
   return (
-    <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
+    <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
-        <p className="text-warning-500 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
-        <p className="text-dark-200 text-sm">Made-up numbers for a 5-unit demo. Wire your scheduling system (7shifts, HotSchedules, Homebase) to run this on your own shifts.</p>
+        <p className="text-ink-800 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
+        <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Wire your scheduling system (7shifts, HotSchedules, Homebase) to run this on your own shifts.</p>
       </div>
-      <Link href="/operators#talk" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-lg px-4 py-2 text-sm">
+      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
       </Link>
     </div>
@@ -63,9 +63,9 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
         <Kpi label="Ghost shift $ (YTD)" value={usd(d.ghostShiftDollarsYr)} sub="clocked-in, no sales recorded" tone="gold" />
       </div>
 
-      <div className="bg-warning-500/5 border border-warning-500/30 rounded-xl p-4 mb-8">
-        <p className="text-warning-500 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
-        <p className="text-dark-200 text-sm">
+      <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8">
+        <p className="text-ink-800 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
+        <p className="text-ink-600 text-sm">
           A "ghost shift" is a clocked-in window with zero sales attached — sometimes it&apos;s legit (prep, dish, ops). Drift is the
           gap between scheduled and clocked hours. Read the pattern. Pull the timesheet. Then decide.
         </p>
@@ -76,7 +76,7 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium text-right">Net sales</th>
                 <th className="px-4 py-2 font-medium text-right">Labor %</th>
@@ -93,7 +93,7 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
                 return (
                   <tr key={s.name} className="border-b border-ink-200/60 last:border-0">
                     <td className="px-4 py-2 text-ink-800">{s.name}</td>
-                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.netSales)}</td>
+                    <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.netSales)}</td>
                     <td className="px-4 py-2 text-right">
                       <span className="flex items-center justify-end gap-3">
                         <span className="relative inline-block h-1.5 w-20 rounded bg-ink-200 overflow-hidden align-middle">
@@ -103,11 +103,11 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
                         {drift > 0 ? <span className="text-[10px] font-semibold rounded-full px-2 py-0.5 bg-amber-500/10 text-warning-500 border border-amber-700/40">+{(drift * 100).toFixed(1)}</span> : null}
                       </span>
                     </td>
-                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{s.overtimeHours}</td>
-                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.overtimeDollars)}</td>
+                    <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{s.overtimeHours}</td>
+                    <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.overtimeDollars)}</td>
                     <td className="px-4 py-2 text-right">
                       <span className="tabular-nums text-ink-800">{s.ghostShiftCount}</span>
-                      <span className="text-dark-400 text-xs ml-1">/ {usd(s.ghostShiftDollars)}</span>
+                      <span className="text-ink-500 text-xs ml-1">/ {usd(s.ghostShiftDollars)}</span>
                     </td>
                   </tr>
                 );
@@ -122,7 +122,7 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium">Employee</th>
                 <th className="px-4 py-2 font-medium">Role</th>
@@ -137,10 +137,10 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
                 <tr key={`${o.store}-${o.name}-${i}`} className="border-b border-ink-200/60 last:border-0">
                   <td className="px-4 py-2 text-ink-800">{o.store}</td>
                   <td className="px-4 py-2 text-ink-800">{o.name}</td>
-                  <td className="px-4 py-2 text-dark-300 capitalize">{o.role}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{o.scheduled}h</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{o.clocked}h</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{o.overtime}h</td>
+                  <td className="px-4 py-2 text-ink-500 capitalize">{o.role}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{o.scheduled}h</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{o.clocked}h</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{o.overtime}h</td>
                   <td className="px-4 py-2 text-right">
                     <span className="text-[10px] font-semibold rounded-full px-2 py-0.5 bg-amber-500/10 text-warning-500 border border-amber-700/40 tabular-nums">+{o.drift}h</span>
                   </td>
@@ -153,7 +153,7 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
 
       <div className="card rounded-xl p-5">
         <p className="text-ink-800 text-xs uppercase tracking-widest mb-2">What to do tonight</p>
-        <ul className="text-dark-200 text-sm space-y-1.5 list-disc list-inside">
+        <ul className="text-ink-600 text-sm space-y-1.5 list-disc list-inside">
           <li>Pull the timesheet for the top-drift employee and ask: was the clock-in window real work?</li>
           <li>For ghost shifts: cross-check against sales by station. A station with hours but zero rings is a question, not an answer.</li>
           <li>Cap overtime hours per role per store before the week closes — the cap is the lever, not the punishment.</li>
