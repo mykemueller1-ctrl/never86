@@ -44,7 +44,7 @@ export default function ReportsLogin() {
 
         <div className="card p-7">
           <h1 className="display text-3xl mb-1.5 text-center">Sign in</h1>
-          <p className="text-ink-500 text-sm mb-6 text-center">Operator access only.</p>
+          <p className="text-ink-500 text-sm mb-6 text-center">Operator portal.</p>
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="password"

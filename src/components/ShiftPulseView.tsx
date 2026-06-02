@@ -146,7 +146,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
                   <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{c.voidRate ? pct(c.voidRate) : '—'}</td>
                   <td className="px-4 py-2 text-right">
                     {c.streakDays > 1 ? (
-                      <span className="text-warning-500 tabular-nums">{c.streakDays} 🔥</span>
+                      <span className="text-ink-800 tabular-nums font-semibold">{c.streakDays}d</span>
                     ) : (
                       <span className="text-ink-500 tabular-nums">{c.streakDays}d</span>
                     )}
