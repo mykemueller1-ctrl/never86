@@ -43,7 +43,8 @@ export default function ForIndex() {
               return (
                 <Link key={r.slug} href={`/for/${r.slug}`} className="card group p-8 block hover:-translate-y-0.5">
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500 mb-2">For the</p>
-                  <p className="display text-3xl text-ink-800 mb-4">{r.badge}</p>
+                  <p className="display text-3xl text-ink-800 mb-1">{r.badge}</p>
+                  <p className="text-ink-500 text-sm mb-5">{r.oneWord}</p>
                   <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">See it <span aria-hidden>→</span></p>
                 </Link>
               );

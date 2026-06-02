@@ -7,6 +7,8 @@ export type RoleSpec = {
   slug: string;
   audience: string; // header chip text
   badge: string; // short tag for cards
+  oneWord: string; // single-word card descriptor for /for grid
+  subhead: string; // single sentence under H1 on the role page
   tone: 'gold' | 'copper' | 'mixed';
   headline: { l1: string; gradient: string; l3: string };
   intro: string;
@@ -20,6 +22,8 @@ export type RoleSpec = {
 export const ROLES: Record<string, RoleSpec> = {
   ceo: {
     slug: 'ceo',
+    oneWord: 'Network',
+    subhead: 'One screen ranked by what costs you money this week.',
     audience: 'For CEOs · multi-unit operators · 5 to 50 units',
     badge: 'CEO',
     tone: 'gold',
@@ -52,6 +56,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   cfo: {
     slug: 'cfo',
+    oneWord: 'Books',
+    subhead: 'Books that close to the penny. Every figure on the board doc, source-tagged.',
     audience: 'For CFOs · finance leaders · controllers · 5 to 50 units',
     badge: 'CFO',
     tone: 'gold',
@@ -84,6 +90,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   coo: {
     slug: 'coo',
+    oneWord: 'Drift',
+    subhead: 'Labor leak before payroll posts. Voids named, ranked, coachable.',
     audience: 'For COOs · VPs of Ops · directors of operations · 5 to 50 units',
     badge: 'COO',
     tone: 'copper',
@@ -116,6 +124,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   cto: {
     slug: 'cto',
+    oneWord: 'Stack',
+    subhead: 'Plug in. Not rip out. Sit next to your POS and reconcile across the stack.',
     audience: 'For CTOs · directors of IT · tech leaders · 5 to 50 units',
     badge: 'CTO',
     tone: 'mixed',
@@ -148,6 +158,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   owner: {
     slug: 'owner',
+    oneWord: 'Solo',
+    subhead: 'Solo operator. Same screen as the chain. None of the enterprise price.',
     audience: 'For independent operators · founders · GMs running 1 to 5 units',
     badge: 'Owner',
     tone: 'gold',
@@ -180,6 +192,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   manager: {
     slug: 'manager',
+    oneWord: 'Floor',
+    subhead: 'Tonight\'s shift in one screen. Coaching conversation set up for you.',
     audience: 'For GMs · kitchen ops · store managers · single-store leaders',
     badge: 'Manager',
     tone: 'copper',
@@ -212,6 +226,8 @@ export const ROLES: Record<string, RoleSpec> = {
 
   crew: {
     slug: 'crew',
+    oneWord: 'Shift',
+    subhead: 'Your shift. Your goal. Your streak. The receipt in your hands.',
     audience: 'For the crew · line cooks · servers · bartenders · dishwashers · hosts',
     badge: 'Crew',
     tone: 'mixed',

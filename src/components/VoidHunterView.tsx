@@ -16,7 +16,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
         <SourceTag level="verified" />
       </div>
       <p className="text-2xl font-bold text-ink-800 leading-tight">{value}</p>
-      {sub ? <p className="text-dark-400 text-xs mt-1">{sub}</p> : null}
+      {sub ? <p className="text-ink-500 text-xs mt-1">{sub}</p> : null}
     </div>
   );
 }
@@ -33,12 +33,12 @@ export function VoidHunterFrame({ sample, children }: { sample?: boolean; childr
 
 function SampleBanner() {
   return (
-    <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
+    <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
-        <p className="text-warning-500 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
-        <p className="text-dark-200 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
+        <p className="text-ink-800 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
+        <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
       </div>
-      <Link href="/#waitlist" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-lg px-4 py-2 text-sm">
+      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
       </Link>
     </div>
@@ -57,9 +57,9 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
         <Kpi label="Stores above the line" value={String(d.storesFlagged)} sub="more than 1.5× median" />
       </div>
 
-      <div className="bg-warning-500/5 border border-warning-500/30 rounded-xl p-4 mb-8">
-        <p className="text-warning-500 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
-        <p className="text-dark-200 text-sm">
+      <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8">
+        <p className="text-ink-800 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
+        <p className="text-ink-600 text-sm">
           A high void rate is a reason to read the void reasons — not proof of anything. Some rows are channel
           buckets, not a single person. Start at the top, pull the reasons, then decide.
         </p>
@@ -70,7 +70,7 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium text-right">Net</th>
                 <th className="px-4 py-2 font-medium text-right">Voids</th>
@@ -90,15 +90,15 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
                     </span>
                   </td>
                   <td className="px-4 py-2 text-right text-warning-500 tabular-nums">{usd(s.net)}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.voids)}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.voids)}</td>
                   <td className={`px-4 py-2 text-right tabular-nums ${s.flagged ? 'text-warning-500 font-semibold' : 'text-ink-800'}`}>{pct(s.voidRate)}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{s.excessYr > 0 ? `${usd(s.excessYr)}` : '—'}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{s.excessYr > 0 ? `${usd(s.excessYr)}` : '—'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="text-dark-400 text-xs mt-2">
+        <p className="text-ink-500 text-xs mt-2">
           Excess / yr = void dollars above the peer-median rate for that store&apos;s net, annualized. A scale of the gap, not a recovery promise.
         </p>
       </div>
@@ -108,7 +108,7 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Name</th>
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium text-right">Void $</th>
@@ -129,19 +129,19 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
                   </td>
                   <td className="px-4 py-2 text-dark-200">{e.store}</td>
                   <td className="px-4 py-2 text-right text-warning-500 tabular-nums">{usd(e.voidAmount)}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{e.voidedItems}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{e.voidedItems}</td>
                   <td className={`px-4 py-2 text-right tabular-nums ${e.flagged ? 'text-warning-500 font-semibold' : 'text-ink-800'}`}>{pct(e.voidRate)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="text-dark-400 text-xs mt-2">
+        <p className="text-ink-500 text-xs mt-2">
           Top void dollars this period. A &ldquo;flag&rdquo; means a high rate <em>and</em> real dollars — but a name on a register can be a shared till. Read the reasons before you act.
         </p>
       </div>
 
-      <div className="flex items-center gap-2 text-dark-400 text-xs">
+      <div className="flex items-center gap-2 text-ink-500 text-xs">
         <SourceTag level={sample ? 'unverified' : 'verified'} />
         <span>
           {sample

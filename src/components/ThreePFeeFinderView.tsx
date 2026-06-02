@@ -23,7 +23,7 @@ function Kpi({ label, value, sub, level }: { label: string; value: string; sub?:
         <SourceTag level={level} />
       </div>
       <p className="text-2xl font-bold text-ink-800 leading-tight">{value}</p>
-      {sub ? <p className="text-dark-400 text-xs mt-1">{sub}</p> : null}
+      {sub ? <p className="text-ink-500 text-xs mt-1">{sub}</p> : null}
     </div>
   );
 }
@@ -40,12 +40,12 @@ export function ThreePFeeFinderFrame({ sample, children }: { sample?: boolean; c
 
 function SampleBanner() {
   return (
-    <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
+    <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
-        <p className="text-warning-500 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
-        <p className="text-dark-200 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
+        <p className="text-ink-800 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
+        <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
       </div>
-      <Link href="/#waitlist" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-lg px-4 py-2 text-sm">
+      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
       </Link>
     </div>
@@ -64,9 +64,9 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
         <Kpi label="Stores below target" value={String(d.storesBelowTarget)} level="verified" sub={`under ${d.firstPartyTarget}% first-party`} />
       </div>
 
-      <div className="bg-warning-500/5 border border-warning-500/30 rounded-xl p-4 mb-8">
-        <p className="text-warning-500 text-sm font-semibold mb-1">The fee is an estimate — the revenue isn&apos;t.</p>
-        <p className="text-dark-200 text-sm">
+      <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8">
+        <p className="text-ink-800 text-sm font-semibold mb-1">The fee is an estimate — the revenue isn&apos;t.</p>
+        <p className="text-ink-600 text-sm">
           We see your third-party revenue from Toast (Verified). The fee is that revenue times an assumed
           20–25% marketplace take. Your real take rate is on your DoorDash and Uber Eats statements — plug it
           in and these turn exact. First-party % is the lever: the more digital you own, the less of this bill you pay.
@@ -79,7 +79,7 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
           <div className="card rounded-xl overflow-hidden">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-ink-200 text-dark-300">
+                <tr className="border-b border-ink-200 text-ink-500">
                   <th className="px-4 py-2 font-medium">Partner</th>
                   <th className="px-4 py-2 font-medium text-right">Delivery</th>
                   <th className="px-4 py-2 font-medium text-right">Pickup</th>
@@ -100,8 +100,8 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
                         </span>
                       </td>
                       <td className="px-4 py-2 text-right text-dark-50 tabular-nums">{pct(p.contractDelivery)}</td>
-                      <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{p.contractPickup != null ? pct(p.contractPickup) : '—'}</td>
-                      <td className="px-4 py-2 text-right text-dark-200 tabular-nums">
+                      <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{p.contractPickup != null ? pct(p.contractPickup) : '—'}</td>
+                      <td className="px-4 py-2 text-right text-ink-700 tabular-nums">
                         {p.premiumLabel && p.premiumRate != null
                           ? `${p.premiumLabel} ${pct(p.premiumRate)}${p.premiumShareEstimate != null ? ` · ~${Math.round(p.premiumShareEstimate * 100)}% of orders` : ''}`
                           : '—'}
@@ -116,21 +116,21 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
               </tbody>
             </table>
           </div>
-          <p className="text-dark-300 text-xs mt-2 leading-relaxed">
+          <p className="text-ink-500 text-xs mt-2 leading-relaxed">
             Blended effective = (delivery × non-premium share) + (premium × premium share). For DoorDash, a 10% contract blends to ~11.2% if DashPass is ~30% of orders. The drift chip shows how many percentage points above contract the blended rate sits.
           </p>
         </div>
       ) : null}
 
       {d.renegotiationLever ? (
-        <div className="mb-8 rounded-2xl border border-gold-500/40 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-copper-500/[0.08] p-6">
+        <div className="mb-8 rounded-2xl border border-ink-200 bg-ink-50 p-6">
           <div className="flex items-center justify-between gap-3 mb-2">
             <p className="text-warning-500 text-[10px] uppercase tracking-[0.22em] font-mono">The lever · {d.renegotiationLever.precedentLabel}</p>
             <SourceTag level="estimated" />
           </div>
-          <p className="text-3xl md:text-4xl font-bold font-mono tabular-nums text-ink-800 mb-1">{usd(d.renegotiationLever.annualSavingsEstimate)}<span className="text-dark-300 text-base font-normal"> / year</span></p>
-          <p className="text-dark-200 text-sm mb-3">{usd(d.renegotiationLever.fourWeekSavingsEstimate)} / 4 weeks at this volume</p>
-          <p className="text-dark-200 text-sm leading-relaxed">{d.renegotiationLever.basis}</p>
+          <p className="text-3xl md:text-4xl font-bold font-mono tabular-nums text-ink-800 mb-1">{usd(d.renegotiationLever.annualSavingsEstimate)}<span className="text-ink-500 text-base font-normal"> / year</span></p>
+          <p className="text-ink-600 text-sm mb-3">{usd(d.renegotiationLever.fourWeekSavingsEstimate)} / 4 weeks at this volume</p>
+          <p className="text-ink-600 text-sm leading-relaxed">{d.renegotiationLever.basis}</p>
         </div>
       ) : null}
 
@@ -139,7 +139,7 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Store</th>
                 <th className="px-4 py-2 font-medium text-right">3P rev / yr</th>
                 <th className="px-4 py-2 font-medium text-right">Est. fees / yr</th>
@@ -158,7 +158,7 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
                     </span>
                   </td>
                   <td className="px-4 py-2 text-right text-warning-500 tabular-nums">{usd(s.tpRevenueYr)}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.fees20)}–{usd(s.fees25)}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.fees20)}–{usd(s.fees25)}</td>
                   <td className={`px-4 py-2 text-right tabular-nums ${s.flagged ? 'text-warning-500 font-semibold' : 'text-ink-800'}`}>
                     {s.firstPartyPct != null ? `${s.firstPartyPct}%` : '—'}
                   </td>
@@ -167,12 +167,12 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
             </tbody>
           </table>
         </div>
-        <p className="text-dark-400 text-xs mt-2">
+        <p className="text-ink-500 text-xs mt-2">
           Ranked by fee exposure. A &ldquo;low first-party&rdquo; flag means under {d.firstPartyTarget}% of this store&apos;s digital runs on owned channels — the stores where shifting volume off the marketplaces saves the most.
         </p>
       </div>
 
-      <div className="flex items-center gap-2 text-dark-400 text-xs">
+      <div className="flex items-center gap-2 text-ink-500 text-xs">
         <SourceTag level={sample ? 'unverified' : 'verified'} />
         <span>
           {sample

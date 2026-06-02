@@ -56,56 +56,44 @@ export default async function AnswerPage({ params }: { params: Params }) {
   };
 
   return (
-    <main className="min-h-screen text-dark-50">
+    <main className="min-h-screen text-ink-800">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <header className="border-b border-white/5 sticky top-0 z-40 nav-shell">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="brand-monogram">N86</span>
-            <span className="font-display font-semibold tracking-tight text-dark-50 text-lg group-hover:text-gold-300 transition-colors">Never 86&apos;d</span>
+      <header className="nav-shell sticky top-0 z-40">
+        <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
+            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
           </Link>
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/answers" className="text-dark-200 hover:text-ink-800 px-3 py-1.5 rounded-lg hover:bg-white/[0.03] hidden sm:inline">All answers</Link>
-            <Link href="/operators#talk" className="text-dark-50 border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 rounded-lg px-3 py-1.5 transition-colors">Talk to us</Link>
-          </div>
+          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
+            <Link href="/answers" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">All answers</Link>
+            <Link href="/operators#talk" className="btn-primary py-1.5 px-4 text-[13px]">Talk to us</Link>
+          </nav>
         </div>
       </header>
 
-      <article className="max-w-3xl mx-auto px-6 pt-12 pb-20">
-        <div className="flex items-center gap-2 mb-5">
-          <Link href="/answers" className="text-gold-300 hover:text-gold-200 text-[10px] uppercase tracking-[0.22em] font-mono">← Answers</Link>
-          {a.audience ? <span className="text-copper-300 text-[10px] uppercase tracking-[0.18em] font-mono">For {a.audience}</span> : null}
-        </div>
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] text-ink-800 mb-4">{a.title}</h1>
+      <article className="max-w-3xl mx-auto px-6 pt-16 pb-20">
+        <Link href="/answers" className="text-ink-500 hover:text-ink-800 text-[12px] font-medium inline-flex items-center gap-1 mb-6">← All answers</Link>
+        {a.audience ? <p className="text-ink-500 text-[11px] uppercase tracking-widest font-medium mb-4">For {a.audience}</p> : null}
+        <h1 className="display text-3xl md:text-5xl mb-5">{a.title}</h1>
         {a.question ? (
-          <p className="text-dark-200 text-lg italic mb-8 border-l-2 border-gold-500/60 pl-4">Q: {a.question}</p>
+          <p className="text-ink-600 text-lg italic mb-8 border-l-2 border-ink-300 pl-4">{a.question}</p>
         ) : null}
 
-        <div className="prose prose-invert max-w-none">
+        <div className="max-w-none">
           {a.answer.split(/\n\n+/).map((para, i) => (
-            <p key={i} className="text-dark-100 text-lg leading-relaxed mb-5">{para}</p>
+            <p key={i} className="text-ink-700 text-lg leading-relaxed mb-5">{para}</p>
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-gold-700/40 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-copper-500/[0.08] p-6">
-          <p className="text-gold-300 text-[10px] uppercase tracking-[0.22em] font-mono mb-2">The discipline behind this answer</p>
-          <p className="text-dark-200 text-sm leading-relaxed">
-            Every figure never86 ships is tagged <span className="text-green-300">Verified</span>,
-            <span className="text-gold-300"> Estimated</span>, or <span className="text-red-300">Unverified</span>.
-            We show our work, and when we&apos;re wrong we walk the number back — like we did when we caught our own
-            $8.3M recovery overstatement and corrected it down to $1.81M. <Link href="/operators#talk" className="text-gold-300 hover:text-gold-200 underline">Talk to the founder →</Link>
-          </p>
-        </div>
-
         {others.length > 0 ? (
-          <div className="mt-12">
-            <p className="text-gold-400 text-[10px] uppercase tracking-[0.22em] font-mono mb-4">More answers</p>
-            <ul className="space-y-2">
+          <div className="mt-16 pt-8 border-t border-ink-200">
+            <p className="text-ink-500 text-[11px] uppercase tracking-widest font-medium mb-4">More answers</p>
+            <ul className="space-y-2.5">
               {others.map((o) => (
                 <li key={o.id}>
-                  <Link href={`/answers/${o.slug}`} className="text-dark-50 hover:text-gold-300 transition-colors">
-                    {o.title} <span className="text-dark-400 text-sm">→</span>
+                  <Link href={`/answers/${o.slug}`} className="text-ink-800 font-medium hover:underline">
+                    {o.title} <span className="text-ink-500 text-sm">→</span>
                   </Link>
                 </li>
               ))}
@@ -114,13 +102,13 @@ export default async function AnswerPage({ params }: { params: Params }) {
         ) : null}
       </article>
 
-      <footer className="border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-3 text-dark-300 text-xs">
+      <footer className="border-t border-ink-200 py-10 px-6 bg-white">
+        <div className="max-w-3xl mx-auto flex items-center justify-between text-ink-500 text-[12px]">
           <div className="flex items-center gap-2">
-            <span className="brand-monogram" style={{ width: '1.25rem', height: '1.25rem', fontSize: '0.55rem' }}>N86</span>
-            <span>Never 86&apos;d · Built by an operator, for operators</span>
+            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
+            <span>Never 86&apos;d</span>
           </div>
-          <Link href="/answers" className="hover:text-gold-300 transition-colors">All answers</Link>
+          <Link href="/answers" className="hover:text-ink-800 transition-colors">All answers</Link>
         </div>
       </footer>
     </main>

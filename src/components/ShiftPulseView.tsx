@@ -16,7 +16,7 @@ function Kpi({ label, value, sub, tone, bar }: { label: string; value: string; s
           <span className={`block h-full ${tone === 'red' ? 'bg-gradient-to-r from-red-700 to-red-400' : tone === 'gold' ? 'bg-gradient-to-r from-amber-700 to-amber-400' : 'bg-gradient-to-r from-green-700 to-green-400'}`} style={{ width: `${Math.min(100, Math.max(0, bar))}%` }} />
         </div>
       ) : null}
-      {sub ? <p className="text-dark-400 text-xs mt-1.5">{sub}</p> : null}
+      {sub ? <p className="text-ink-500 text-xs mt-1.5">{sub}</p> : null}
     </div>
   );
 }
@@ -33,12 +33,12 @@ export function ShiftPulseFrame({ sample, children }: { sample?: boolean; childr
 
 function SampleBanner() {
   return (
-    <div className="bg-gold-500/10 border border-gold-500/30 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
+    <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
-        <p className="text-warning-500 text-sm font-semibold mb-1">Sample shift — this isn&apos;t a real restaurant.</p>
-        <p className="text-dark-200 text-sm">Made-up Friday-night numbers for a 5-unit demo. Wire your POS + scheduling to run this live, station-by-station.</p>
+        <p className="text-ink-800 text-sm font-semibold mb-1">Sample shift — this isn&apos;t a real restaurant.</p>
+        <p className="text-ink-600 text-sm">Made-up Friday-night numbers for a 5-unit demo. Wire your POS + scheduling to run this live, station-by-station.</p>
       </div>
-      <Link href="/operators#talk" className="shrink-0 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-lg px-4 py-2 text-sm">
+      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
       </Link>
     </div>
@@ -57,7 +57,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
         <div>
           <p className="text-gold-400 text-[10px] uppercase tracking-widest">Tonight</p>
           <p className="text-2xl font-bold text-ink-800">{d.store} · {d.shift}</p>
-          <p className="text-dark-300 text-sm">Started {d.startedAt}</p>
+          <p className="text-ink-600 text-sm">Started {d.startedAt}</p>
         </div>
         <span className="text-[10px] uppercase tracking-wider font-semibold rounded-full px-2.5 py-1 bg-green-500/10 text-green-300 border border-green-700/40">LIVE</span>
       </div>
@@ -91,7 +91,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Station</th>
                 <th className="px-4 py-2 font-medium text-right">Net so far</th>
                 <th className="px-4 py-2 font-medium text-right">Voids</th>
@@ -105,13 +105,13 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
                 return (
                   <tr key={s.name} className="border-b border-ink-200/60 last:border-0">
                     <td className="px-4 py-2 text-ink-800">{s.name}</td>
-                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.net)}</td>
-                    <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{s.voids}</td>
+                    <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.net)}</td>
+                    <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{s.voids}</td>
                     <td className="px-4 py-2 text-right">
                       <span className={`tabular-nums ${above ? 'text-warning-500' : 'text-green-300'}`}>{pct(s.voidRate)}</span>
                       {above ? <span className="ml-2 text-[10px] font-semibold rounded-full px-2 py-0.5 bg-amber-500/10 text-warning-500 border border-amber-700/40">above</span> : null}
                     </td>
-                    <td className="px-4 py-2 text-right text-dark-400 tabular-nums">{pct(s.stationMedianVoidRate)}</td>
+                    <td className="px-4 py-2 text-right text-ink-500 tabular-nums">{pct(s.stationMedianVoidRate)}</td>
                   </tr>
                 );
               })}
@@ -125,7 +125,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
         <div className="card rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-ink-200 text-dark-300">
+              <tr className="border-b border-ink-200 text-ink-500">
                 <th className="px-4 py-2 font-medium">Crew</th>
                 <th className="px-4 py-2 font-medium">Station</th>
                 <th className="px-4 py-2 font-medium text-right">Covers</th>
@@ -138,17 +138,17 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
               {d.crew.map((c) => (
                 <tr key={c.name} className="border-b border-ink-200/60 last:border-0">
                   <td className="px-4 py-2 text-ink-800">
-                    {c.name} <span className="text-dark-400 text-xs capitalize">· {c.role}</span>
+                    {c.name} <span className="text-ink-500 text-xs capitalize">· {c.role}</span>
                   </td>
-                  <td className="px-4 py-2 text-dark-300">{c.station}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{c.covers || '—'}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{c.net ? usd(c.net) : '—'}</td>
-                  <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{c.voidRate ? pct(c.voidRate) : '—'}</td>
+                  <td className="px-4 py-2 text-ink-500">{c.station}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{c.covers || '—'}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{c.net ? usd(c.net) : '—'}</td>
+                  <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{c.voidRate ? pct(c.voidRate) : '—'}</td>
                   <td className="px-4 py-2 text-right">
                     {c.streakDays > 1 ? (
                       <span className="text-warning-500 tabular-nums">{c.streakDays} 🔥</span>
                     ) : (
-                      <span className="text-dark-400 tabular-nums">{c.streakDays}d</span>
+                      <span className="text-ink-500 tabular-nums">{c.streakDays}d</span>
                     )}
                   </td>
                 </tr>
@@ -165,7 +165,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
             <div key={a.name} className="bg-dark-700 border border-gold-700/40 rounded-xl p-4">
               <p className="text-gold-400 text-[10px] uppercase tracking-wider mb-1">Achievement</p>
               <p className="text-ink-800 font-semibold text-sm mb-0.5">{a.name}</p>
-              <p className="text-dark-300 text-xs mb-2">{a.crew}</p>
+              <p className="text-ink-500 text-xs mb-2">{a.crew}</p>
               <p className="text-dark-200 text-xs leading-relaxed">{a.description}</p>
             </div>
           ))}
@@ -174,7 +174,7 @@ export function ShiftPulseBody({ data: d, sample }: { data: ShiftPulse; sample?:
 
       <div className="card rounded-xl p-5">
         <p className="text-ink-800 text-xs uppercase tracking-widest mb-2">Why this matters</p>
-        <p className="text-dark-200 text-sm leading-relaxed">
+        <p className="text-ink-600 text-sm leading-relaxed">
           The crew that runs the floor never sees the back-office screen — and the back-office screen never sees the
           shift. Shift Pulse closes that loop. One screen, one shift, the crew&apos;s own median as the floor.
           It&apos;s the people-native AI half of the platform: the back office and the floor working from the same numbers.
