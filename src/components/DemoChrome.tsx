@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Track } from '@/components/Track';
 
 const ALL_AGENTS = [
   { name: 'Void Hunter', href: '/demo/void-hunter' },
@@ -26,6 +27,7 @@ export function DemoChrome({
 
   return (
     <main className="min-h-screen text-ink-800">
+      <Track eventType="agent_view" agentName={title} audience={audience} />
       <header className="nav-shell sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 group">

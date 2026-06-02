@@ -78,6 +78,8 @@ export default async function AdminNever86() {
             <a href="#team" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Team</a>
             <a href="#pipeline" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Pipeline</a>
             <a href="#wins" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Quick wins</a>
+            <a href="#leads" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Leads</a>
+            <a href="#activity" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Activity</a>
             <a href="#ops" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Ops</a>
             <a href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</a>
             <a href="/command-center" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Operator view</a>
@@ -345,9 +347,105 @@ export default async function AdminNever86() {
         </div>
       </section>
 
+      {/* LEADS */}
+      <section id="leads" className="max-w-6xl mx-auto px-6 py-8">
+        <SectionHeader id="leads" kicker="Section 06" title="Leads" />
+        <p className="text-dark-300 text-sm mb-4">Anyone who hit the form — homepage, /operators, role pages. Welcome email sent · Myke notified · 24h + 7d follow-ups queued.</p>
+        {snap.leads.length === 0 ? (
+          <p className="text-dark-300 text-sm bg-dark-700 border border-dark-600 rounded-2xl p-6">No leads yet. When someone hits the form they land here.</p>
+        ) : (
+          <div className="bg-dark-700 border border-dark-600 rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-dark-600 text-dark-400 text-[10px] uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 font-medium">When</th>
+                  <th className="text-left px-4 py-3 font-medium">Name · Email</th>
+                  <th className="text-left px-4 py-3 font-medium">Restaurant</th>
+                  <th className="text-left px-4 py-3 font-medium">Units</th>
+                  <th className="text-left px-4 py-3 font-medium">From</th>
+                  <th className="text-left px-4 py-3 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snap.leads.map((l) => (
+                  <tr key={l.id} className="border-b border-dark-600/60 last:border-0">
+                    <td className="px-4 py-3 text-dark-400 text-xs tabular-nums">{l.created_at.slice(0, 16).replace('T', ' ')}</td>
+                    <td className="px-4 py-3 text-white">
+                      <p className="font-medium">{l.name ?? '—'}</p>
+                      <p className="text-dark-400 text-xs">{l.email}</p>
+                    </td>
+                    <td className="px-4 py-3 text-dark-200">{l.restaurant_name ?? '—'}</td>
+                    <td className="px-4 py-3 text-dark-200 tabular-nums">{l.units ?? '—'}</td>
+                    <td className="px-4 py-3 text-dark-400 text-xs">{l.source_page ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold rounded-full border bg-gold-500/10 text-gold-300 border-gold-700/40 px-2.5 py-0.5">{l.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* ACTIVITY */}
+      <section id="activity" className="max-w-6xl mx-auto px-6 py-8">
+        <SectionHeader id="activity" kicker="Section 07" title="Anonymous visitor activity" />
+        <p className="text-dark-300 text-sm mb-4">Real-time feed of who&apos;s clicking what. Demo views, role views, page views — bucketed by session.</p>
+        <div className="grid md:grid-cols-3 gap-5">
+          {/* Agent rollup */}
+          <div className="md:col-span-1 bg-dark-700 border border-dark-600 rounded-2xl p-5">
+            <p className="text-gold-500 text-[10px] uppercase tracking-widest mb-3">Top agents · last 50 views</p>
+            {snap.agentRollup.length === 0 ? (
+              <p className="text-dark-300 text-sm">No agent views yet.</p>
+            ) : (
+              <ul className="space-y-2">
+                {snap.agentRollup.map((r) => (
+                  <li key={r.agent_name} className="flex items-center justify-between text-sm">
+                    <span className="text-white">{r.agent_name}</span>
+                    <span className="text-gold-300 tabular-nums font-mono">{r.views}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Live event feed */}
+          <div className="md:col-span-2 bg-dark-700 border border-dark-600 rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-dark-600 text-dark-400 text-[10px] uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 font-medium">When</th>
+                  <th className="text-left px-4 py-3 font-medium">Event</th>
+                  <th className="text-left px-4 py-3 font-medium">What</th>
+                  <th className="text-left px-4 py-3 font-medium">Session</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snap.events.length === 0 ? (
+                  <tr><td colSpan={4} className="p-6 text-dark-300 text-sm">No events yet — visitors landing on demos or role pages will show here.</td></tr>
+                ) : (
+                  snap.events.map((e) => (
+                    <tr key={e.id} className="border-b border-dark-600/60 last:border-0">
+                      <td className="px-4 py-3 text-dark-400 text-xs tabular-nums">{e.created_at.slice(11, 19)}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] uppercase tracking-wider font-mono text-gold-300">{e.event_type}</span>
+                      </td>
+                      <td className="px-4 py-3 text-white">
+                        {e.agent_name ?? e.audience ?? e.page_path ?? '—'}
+                      </td>
+                      <td className="px-4 py-3 text-dark-400 text-xs font-mono">{e.session_id?.slice(0, 12) ?? '—'}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       {/* OPS HEALTH */}
       <section id="ops" className="max-w-6xl mx-auto px-6 py-8">
-        <SectionHeader id="ops" kicker="Section 06" title="Ops health" />
+        <SectionHeader id="ops" kicker="Section 08" title="Ops health" />
         <div className="grid md:grid-cols-3 gap-4">
           <a href="/api/ops-health" className="bg-dark-700 border border-dark-600 hover:border-gold-500 rounded-2xl p-5 block">
             <p className="text-white font-semibold mb-1">Database</p>
