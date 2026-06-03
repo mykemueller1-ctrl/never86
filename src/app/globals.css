@@ -156,6 +156,75 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* Compass-style brand gradient — Void Hunter blue. Sister to Bamba red,
+   sized for a thin top strip or a hero band. */
+.brand-band {
+  background: linear-gradient(100deg, #0066ff, #003bb5);
+  color: #ffffff;
+}
+.brand-band .brand-monogram {
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+}
+.brand-band-thin {
+  height: 4px;
+  background: linear-gradient(100deg, #0066ff, #003bb5);
+}
+
+/* Compass KPI card — dense, uppercase mini-label, big tabular number,
+   optional delta. Lifted from the Bamba weekly tracker treatment. */
+.kpi {
+  background: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 200ms ease;
+}
+.kpi:hover { border-color: #d2d2d7; }
+.kpi-label {
+  font-size: 11px;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.kpi-val {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: -0.022em;
+  font-variant-numeric: tabular-nums;
+  color: #1d1d1f;
+}
+.kpi-delta { font-size: 12.5px; margin-top: 4px; font-weight: 600; }
+.kpi-delta.up { color: #34c759; }
+.kpi-delta.down { color: #ff3b30; }
+.kpi-delta.flat { color: #86868b; }
+
+/* Compass dense data table */
+.data-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.data-table th, .data-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #e8e8ed;
+  text-align: right;
+  white-space: nowrap;
+}
+.data-table th:first-child, .data-table td:first-child { text-align: left; }
+.data-table thead th {
+  color: #86868b;
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Source-tag badges — paired with the .kpi card */
+.badge { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 9px; }
+.badge-verified  { background: #e6f4ec; color: #1a8a4a; }
+.badge-estimated { background: #fbf2dd; color: #c47f00; }
+.badge-unverified{ background: #fbe7e4; color: #c0392b; }
+.badge-info      { background: #e8eefb; color: #0052d6; }
+
 /* Logic mode (operator-only provenance overlay) */
 .logic-only,
 .logic-only-inline { display: none; }

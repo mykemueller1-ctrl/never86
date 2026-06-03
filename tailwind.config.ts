@@ -52,6 +52,21 @@ const config: Config = {
           800: '#1e3263',
           900: '#0a2540', // primary navy
         },
+        // Void Hunter brand blue — the compass treatment uses this for the
+        // gradient header strip + KPI deltas + chart strokes. Bamba uses red
+        // (#C8102E), never86 uses blue.
+        void: {
+          50: '#eef4ff',
+          100: '#d9e6ff',
+          200: '#b3ccff',
+          300: '#80acff',
+          400: '#4d8aff',
+          500: '#0066ff', // primary
+          600: '#0052d6',
+          700: '#003fab',
+          800: '#003bb5', // gradient end
+          900: '#001f6b',
+        },
         // Compatibility shim — `dark-*` classes used across legacy components
         // remap to the light/neutral scale so the dark UI flips to light without
         // a per-file rename. dark-50 → near-black text on light; dark-800/900 → pure black surfaces.
