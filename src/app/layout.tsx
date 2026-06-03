@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Newsreader } from 'next/font/google';
 import './globals.css';
 import { LogicToggle } from '@/components/LogicToggle';
 
@@ -7,6 +7,14 @@ const display = Inter({
   subsets: ['latin'],
   variable: '--font-display',
   weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+});
+
+const serif = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   display: 'swap',
 });
 
@@ -39,8 +47,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body className="font-sans antialiased bg-ink-50 text-ink-800">
+    <html lang="en" className={`${display.variable} ${serif.variable} ${mono.variable}`}>
+      <body className="font-sans antialiased" style={{ background: '#000' }}>
         {children}
         <LogicToggle />
       </body>

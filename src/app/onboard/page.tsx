@@ -74,7 +74,7 @@ export default function OnboardPage() {
   }
 
   return (
-    <main className="min-h-screen text-ink-800">
+    <main className="compass min-h-screen">
       <header className="nav-shell sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 group">
