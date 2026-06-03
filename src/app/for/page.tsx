@@ -15,37 +15,47 @@ export const metadata: Metadata = {
 
 export default function ForIndex() {
   return (
-    <main className="min-h-screen text-ink-800">
-      <header className="nav-shell sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
-            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
+    <main className="compass min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <Link href="/" className="flex items-start gap-4 group">
+            <span className="compass-mark">N</span>
+            <span>
+              <p className="font-serif text-[24px] leading-none text-white">
+                Never 86&apos;d <span className="italic text-white/70">· pick your seat</span>
+              </p>
+              <p className="compass-eyebrow-dim mt-2">Operator OS · seven roles</p>
+            </span>
           </Link>
-          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
-            <Link href="/" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">Home</Link>
-            <Link href="/operators#talk" className="btn-primary py-1.5 px-4 text-[13px]">Talk to us</Link>
+          <nav className="flex items-center gap-2 text-[13px]">
+            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
+            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
           </nav>
         </div>
-      </header>
+      </div>
 
-      <section className="pt-24 md:pt-32 pb-16 md:pb-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-6">Pick your seat.</h1>
-        </div>
+      <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-12">
+        <p className="compass-eyebrow mb-6">— Pick your seat</p>
+        <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-6">
+          One platform.<br />
+          <em>Seven roles.</em>
+        </h1>
+        <p className="compass-body text-lg md:text-xl max-w-2xl">
+          Each role sees the screen they need. Same numbers, different read.
+        </p>
       </section>
 
       <section className="px-6 pb-24">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {ROLE_ORDER.map((slug) => {
               const r = ROLES[slug];
               return (
-                <Link key={r.slug} href={`/for/${r.slug}`} className="card group p-8 block hover:-translate-y-0.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-500 mb-2">For the</p>
-                  <p className="display text-3xl text-ink-800 mb-1">{r.badge}</p>
-                  <p className="text-ink-500 text-sm mb-5">{r.oneWord}</p>
-                  <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">See it <span aria-hidden>→</span></p>
+                <Link key={r.slug} href={`/for/${r.slug}`} className="compass-card hover:border-[#0066ff] transition-colors block group">
+                  <p className="compass-card-label">For the</p>
+                  <h3>{r.badge}</h3>
+                  <p className="compass-body text-[14px] mt-1 mb-4">{r.oneWord}</p>
+                  <p className="text-[14px] inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>See it <span aria-hidden>→</span></p>
                 </Link>
               );
             })}
@@ -53,16 +63,16 @@ export default function ForIndex() {
         </div>
       </section>
 
-      <footer className="border-t border-ink-200 py-10 px-6 bg-white">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
+      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d</span>
+            <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/answers" className="hover:text-ink-800 transition-colors">Answers</Link>
-            <Link href="/press" className="hover:text-ink-800 transition-colors">Press</Link>
-            <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
+            <Link href="/answers" className="hover:text-white transition-colors">Answers</Link>
+            <Link href="/press" className="hover:text-white transition-colors">Press</Link>
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
           </div>
         </div>
       </footer>
