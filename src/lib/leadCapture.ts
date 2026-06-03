@@ -11,6 +11,9 @@ export type LeadInput = {
   userAgent?: string;
   ip?: string;
   requestedAgent?: string;
+  posType?: string;
+  dataPreference?: string;
+  interestedAgent?: string;
   utm?: { source?: string; medium?: string; campaign?: string };
 };
 
@@ -25,7 +28,8 @@ export async function captureLead(input: LeadInput): Promise<{ leadId: number | 
         email, name, restaurant_name, units, role,
         source_page, referrer, user_agent, ip,
         utm_source, utm_medium, utm_campaign,
-        requested_agent, unlocked_at
+        requested_agent, unlocked_at,
+        pos_type, data_preference, interested_agent
       ) VALUES (
         ${input.email.toLowerCase()},
         ${input.name ?? null},
@@ -40,7 +44,10 @@ export async function captureLead(input: LeadInput): Promise<{ leadId: number | 
         ${input.utm?.medium ?? null},
         ${input.utm?.campaign ?? null},
         ${input.requestedAgent ?? null},
-        ${input.requestedAgent ? new Date() : null}
+        ${input.requestedAgent ? new Date() : null},
+        ${input.posType ?? null},
+        ${input.dataPreference ?? null},
+        ${input.interestedAgent ?? null}
       )
       ON CONFLICT (LOWER(email)) DO UPDATE SET
         updated_at = NOW(),
@@ -49,7 +56,10 @@ export async function captureLead(input: LeadInput): Promise<{ leadId: number | 
         units = COALESCE(EXCLUDED.units, admin.leads.units),
         source_page = COALESCE(EXCLUDED.source_page, admin.leads.source_page),
         requested_agent = COALESCE(EXCLUDED.requested_agent, admin.leads.requested_agent),
-        unlocked_at = COALESCE(admin.leads.unlocked_at, EXCLUDED.unlocked_at)
+        unlocked_at = COALESCE(admin.leads.unlocked_at, EXCLUDED.unlocked_at),
+        pos_type = COALESCE(EXCLUDED.pos_type, admin.leads.pos_type),
+        data_preference = COALESCE(EXCLUDED.data_preference, admin.leads.data_preference),
+        interested_agent = COALESCE(EXCLUDED.interested_agent, admin.leads.interested_agent)
       RETURNING id
     `;
     const leadId = rows[0]?.id ?? null;
