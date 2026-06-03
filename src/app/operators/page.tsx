@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const FREE_AGENTS = [
-  { name: 'Void Hunter', href: '/demo/void-hunter' },
-  { name: '3P Fee Finder', href: '/demo/3p-fee-finder' },
-  { name: 'Labor Leak', href: '/demo/labor-leak' },
-  { name: 'Tip Variance', href: '/demo/tip-variance' },
-  { name: 'Catering Leak', href: '/demo/catering-leak' },
-  { name: 'Shift Pulse', href: '/demo/shift-pulse' },
+  { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids' },
+  { name: '3P Fee Finder',  href: '/demo/3p-fee-finder',  tag: 'Delivery' },
+  { name: 'Labor Leak',     href: '/demo/labor-leak',     tag: 'Labor' },
+  { name: 'Tip Variance',   href: '/demo/tip-variance',   tag: 'Tips' },
+  { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering' },
+  { name: 'Shift Pulse',    href: '/demo/shift-pulse',    tag: 'Shift' },
 ];
 
 export default function OperatorsLanding() {
@@ -43,72 +43,89 @@ export default function OperatorsLanding() {
   }
 
   return (
-    <main className="min-h-screen text-ink-800">
-      <header className="nav-shell sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
-            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
+    <main className="compass min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <Link href="/" className="flex items-start gap-4 group">
+            <span className="compass-mark">N</span>
+            <span>
+              <p className="font-serif text-[24px] leading-none text-white">
+                Never 86&apos;d <span className="italic text-white/70">for operators</span>
+              </p>
+              <p className="compass-eyebrow-dim mt-2">Operator OS · 15 minutes</p>
+            </span>
           </Link>
-          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
-            <Link href="/for" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">Pick your seat</Link>
-            <Link href="/reports/login" className="px-3 py-1.5 rounded-full text-ink-800 hover:bg-black/[0.04] font-medium">Sign in</Link>
+          <nav className="flex items-center gap-2 text-[13px]">
+            <Link href="/for" className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
+            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
           </nav>
         </div>
-      </header>
+      </div>
 
-      <section className="pt-24 md:pt-32 pb-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-8">For operators.</h1>
-          <Link href="#talk" className="btn-primary">Talk to us</Link>
+      <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-16">
+        <p className="compass-eyebrow mb-6">— For operators</p>
+        <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
+          15 minutes. <em>One signal.</em><br />
+          One <em>recovery.</em>
+        </h1>
+        <div className="flex flex-wrap gap-3">
+          <Link href="#talk" className="btn-primary" style={{ background: '#0066ff' }}>Talk to us →</Link>
+          <Link href="/onboard" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Onboard your store</Link>
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-6 bg-ink-100">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="display text-3xl md:text-5xl text-center mb-12">Try one. Right now.</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <p className="compass-eyebrow mb-4">— Try a free agent</p>
+          <h2 className="compass-display text-3xl md:text-5xl mb-12">
+            Try one. <em>Right now.</em>
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {FREE_AGENTS.map((a) => (
-              <Link key={a.name} href={a.href} className="card group p-8 block text-center hover:-translate-y-0.5">
-                <p className="display text-2xl text-ink-800 mb-3">{a.name}</p>
-                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
+              <Link key={a.name} href={a.href} className="compass-card hover:border-[#0066ff] transition-colors block group">
+                <p className="compass-card-label">{a.tag}</p>
+                <h3>{a.name}</h3>
+                <p className="text-[14px] mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>Try it free <span aria-hidden>→</span></p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="talk" className="py-16 md:py-24 px-6">
-        <div className="max-w-xl mx-auto text-center">
-          <h2 className="display text-4xl md:text-5xl mb-8">15 minutes.</h2>
+      <section id="talk" className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+        <div className="max-w-xl mx-auto">
+          <p className="compass-eyebrow mb-4 text-center">— Talk to us</p>
+          <h2 className="compass-display text-4xl md:text-5xl mb-8 text-center">
+            One call. <em>One signal.</em>
+          </h2>
           {status === 'success' ? (
-            <div className="card p-10">
-              <p className="text-ink-800 text-xl font-semibold">{message}</p>
+            <div className="compass-card text-center">
+              <p className="font-serif text-2xl text-white">{message}</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="card p-7 space-y-3 text-left">
-              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
-              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
-              <input type="number" min="1" placeholder="Units" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors" />
-              <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50">
-                {status === 'loading' ? 'Sending…' : 'Talk to us'}
+            <form onSubmit={handleSubmit} className="compass-card space-y-3">
+              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="number" min="1" placeholder="Units" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
+                {status === 'loading' ? 'Sending…' : 'Talk to us →'}
               </button>
-              {status === 'error' && <p className="text-danger-500 text-sm text-center">{message}</p>}
+              {status === 'error' && <p className="text-[#ff453a] text-sm text-center">{message}</p>}
             </form>
           )}
         </div>
       </section>
 
-      <footer className="border-t border-ink-200 py-10 px-6 bg-white">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
+      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d</span>
+            <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" className="hover:text-ink-800 transition-colors">Seats</Link>
-            <Link href="/reports/login" className="hover:text-ink-800 transition-colors">Sign in</Link>
+            <Link href="/for" className="hover:text-white transition-colors">Seats</Link>
+            <Link href="/reports/login" className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>

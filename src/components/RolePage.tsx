@@ -4,60 +4,73 @@ import { Track } from '@/components/Track';
 
 export function RolePage({ spec }: { spec: RoleSpec }) {
   return (
-    <main className="min-h-screen text-ink-800">
+    <main className="compass min-h-screen">
       <Track eventType="role_view" audience={spec.badge} />
-      <header className="nav-shell sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
-            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
+
+      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <Link href="/" className="flex items-start gap-4 group">
+            <span className="compass-mark">N</span>
+            <span>
+              <p className="font-serif text-[24px] leading-none text-white">
+                Never 86&apos;d <span className="italic text-white/70">for {spec.badge}</span>
+              </p>
+              <p className="compass-eyebrow-dim mt-2">Operator OS · {spec.badge} seat</p>
+            </span>
           </Link>
-          <nav className="flex items-center gap-1 text-[13px] text-ink-600">
-            <Link href="/for" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04] hidden sm:inline">All seats</Link>
-            <Link href="/operators#talk" className="btn-primary py-1.5 px-4 text-[13px]">Talk to us</Link>
+          <nav className="flex items-center gap-2 text-[13px]">
+            <Link href="/for" className="compass-pill"><span className="avatar">A</span><span>All seats</span></Link>
+            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
           </nav>
         </div>
-      </header>
+      </div>
 
-      {/* Hero — nothing else */}
-      <section className="pt-28 md:pt-40 pb-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-6">For the {spec.badge}</p>
-          <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-6">
-            {spec.headline.l1}<br />
-            {spec.headline.gradient}
-          </h1>
-          <p className="text-ink-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">{spec.subhead}</p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href={spec.freeAgents[0].href} className="btn-primary">Try {spec.freeAgents[0].name}</Link>
-            <Link href="/operators#talk" className="btn-secondary">Talk to us</Link>
-          </div>
+      <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-20">
+        <p className="compass-eyebrow mb-6">— For the {spec.badge}</p>
+        <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
+          {spec.headline.l1}<br />
+          <em>{spec.headline.gradient}</em>
+        </h1>
+        <p className="compass-body text-lg md:text-xl max-w-2xl mb-10">{spec.subhead}</p>
+        <div className="flex flex-wrap gap-3">
+          <Link href={spec.freeAgents[0].href} className="btn-primary" style={{ background: '#0066ff' }}>
+            Try {spec.freeAgents[0].name} →
+          </Link>
+          <Link href="/onboard" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+            Onboard your store
+          </Link>
         </div>
       </section>
 
-      {/* Three free agents */}
-      <section className="py-16 md:py-24 px-6 bg-ink-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-4">
+      <section className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <p className="compass-eyebrow mb-4">— Free agents for the {spec.badge}</p>
+          <h2 className="compass-display text-3xl md:text-5xl mb-12">
+            Three places <em>to start.</em>
+          </h2>
+          <div className="grid md:grid-cols-3 gap-3">
             {spec.freeAgents.map((w) => (
-              <Link key={w.name} href={w.href} className="card group p-10 block hover:-translate-y-0.5 text-center">
-                <p className="display text-2xl text-ink-800 mb-3">{w.name}</p>
-                <p className="text-ink-800 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">Try it free <span aria-hidden>→</span></p>
+              <Link key={w.name} href={w.href} className="compass-card hover:border-[#0066ff] transition-colors block group">
+                <p className="compass-card-label">Agent</p>
+                <h3 className="!mt-3">{w.name}</h3>
+                <p className="compass-body text-[14px] mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
+                  Try it free <span aria-hidden>→</span>
+                </p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-ink-200 py-10 px-6 bg-white">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-ink-500 text-[12px]">
+      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d</span>
+            <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" className="hover:text-ink-800 transition-colors">All seats</Link>
-            <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
+            <Link href="/for" className="hover:text-white transition-colors">Seats</Link>
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
           </div>
         </div>
       </footer>
