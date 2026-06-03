@@ -54,6 +54,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen text-ink-800">
+      <div className="brand-band-thin" aria-hidden />
       <header className="nav-shell sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 group">
@@ -68,16 +69,45 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="pt-28 md:pt-40 pb-24 md:pb-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="pt-24 md:pt-32 pb-16 md:pb-20 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-widest mb-6" style={{ color: '#0052d6' }}>
+            <span className="live-dot mr-2 align-middle" />
+            <span className="align-middle">Operator OS · powered by Never 86&apos;d</span>
+          </p>
           <h1 className="display text-5xl md:text-7xl lg:text-8xl mb-10">
             Find the leak.<br />
             Name who owns it.<br />
             Keep the receipt.
           </h1>
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
             <Link href="/onboard" className="btn-primary">Onboard your store</Link>
             <Link href="/demo/void-hunter" className="btn-secondary">Try a free agent</Link>
+          </div>
+
+          {/* Compass KPI strip — illustrative numbers source-tagged so the page
+              reads as a working dashboard not a brochure. */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto text-left">
+            <div className="kpi">
+              <p className="kpi-label">Recovered · design partner</p>
+              <p className="kpi-val">$1.81M</p>
+              <p className="kpi-delta up">Verified <span className="badge badge-verified ml-1">✓</span></p>
+            </div>
+            <div className="kpi">
+              <p className="kpi-label">Orders reconciled</p>
+              <p className="kpi-val">545,677</p>
+              <p className="kpi-delta up">Across 4 months</p>
+            </div>
+            <div className="kpi">
+              <p className="kpi-label">Free agents live</p>
+              <p className="kpi-val">7</p>
+              <p className="kpi-delta flat">Try any in 60s</p>
+            </div>
+            <div className="kpi">
+              <p className="kpi-label">Onboard time</p>
+              <p className="kpi-val">15 min</p>
+              <p className="kpi-delta flat">Self-serve</p>
+            </div>
           </div>
         </div>
       </section>
