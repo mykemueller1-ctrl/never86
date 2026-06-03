@@ -76,7 +76,7 @@ export default function Home() {
             Keep the receipt.
           </h1>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/for" className="btn-primary">Pick your seat</Link>
+            <Link href="/onboard" className="btn-primary">Onboard your store</Link>
             <Link href="/demo/void-hunter" className="btn-secondary">Try a free agent</Link>
           </div>
         </div>

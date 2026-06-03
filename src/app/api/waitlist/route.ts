@@ -14,6 +14,9 @@ const waitlistInput = z.object({
   role: z.string().optional(),
   sourcePage: z.string().optional(),
   agentRequested: z.string().optional(),
+  posType: z.string().optional(),
+  dataPreference: z.string().optional(),
+  interestedAgent: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,6 +37,9 @@ export async function POST(req: NextRequest) {
       role: data.role,
       sourcePage,
       requestedAgent: data.agentRequested,
+      posType: data.posType,
+      dataPreference: data.dataPreference,
+      interestedAgent: data.interestedAgent,
       referrer: req.headers.get('referer') ?? undefined,
       userAgent: req.headers.get('user-agent') ?? undefined,
       ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
@@ -66,12 +72,17 @@ export async function POST(req: NextRequest) {
       process.env.OWNER_EMAIL || 'myke@n86.app',
       data.agentRequested
         ? `⚡ ${data.agentRequested} unlock · ${data.name || data.email}`
+        : data.interestedAgent
+        ? `🚪 Self-onboard · ${data.name || data.email} · ${data.interestedAgent}`
         : `New lead · ${data.name || data.email}${data.restaurantName ? ' · ' + data.restaurantName : ''}`,
       `<p>${agentLine}<strong>${data.name || 'Someone'}</strong> just hit the form.</p>
        <p>Email: ${data.email}<br/>
        ${data.restaurantName ? `Restaurant: ${data.restaurantName}<br/>` : ''}
        ${unitsNum ? `Units: ${unitsNum}<br/>` : ''}
        ${data.role ? `Role: ${data.role}<br/>` : ''}
+       ${data.posType ? `POS: ${data.posType}<br/>` : ''}
+       ${data.interestedAgent ? `Wants agent: ${data.interestedAgent}<br/>` : ''}
+       ${data.dataPreference ? `Data-share: ${data.dataPreference}<br/>` : ''}
        ${sourcePage ? `From: ${sourcePage}` : ''}</p>
        <p>Stored in admin.leads · 24h + 7d follow-ups queued.</p>`
     );
