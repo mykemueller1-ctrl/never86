@@ -128,11 +128,11 @@ export default function Home() {
               Every figure source-tagged. Every recovery owned by a name. The platform every operator wishes their POS gave them.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>
-                Onboard your store →
+              <Link href="/connect" className="btn-primary" style={{ background: '#0066ff' }}>
+                Drop a CSV · see the leak →
               </Link>
-              <Link href="/demo/void-hunter" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
-                Try a free agent
+              <Link href="/onboard" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+                Full onboard
               </Link>
             </div>
           </div>
