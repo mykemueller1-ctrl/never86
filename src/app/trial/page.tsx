@@ -1,0 +1,409 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+
+type Result = {
+  ok: true;
+  rowsParsed: number;
+  networkNet: number;
+  networkVoids: number;
+  networkVoidRate: number;
+  medianStoreVoidRate: number;
+  storesFlagged: number;
+  stores: Array<{ name: string; net: number; voids: number; voidRate: number; excessYr: number; flagged: boolean }>;
+  employees: Array<{ store: string; name: string; net: number; voidAmount: number; voidRate: number; flagged: boolean }>;
+};
+
+type Err = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
+
+const POS_OPTIONS = [
+  { v: 'Toast', tag: 'Now',  status: 'csv',    note: 'Drop your Toast Employee Performance CSV today; OAuth in approval.' },
+  { v: 'Lightspeed', tag: 'Soon', status: 'soon', note: 'Lightspeed dev-account OAuth in build. Email me when it lights up.' },
+  { v: 'Aloha', tag: 'Soon', status: 'soon', note: 'NCR/Aloha integration in motion. Enterprise partner cycle.' },
+  { v: 'Square', tag: 'CSV',  status: 'csv',  note: 'Drop your Square employee summary CSV — same flow.' },
+  { v: 'Clover', tag: 'CSV',  status: 'csv',  note: 'Drop your Clover Reports export — same flow.' },
+  { v: 'Other', tag: 'Tell us', status: 'soon', note: "Tell us your POS — we'll prioritize the ones operators ask for." },
+];
+
+const usd = (n: number) => '$' + Math.round(n).toLocaleString();
+const pct = (n: number) => (n * 100).toFixed(2) + '%';
+
+function formatRemaining(ms: number): string {
+  if (ms <= 0) return '00:00';
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+export default function TrialPage() {
+  const [phase, setPhase] = useState<'start' | 'active' | 'ended'>('start');
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState<number>(0);
+  const [starting, setStarting] = useState(false);
+
+  const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
+  const [result, setResult] = useState<Result | null>(null);
+  const [errMsg, setErrMsg] = useState('');
+  const [errHint, setErrHint] = useState('');
+  const [detectedCols, setDetectedCols] = useState<string[]>([]);
+  const [filename, setFilename] = useState('');
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Lead capture
+  const [email, setEmail] = useState('');
+  const [restaurantName, setRestaurantName] = useState('');
+  const [name, setName] = useState('');
+  const [leadSaved, setLeadSaved] = useState(false);
+
+  // POS waitlist
+  const [waitlistPos, setWaitlistPos] = useState<string | null>(null);
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  // Tick countdown
+  useEffect(() => {
+    if (phase !== 'active' || !expiresAt) return;
+    const id = setInterval(() => {
+      const ms = expiresAt - Date.now();
+      setRemaining(ms);
+      if (ms <= 0) {
+        setPhase('ended');
+        clearInterval(id);
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [phase, expiresAt]);
+
+  async function startTrial() {
+    setStarting(true);
+    try {
+      const res = await fetch('/api/trial/start', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok && data.expiresAt) {
+        setExpiresAt(new Date(data.expiresAt).getTime());
+        setRemaining(new Date(data.expiresAt).getTime() - Date.now());
+        setPhase('active');
+      } else {
+        setErrMsg(data.error || 'Could not start trial.');
+      }
+    } catch (e: unknown) {
+      setErrMsg(e instanceof Error ? e.message : 'Could not start trial.');
+    } finally {
+      setStarting(false);
+    }
+  }
+
+  async function runFile(file: File) {
+    setFilename(file.name);
+    setStatus('running');
+    setErrMsg('');
+    setErrHint('');
+    setDetectedCols([]);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/connect/void-hunter', { method: 'POST', body: form });
+      const data: Result | Err = await res.json();
+      if (data.ok) {
+        setResult(data);
+        setStatus('done');
+      } else {
+        setErrMsg(data.error || 'Failed to parse');
+        setErrHint(data.hint || '');
+        setDetectedCols(data.detectedColumns || []);
+        setStatus('error');
+      }
+    } catch (e: unknown) {
+      setErrMsg(e instanceof Error ? e.message : 'Something went wrong');
+      setStatus('error');
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    if (phase !== 'active') return;
+    const file = e.dataTransfer.files?.[0];
+    if (file) runFile(file);
+  }
+
+  async function saveLead(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          name,
+          restaurantName,
+          agentRequested: 'Void Hunter · trial',
+          sourcePage: '/trial',
+        }),
+      });
+      setLeadSaved(true);
+    } catch {}
+  }
+
+  async function joinWaitlist(pos: string) {
+    if (!email) {
+      setWaitlistPos(pos);
+      return;
+    }
+    setWaitlistStatus('sending');
+    try {
+      await fetch('/api/integration-waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, restaurantName, pos, sourcePage: '/trial' }),
+      });
+      setWaitlistStatus('sent');
+      setWaitlistPos(pos);
+    } catch {
+      setWaitlistStatus('error');
+    }
+  }
+
+  const networkLeakYr = result
+    ? Math.max(0, result.networkVoids - result.medianStoreVoidRate * result.networkNet) * 3
+    : 0;
+
+  return (
+    <main className="compass min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <Link href="/" className="flex items-start gap-4 group">
+            <span className="compass-mark">N</span>
+            <span>
+              <p className="font-serif text-[24px] leading-none text-white">
+                Never 86&apos;d <span className="italic text-white/70">· live trial</span>
+              </p>
+              <p className="compass-eyebrow-dim mt-2">Operator OS · 60 minutes · real reads on your locations</p>
+            </span>
+          </Link>
+          {phase === 'active' && (
+            <div className="text-right">
+              <p className="compass-eyebrow-dim">— Time remaining</p>
+              <p className="font-mono tabular-nums text-3xl mt-1" style={{ color: remaining < 5 * 60 * 1000 ? '#ff9500' : '#ffffff' }}>
+                {formatRemaining(remaining)}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {phase === 'start' && (
+        <section className="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-16 text-center">
+          <p className="compass-eyebrow mb-6">— Free trial · 60 minutes</p>
+          <h1 className="compass-display text-5xl md:text-7xl mb-6">
+            One hour. <em>Your real numbers.</em>
+          </h1>
+          <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+            Hit start, drop your POS export, and we&apos;ll run Void Hunter on your actual stores for the next 60 minutes. No signup. No card. No human in the loop.
+          </p>
+          <button
+            onClick={startTrial}
+            disabled={starting}
+            className="btn-primary text-base disabled:opacity-50"
+            style={{ background: '#0066ff' }}
+          >
+            {starting ? 'Starting…' : 'Start the hour →'}
+          </button>
+          {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
+          <p className="compass-eyebrow-dim mt-6">— Supported now: Toast, Square, Clover (CSV) · OAuth for Toast/Lightspeed/Aloha in build</p>
+        </section>
+      )}
+
+      {phase === 'active' && (
+        <>
+          <section className="max-w-4xl mx-auto px-6 pt-8 pb-8">
+            <p className="compass-eyebrow mb-6">— Drop a CSV · run on your real data</p>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => inputRef.current?.click()}
+              className="compass-card cursor-pointer text-center transition-all"
+              style={{
+                padding: '60px 20px',
+                borderStyle: 'dashed',
+                borderColor: dragging ? '#0066ff' : '#2c2c2e',
+                background: dragging ? 'rgba(0,102,255,0.04)' : '#0a0a0a',
+              }}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv,text/csv"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }}
+                className="hidden"
+              />
+              {status === 'running' ? (
+                <>
+                  <p className="compass-eyebrow mb-3">— Running</p>
+                  <p className="font-serif text-2xl text-white">Analyzing <em>{filename}</em>…</p>
+                </>
+              ) : (
+                <>
+                  <p className="compass-eyebrow mb-3">— Drop a CSV here</p>
+                  <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file</p>
+                  <p className="compass-body text-sm">Toast / Square / Clover · Location, Employee, Net Sales, Void Amount</p>
+                </>
+              )}
+            </div>
+
+            {status === 'error' && (
+              <div className="compass-card mt-4" style={{ borderColor: '#ff453a' }}>
+                <p className="compass-card-label" style={{ color: '#ff453a' }}>— Couldn&apos;t parse</p>
+                <p className="font-serif text-xl text-white mt-3">{errMsg}</p>
+                {errHint && <p className="compass-body text-sm mt-3">{errHint}</p>}
+                {detectedCols.length > 0 && (
+                  <p className="compass-body text-sm mt-3">
+                    <span className="text-[#6e6e73]">Columns we saw:</span>{' '}
+                    <span className="font-mono text-white">{detectedCols.join(' · ')}</span>
+                  </p>
+                )}
+              </div>
+            )}
+          </section>
+
+          {status === 'done' && result && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Result · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {result.storesFlagged > 0
+                    ? <>Found <em>{result.storesFlagged} store{result.storesFlagged === 1 ? '' : 's'}</em> above the peer band.</>
+                    : <>No stores <em>above the peer band.</em></>}
+                </h2>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network net sales</p><p className="compass-kpi-val">{usd(result.networkNet)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network voids</p><p className="compass-kpi-val">{usd(result.networkVoids)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network void rate</p><p className="compass-kpi-val">{pct(result.networkVoidRate)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Peer-median rate</p><p className="compass-kpi-val">{pct(result.medianStoreVoidRate)}</p></div>
+                </div>
+
+                {networkLeakYr > 0 && (
+                  <div className="compass-card mb-10" style={{ borderColor: '#0066ff' }}>
+                    <p className="compass-card-label" style={{ color: '#0066ff' }}>— The lever</p>
+                    <h3>Excess voids above the peer band, annualized: <em style={{ color: '#0066ff' }}>{usd(networkLeakYr)}</em></h3>
+                  </div>
+                )}
+
+                {result.stores.length > 0 && (
+                  <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                    <table className="data-table w-full">
+                      <thead>
+                        <tr>
+                          <th className="!text-left">Store</th>
+                          <th>Net</th>
+                          <th>Voids</th>
+                          <th>Rate</th>
+                          <th>Excess / yr</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.stores.map((s) => (
+                          <tr key={s.name} style={{ color: '#d2d2d7' }}>
+                            <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
+                            <td className="font-mono tabular-nums">{usd(s.net)}</td>
+                            <td className="font-mono tabular-nums">{usd(s.voids)}</td>
+                            <td className="font-mono tabular-nums">{pct(s.voidRate)}</td>
+                            <td className="font-mono tabular-nums">{s.excessYr > 0 ? usd(s.excessYr) : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <div className="max-w-3xl mx-auto">
+              <p className="compass-eyebrow mb-4">— Connect your POS · auto-read every shift</p>
+              <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                When OAuth lights up, <em>we email you first.</em>
+              </h2>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {POS_OPTIONS.map((p) => (
+                  <button
+                    key={p.v}
+                    onClick={() => joinWaitlist(p.v)}
+                    className="compass-card text-left hover:border-[#0066ff] transition-colors group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="compass-card-label">{p.tag}</p>
+                      {p.status === 'csv'
+                        ? <span className="text-[11px] font-medium" style={{ color: '#34c759' }}>CSV today</span>
+                        : <span className="text-[11px] font-medium" style={{ color: '#0066ff' }}>Waitlist</span>}
+                    </div>
+                    <h3>{p.v}</h3>
+                    <p className="compass-body text-[13px] mt-2">{p.note}</p>
+                    {waitlistPos === p.v && waitlistStatus === 'sent' && <p className="text-[11px] mt-2" style={{ color: '#34c759' }}>✓ On the list</p>}
+                  </button>
+                ))}
+              </div>
+
+              {!email && waitlistPos && (
+                <p className="compass-body text-sm mt-4 text-center">
+                  Add your email below first so we know where to send the &ldquo;{waitlistPos}&rdquo; alert.
+                </p>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {phase === 'ended' && (
+        <section className="max-w-2xl mx-auto px-6 pt-16 pb-12 text-center">
+          <p className="compass-eyebrow mb-6" style={{ color: '#ff9500' }}>— Trial ended</p>
+          <h1 className="compass-display text-4xl md:text-6xl mb-6">
+            Time&apos;s up. <em>The leak isn&apos;t.</em>
+          </h1>
+          <p className="compass-body text-lg md:text-xl mb-10">
+            You saw the read. Want it on every shift, wired to your live POS, every figure source-tagged? Drop your details — Myke reaches out personally within 24 hours.
+          </p>
+        </section>
+      )}
+
+      {phase !== 'start' && (
+        <section className="border-t border-[#1f1f1f] py-16 px-6">
+          <div className="max-w-xl mx-auto">
+            <p className="compass-eyebrow mb-4 text-center">— Save your read · wire it to live data</p>
+            {leadSaved ? (
+              <div className="compass-card text-center">
+                <p className="font-serif text-2xl text-white">You&apos;re saved.</p>
+                <p className="compass-body mt-3">Myke will reach out within 24 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={saveLead} className="compass-card space-y-3">
+                <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <button type="submit" className="btn-primary w-full" style={{ background: '#0066ff' }}>Save my read →</button>
+              </form>
+            )}
+          </div>
+        </section>
+      )}
+
+      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
+          <div className="flex items-center gap-2">
+            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
+            <span>Never 86&apos;d · Built by operators</span>
+          </div>
+          <div className="flex items-center gap-5">
+            <Link href="/pricing"  className="hover:text-white transition-colors">Pricing</Link>
+            <Link href="/onboard"  className="hover:text-white transition-colors">Full onboard</Link>
+            <Link href="/"         className="hover:text-white transition-colors">Home</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
