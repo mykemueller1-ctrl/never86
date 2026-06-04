@@ -158,7 +158,7 @@ body {
 
 /* ─── COMPASS DARK TREATMENT ─────────────────────────────────────────────
    Editorial dark theme — black bg, white text, blue accent. Mirrors the
-   compass-bamba-csuite aesthetic but swapped to Void Hunter blue.
+   Editorial dark theme — black bg, white text, blue accent. Compass DNA
 */
 
 .compass {
@@ -344,8 +344,7 @@ body {
   letter-spacing: 0;
 }
 
-/* Compass-style brand gradient — Void Hunter blue. Sister to Bamba red,
-   sized for a thin top strip or a hero band. */
+/* Compass-style brand gradient — Void Hunter blue. Thin top strip or hero band. */
 .brand-band {
   background: linear-gradient(100deg, #0066ff, #003bb5);
   color: #ffffff;
@@ -360,7 +359,7 @@ body {
 }
 
 /* Compass KPI card — dense, uppercase mini-label, big tabular number,
-   optional delta. Lifted from the Bamba weekly tracker treatment. */
+   optional delta. */
 .kpi {
   background: #ffffff;
   border: 1px solid #e8e8ed;
