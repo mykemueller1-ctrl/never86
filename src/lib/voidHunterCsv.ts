@@ -59,15 +59,32 @@ export function parseCsv(input: string): { headers: string[]; rows: string[][] }
 
 // Column aliases — try a few common header names for each logical field.
 // Returns the index, or -1 if none match.
-function findCol(headers: string[], aliases: string[]): number {
+//
+// `negativeTokens` is a list of substrings that, if present in a header,
+// disqualify that header even if it matches an alias. We use this to
+// avoid grabbing count/qty columns when the operator wants the dollar
+// column (e.g. Square has "Items Voided" = count, "Refunds" = dollars —
+// we want Refunds for void$).
+function findCol(headers: string[], aliases: string[], negativeTokens: string[] = []): number {
   const lc = headers.map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+  // Exact match first — strongest signal.
   for (const alias of aliases) {
     const a = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const i = lc.findIndex((h) => h === a || h.includes(a));
-    if (i >= 0) return i;
+    const exact = lc.findIndex((h) => h === a);
+    if (exact >= 0 && !negativeTokens.some((n) => lc[exact].includes(n))) return exact;
+  }
+  // Then substring match.
+  for (const alias of aliases) {
+    const a = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (let i = 0; i < lc.length; i++) {
+      if (lc[i].includes(a) && !negativeTokens.some((n) => lc[i].includes(n))) return i;
+    }
   }
   return -1;
 }
+
+// Negative tokens for any column we want to be a $ amount, not a count.
+const NOT_A_COUNT = ['count', 'qty', 'quantity', 'numof', 'items', 'transactions'];
 
 const num = (s: string | undefined): number => {
   if (!s) return 0;
@@ -95,10 +112,35 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
     return { ok: false, error: 'CSV looked empty', hint: 'Make sure the first row is column headers and there are data rows below.' };
   }
 
-  const iStore    = findCol(headers, ['Location', 'Store', 'Site', 'Restaurant']);
-  const iEmployee = findCol(headers, ['Employee', 'Name', 'EmployeeName', 'Staff']);
-  const iNet      = findCol(headers, ['NetSales', 'Net', 'Sales', 'Gross', 'Total']);
-  const iVoid     = findCol(headers, ['VoidAmount', 'Voids', 'VoidTotal', 'VoidedAmount', 'Void$', 'VoidDollars']);
+  const iStore    = findCol(headers, ['Location', 'LocationName', 'Store', 'StoreName', 'Site', 'Restaurant']);
+  // Employee should not be the Store column (which can also contain "name").
+  // We bias toward strings that strongly imply an employee identifier.
+  const iEmployee = findCol(
+    headers,
+    ['Employee', 'EmployeeName', 'Cashier', 'CashierName', 'TeamMember', 'Staff', 'Server', 'ServerName', 'Name'],
+    [],
+  );
+  const iNet  = findCol(
+    headers,
+    ['NetSales', 'NetTotal', 'PeriodNet', 'Net', 'Sales', 'Gross', 'Total'],
+    NOT_A_COUNT,
+  );
+  // Void $ — preferred priority:
+  //   1. Explicit "Void $" headers (VoidAmount, VoidTotal, VoidedSales…)
+  //   2. Explicit "Refund $" headers (RefundAmount…)
+  //   3. Generic "Voids" / "Void" (filtered against NOT_A_COUNT so we don't
+  //      grab "Items Voided" count columns)
+  //   4. Generic "Refunds" / "Refunded" — last fallback (Square convention
+  //      where a refund column doubles as the void$ surface)
+  const iVoid = findCol(
+    headers,
+    ['VoidAmount', 'VoidTotal', 'VoidedAmount', 'VoidedSales', 'VoidSales',
+     'VoidDollars',
+     'RefundAmount', 'RefundedAmount', 'RefundTotal',
+     'Voids', 'Void',
+     'Refunds', 'Refunded'],
+    NOT_A_COUNT,
+  );
 
   const missing: string[] = [];
   if (iStore < 0)    missing.push('Location / Store');
