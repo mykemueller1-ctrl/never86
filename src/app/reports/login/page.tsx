@@ -35,16 +35,20 @@ export default function ReportsLogin() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-ink-50">
+    <main className="compass min-h-screen flex flex-col items-center justify-center px-6">
       <div className="max-w-sm w-full">
-        <Link href="/" className="flex items-center justify-center gap-2 mb-10 group">
-          <span className="brand-monogram" style={{ width: '1.6rem', height: '1.6rem', fontSize: '0.6rem' }}>N86</span>
-          <span className="font-semibold tracking-tighter text-ink-800 text-lg">Never 86&apos;d</span>
+        <Link href="/" className="flex items-center justify-center gap-3 mb-10 group">
+          <span className="compass-mark">N</span>
+          <span className="font-serif text-[22px] text-white">
+            Never 86&apos;d <span className="italic text-white/70">· sign in</span>
+          </span>
         </Link>
 
-        <div className="card p-7">
-          <h1 className="display text-3xl mb-1.5 text-center">Sign in</h1>
-          <p className="text-ink-500 text-sm mb-6 text-center">Operator portal.</p>
+        <div className="compass-card">
+          <p className="compass-eyebrow text-center mb-3">— Operator portal</p>
+          <h1 className="compass-display text-3xl mb-6 text-center">
+            <em>Sign in.</em>
+          </h1>
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="password"
@@ -52,21 +56,22 @@ export default function ReportsLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoFocus
-              className="w-full bg-white border border-ink-300 rounded-xl px-4 py-3 text-ink-800 placeholder-ink-500 focus:outline-none focus:border-ink-800 transition-colors"
+              className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
             />
             <button
               type="submit"
               disabled={status === 'loading'}
               className="btn-primary w-full disabled:opacity-60"
+              style={{ background: '#0066ff' }}
             >
-              {status === 'loading' ? 'Checking…' : 'Enter'}
+              {status === 'loading' ? 'Checking…' : 'Enter →'}
             </button>
-            {status === 'error' ? <p className="text-danger-500 text-sm text-center">{message}</p> : null}
+            {status === 'error' ? <p className="text-[#ff453a] text-sm text-center">{message}</p> : null}
           </form>
         </div>
 
-        <p className="text-ink-500 text-[12px] mt-6 text-center">
-          Not an operator yet? <Link href="/operators#talk" className="text-ink-800 font-medium hover:underline">Start here</Link>
+        <p className="text-[#6e6e73] text-[12px] mt-6 text-center">
+          Not an operator yet? <Link href="/onboard" className="text-white font-medium hover:underline">Onboard your store</Link>
         </p>
       </div>
     </main>
