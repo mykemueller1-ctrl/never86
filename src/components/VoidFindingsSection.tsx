@@ -22,7 +22,7 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
 
       <div className="logic-only bg-amber-500/5 border border-amber-500/30 rounded-lg p-3 mb-3 text-xs font-mono text-amber-200">
         <div className="text-amber-300 uppercase tracking-wider font-semibold mb-1">🔍 logic · provenance</div>
-        <div>source: <code>void_hunter_findings</code> · operator_id=3 · analysis {prettyDate(d.analysisDate)}</div>
+        <div>source: <code>void_hunter_findings</code> · analysis {prettyDate(d.analysisDate)}</div>
         <div>buckets: network_rollup({network ? 1 : 0}) · location_voids_measured({d.byLocation.length}) · top_employee_offenders({d.topOffenders ? 1 : 0}) · data_gap_note({d.dataGaps.length})</div>
         {network ? <div>network row: id={network.id} · ${network.dollarAmount} · {network.count} events · top={network.topOffender}</div> : null}
         {d.topOffenders ? <div>top-offenders row: id={d.topOffenders.id} · {d.topOffenders.topOffender}</div> : null}
