@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-type Result = {
+type VoidResult = {
   ok: true;
   rowsParsed: number;
   networkNet: number;
@@ -15,15 +15,48 @@ type Result = {
   employees: Array<{ store: string; name: string; net: number; voidAmount: number; voidRate: number; flagged: boolean }>;
 };
 
+type EmployeeFlag = { store: string; name: string; count: number; dollars: number; rate: number; peerRate: number };
+type EmployeeRow = {
+  store: string; name: string;
+  ticketsRung: number; netSales: number;
+  voidsDollars: number; voidsCount: number; cashVoidsCount: number;
+  compsDollars: number; compsCount: number;
+  discountsDollars: number; discountsCount: number;
+  voidAfterPaymentCount: number; promoStackedCount: number; discountAfterCloseCount: number;
+  riskScore: number;
+};
+
+type LeakResult = {
+  ok: true;
+  rowsParsed: number;
+  ticketsAnalyzed: number;
+  stores: string[];
+  networkNet: number; networkVoids: number; networkComps: number; networkDiscounts: number;
+  signals: {
+    voidAfterPayment:    { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
+    cashOnlyVoiders:     EmployeeFlag[];
+    promoStacking:       { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
+    compAbuse:           EmployeeFlag[];
+    discountAfterClose:  { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
+  };
+  employees: EmployeeRow[];
+};
+
 type Err = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
+const MODES = [
+  { id: 'void', label: 'Void Hunter',    blurb: 'Employee performance CSV · voids vs peer band' },
+  { id: 'leak', label: 'Leak Detector',  blurb: 'Ticket-level CSV · comps, promos, post-pay voids, cash-only voiders' },
+] as const;
+type Mode = typeof MODES[number]['id'];
+
 const POS_OPTIONS = [
-  { v: 'Toast', tag: 'Now',  status: 'csv',    note: 'Drop your Toast Employee Performance CSV today; OAuth in approval.' },
-  { v: 'Lightspeed', tag: 'Soon', status: 'soon', note: 'Lightspeed dev-account OAuth in build. Email me when it lights up.' },
-  { v: 'Aloha', tag: 'Soon', status: 'soon', note: 'NCR/Aloha integration in motion. Enterprise partner cycle.' },
-  { v: 'Square', tag: 'CSV',  status: 'csv',  note: 'Drop your Square employee summary CSV — same flow.' },
-  { v: 'Clover', tag: 'CSV',  status: 'csv',  note: 'Drop your Clover Reports export — same flow.' },
-  { v: 'Other', tag: 'Tell us', status: 'soon', note: "Tell us your POS — we'll prioritize the ones operators ask for." },
+  { v: 'Toast',      tag: 'Now',     status: 'csv',  note: 'Drop Toast Employee Performance or Sales Detail CSV today.' },
+  { v: 'Lightspeed', tag: 'Soon',    status: 'soon', note: 'Lightspeed dev-account OAuth in build.' },
+  { v: 'Aloha',      tag: 'Soon',    status: 'soon', note: 'NCR/Aloha integration in motion. Enterprise partner cycle.' },
+  { v: 'Square',     tag: 'CSV',     status: 'csv',  note: 'Drop your Square employee summary CSV.' },
+  { v: 'Clover',     tag: 'CSV',     status: 'csv',  note: 'Drop your Clover Reports export.' },
+  { v: 'Other',      tag: 'Tell us', status: 'soon', note: "Tell us your POS — we'll prioritize the ones operators ask for." },
 ];
 
 const usd = (n: number) => '$' + Math.round(n).toLocaleString();
@@ -42,8 +75,10 @@ export default function TrialPage() {
   const [remaining, setRemaining] = useState<number>(0);
   const [starting, setStarting] = useState(false);
 
+  const [mode, setMode] = useState<Mode>('void');
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
-  const [result, setResult] = useState<Result | null>(null);
+  const [voidResult, setVoidResult] = useState<VoidResult | null>(null);
+  const [leakResult, setLeakResult] = useState<LeakResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -51,17 +86,14 @@ export default function TrialPage() {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Lead capture
   const [email, setEmail] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
   const [name, setName] = useState('');
   const [leadSaved, setLeadSaved] = useState(false);
 
-  // POS waitlist
   const [waitlistPos, setWaitlistPos] = useState<string | null>(null);
   const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  // Tick countdown
   useEffect(() => {
     if (phase !== 'active' || !expiresAt) return;
     const id = setInterval(() => {
@@ -97,21 +129,23 @@ export default function TrialPage() {
   async function runFile(file: File) {
     setFilename(file.name);
     setStatus('running');
-    setErrMsg('');
-    setErrHint('');
-    setDetectedCols([]);
+    setErrMsg(''); setErrHint(''); setDetectedCols([]);
+    setVoidResult(null); setLeakResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await fetch('/api/connect/void-hunter', { method: 'POST', body: form });
-      const data: Result | Err = await res.json();
+      const endpoint = mode === 'void' ? '/api/connect/void-hunter' : '/api/connect/leak-detector';
+      const res = await fetch(endpoint, { method: 'POST', body: form });
+      const data = await res.json();
       if (data.ok) {
-        setResult(data);
+        if (mode === 'void') setVoidResult(data as VoidResult);
+        else setLeakResult(data as LeakResult);
         setStatus('done');
       } else {
-        setErrMsg(data.error || 'Failed to parse');
-        setErrHint(data.hint || '');
-        setDetectedCols(data.detectedColumns || []);
+        const err = data as Err;
+        setErrMsg(err.error || 'Failed to parse');
+        setErrHint(err.hint || '');
+        setDetectedCols(err.detectedColumns || []);
         setStatus('error');
       }
     } catch (e: unknown) {
@@ -135,10 +169,8 @@ export default function TrialPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email,
-          name,
-          restaurantName,
-          agentRequested: 'Void Hunter · trial',
+          email, name, restaurantName,
+          agentRequested: mode === 'void' ? 'Void Hunter · trial' : 'Leak Detector · trial',
           sourcePage: '/trial',
         }),
       });
@@ -147,26 +179,19 @@ export default function TrialPage() {
   }
 
   async function joinWaitlist(pos: string) {
-    if (!email) {
-      setWaitlistPos(pos);
-      return;
-    }
+    if (!email) { setWaitlistPos(pos); return; }
     setWaitlistStatus('sending');
     try {
       await fetch('/api/integration-waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, restaurantName, pos, sourcePage: '/trial' }),
       });
-      setWaitlistStatus('sent');
-      setWaitlistPos(pos);
-    } catch {
-      setWaitlistStatus('error');
-    }
+      setWaitlistStatus('sent'); setWaitlistPos(pos);
+    } catch { setWaitlistStatus('error'); }
   }
 
-  const networkLeakYr = result
-    ? Math.max(0, result.networkVoids - result.medianStoreVoidRate * result.networkNet) * 3
+  const networkLeakYr = voidResult
+    ? Math.max(0, voidResult.networkVoids - voidResult.medianStoreVoidRate * voidResult.networkNet) * 3
     : 0;
 
   return (
@@ -200,25 +225,32 @@ export default function TrialPage() {
             One hour. <em>Your real numbers.</em>
           </h1>
           <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Hit start, drop your POS export, and we&apos;ll run Void Hunter on your actual stores for the next 60 minutes. No signup. No card. No human in the loop.
+            Two agents wired. Drop a CSV, see what&apos;s actually happening on your floor. No card. No human in the loop.
           </p>
-          <button
-            onClick={startTrial}
-            disabled={starting}
-            className="btn-primary text-base disabled:opacity-50"
-            style={{ background: '#0066ff' }}
-          >
+          <button onClick={startTrial} disabled={starting} className="btn-primary text-base disabled:opacity-50" style={{ background: '#0066ff' }}>
             {starting ? 'Starting…' : 'Start the hour →'}
           </button>
           {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
-          <p className="compass-eyebrow-dim mt-6">— Supported now: Toast, Square, Clover (CSV) · OAuth for Toast/Lightspeed/Aloha in build</p>
+          <p className="compass-eyebrow-dim mt-6">— Supported now: Toast · Square · Clover · PDQ (CSV) · OAuth for Toast/Lightspeed/Aloha in build</p>
         </section>
       )}
 
       {phase === 'active' && (
         <>
-          <section className="max-w-4xl mx-auto px-6 pt-8 pb-8">
-            <p className="compass-eyebrow mb-6">— Drop a CSV · run on your real data</p>
+          <section className="max-w-4xl mx-auto px-6 pt-8 pb-4">
+            <p className="compass-eyebrow mb-4">— Pick an agent</p>
+            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+              {MODES.map((m) => (
+                <button key={m.id} type="button" onClick={() => { setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); }}
+                  className="compass-card text-left transition-colors"
+                  style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
+                  <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
+                  <h3>{m.label}</h3>
+                  <p className="compass-body text-sm mt-2">{m.blurb}</p>
+                </button>
+              ))}
+            </div>
+
             <div
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
@@ -232,23 +264,21 @@ export default function TrialPage() {
                 background: dragging ? 'rgba(0,102,255,0.04)' : '#0a0a0a',
               }}
             >
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".csv,text/csv"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }}
-                className="hidden"
-              />
+              <input ref={inputRef} type="file" accept=".csv,text/csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }} className="hidden" />
               {status === 'running' ? (
                 <>
-                  <p className="compass-eyebrow mb-3">— Running</p>
+                  <p className="compass-eyebrow mb-3">— Running {mode === 'void' ? 'Void Hunter' : 'Leak Detector'}</p>
                   <p className="font-serif text-2xl text-white">Analyzing <em>{filename}</em>…</p>
                 </>
               ) : (
                 <>
-                  <p className="compass-eyebrow mb-3">— Drop a CSV here</p>
+                  <p className="compass-eyebrow mb-3">— Drop a CSV for {mode === 'void' ? 'Void Hunter' : 'Leak Detector'}</p>
                   <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file</p>
-                  <p className="compass-body text-sm">Toast / Square / Clover · Location, Employee, Net Sales, Void Amount</p>
+                  <p className="compass-body text-sm">
+                    {mode === 'void'
+                      ? 'Per-employee CSV · Location, Employee, Net Sales, Void Amount'
+                      : 'Per-ticket CSV · Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns'}
+                  </p>
                 </>
               )}
             </div>
@@ -268,44 +298,33 @@ export default function TrialPage() {
             )}
           </section>
 
-          {status === 'done' && result && (
+          {status === 'done' && voidResult && mode === 'void' && (
             <section className="border-t border-[#1f1f1f] py-16 px-6">
               <div className="max-w-5xl mx-auto">
-                <p className="compass-eyebrow mb-4">— Result · {filename}</p>
+                <p className="compass-eyebrow mb-4">— Void Hunter · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
-                  {result.storesFlagged > 0
-                    ? <>Found <em>{result.storesFlagged} store{result.storesFlagged === 1 ? '' : 's'}</em> above the peer band.</>
+                  {voidResult.storesFlagged > 0
+                    ? <>Found <em>{voidResult.storesFlagged} store{voidResult.storesFlagged === 1 ? '' : 's'}</em> above the peer band.</>
                     : <>No stores <em>above the peer band.</em></>}
                 </h2>
-
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-                  <div className="compass-kpi"><p className="compass-kpi-label">Network net sales</p><p className="compass-kpi-val">{usd(result.networkNet)}</p></div>
-                  <div className="compass-kpi"><p className="compass-kpi-label">Network voids</p><p className="compass-kpi-val">{usd(result.networkVoids)}</p></div>
-                  <div className="compass-kpi"><p className="compass-kpi-label">Network void rate</p><p className="compass-kpi-val">{pct(result.networkVoidRate)}</p></div>
-                  <div className="compass-kpi"><p className="compass-kpi-label">Peer-median rate</p><p className="compass-kpi-val">{pct(result.medianStoreVoidRate)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network net</p><p className="compass-kpi-val">{usd(voidResult.networkNet)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network voids</p><p className="compass-kpi-val">{usd(voidResult.networkVoids)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network void rate</p><p className="compass-kpi-val">{pct(voidResult.networkVoidRate)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Peer-median rate</p><p className="compass-kpi-val">{pct(voidResult.medianStoreVoidRate)}</p></div>
                 </div>
-
                 {networkLeakYr > 0 && (
                   <div className="compass-card mb-10" style={{ borderColor: '#0066ff' }}>
                     <p className="compass-card-label" style={{ color: '#0066ff' }}>— The lever</p>
                     <h3>Excess voids above the peer band, annualized: <em style={{ color: '#0066ff' }}>{usd(networkLeakYr)}</em></h3>
                   </div>
                 )}
-
-                {result.stores.length > 0 && (
+                {voidResult.stores.length > 0 && (
                   <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
                     <table className="data-table w-full">
-                      <thead>
-                        <tr>
-                          <th className="!text-left">Store</th>
-                          <th>Net</th>
-                          <th>Voids</th>
-                          <th>Rate</th>
-                          <th>Excess / yr</th>
-                        </tr>
-                      </thead>
+                      <thead><tr><th className="!text-left">Store</th><th>Net</th><th>Voids</th><th>Rate</th><th>Excess / yr</th></tr></thead>
                       <tbody>
-                        {result.stores.map((s) => (
+                        {voidResult.stores.map((s) => (
                           <tr key={s.name} style={{ color: '#d2d2d7' }}>
                             <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
                             <td className="font-mono tabular-nums">{usd(s.net)}</td>
@@ -322,6 +341,119 @@ export default function TrialPage() {
             </section>
           )}
 
+          {status === 'done' && leakResult && mode === 'leak' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-6xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Leak Detector · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-8">
+                  {leakResult.ticketsAnalyzed.toLocaleString()} tickets. <em>{leakResult.stores.length} store{leakResult.stores.length === 1 ? '' : 's'}.</em>
+                </h2>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network net</p><p className="compass-kpi-val">{usd(leakResult.networkNet)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Voids</p><p className="compass-kpi-val">{usd(leakResult.networkVoids)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Comps</p><p className="compass-kpi-val">{usd(leakResult.networkComps)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Discounts</p><p className="compass-kpi-val">{usd(leakResult.networkDiscounts)}</p></div>
+                </div>
+
+                {/* Signal cards */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-12">
+                  <div className="compass-card" style={leakResult.signals.voidAfterPayment.totalCount > 0 ? { borderColor: '#ff453a' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.voidAfterPayment.totalCount > 0 ? { color: '#ff453a' } : {}}>— Void after payment</p>
+                    <h3>{leakResult.signals.voidAfterPayment.totalCount} tickets · <em>{usd(leakResult.signals.voidAfterPayment.totalDollars)}</em></h3>
+                    <p className="compass-body text-[13px] mt-2">Ticket was paid, then voided. The classic skim.</p>
+                    {leakResult.signals.voidAfterPayment.flagged.slice(0, 5).map((f) => (
+                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card" style={leakResult.signals.cashOnlyVoiders.length > 0 ? { borderColor: '#ff453a' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.cashOnlyVoiders.length > 0 ? { color: '#ff453a' } : {}}>— Cash-only voiders</p>
+                    <h3>{leakResult.signals.cashOnlyVoiders.length} name{leakResult.signals.cashOnlyVoiders.length === 1 ? '' : 's'} flagged</h3>
+                    <p className="compass-body text-[13px] mt-2">≥80% of their voids on cash tickets. Strong theft signal.</p>
+                    {leakResult.signals.cashOnlyVoiders.slice(0, 5).map((f) => (
+                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card" style={leakResult.signals.compAbuse.length > 0 ? { borderColor: '#ff9500' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.compAbuse.length > 0 ? { color: '#ff9500' } : {}}>— Comp abuse</p>
+                    <h3>{leakResult.signals.compAbuse.length} name{leakResult.signals.compAbuse.length === 1 ? '' : 's'} flagged</h3>
+                    <p className="compass-body text-[13px] mt-2">Comp rate above peer band, or {'>'}10% of own revenue comped.</p>
+                    {leakResult.signals.compAbuse.slice(0, 5).map((f) => (
+                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card" style={leakResult.signals.promoStacking.totalCount > 0 ? { borderColor: '#ff9500' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.promoStacking.totalCount > 0 ? { color: '#ff9500' } : {}}>— Promo stacking</p>
+                    <h3>{leakResult.signals.promoStacking.totalCount} tickets · <em>{usd(leakResult.signals.promoStacking.totalDollars)}</em></h3>
+                    <p className="compass-body text-[13px] mt-2">Two or more discounts applied to a single ticket.</p>
+                    {leakResult.signals.promoStacking.flagged.slice(0, 5).map((f) => (
+                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card" style={leakResult.signals.discountAfterClose.totalCount > 0 ? { borderColor: '#ff9500' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.discountAfterClose.totalCount > 0 ? { color: '#ff9500' } : {}}>— Discount after close</p>
+                    <h3>{leakResult.signals.discountAfterClose.totalCount} tickets · <em>{usd(leakResult.signals.discountAfterClose.totalDollars)}</em></h3>
+                    <p className="compass-body text-[13px] mt-2">Discount applied after the ticket was closed.</p>
+                    {leakResult.signals.discountAfterClose.flagged.slice(0, 5).map((f) => (
+                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card">
+                    <p className="compass-card-label">— Network rates</p>
+                    <h3>Aggregate</h3>
+                    <p className="compass-body text-[13px] mt-2">
+                      Void: <span className="font-mono text-white">{pct(leakResult.networkVoids / Math.max(1, leakResult.networkNet))}</span>
+                      <br />Comp: <span className="font-mono text-white">{pct(leakResult.networkComps / Math.max(1, leakResult.networkNet))}</span>
+                      <br />Discount: <span className="font-mono text-white">{pct(leakResult.networkDiscounts / Math.max(1, leakResult.networkNet))}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Top-risk employee table */}
+                <p className="compass-eyebrow mb-3">— Top names · sorted by composite risk score</p>
+                <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr>
+                      <th className="!text-left">Name</th>
+                      <th className="!text-left">Store</th>
+                      <th>Tickets</th>
+                      <th>Net</th>
+                      <th>Voids</th>
+                      <th>Cash voids</th>
+                      <th>Comps</th>
+                      <th>PostPay</th>
+                      <th>Stack</th>
+                      <th>Risk</th>
+                    </tr></thead>
+                    <tbody>
+                      {leakResult.employees.slice(0, 20).map((e) => (
+                        <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left">{e.store}</td>
+                          <td className="font-mono tabular-nums">{e.ticketsRung}</td>
+                          <td className="font-mono tabular-nums">{usd(e.netSales)}</td>
+                          <td className="font-mono tabular-nums">{usd(e.voidsDollars)}</td>
+                          <td className="font-mono tabular-nums">{e.cashVoidsCount}</td>
+                          <td className="font-mono tabular-nums">{usd(e.compsDollars)}</td>
+                          <td className="font-mono tabular-nums">{e.voidAfterPaymentCount}</td>
+                          <td className="font-mono tabular-nums">{e.promoStackedCount}</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: e.riskScore >= 50 ? '#ff453a' : e.riskScore >= 20 ? '#ff9500' : '#86868b' }}>
+                            {e.riskScore}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
+
           <section className="border-t border-[#1f1f1f] py-16 px-6">
             <div className="max-w-3xl mx-auto">
               <p className="compass-eyebrow mb-4">— Connect your POS · auto-read every shift</p>
@@ -330,11 +462,7 @@ export default function TrialPage() {
               </h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {POS_OPTIONS.map((p) => (
-                  <button
-                    key={p.v}
-                    onClick={() => joinWaitlist(p.v)}
-                    className="compass-card text-left hover:border-[#0066ff] transition-colors group"
-                  >
+                  <button key={p.v} onClick={() => joinWaitlist(p.v)} className="compass-card text-left hover:border-[#0066ff] transition-colors group">
                     <div className="flex items-center justify-between">
                       <p className="compass-card-label">{p.tag}</p>
                       {p.status === 'csv'
@@ -347,7 +475,6 @@ export default function TrialPage() {
                   </button>
                 ))}
               </div>
-
               {!email && waitlistPos && (
                 <p className="compass-body text-sm mt-4 text-center">
                   Add your email below first so we know where to send the &ldquo;{waitlistPos}&rdquo; alert.
