@@ -33,12 +33,12 @@ const OPERATOR_DROPDOWN = [
 ];
 
 const SECTIONS = [
-  { n: '01', label: 'Who we are', href: '#who' },
-  { n: '02', label: 'What we do', href: '#what' },
-  { n: '03', label: 'Free agents', href: '#agents' },
-  { n: '04', label: 'Pick your seat', href: '#seats' },
-  { n: '05', label: 'The correction', href: '/case/walked-the-number-back' },
-  { n: '06', label: 'Onboard',  href: '/onboard' },
+  { n: '01', label: 'The story', href: '#who' },
+  { n: '02', label: 'What we offer', href: '#offer-tiers' },
+  { n: '03', label: "Myke's story", href: '#myke' },
+  { n: '04', label: 'What we do', href: '#what' },
+  { n: '05', label: 'Free agents', href: '#agents' },
+  { n: '06', label: 'Pick your seat', href: '#seats' },
 ];
 
 export default function Home() {
@@ -235,11 +235,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WHO WE ARE */}
+      {/* § 01 · THE STORY */}
       <section id="who" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           <div>
-            <p className="compass-eyebrow mb-4">— 01 · Who we are</p>
+            <p className="compass-eyebrow mb-4">— 01 · The story</p>
             <h2 className="compass-display text-4xl md:text-6xl">
               Built by an operator. <em>For operators.</em>
             </h2>
@@ -257,6 +257,115 @@ export default function Home() {
             <p>
               The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
+            <p>
+              Today we serve the whole ladder — <span className="text-white font-semibold">solo operator on one Toast terminal, all the way to a CEO running 50 stores across three brands.</span> Same source-tag discipline. Same operator-first ethos. The price scales; the rule doesn&apos;t.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* § 02 · WHAT WE OFFER — independent → enterprise */}
+      <section id="offer-tiers" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="compass-eyebrow mb-4">— 02 · What we offer</p>
+          <h2 className="compass-display text-4xl md:text-6xl mb-14">
+            From the solo operator <em>to the C-suite.</em>
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+            <div className="compass-card flex flex-col">
+              <p className="compass-card-label">— Independent</p>
+              <h3>One store. One operator.</h3>
+              <p className="compass-body text-[14px] mt-3 mb-5">
+                You&apos;re running ops, finance, marketing, HR, and the floor yourself at 11pm. The free trial is built for you.
+              </p>
+              <ul className="space-y-2 mb-6 flex-1">
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute timed trial · drop a CSV · no card</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 free agents to try</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
+              </ul>
+              <Link href="/trial" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+                Start the trial
+              </Link>
+            </div>
+
+            <div className="compass-card flex flex-col" style={{ borderColor: '#0066ff' }}>
+              <p className="compass-card-label" style={{ color: '#0066ff' }}>— Operator · $299/mo</p>
+              <h3>1–3 stores.</h3>
+              <p className="compass-body text-[14px] mt-3 mb-5">
+                The full agent stack wired to your live POS. Daily auto-pull, per-name alerts, your Command Center.
+              </p>
+              <ul className="space-y-2 mb-6 flex-1">
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>All agents wired to Toast / Square / Clover</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Email + SMS alerts when a name spikes</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Single-tenant Command Center · 90-day history</span></li>
+              </ul>
+              <Link href="/onboard" className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
+                Onboard your store →
+              </Link>
+            </div>
+
+            <div className="compass-card flex flex-col">
+              <p className="compass-card-label">— Multi-unit · $999/mo</p>
+              <h3>4–16 stores.</h3>
+              <p className="compass-body text-[14px] mt-3 mb-5">
+                Network-level peer bands. Per-role lenses for CFO, COO, Chef, GM. Roll-up + drill-down.
+              </p>
+              <ul className="space-y-2 mb-6 flex-1">
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Peer-band analysis across your fleet</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-role lenses · CEO · CFO · COO · Chef · Owner</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Slack + Teams integration · unlimited history</span></li>
+              </ul>
+              <Link href="/onboard" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+                Talk to us
+              </Link>
+            </div>
+
+            <div className="compass-card flex flex-col">
+              <p className="compass-card-label">— Enterprise · Custom</p>
+              <h3>16+ stores. Multi-brand.</h3>
+              <p className="compass-body text-[14px] mt-3 mb-5">
+                Per-brand isolation. SSO. Custom POS integrations (Aloha, PDQ, proprietary). MCP API. QBR.
+              </p>
+              <ul className="space-y-2 mb-6 flex-1">
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-brand tenant isolation</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>SSO · Okta / Azure AD / Google</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Quarterly business review with the founder</span></li>
+              </ul>
+              <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+                Email myke@n86.app
+              </a>
+            </div>
+          </div>
+
+          <p className="compass-eyebrow-dim text-center">— Same source-tag discipline at every tier. The price scales; the rule doesn&apos;t.</p>
+        </div>
+      </section>
+
+      {/* § 03 · MYKE'S STORY — first-person */}
+      <section id="myke" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+        <div className="max-w-3xl mx-auto">
+          <p className="compass-eyebrow mb-4">— 03 · Myke&apos;s story</p>
+          <h2 className="compass-display text-4xl md:text-6xl mb-10">
+            I built this <em>for myself first.</em>
+          </h2>
+          <div className="space-y-6 compass-body text-lg leading-relaxed">
+            <p>
+              I&apos;m Myke. I run <span className="text-white font-semibold">Community Tap &amp; Pizza in Fort Dodge, Iowa</span>. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning.
+            </p>
+            <p>
+              I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line.
+            </p>
+            <p>
+              The first version was a single HTML file on my laptop. I was trying to figure out why food cost drifted four points one week and nobody could explain it. I wrote the math, fed in my own Z-reports, and it pointed at the right station. Then it pointed at the next leak. Then the next.
+            </p>
+            <p>
+              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — overstated by $6.5M. So I walked it back, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product.
+            </p>
+            <p>
+              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same code. Same source-tag rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
+            </p>
+            <p style={{ color: '#86868b' }}>— Myke Mueller · Fort Dodge, Iowa</p>
           </div>
         </div>
       </section>
@@ -264,7 +373,7 @@ export default function Home() {
       {/* WHAT WE DO */}
       <section id="what" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 02 · What we do</p>
+          <p className="compass-eyebrow mb-4">— 04 · What we do</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-14">
             We sit on top of your POS<br />
             and tell you <em>when one of them is lying.</em>
@@ -325,7 +434,7 @@ export default function Home() {
       {/* Free agents */}
       <section id="agents" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 03 · Free agents</p>
+          <p className="compass-eyebrow mb-4">— 05 · Free agents</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             Try one. <em>Right now.</em>
           </h2>
@@ -347,7 +456,7 @@ export default function Home() {
       {/* Pick your seat */}
       <section id="seats" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 04 · Pick your seat</p>
+          <p className="compass-eyebrow mb-4">— 06 · Pick your seat</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             One platform. <em>Seven roles.</em>
           </h2>
@@ -365,7 +474,7 @@ export default function Home() {
       {/* Talk to us */}
       <section id="offer" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto">
-          <p className="compass-eyebrow mb-4 text-center">— 05 · 15 minutes</p>
+          <p className="compass-eyebrow mb-4 text-center">— 07 · 15 minutes</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10 text-center">
             One call. <em>One signal.</em>
           </h2>
