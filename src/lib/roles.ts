@@ -256,6 +256,40 @@ export const ROLES: Record<string, RoleSpec> = {
     ],
     bookCtaLine: 'Ask your manager to try Shift Pulse free at /demo/shift-pulse — no login. If they like it, we\'ll wire it to your store.',
   },
+
+  chef: {
+    slug: 'chef',
+    oneWord: 'Kitchen',
+    subhead: "The chef who runs the books. The line that doesn't lie. Food cost, beverage mix, prep waste — owned at the pass.",
+    audience: 'For chef-owners · executive chefs · culinary directors · chef-led groups',
+    badge: 'Chef',
+    tone: 'copper',
+    headline: { l1: 'The line that', gradient: "doesn't lie.", l3: 'The kitchen, the books, the floor — one screen.' },
+    intro: "You're the operator AND the chef. You run the pass at 7pm and the P&L at 11am. We hand you food cost broken out by category, prep waste by station, beverage mix by service period — every figure source-tagged so when the GM says \"the line is fine\" you have the receipt.",
+    pains: [
+      'Your CDC says food cost is "fine." Your invoices say otherwise. Reconciliation is on you.',
+      'Beverage mix drifts and you can\'t tell if it\'s the bartender, the menu, or the inventory count.',
+      'Prep waste is invisible until end-of-week — by then the line cook\'s habit is set.',
+      'You signed off on a $40K week and the books say $32K. Where did $8K go?',
+    ],
+    reliefs: [
+      'Food cost by category vs your menu mix — daily, not weekly.',
+      'Beverage program: beer / liquor / pop / wine split, per service period, per bartender.',
+      'Catering economics with the off-prem reconciliation gap surfaced — where the orders ran but the receipts didn\'t.',
+      'Source-tag on every number. When the line cook says "we 86\'d it," we know if the receipt agrees.',
+    ],
+    freeAgents: [
+      { name: 'Catering Leak', line: 'Per-store catering net vs invoiced — where the receipt and the order disagree.', href: '/demo/catering-leak' },
+      { name: 'Void Hunter', line: 'Voids vs each station\'s peer median — line cook patterns, not verdicts.', href: '/demo/void-hunter' },
+      { name: '3P Fee Finder', line: 'What DD/UE/GH actually keep — so menu pricing on 3P is honest.', href: '/demo/3p-fee-finder' },
+    ],
+    answers: [
+      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'catering-economics-multi-unit', t: 'How catering economics break for multi-unit operators' },
+      { slug: 'people-native-ai-restaurants', t: 'What does "people-native AI" mean for restaurants' },
+    ],
+    bookCtaLine: '15 minutes. Bring last week\'s invoices and one day\'s line sheets. We\'ll show the gap before the call ends.',
+  },
 };
 
-export const ROLE_ORDER = ['ceo', 'cfo', 'coo', 'cto', 'owner', 'manager', 'crew'] as const;
+export const ROLE_ORDER = ['ceo', 'cfo', 'coo', 'chef', 'cto', 'owner', 'manager', 'crew'] as const;

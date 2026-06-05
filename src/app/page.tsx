@@ -1,36 +1,44 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const FREE_AGENTS = [
-  { name: 'Void Hunter', href: '/demo/void-hunter', tag: 'Voids' },
-  { name: '3P Fee Finder', href: '/demo/3p-fee-finder', tag: 'Delivery' },
-  { name: 'Labor Leak', href: '/demo/labor-leak', tag: 'Labor' },
-  { name: 'Tip Variance', href: '/demo/tip-variance', tag: 'Tips' },
-  { name: 'Catering Leak', href: '/demo/catering-leak', tag: 'Catering' },
-  { name: 'Rate Card Audit', href: '/demo/rate-card-audit', tag: '3P Rates' },
-  { name: 'Shift Pulse', href: '/demo/shift-pulse', tag: 'Shift' },
+  { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'One name above the peer band, by store + cross-network.' },
+  { name: '3P Fee Finder',  href: '/demo/3p-fee-finder',  tag: 'Delivery', line: 'Contract vs blended-effective DD/UE/GH take rate.' },
+  { name: 'Labor Leak',     href: '/demo/labor-leak',     tag: 'Labor',    line: 'OT drift, ghost shifts, schedule-vs-clocked gaps.' },
+  { name: 'Tip Variance',   href: '/demo/tip-variance',   tag: 'Tips',     line: 'Week-over-week tip movement, per store + per name.' },
+  { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.' },
+  { name: 'Rate Card Audit',href: '/demo/rate-card-audit',tag: '3P Rates', line: 'Where your DD/UE/GH rates sit vs peer band.' },
+  { name: 'Shift Pulse',    href: '/demo/shift-pulse',    tag: 'Shift',    line: 'Crew + manager sentiment at the close of every shift.' },
 ];
 
 const SEATS = [
-  { h: 'A', name: 'All',     tag: 'Overview',       href: '/for', active: true },
-  { h: 'C', name: 'CEO',     tag: 'Network',        href: '/for/ceo' },
-  { h: 'F', name: 'CFO',     tag: 'Books',          href: '/for/cfo' },
-  { h: 'O', name: 'COO',     tag: 'Floor',          href: '/for/coo' },
-  { h: 'T', name: 'CTO',     tag: 'Stack',          href: '/for/cto' },
-  { h: 'W', name: 'Owner',   tag: 'Solo',           href: '/for/owner' },
-  { h: 'M', name: 'Manager', tag: 'Shift',          href: '/for/manager' },
-  { h: 'R', name: 'Crew',    tag: 'Drift',          href: '/for/crew' },
+  { h: 'A', name: 'All',     tag: 'Overview', href: '/for', active: true },
+  { h: 'C', name: 'CEO',     tag: 'Network',  href: '/for/ceo' },
+  { h: 'F', name: 'CFO',     tag: 'Books',    href: '/for/cfo' },
+  { h: 'O', name: 'COO',     tag: 'Drift',    href: '/for/coo' },
+  { h: 'K', name: 'Chef',    tag: 'Kitchen',  href: '/for/chef' },
+  { h: 'W', name: 'Owner',   tag: 'Solo',     href: '/for/owner' },
+  { h: 'M', name: 'Manager', tag: 'Floor',    href: '/for/manager' },
+  { h: 'R', name: 'Crew',    tag: 'Shift',    href: '/for/crew' },
+];
+
+const OPERATOR_DROPDOWN = [
+  { name: 'CEO',     tag: 'Network',     href: '/for/ceo',  blurb: 'One screen ranked by what costs you money this week.' },
+  { name: 'CFO',     tag: 'Books',       href: '/for/cfo',  blurb: 'Books that close to the penny. Every figure source-tagged.' },
+  { name: 'COO · Ops', tag: 'Drift',     href: '/for/coo',  blurb: 'Labor leak before payroll posts. Voids named, ranked, coachable.' },
+  { name: 'Chef',    tag: 'Kitchen',     href: '/for/chef', blurb: 'The chef who runs the books. The line that doesn\'t lie.' },
+  { name: 'Owner',   tag: 'Solo',        href: '/for/owner',blurb: 'Solo operator. Same screen as the chain. None of the enterprise price.' },
 ];
 
 const SECTIONS = [
-  { n: '01', label: 'Free Agents',    href: '#agents' },
-  { n: '02', label: 'Pick Your Seat', href: '#seats' },
-  { n: '03', label: 'The Correction', href: '/case/walked-the-number-back' },
-  { n: '04', label: 'Onboard',        href: '/onboard' },
-  { n: '05', label: 'Operators',      href: '/operators' },
-  { n: '06', label: 'Answers',        href: '/answers' },
+  { n: '01', label: 'Who we are', href: '#who' },
+  { n: '02', label: 'What we do', href: '#what' },
+  { n: '03', label: 'Free agents', href: '#agents' },
+  { n: '04', label: 'Pick your seat', href: '#seats' },
+  { n: '05', label: 'The correction', href: '/case/walked-the-number-back' },
+  { n: '06', label: 'Onboard',  href: '/onboard' },
 ];
 
 export default function Home() {
@@ -39,6 +47,17 @@ export default function Home() {
   const [restaurantName, setRestaurantName] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+
+  // Operator dropdown state
+  const [opOpen, setOpOpen] = useState(false);
+  const dropRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (dropRef.current && !dropRef.current.contains(e.target as Node)) setOpOpen(false);
+    }
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,8 +105,55 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Top tab nav — Agents · For Operators ▾ · Pricing · Trial · Sign in */}
+        <nav className="mt-6 flex flex-wrap items-center gap-2 text-[14px]" ref={dropRef}>
+          <Link href="#agents" className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
+
+          <div className="relative">
+            <button
+              onClick={() => setOpOpen((v) => !v)}
+              className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
+              aria-expanded={opOpen}
+            >
+              For multi-unit operators
+              <span className="text-[10px]" style={{ color: '#0066ff' }}>{opOpen ? '▴' : '▾'}</span>
+            </button>
+            {opOpen && (
+              <div className="absolute left-0 top-full mt-2 w-80 z-50 bg-[#0a0a0a] border border-[#1f1f1f] rounded-2xl p-2 shadow-2xl">
+                {OPERATOR_DROPDOWN.map((o) => (
+                  <Link
+                    key={o.name}
+                    href={o.href}
+                    onClick={() => setOpOpen(false)}
+                    className="block px-4 py-3 rounded-xl hover:bg-white/[0.05] transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-serif text-lg text-white">{o.name}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#0066ff' }}>{o.tag}</p>
+                    </div>
+                    <p className="text-[13px] mt-1" style={{ color: '#86868b' }}>{o.blurb}</p>
+                  </Link>
+                ))}
+                <Link
+                  href="/for"
+                  onClick={() => setOpOpen(false)}
+                  className="block px-4 py-2 mt-1 border-t border-[#1f1f1f] text-[13px]"
+                  style={{ color: '#0066ff' }}
+                >
+                  All seven seats →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link href="/pricing"   className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Pricing</Link>
+          <Link href="/trial"     className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
+          <span className="flex-1" />
+          <Link href="/reports/login" className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
+        </nav>
+
         {/* Persona pill row */}
-        <div className="mt-7 flex gap-2 overflow-x-auto pb-1">
+        <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
           {SEATS.map((s) => (
             <Link
               key={s.name}
@@ -114,9 +180,7 @@ export default function Home() {
 
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
-        <p className="compass-eyebrow mb-6">
-          — Operator OS · Network Operating Layer
-        </p>
+        <p className="compass-eyebrow mb-6">— Operator OS · Network Operating Layer</p>
         <div className="grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start">
           <div>
             <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
@@ -137,7 +201,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right sidebar card */}
           <aside className="compass-card">
             <p className="compass-card-label">This view · primary audience</p>
             <h3>You · Operator</h3>
@@ -152,7 +215,6 @@ export default function Home() {
           </aside>
         </div>
 
-        {/* KPI strip — compass dark */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
           <div className="compass-kpi">
             <p className="compass-kpi-label">Recovered · network</p>
@@ -173,10 +235,97 @@ export default function Home() {
         </div>
       </section>
 
+      {/* WHO WE ARE */}
+      <section id="who" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
+          <div>
+            <p className="compass-eyebrow mb-4">— 01 · Who we are</p>
+            <h2 className="compass-display text-4xl md:text-6xl">
+              Built by an operator. <em>For operators.</em>
+            </h2>
+          </div>
+          <div className="space-y-7 compass-body text-lg leading-relaxed max-w-2xl">
+            <p>
+              Never 86&apos;d started as the calculator we made for our own restaurant — <span className="text-white font-semibold">Community Tap &amp; Pizza, Storm Lake, Iowa</span>. Myke Mueller (founder) was an operator first, founder second. Still is.
+            </p>
+            <p>
+              The first version was an HTML page open on Myke&apos;s laptop on a Tuesday at 11pm trying to figure out why food cost drifted four points week-over-week. The math caught it. So did the next leak. And the next.
+            </p>
+            <p>
+              We now serve a <span className="text-white font-semibold">16-unit chef-led group</span> as our first design partner. $15.72M reconciled across 545,677 orders. $1.81M recovery surface, sourced to the cent.
+            </p>
+            <p>
+              The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT WE DO */}
+      <section id="what" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
+        <div className="max-w-7xl mx-auto">
+          <p className="compass-eyebrow mb-4">— 02 · What we do</p>
+          <h2 className="compass-display text-4xl md:text-6xl mb-14">
+            We sit on top of your POS<br />
+            and tell you <em>when one of them is lying.</em>
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-12">
+            <div className="compass-card">
+              <p className="compass-card-label">— What we are not</p>
+              <h3>Not a dashboard.</h3>
+              <p className="compass-body text-[14px] mt-3">
+                Dashboards make you read a chart and decide what to do. We name the leak, point at the store, name the person, and tell you the next move.
+              </p>
+            </div>
+            <div className="compass-card">
+              <p className="compass-card-label">— What we are not</p>
+              <h3>Not a CRM.</h3>
+              <p className="compass-body text-[14px] mt-3">
+                Your POS already knows everything that happened. We sit next to it and tell you which of those things were a leak, by store and by name.
+              </p>
+            </div>
+            <div className="compass-card">
+              <p className="compass-card-label">— What we are not</p>
+              <h3>Not a replacement.</h3>
+              <p className="compass-body text-[14px] mt-3">
+                Keep Toast, R365, 7shifts, Thanx, Marqii. We don&apos;t rip anything out. We sit on top of the stack you have and reconcile across it.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-3 mb-12">
+            <div className="compass-card" style={{ borderColor: '#0066ff' }}>
+              <p className="compass-card-label" style={{ color: '#0066ff' }}>— What we are</p>
+              <h3>The Operator OS.</h3>
+              <p className="compass-body text-[15px] mt-3 leading-relaxed">
+                Seven agents reading sales, labor, voids, 3P fees, tips, catering, shift sentiment. One screen per role. Every figure source-tagged <span style={{ color: '#34c759' }} className="font-semibold">Verified</span> / <span style={{ color: '#ff9500' }} className="font-semibold">Estimated</span> / <span style={{ color: '#ff453a' }} className="font-semibold">Unverified</span>. When we&apos;re wrong, we publish the correction.
+              </p>
+            </div>
+            <div className="compass-card">
+              <p className="compass-card-label">— How it works</p>
+              <h3>30 seconds to first leak.</h3>
+              <p className="compass-body text-[15px] mt-3 leading-relaxed">
+                Drop a Toast / Square / Clover / PDQ export at <Link href="/trial" className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>. Void Hunter and the Leak Detector run on your real numbers. 60-minute live read, no card, no human in the loop. If you like it, wire it to live data — we email per-POS when each OAuth ships.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-2">
+            {FREE_AGENTS.map((a) => (
+              <Link key={a.name} href={a.href} className="compass-card text-center hover:border-[#0066ff] transition-colors block">
+                <p className="compass-card-label">{a.tag}</p>
+                <p className="font-serif text-[15px] mt-2 text-white leading-tight">{a.name}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Free agents */}
       <section id="agents" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 01 · Free agents</p>
+          <p className="compass-eyebrow mb-4">— 03 · Free agents</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             Try one. <em>Right now.</em>
           </h2>
@@ -185,6 +334,7 @@ export default function Home() {
               <Link key={a.name} href={a.href} className="compass-card hover:border-[#0066ff] transition-colors block group">
                 <p className="compass-card-label">{a.tag}</p>
                 <h3 className="!mt-3">{a.name}</h3>
+                <p className="compass-body text-[14px] mt-3">{a.line}</p>
                 <p className="compass-body text-[14px] mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
                   Try it free <span aria-hidden>→</span>
                 </p>
@@ -197,7 +347,7 @@ export default function Home() {
       {/* Pick your seat */}
       <section id="seats" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 02 · Pick your seat</p>
+          <p className="compass-eyebrow mb-4">— 04 · Pick your seat</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             One platform. <em>Seven roles.</em>
           </h2>
@@ -215,7 +365,7 @@ export default function Home() {
       {/* Talk to us */}
       <section id="offer" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto">
-          <p className="compass-eyebrow mb-4 text-center">— 03 · 15 minutes</p>
+          <p className="compass-eyebrow mb-4 text-center">— 05 · 15 minutes</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10 text-center">
             One call. <em>One signal.</em>
           </h2>
@@ -225,34 +375,13 @@ export default function Home() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="compass-card space-y-3">
-              <input
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
-              />
-              <input
-                type="text"
-                placeholder="Restaurant or group"
-                value={restaurantName}
-                onChange={(e) => setRestaurantName(e.target.value)}
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="btn-primary w-full disabled:opacity-50"
-                style={{ background: '#0066ff' }}
-              >
+              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)}
+                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                 {status === 'loading' ? 'Sending…' : 'Talk to us'}
               </button>
               {status === 'error' && <p className="text-[#ff453a] text-sm text-center">{message}</p>}

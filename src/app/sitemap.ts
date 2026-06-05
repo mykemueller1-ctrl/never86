@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/for/cfo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/coo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/cto`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/for/chef`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/owner`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/manager`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/crew`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
