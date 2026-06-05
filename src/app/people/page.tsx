@@ -71,7 +71,7 @@ export default function PeoplePage() {
           <em>what the back office</em> sees.
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl mb-10">
-          Built on a real restaurant. Storm Lake, Iowa. 41 staff, 7 departments, every shift on one screen.
+          Built on a real restaurant. Fort Dodge, Iowa. 41 staff, 7 departments, every shift on one screen.
         </p>
         <a href="#notify" className="btn-primary" style={{ background: '#0066ff' }}>Get notified →</a>
       </section>

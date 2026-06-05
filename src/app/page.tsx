@@ -246,7 +246,7 @@ export default function Home() {
           </div>
           <div className="space-y-7 compass-body text-lg leading-relaxed max-w-2xl">
             <p>
-              Never 86&apos;d started as the calculator we made for our own restaurant — <span className="text-white font-semibold">Community Tap &amp; Pizza, Storm Lake, Iowa</span>. Myke Mueller (founder) was an operator first, founder second. Still is.
+              Never 86&apos;d started as the calculator we made for our own restaurant — <span className="text-white font-semibold">Community Tap &amp; Pizza, Fort Dodge, Iowa</span>. Myke Mueller (founder) was an operator first, founder second. Still is.
             </p>
             <p>
               The first version was an HTML page open on Myke&apos;s laptop on a Tuesday at 11pm trying to figure out why food cost drifted four points week-over-week. The math caught it. So did the next leak. And the next.
