@@ -24,7 +24,7 @@ const FACTS = [
   ['Site',             'https://never86.ai'],
   ['Press',            'press@never86.ai'],
   ['Sales / operator', 'myke@n86.app'],
-  ['Headquarters',     'Storm Lake, Iowa'],
+  ['Headquarters',     'Fort Dodge, Iowa'],
 ];
 
 export default function PressKit() {
@@ -75,7 +75,7 @@ export default function PressKit() {
             <p className="compass-card-label">Myke Mueller</p>
             <h3>Operator first, founder second.</h3>
             <p className="compass-body leading-relaxed mt-3">
-              Runs Community Tap &amp; Pizza in Storm Lake, Iowa. Available for: founder interviews, operator podcasts, restaurant-industry trade press.
+              Runs Community Tap &amp; Pizza in Fort Dodge, Iowa. Available for: founder interviews, operator podcasts, restaurant-industry trade press.
             </p>
           </div>
         </section>
