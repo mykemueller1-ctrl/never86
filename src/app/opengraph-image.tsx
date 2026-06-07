@@ -15,39 +15,77 @@ export default async function OG() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '80px',
-          background: '#fbfbfd',
+          padding: '70px',
+          background: '#000000',
           fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+          backgroundImage: 'linear-gradient(180deg, #050505 0%, #000000 100%)',
         }}
       >
-        {/* Brand mark */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Top brand band */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 6,
+            background: 'linear-gradient(100deg, #0066ff 0%, #003bb5 100%)',
+          }}
+        />
+
+        {/* Brand mark + eyebrow */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
           <div
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 12,
-              background: 'linear-gradient(135deg, #d49a0e, #a3760a)',
+              width: 64,
+              height: 64,
+              borderRadius: 14,
+              background: 'linear-gradient(135deg, #0066ff, #003bb5)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: 18,
-              letterSpacing: '0.05em',
-            }}
-          >
-            N86
-          </div>
-          <div
-            style={{
               fontWeight: 600,
-              fontSize: 28,
-              color: '#1d1d1f',
-              letterSpacing: '-0.022em',
+              fontSize: 36,
+              fontStyle: 'italic',
+              fontFamily: 'Georgia, "Times New Roman", serif',
             }}
           >
-            Never 86&apos;d
+            N
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontWeight: 500,
+                fontSize: 32,
+                color: '#ffffff',
+                letterSpacing: '-0.018em',
+                lineHeight: 1,
+              }}
+            >
+              Never 86&apos;d
+              <span
+                style={{
+                  fontStyle: 'italic',
+                  color: 'rgba(255,255,255,0.7)',
+                  marginLeft: 8,
+                }}
+              >
+                for operators
+              </span>
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#0066ff',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+              }}
+            >
+              — Operator OS · 8 agents · source-tagged
+            </div>
           </div>
         </div>
 
@@ -56,31 +94,46 @@ export default async function OG() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            fontSize: 92,
-            fontWeight: 700,
-            lineHeight: 1.05,
-            letterSpacing: '-0.03em',
-            color: '#1d1d1f',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontWeight: 500,
+            fontSize: 88,
+            lineHeight: 1.04,
+            letterSpacing: '-0.022em',
+            color: '#ffffff',
           }}
         >
-          <div>Find the leak.</div>
-          <div>Name who owns it.</div>
-          <div>Keep the receipt.</div>
+          <div>
+            Find the leak. <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Name who</span>
+          </div>
+          <div>
+            owns it. <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Keep</span> the receipt.
+          </div>
         </div>
 
-        {/* Footer line */}
+        {/* Footer */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             color: '#86868b',
-            fontSize: 22,
+            fontSize: 20,
             letterSpacing: '-0.011em',
+            borderTop: '1px solid #1f1f1f',
+            paddingTop: 24,
           }}
         >
-          <div>Restaurant financial intelligence · built by an operator.</div>
-          <div style={{ color: '#1d1d1f', fontWeight: 500 }}>never86.ai</div>
+          <div>$1.81M recovered · 545,677 orders · built by operators</div>
+          <div
+            style={{
+              color: '#ffffff',
+              fontWeight: 500,
+              fontFamily: 'Georgia, serif',
+              fontSize: 22,
+            }}
+          >
+            never86.ai
+          </div>
         </div>
       </div>
     ),

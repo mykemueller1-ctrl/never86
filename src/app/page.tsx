@@ -100,7 +100,7 @@ export default function Home() {
           <div className="text-right">
             <p className="font-mono text-[13px] text-white tabular-nums">$1.81M RECOVERED · 545,677 ORDERS</p>
             <p className="compass-eyebrow-dim mt-1">
-              DMV · NASHVILLE · RALEIGH <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
+              MULTI-MARKET NETWORK <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
             </p>
           </div>
         </div>
