@@ -107,7 +107,7 @@ export default function Home() {
 
         {/* Top tab nav — Agents · For Operators ▾ · Pricing · Trial · Sign in */}
         <nav className="mt-6 flex flex-wrap items-center gap-2 text-[14px]" ref={dropRef}>
-          <Link href="#agents" className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
+          <Link href="/agents" className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
 
           <div className="relative">
             <button
