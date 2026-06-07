@@ -56,6 +56,9 @@ export default async function OG() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div
               style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 8,
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 fontWeight: 500,
                 fontSize: 32,
@@ -64,12 +67,11 @@ export default async function OG() {
                 lineHeight: 1,
               }}
             >
-              Never 86&apos;d
+              <span>Never 86&apos;d</span>
               <span
                 style={{
                   fontStyle: 'italic',
                   color: 'rgba(255,255,255,0.7)',
-                  marginLeft: 8,
                 }}
               >
                 for operators
@@ -102,11 +104,14 @@ export default async function OG() {
             color: '#ffffff',
           }}
         >
-          <div>
-            Find the leak. <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Name who</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
+            <span>Find the leak.</span>
+            <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Name who</span>
           </div>
-          <div>
-            owns it. <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Keep</span> the receipt.
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
+            <span>owns it.</span>
+            <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Keep</span>
+            <span>the receipt.</span>
           </div>
         </div>
 
