@@ -34,6 +34,15 @@ export type EmployeeRow = {
   riskScore: number;
 };
 
+export type DowPattern = {
+  store: string;
+  name: string;
+  dow: string;          // Mon · Tue · Wed · …
+  voidsOnDow: number;
+  totalVoids: number;
+  concentration: number; // 0..1
+};
+
 export type LeakReport = {
   rowsParsed: number;
   ticketsAnalyzed: number;
@@ -48,6 +57,7 @@ export type LeakReport = {
     promoStacking:       { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
     compAbuse:           EmployeeFlag[];
     discountAfterClose:  { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
+    dowVoidPatterns:     DowPattern[];
   };
   employees: EmployeeRow[];
 };
@@ -127,6 +137,7 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
   const iPaid     = findColumn(headers, ['PaidFlag', 'IsPaid', 'Paid', 'PaymentStatus', 'TenderApplied']);
   const iClosedTs = findColumn(headers, ['ClosedAt', 'ClosedTime', 'TicketClose']);
   const iDiscTs   = findColumn(headers, ['DiscountTime', 'DiscountAt', 'DiscountAppliedAt']);
+  const iTicketTs = findColumn(headers, ['BusinessDate', 'TicketDate', 'OrderDate', 'Date', 'Timestamp', 'OpenedAt']);
 
   const missing: string[] = [];
   if (iStore < 0)    missing.push('Location / Store');
@@ -155,6 +166,7 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
     postVoid: boolean;
     paid: boolean;
     discAfterClose: boolean;
+    dow: number | null; // 0=Sun … 6=Sat, or null if no date
   };
   const parsed: Row[] = [];
   for (const r of rows) {
@@ -176,6 +188,14 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       const disc   = r[iDiscTs]   ? Date.parse(r[iDiscTs])   : NaN;
       discAfterClose = Number.isFinite(closed) && Number.isFinite(disc) && disc > closed;
     }
+    let dow: number | null = null;
+    if (iTicketTs >= 0 && r[iTicketTs]) {
+      const ms = Date.parse(r[iTicketTs]);
+      if (Number.isFinite(ms)) dow = new Date(ms).getUTCDay();
+    } else if (iClosedTs >= 0 && r[iClosedTs]) {
+      const ms = Date.parse(r[iClosedTs]);
+      if (Number.isFinite(ms)) dow = new Date(ms).getUTCDay();
+    }
     parsed.push({
       store, employee,
       net: num(r[iNet]),
@@ -184,12 +204,16 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       compAmt, comped,
       discountAmt, discountCount,
       postVoid, paid, discAfterClose,
+      dow,
     });
   }
 
   if (!parsed.length) {
     return { ok: false, error: 'No valid data rows', hint: 'Check that Location and Employee columns are populated.' };
   }
+
+  // Day-of-week void histogram per (store, employee). Keys: dow 0=Sun..6=Sat
+  const dowHistByKey = new Map<string, number[]>();
 
   // Aggregate per (store, employee)
   const byEmp = new Map<string, EmployeeRow>();
@@ -216,6 +240,11 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       agg.voidsCount += 1;
       agg.voidsDollars += r.voidAmt;
       if (r.tender.includes('cash')) agg.cashVoidsCount += 1;
+      if (r.dow !== null) {
+        let hist = dowHistByKey.get(key);
+        if (!hist) { hist = [0, 0, 0, 0, 0, 0, 0]; dowHistByKey.set(key, hist); }
+        hist[r.dow] += 1;
+      }
     }
     if (r.comped) {
       agg.compsCount += 1;
@@ -304,6 +333,32 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
     }))
     .sort((a, b) => b.rate - a.rate);
 
+  // Day-of-week void concentration: an employee whose voids cluster on
+  // a single day-of-week >= 40% of the time, with >= 5 total voids.
+  // The pattern detector — "they always void on Tuesday closes."
+  const DOW_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dowVoidPatterns: DowPattern[] = [];
+  dowHistByKey.forEach((hist, key) => {
+    const total = hist.reduce((s: number, x: number) => s + x, 0);
+    if (total < 5) return;
+    let maxDay = 0;
+    let maxCount = 0;
+    for (let i = 0; i < 7; i++) {
+      if (hist[i] > maxCount) { maxCount = hist[i]; maxDay = i; }
+    }
+    const conc = maxCount / total;
+    if (conc < 0.40) return;
+    const [store, name] = key.split('::');
+    dowVoidPatterns.push({
+      store, name,
+      dow: DOW_NAMES[maxDay],
+      voidsOnDow: maxCount,
+      totalVoids: total,
+      concentration: conc,
+    });
+  });
+  dowVoidPatterns.sort((a, b) => b.concentration - a.concentration);
+
   // Discount-after-close
   const dacRows: EmployeeFlag[] = employees
     .filter((e) => e.discountAfterCloseCount > 0)
@@ -336,6 +391,9 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
     if (e.voidAfterPaymentCount > 0) score += Math.min(25, e.voidAfterPaymentCount * 3);
     if (e.promoStackedCount > 0) score += Math.min(15, e.promoStackedCount * 2);
     if (e.discountAfterCloseCount > 0) score += Math.min(15, e.discountAfterCloseCount * 3);
+    // Day-of-week concentration adds risk if this employee shows up in dowVoidPatterns
+    const dowHit = dowVoidPatterns.find((p) => p.store === e.store && p.name === e.name);
+    if (dowHit) score += Math.round(Math.min(15, (dowHit.concentration - 0.4) * 40));
     e.riskScore = Math.round(score);
   }
   employees.sort((a, b) => b.riskScore - a.riskScore);
@@ -354,6 +412,7 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       promoStacking:      { totalCount: psTotalCount,  totalDollars: psTotalDollars,  flagged: psRows.slice(0, 15) },
       compAbuse:          compAbuse.slice(0, 15),
       discountAfterClose: { totalCount: dacTotalCount, totalDollars: dacTotalDollars, flagged: dacRows.slice(0, 15) },
+      dowVoidPatterns:    dowVoidPatterns.slice(0, 15),
     },
     employees: employees.slice(0, 30),
   };

@@ -71,6 +71,11 @@ const cases = [
     actual: `count=${result.signals.discountAfterClose.totalCount}, flagged=${result.signals.discountAfterClose.flagged.map((f) => `${f.name}(${f.count})`).join(', ')}`,
   },
   {
+    name: 'Day-of-week pattern · James Wilson · all 6 voids on Tuesday',
+    ok: result.signals.dowVoidPatterns.some((p) => p.name === 'James Wilson' && p.dow === 'Tue' && p.voidsOnDow === 6),
+    actual: result.signals.dowVoidPatterns.map((p) => `${p.name} ${p.dow} ${p.voidsOnDow}/${p.totalVoids}`).join(' · ') || '(none)',
+  },
+  {
     name: 'Risk score · top 3 are the three bad actors (James, Devon, Aisha or Chris)',
     ok: (() => {
       const top3 = result.employees.slice(0, 4).map((e) => e.name);

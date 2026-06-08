@@ -38,6 +38,7 @@ type LeakResult = {
     promoStacking:       { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
     compAbuse:           EmployeeFlag[];
     discountAfterClose:  { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
+    dowVoidPatterns:     Array<{ store: string; name: string; dow: string; voidsOnDow: number; totalVoids: number; concentration: number }>;
   };
   employees: EmployeeRow[];
 };
@@ -441,6 +442,15 @@ export default function TrialPage() {
                     <p className="compass-body text-[13px] mt-2">Discount applied after the ticket was closed.</p>
                     {leakResult.signals.discountAfterClose.flagged.slice(0, 5).map((f) => (
                       <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                    ))}
+                  </div>
+
+                  <div className="compass-card" style={leakResult.signals.dowVoidPatterns?.length > 0 ? { borderColor: '#ff453a' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.dowVoidPatterns?.length > 0 ? { color: '#ff453a' } : {}}>— Day-of-week pattern</p>
+                    <h3>{leakResult.signals.dowVoidPatterns?.length || 0} name{leakResult.signals.dowVoidPatterns?.length === 1 ? '' : 's'} flagged</h3>
+                    <p className="compass-body text-[13px] mt-2">≥40% of their voids cluster on one weekday. The shift pattern.</p>
+                    {leakResult.signals.dowVoidPatterns?.slice(0, 5).map((f) => (
+                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.dow} <span className="text-[#6e6e73]">·</span> {f.voidsOnDow}/{f.totalVoids}</p>
                     ))}
                   </div>
 
