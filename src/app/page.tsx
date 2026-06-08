@@ -509,6 +509,7 @@ export default function Home() {
             <Link href="/for"     className="hover:text-white transition-colors">Seats</Link>
             <Link href="/people"  className="hover:text-white transition-colors">People</Link>
             <Link href="/onboard" className="hover:text-white transition-colors">Onboard</Link>
+            <Link href="/changelog" className="hover:text-white transition-colors">Changelog</Link>
             <Link href="/reports/login" className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
