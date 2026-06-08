@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 
 export const metadata: Metadata = {
   title: "Agents · Never 86'd",
@@ -18,135 +19,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://never86.ai/agents' },
 };
 
-const AGENTS = [
-  {
-    name: 'Void Hunter',
-    href: '/demo/void-hunter',
-    tag: 'Voids',
-    seat: 'COO · Owner',
-    headline: 'One name above the peer band.',
-    catches: [
-      'Voids vs each store\'s own peer median (not industry benchmark)',
-      'Per-store + per-name void rate, flagged if > 1.5× peer median',
-      'Annualized excess-vs-peer dollar amount',
-      'Pattern detection — not verdict',
-    ],
-    needs: 'Employee performance CSV (Toast / Square / Clover / PDQ) with Location, Employee, Net Sales, Void Amount columns. Or a live POS connection.',
-    output: 'KPI strip · per-store table sorted by void rate · top-15 names sorted by void $.',
-  },
-  {
-    name: 'Leak Detector',
-    href: '/trial',
-    tag: '5 signals',
-    seat: 'COO · CFO · Owner',
-    headline: 'Five theft signals, ticket-level.',
-    catches: [
-      'Void after payment — paid then voided. The classic skim.',
-      'Cash-only voiders — ≥80% voids on cash tender, ≥5 voids total',
-      'Comp abuse — above peer band or > 10% of own revenue comped',
-      'Promo stacking — two or more discounts on a single ticket',
-      'Discount after close — discount applied after ticket closed',
-    ],
-    needs: 'Ticket-level CSV (Toast Sales Detail / Square Transactions / Clover Reports) with Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns.',
-    output: 'Five color-coded signal cards · top-20 employee table sorted by composite risk score (red ≥ 50, orange ≥ 20).',
-  },
-  {
-    name: '3P Fee Finder',
-    href: '/demo/3p-fee-finder',
-    tag: 'Delivery',
-    seat: 'CFO · CEO',
-    headline: 'Contract vs blended-effective, per partner.',
-    catches: [
-      'Contracted DD / UE / GH take rate vs what they actually keep',
-      'DashPass-blended math: dd × (1 − share) + 0.14 × share',
-      'Per-partner renegotiation lever, named to the dollar',
-      'The $585K UE+GH lever for our design partner — sourced',
-    ],
-    needs: 'Per-partner 3P payout statements + your contracted rates.',
-    output: 'Per-partner table showing contracted % · blended-effective % · annualized recovery surface if renegotiated to floor.',
-  },
-  {
-    name: 'Labor Leak',
-    href: '/demo/labor-leak',
-    tag: 'Labor',
-    seat: 'COO · Manager',
-    headline: 'OT drift before payroll closes.',
-    catches: [
-      'Overtime drift per store, ranked by hours',
-      'Ghost shifts — clocked time, zero sales attached',
-      'Schedule-vs-clocked gaps, per employee per week',
-      'Labor % vs budget, per store, with drift bars',
-    ],
-    needs: 'Schedule + timesheet data from 7shifts / Toast Payroll / Square Team / similar.',
-    output: 'Per-store labor scorecard · top OT offenders · ghost-shift list with the shift IDs.',
-  },
-  {
-    name: 'Tip Variance',
-    href: '/demo/tip-variance',
-    tag: 'Tips',
-    seat: 'CFO · Manager · Crew',
-    headline: 'Service slipping shows up here first.',
-    catches: [
-      'Week-over-week tip movement per store',
-      'Per-name tip drift — diagnostic for service quality',
-      'Section vs server effects separated',
-      'Leading indicator the P&L misses',
-    ],
-    needs: 'POS tip data — net tips per employee per shift / week.',
-    output: 'Week-over-week trend per store · per-name leaderboard sorted by Δ.',
-  },
-  {
-    name: 'Catering Leak',
-    href: '/demo/catering-leak',
-    tag: 'Catering',
-    seat: 'Chef · CFO · Owner',
-    headline: 'Where the order ran but the receipt didn\'t.',
-    catches: [
-      'Per-store catering economics (mix, contribution margin)',
-      'Invoice-vs-POS reconciliation gap',
-      'Off-prem orders that ran without a ticket',
-      'Per-customer concentration risk',
-    ],
-    needs: 'Catering invoices + POS catering category exports.',
-    output: 'Per-store catering scorecard · the reconciliation gap dollar amount · top-customer concentration.',
-  },
-  {
-    name: 'Rate Card Audit',
-    href: '/demo/rate-card-audit',
-    tag: '3P Rates',
-    seat: 'CFO · CEO',
-    headline: 'Where your DD/UE/GH rates sit vs peer band.',
-    catches: [
-      'Operator drops their contracted DD/UE/GH rates',
-      'Industry peer band (floor 10%, typical 18-20%, ceiling 30%)',
-      'Position bar showing where they sit on the axis',
-      'The "contract vs effective" gap typically 1.2-2.8pp at multi-unit scale',
-    ],
-    needs: 'Just your contracted rates — no POS connection needed.',
-    output: 'Verdict card with position bar · the lever amount · industry peer-band context.',
-  },
-  {
-    name: 'Shift Pulse',
-    href: '/demo/shift-pulse',
-    tag: 'Shift',
-    seat: 'Manager · Crew',
-    headline: 'Tonight\'s shift in one screen.',
-    catches: [
-      'Covers vs forecast, live during service',
-      'Station median, set as the floor',
-      'Tonight\'s goal — the one number that matters',
-      'Streak count — zero-comp shifts, voids under the line',
-    ],
-    needs: 'POS live feed + forecast input (or last 8-week average).',
-    output: 'Single-screen crew view · pacing meter · the goal · the streak.',
-  },
-];
-
-const SOURCE_TAGS = [
-  { v: 'Verified',   color: '#34c759', meaning: 'We can re-pull this from a primary source and defend it to the penny.' },
-  { v: 'Estimated',  color: '#ff9500', meaning: 'Modeled from a benchmark or assumption. We name the assumption next to the number.' },
-  { v: 'Unverified', color: '#ff453a', meaning: 'Source not wired yet. Number is illustrative — operator-only.' },
-];
+// AGENT_SPECS and SOURCE_TAGS imported from @/lib/agentSpecs
 
 export default function AgentsPage() {
   return (
@@ -186,7 +59,7 @@ export default function AgentsPage() {
       <section className="border-t border-[#1f1f1f] px-6 py-16 md:py-20">
         <div className="max-w-7xl mx-auto">
           <div className="space-y-3">
-            {AGENTS.map((a, i) => (
+            {AGENT_SPECS.map((a, i) => (
               <article key={a.name} className="compass-card hover:border-[#0066ff] transition-colors">
                 <div className="grid lg:grid-cols-[1fr_2fr] gap-6">
                   <div>
@@ -194,9 +67,14 @@ export default function AgentsPage() {
                     <h3 className="!mt-2 text-2xl md:text-3xl">{a.name}</h3>
                     <p className="text-[12px] mt-2" style={{ color: '#86868b' }}>For the {a.seat}</p>
                     <p className="font-serif italic mt-4 text-lg" style={{ color: '#0066ff' }}>{a.headline}</p>
-                    <Link href={a.href} className="text-[13px] mt-5 inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
-                      Try {a.name} <span aria-hidden>→</span>
-                    </Link>
+                    <div className="flex gap-3 mt-5 flex-wrap">
+                      <Link href={`/agents/${a.slug}`} className="text-[13px] inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
+                        Read more <span aria-hidden>→</span>
+                      </Link>
+                      <Link href={a.href} className="text-[13px] inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#86868b' }}>
+                        Try {a.name} <span aria-hidden>→</span>
+                      </Link>
+                    </div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
