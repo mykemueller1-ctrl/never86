@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { listPublishedAnswers } from '@/lib/answersDb';
+import { AGENT_SPECS } from '@/lib/agentSpecs';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -53,5 +54,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...fixed, ...dynamicEntries];
+  const agentEntries: MetadataRoute.Sitemap = AGENT_SPECS.map((a) => ({
+    url: `${BASE}/agents/${a.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.92,
+  }));
+
+  return [...fixed, ...agentEntries, ...dynamicEntries];
 }

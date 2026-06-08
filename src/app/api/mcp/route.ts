@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listPublishedAnswers, getPublishedAnswer } from '@/lib/answersDb';
+import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,33 +54,52 @@ const TOOLS = [
   },
   {
     name: 'list_free_agents',
-    description: 'List the 6 free quick-win agents (no signup) operators can try right now. Returns name, audience, URL, description.',
+    description: 'List the 8 free quick-win agents (no signup) operators can try right now. Returns name, audience, URL, headline, what-it-catches, sample-signal.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   },
   {
+    name: 'get_agent',
+    description: 'Fetch the full spec for a single agent by slug — catches, data needs, output shape, sample signal, POS support.',
+    inputSchema: {
+      type: 'object',
+      properties: { slug: { type: 'string', description: 'Agent slug — e.g. "void-hunter", "leak-detector", "3p-fee-finder"' } },
+      required: ['slug'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'list_seats',
-    description: 'List the 7 role-routed landing pages (CEO, CFO, COO, CTO, Owner, Manager, Crew). Returns role + URL.',
+    description: 'List the 8 role-routed landing pages (CEO, CFO, COO, Chef, CTO, Owner, Manager, Crew). Returns role + URL.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+  },
+  {
+    name: 'list_source_tags',
+    description: 'List the three source-tag categories Never 86\'d applies to every figure: Verified, Estimated, Unverified. Returns name + meaning.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   },
 ];
 
-const FREE_AGENTS = [
-  { name: 'Void Hunter', audience: 'owner', url: 'https://never86.ai/demo/void-hunter', description: "Voids vs each store's own peer median, by name. Flags patterns, never verdicts." },
-  { name: '3P Fee Finder', audience: 'cfo', url: 'https://never86.ai/demo/3p-fee-finder', description: 'Contract vs blended-effective marketplace take rate, per partner.' },
-  { name: 'Catering Leak', audience: 'owner', url: 'https://never86.ai/demo/catering-leak', description: 'Per-store catering economics + invoice-vs-POS reconciliation gap.' },
-  { name: 'Labor Leak', audience: 'coo', url: 'https://never86.ai/demo/labor-leak', description: 'Overtime drift, ghost shifts, schedule-vs-clocked gaps.' },
-  { name: 'Tip Variance', audience: 'manager', url: 'https://never86.ai/demo/tip-variance', description: 'Week-over-week tip movement per store and by name.' },
-  { name: 'Shift Pulse', audience: 'crew', url: 'https://never86.ai/demo/shift-pulse', description: "Tonight's shift in one screen — covers, station median, goal, streak." },
-];
+const FREE_AGENTS = AGENT_SPECS.map((a) => ({
+  slug: a.slug,
+  name: a.name,
+  audience: a.seat,
+  landingUrl: `https://never86.ai/agents/${a.slug}`,
+  demoUrl: `https://never86.ai${a.href}`,
+  headline: a.headline,
+  catches: a.catches,
+  sampleSignal: a.sampleSignal,
+  posSupport: a.posSupport,
+}));
 
 const SEATS = [
-  { role: 'CEO', url: 'https://never86.ai/for/ceo' },
-  { role: 'CFO', url: 'https://never86.ai/for/cfo' },
-  { role: 'COO', url: 'https://never86.ai/for/coo' },
-  { role: 'CTO', url: 'https://never86.ai/for/cto' },
-  { role: 'Owner', url: 'https://never86.ai/for/owner' },
+  { role: 'CEO',     url: 'https://never86.ai/for/ceo' },
+  { role: 'CFO',     url: 'https://never86.ai/for/cfo' },
+  { role: 'COO',     url: 'https://never86.ai/for/coo' },
+  { role: 'Chef',    url: 'https://never86.ai/for/chef' },
+  { role: 'CTO',     url: 'https://never86.ai/for/cto' },
+  { role: 'Owner',   url: 'https://never86.ai/for/owner' },
   { role: 'Manager', url: 'https://never86.ai/for/manager' },
-  { role: 'Crew', url: 'https://never86.ai/for/crew' },
+  { role: 'Crew',    url: 'https://never86.ai/for/crew' },
 ];
 
 function ok(id: string | number | null | undefined, result: unknown) {
@@ -148,8 +168,34 @@ async function handle(req: JsonRpcReq): Promise<Response> {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(FREE_AGENTS, null, 2) }] });
       }
 
+      if (name === 'get_agent') {
+        const slug = String(args.slug ?? '');
+        const a = AGENT_SPECS.find((x) => x.slug === slug);
+        if (!a) return ok(req.id, { content: [{ type: 'text', text: `No agent with slug "${slug}". Available: ${AGENT_SPECS.map((x) => x.slug).join(', ')}` }] });
+        const out = {
+          slug: a.slug,
+          name: a.name,
+          tag: a.tag,
+          seat: a.seat,
+          headline: a.headline,
+          intro: a.intro,
+          catches: a.catches,
+          dataNeeds: a.needs,
+          output: a.output,
+          sampleSignal: a.sampleSignal,
+          posSupport: a.posSupport,
+          landingUrl: `https://never86.ai/agents/${a.slug}`,
+          demoUrl: `https://never86.ai${a.href}`,
+        };
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
+      }
+
       if (name === 'list_seats') {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(SEATS, null, 2) }] });
+      }
+
+      if (name === 'list_source_tags') {
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(SOURCE_TAGS, null, 2) }] });
       }
 
       return err(req.id, -32601, `Unknown tool: ${name}`);
