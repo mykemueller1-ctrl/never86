@@ -50,6 +50,7 @@ const MODES = [
   { id: 'void',  label: 'Void Hunter',   blurb: 'Employee performance CSV · voids vs peer band' },
   { id: 'leak',  label: 'Leak Detector', blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
   { id: 'labor', label: 'Labor Drift',   blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
+  { id: 'tips',  label: 'Tip Variance',  blurb: 'Weekly tip CSV · per-name week-over-week tip-rate delta' },
 ] as const;
 type Mode = typeof MODES[number]['id'];
 
@@ -64,6 +65,17 @@ type LaborDriftResult = {
   driftRatio: number;
   perEmployee: Array<{ store: string; name: string; earlyClockIns: number; lateClockOuts: number; earlyMinutes: number; lateMinutes: number; totalOtMinutes: number; shiftsRun: number }>;
   ghostShifts: Array<{ store: string; name: string; clockedMinutes: number; netSales: number; shiftStart: string }>;
+};
+
+type TipVarianceResult = {
+  ok: true;
+  rowsParsed: number;
+  weeks: string[];
+  employees: number;
+  networkPrevTips: number;
+  networkCurrTips: number;
+  networkWoW: number;
+  perEmployee: Array<{ store: string; name: string; prevTipRate: number; currTipRate: number; deltaPp: number; prevTipDollars: number; currTipDollars: number; flagged: boolean }>;
 };
 
 const POS_OPTIONS = [
@@ -96,6 +108,7 @@ export default function TrialPage() {
   const [voidResult, setVoidResult] = useState<VoidResult | null>(null);
   const [leakResult, setLeakResult] = useState<LeakResult | null>(null);
   const [laborResult, setLaborResult] = useState<LaborDriftResult | null>(null);
+  const [tipsResult, setTipsResult] = useState<TipVarianceResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -149,19 +162,21 @@ export default function TrialPage() {
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
-    setVoidResult(null); setLeakResult(null); setLaborResult(null);
+    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
-      const endpoint = mode === 'void' ? '/api/connect/void-hunter'
-                     : mode === 'leak' ? '/api/connect/leak-detector'
-                     : '/api/connect/labor-drift';
+      const endpoint = mode === 'void'  ? '/api/connect/void-hunter'
+                     : mode === 'leak'  ? '/api/connect/leak-detector'
+                     : mode === 'labor' ? '/api/connect/labor-drift'
+                     : '/api/connect/tip-variance';
       const res = await fetch(endpoint, { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
-        if (mode === 'void')  setVoidResult(data as VoidResult);
-        else if (mode === 'leak') setLeakResult(data as LeakResult);
-        else setLaborResult(data as LaborDriftResult);
+        if      (mode === 'void')  setVoidResult(data as VoidResult);
+        else if (mode === 'leak')  setLeakResult(data as LeakResult);
+        else if (mode === 'labor') setLaborResult(data as LaborDriftResult);
+        else                       setTipsResult(data as TipVarianceResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
       } else {
@@ -319,7 +334,9 @@ export default function TrialPage() {
                       ? 'Per-employee CSV · Location, Employee, Net Sales, Void Amount'
                       : mode === 'leak'
                       ? 'Per-ticket CSV · Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns'
-                      : 'Timesheet CSV · Location, Employee, Scheduled Start/End, Clock In/Out (+ Net Sales for ghost-shift detection)'}
+                      : mode === 'labor'
+                      ? 'Timesheet CSV · Location, Employee, Scheduled Start/End, Clock In/Out (+ Net Sales for ghost-shift detection)'
+                      : 'Weekly tip CSV · Location, Employee, Week, Net Sales, Net Tips (must cover ≥ 2 weeks)'}
                   </p>
                 </>
               )}
@@ -582,6 +599,57 @@ export default function TrialPage() {
                           <td className="font-mono tabular-nums">{e.lateClockOuts}</td>
                           <td className="font-mono tabular-nums">{Math.round(e.lateMinutes)}</td>
                           <td className="font-mono tabular-nums font-semibold" style={{ color: e.totalOtMinutes > 120 ? '#ff453a' : e.totalOtMinutes > 30 ? '#ff9500' : '#86868b' }}>{Math.round(e.totalOtMinutes)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && tipsResult && mode === 'tips' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Tip Variance · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {tipsResult.perEmployee.filter((e) => e.flagged).length > 0
+                    ? <>{tipsResult.perEmployee.filter((e) => e.flagged).length} name{tipsResult.perEmployee.filter((e) => e.flagged).length === 1 ? '' : 's'} <em>dropping fast</em>.</>
+                    : <>No flagged names <em>this week.</em></>}
+                </h2>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Weeks loaded</p><p className="compass-kpi-val">{tipsResult.weeks.length}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network prev tips</p><p className="compass-kpi-val">${Math.round(tipsResult.networkPrevTips).toLocaleString()}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network curr tips</p><p className="compass-kpi-val">${Math.round(tipsResult.networkCurrTips).toLocaleString()}</p></div>
+                  <div className="compass-kpi">
+                    <p className="compass-kpi-label">Network WoW</p>
+                    <p className="compass-kpi-val" style={{ color: tipsResult.networkWoW < -0.05 ? '#ff453a' : tipsResult.networkWoW < 0 ? '#ff9500' : '#ffffff' }}>
+                      {(tipsResult.networkWoW * 100).toFixed(1)}<span className="unit">%</span>
+                    </p>
+                  </div>
+                </div>
+
+                <p className="compass-eyebrow mb-3">— Per name · sorted by most-negative WoW delta</p>
+                <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr>
+                      <th className="!text-left">Name</th><th className="!text-left">Store</th>
+                      <th>Prev rate</th><th>Curr rate</th><th>Δ pp</th><th>Prev $</th><th>Curr $</th><th>Flag</th>
+                    </tr></thead>
+                    <tbody>
+                      {tipsResult.perEmployee.map((e) => (
+                        <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left">{e.store}</td>
+                          <td className="font-mono tabular-nums">{(e.prevTipRate * 100).toFixed(2)}%</td>
+                          <td className="font-mono tabular-nums">{(e.currTipRate * 100).toFixed(2)}%</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: e.deltaPp < -3 ? '#ff453a' : e.deltaPp < -1 ? '#ff9500' : e.deltaPp > 1 ? '#34c759' : '#86868b' }}>
+                            {e.deltaPp > 0 ? '+' : ''}{e.deltaPp.toFixed(2)}
+                          </td>
+                          <td className="font-mono tabular-nums">${Math.round(e.prevTipDollars).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums">${Math.round(e.currTipDollars).toLocaleString()}</td>
+                          <td className="font-mono">{e.flagged ? <span className="badge badge-unverified">Flag</span> : '—'}</td>
                         </tr>
                       ))}
                     </tbody>
