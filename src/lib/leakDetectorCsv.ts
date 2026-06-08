@@ -43,6 +43,14 @@ export type DowPattern = {
   concentration: number; // 0..1
 };
 
+export type MicroComp = {
+  store: string;
+  name: string;
+  compsCount: number;
+  compsDollars: number;
+  avgComp: number;        // dollars per comp
+};
+
 export type LeakReport = {
   rowsParsed: number;
   ticketsAnalyzed: number;
@@ -58,6 +66,7 @@ export type LeakReport = {
     compAbuse:           EmployeeFlag[];
     discountAfterClose:  { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
     dowVoidPatterns:     DowPattern[];
+    microCompPatterns:   MicroComp[];
   };
   employees: EmployeeRow[];
 };
@@ -359,6 +368,28 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
   });
   dowVoidPatterns.sort((a, b) => b.concentration - a.concentration);
 
+  // Micro-comp pattern · modifier-abuse proxy.
+  // 10+ comps in window AND average comp < $5 = high count of tiny comps,
+  // which usually means the employee is comping individual modifiers
+  // ("no charge add bacon", "free upgrade to large fries") rather than
+  // running a real service-recovery program. Operators in this category
+  // tend to be selling the upgrade to the guest off-book and pocketing
+  // the cash, or skimming through the kitchen.
+  const microCompPatterns: MicroComp[] = employees
+    .filter((e) => {
+      if (e.compsCount < 10) return false;
+      const avg = e.compsDollars / Math.max(1, e.compsCount);
+      return avg > 0 && avg < 5;
+    })
+    .map((e) => ({
+      store: e.store,
+      name: e.name,
+      compsCount: e.compsCount,
+      compsDollars: e.compsDollars,
+      avgComp: e.compsDollars / Math.max(1, e.compsCount),
+    }))
+    .sort((a, b) => b.compsCount - a.compsCount);
+
   // Discount-after-close
   const dacRows: EmployeeFlag[] = employees
     .filter((e) => e.discountAfterCloseCount > 0)
@@ -394,6 +425,9 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
     // Day-of-week concentration adds risk if this employee shows up in dowVoidPatterns
     const dowHit = dowVoidPatterns.find((p) => p.store === e.store && p.name === e.name);
     if (dowHit) score += Math.round(Math.min(15, (dowHit.concentration - 0.4) * 40));
+    // Micro-comp pattern · 10+ comps averaging under $5 each
+    const microHit = microCompPatterns.find((p) => p.store === e.store && p.name === e.name);
+    if (microHit) score += Math.min(15, Math.round(microHit.compsCount / 2));
     e.riskScore = Math.round(score);
   }
   employees.sort((a, b) => b.riskScore - a.riskScore);
@@ -413,6 +447,7 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       compAbuse:          compAbuse.slice(0, 15),
       discountAfterClose: { totalCount: dacTotalCount, totalDollars: dacTotalDollars, flagged: dacRows.slice(0, 15) },
       dowVoidPatterns:    dowVoidPatterns.slice(0, 15),
+      microCompPatterns:  microCompPatterns.slice(0, 15),
     },
     employees: employees.slice(0, 30),
   };

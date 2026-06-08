@@ -76,6 +76,11 @@ const cases = [
     actual: result.signals.dowVoidPatterns.map((p) => `${p.name} ${p.dow} ${p.voidsOnDow}/${p.totalVoids}`).join(' · ') || '(none)',
   },
   {
+    name: 'Micro-comp pattern · Riley Cooper · 12 comps averaging ~$2.25 each',
+    ok: result.signals.microCompPatterns.some((p) => p.name === 'Riley Cooper' && p.compsCount === 12 && p.avgComp > 1.5 && p.avgComp < 3),
+    actual: result.signals.microCompPatterns.map((p) => `${p.name} ${p.compsCount}x avg $${p.avgComp.toFixed(2)}`).join(' · ') || '(none)',
+  },
+  {
     name: 'Risk score · top 3 are the three bad actors (James, Devon, Aisha or Chris)',
     ok: (() => {
       const top3 = result.employees.slice(0, 4).map((e) => e.name);
