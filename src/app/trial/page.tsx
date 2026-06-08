@@ -47,10 +47,11 @@ type LeakResult = {
 type Err = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
 const MODES = [
-  { id: 'void',  label: 'Void Hunter',   blurb: 'Employee performance CSV · voids vs peer band' },
-  { id: 'leak',  label: 'Leak Detector', blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
-  { id: 'labor', label: 'Labor Drift',   blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
-  { id: 'tips',  label: 'Tip Variance',  blurb: 'Weekly tip CSV · per-name week-over-week tip-rate delta' },
+  { id: 'void',     label: 'Void Hunter',   blurb: 'Employee performance CSV · voids vs peer band' },
+  { id: 'leak',     label: 'Leak Detector', blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
+  { id: 'labor',    label: 'Labor Drift',   blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
+  { id: 'tips',     label: 'Tip Variance',  blurb: 'Weekly tip CSV · per-name week-over-week tip-rate delta' },
+  { id: 'catering', label: 'Catering Leak', blurb: 'Catering recon CSV · invoice-vs-POS gap · unmatched orders' },
 ] as const;
 type Mode = typeof MODES[number]['id'];
 
@@ -76,6 +77,21 @@ type TipVarianceResult = {
   networkCurrTips: number;
   networkWoW: number;
   perEmployee: Array<{ store: string; name: string; prevTipRate: number; currTipRate: number; deltaPp: number; prevTipDollars: number; currTipDollars: number; flagged: boolean }>;
+};
+
+type CateringResult = {
+  ok: true;
+  rowsParsed: number;
+  orders: number;
+  stores: string[];
+  totalInvoice: number;
+  totalPos: number;
+  totalGap: number;
+  gapRatio: number;
+  perStore: Array<{ store: string; orders: number; totalInvoice: number; totalPos: number; totalGap: number; gapRatio: number }>;
+  topCustomerConcentration: Array<{ customer: string; orders: number; totalGap: number; totalInvoice: number; gapShare: number }>;
+  unmatchedOrders: Array<{ store: string; orderId: string; customer: string; eventDate: string; invoiceAmount: number; posAmount: number; gap: number }>;
+  flaggedOrders: Array<{ store: string; orderId: string; customer: string; eventDate: string; invoiceAmount: number; posAmount: number; gap: number }>;
 };
 
 const POS_OPTIONS = [
@@ -109,6 +125,7 @@ export default function TrialPage() {
   const [leakResult, setLeakResult] = useState<LeakResult | null>(null);
   const [laborResult, setLaborResult] = useState<LaborDriftResult | null>(null);
   const [tipsResult, setTipsResult] = useState<TipVarianceResult | null>(null);
+  const [cateringResult, setCateringResult] = useState<CateringResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -162,21 +179,23 @@ export default function TrialPage() {
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
-    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null);
+    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
-      const endpoint = mode === 'void'  ? '/api/connect/void-hunter'
-                     : mode === 'leak'  ? '/api/connect/leak-detector'
-                     : mode === 'labor' ? '/api/connect/labor-drift'
-                     : '/api/connect/tip-variance';
+      const endpoint = mode === 'void'     ? '/api/connect/void-hunter'
+                     : mode === 'leak'     ? '/api/connect/leak-detector'
+                     : mode === 'labor'    ? '/api/connect/labor-drift'
+                     : mode === 'tips'     ? '/api/connect/tip-variance'
+                     : '/api/connect/catering-leak';
       const res = await fetch(endpoint, { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
-        if      (mode === 'void')  setVoidResult(data as VoidResult);
-        else if (mode === 'leak')  setLeakResult(data as LeakResult);
-        else if (mode === 'labor') setLaborResult(data as LaborDriftResult);
-        else                       setTipsResult(data as TipVarianceResult);
+        if      (mode === 'void')     setVoidResult(data as VoidResult);
+        else if (mode === 'leak')     setLeakResult(data as LeakResult);
+        else if (mode === 'labor')    setLaborResult(data as LaborDriftResult);
+        else if (mode === 'tips')     setTipsResult(data as TipVarianceResult);
+        else                          setCateringResult(data as CateringResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
       } else {
@@ -336,7 +355,9 @@ export default function TrialPage() {
                       ? 'Per-ticket CSV · Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns'
                       : mode === 'labor'
                       ? 'Timesheet CSV · Location, Employee, Scheduled Start/End, Clock In/Out (+ Net Sales for ghost-shift detection)'
-                      : 'Weekly tip CSV · Location, Employee, Week, Net Sales, Net Tips (must cover ≥ 2 weeks)'}
+                      : mode === 'tips'
+                      ? 'Weekly tip CSV · Location, Employee, Week, Net Sales, Net Tips (must cover ≥ 2 weeks)'
+                      : 'Catering recon CSV · Location, Customer, Invoice Amount, POS Amount (+ Order ID + Event Date optional)'}
                   </p>
                 </>
               )}
@@ -650,6 +671,80 @@ export default function TrialPage() {
                           <td className="font-mono tabular-nums">${Math.round(e.prevTipDollars).toLocaleString()}</td>
                           <td className="font-mono tabular-nums">${Math.round(e.currTipDollars).toLocaleString()}</td>
                           <td className="font-mono">{e.flagged ? <span className="badge badge-unverified">Flag</span> : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && cateringResult && mode === 'catering' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Catering Leak · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {cateringResult.unmatchedOrders.length > 0
+                    ? <>Found <em>{cateringResult.unmatchedOrders.length} unmatched order{cateringResult.unmatchedOrders.length === 1 ? '' : 's'}</em> · ${Math.round(cateringResult.totalGap).toLocaleString()} total gap.</>
+                    : <>${Math.round(cateringResult.totalGap).toLocaleString()} total gap <em>across {cateringResult.orders} orders.</em></>}
+                </h2>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Orders</p><p className="compass-kpi-val">{cateringResult.orders}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Invoice total</p><p className="compass-kpi-val">${Math.round(cateringResult.totalInvoice).toLocaleString()}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">POS total</p><p className="compass-kpi-val">${Math.round(cateringResult.totalPos).toLocaleString()}</p></div>
+                  <div className="compass-kpi">
+                    <p className="compass-kpi-label">Gap ratio</p>
+                    <p className="compass-kpi-val" style={{ color: cateringResult.gapRatio > 0.1 ? '#ff453a' : cateringResult.gapRatio > 0.03 ? '#ff9500' : '#34c759' }}>
+                      {(cateringResult.gapRatio * 100).toFixed(1)}<span className="unit">%</span>
+                    </p>
+                  </div>
+                </div>
+
+                {cateringResult.unmatchedOrders.length > 0 && (
+                  <div className="compass-card mb-10" style={{ borderColor: '#ff453a' }}>
+                    <p className="compass-card-label" style={{ color: '#ff453a' }}>— Unmatched orders</p>
+                    <h3>{cateringResult.unmatchedOrders.length} invoice{cateringResult.unmatchedOrders.length === 1 ? '' : 's'} · no POS ticket</h3>
+                    <ul className="mt-3 space-y-1">
+                      {cateringResult.unmatchedOrders.slice(0, 10).map((o, i) => (
+                        <li key={`${o.orderId}-${i}`} className="text-[13px] text-white font-mono">{o.customer} <span className="text-[#6e6e73]">·</span> {o.store} <span className="text-[#6e6e73]">·</span> ${Math.round(o.invoiceAmount).toLocaleString()} <span className="text-[#6e6e73]">·</span> {o.eventDate}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <p className="compass-eyebrow mb-3">— Top customer concentration</p>
+                <div className="compass-card overflow-x-auto mb-10" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr><th className="!text-left">Customer</th><th>Orders</th><th>Invoice $</th><th>Gap $</th><th>Gap share</th></tr></thead>
+                    <tbody>
+                      {cateringResult.topCustomerConcentration.slice(0, 10).map((c) => (
+                        <tr key={c.customer} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{c.customer}</td>
+                          <td className="font-mono tabular-nums">{c.orders}</td>
+                          <td className="font-mono tabular-nums">${Math.round(c.totalInvoice).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: c.totalGap > 1000 ? '#ff453a' : c.totalGap > 200 ? '#ff9500' : '#86868b' }}>${Math.round(c.totalGap).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums">{(c.gapShare * 100).toFixed(1)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className="compass-eyebrow mb-3">— Per store · sorted by total gap</p>
+                <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr><th className="!text-left">Store</th><th>Orders</th><th>Invoice</th><th>POS</th><th>Gap</th><th>Gap ratio</th></tr></thead>
+                    <tbody>
+                      {cateringResult.perStore.map((s) => (
+                        <tr key={s.store} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{s.store}</td>
+                          <td className="font-mono tabular-nums">{s.orders}</td>
+                          <td className="font-mono tabular-nums">${Math.round(s.totalInvoice).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums">${Math.round(s.totalPos).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: s.totalGap > 1000 ? '#ff453a' : s.totalGap > 200 ? '#ff9500' : '#86868b' }}>${Math.round(s.totalGap).toLocaleString()}</td>
+                          <td className="font-mono tabular-nums">{(s.gapRatio * 100).toFixed(2)}%</td>
                         </tr>
                       ))}
                     </tbody>
