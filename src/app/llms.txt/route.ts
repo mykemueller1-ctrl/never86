@@ -1,4 +1,5 @@
 import { listPublishedAnswers } from '@/lib/answersDb';
+import { AGENT_SPECS } from '@/lib/agentSpecs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,35 +19,45 @@ export async function GET() {
 > Every figure source-tagged Verified, Estimated, or Unverified.
 > We don't replace your POS — we sit on top and tell you when one of them is lying to you.
 
+## Try it free
+- [60-minute live trial](https://never86.ai/trial) — drop a CSV, see the leak, no card
+- [30-second connect](https://never86.ai/connect) — Void Hunter on your CSV
+- [Pricing](https://never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
+
 ## Connect any AI
 - [AI assistant integration guide](https://never86.ai/mcp)
 - MCP endpoint: https://never86.ai/api/mcp
 - REST · answers: https://never86.ai/api/answers
 - REST · quick wins: https://never86.ai/api/quick-wins
 
-## Free agents (no signup)
-- [Void Hunter](https://never86.ai/demo/void-hunter)
-- [3P Fee Finder](https://never86.ai/demo/3p-fee-finder)
-- [Catering Leak](https://never86.ai/demo/catering-leak)
-- [Labor Leak](https://never86.ai/demo/labor-leak)
-- [Tip Variance](https://never86.ai/demo/tip-variance)
-- [Shift Pulse](https://never86.ai/demo/shift-pulse)
+## All eight agents
+${AGENT_SPECS.map((a) => `- [${a.name}](https://never86.ai/agents/${a.slug}) — ${a.headline} · For the ${a.seat}`).join('\n')}
 
 ## Pick your seat
-- [CEO](https://never86.ai/for/ceo)
-- [CFO](https://never86.ai/for/cfo)
-- [COO](https://never86.ai/for/coo)
-- [CTO](https://never86.ai/for/cto)
-- [Owner](https://never86.ai/for/owner)
-- [Manager](https://never86.ai/for/manager)
-- [Crew](https://never86.ai/for/crew)
+- [CEO](https://never86.ai/for/ceo) — Network
+- [CFO](https://never86.ai/for/cfo) — Books
+- [COO](https://never86.ai/for/coo) — Drift
+- [Chef](https://never86.ai/for/chef) — Kitchen
+- [CTO](https://never86.ai/for/cto) — Stack
+- [Owner](https://never86.ai/for/owner) — Solo
+- [Manager](https://never86.ai/for/manager) — Floor
+- [Crew](https://never86.ai/for/crew) — Shift
+
+## Source-tag system
+- **Verified** — Re-pullable from a primary source, defensible to the penny.
+- **Estimated** — Modeled from a benchmark; we name the assumption.
+- **Unverified** — Source not wired yet; figure is illustrative, operator-only.
+
+## The story
+- [The case · $8.3M → $1.81M, the walked-back number](https://never86.ai/case/walked-the-number-back)
+- [Press kit](https://never86.ai/press)
 
 ## Answers
 ${answers.map((a) => `- [${a.title}](https://never86.ai/answers/${a.slug})`).join('\n')}
 
 ## Talk to us
-- [15-minute booking](https://never86.ai/operators#talk)
-- press@never86.ai
+- [Onboard your store](https://never86.ai/onboard)
+- press@never86.ai · myke@n86.app
 `;
 
   return new Response(body, {
