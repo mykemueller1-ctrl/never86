@@ -39,6 +39,7 @@ type LeakResult = {
     compAbuse:           EmployeeFlag[];
     discountAfterClose:  { totalCount: number; totalDollars: number; flagged: EmployeeFlag[] };
     dowVoidPatterns:     Array<{ store: string; name: string; dow: string; voidsOnDow: number; totalVoids: number; concentration: number }>;
+    microCompPatterns:   Array<{ store: string; name: string; compsCount: number; compsDollars: number; avgComp: number }>;
   };
   employees: EmployeeRow[];
 };
@@ -46,10 +47,24 @@ type LeakResult = {
 type Err = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
 const MODES = [
-  { id: 'void', label: 'Void Hunter',    blurb: 'Employee performance CSV · voids vs peer band' },
-  { id: 'leak', label: 'Leak Detector',  blurb: 'Ticket-level CSV · comps, promos, post-pay voids, cash-only voiders' },
+  { id: 'void',  label: 'Void Hunter',   blurb: 'Employee performance CSV · voids vs peer band' },
+  { id: 'leak',  label: 'Leak Detector', blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
+  { id: 'labor', label: 'Labor Drift',   blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
 ] as const;
 type Mode = typeof MODES[number]['id'];
+
+type LaborDriftResult = {
+  ok: true;
+  rowsParsed: number;
+  shifts: number;
+  employees: number;
+  stores: string[];
+  totalDriftMinutes: number;
+  totalDriftDollars: number;
+  driftRatio: number;
+  perEmployee: Array<{ store: string; name: string; earlyClockIns: number; lateClockOuts: number; earlyMinutes: number; lateMinutes: number; totalOtMinutes: number; shiftsRun: number }>;
+  ghostShifts: Array<{ store: string; name: string; clockedMinutes: number; netSales: number; shiftStart: string }>;
+};
 
 const POS_OPTIONS = [
   { v: 'Toast',      tag: 'Now',     status: 'csv',  note: 'Drop Toast Employee Performance or Sales Detail CSV today.' },
@@ -80,6 +95,7 @@ export default function TrialPage() {
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
   const [voidResult, setVoidResult] = useState<VoidResult | null>(null);
   const [leakResult, setLeakResult] = useState<LeakResult | null>(null);
+  const [laborResult, setLaborResult] = useState<LaborDriftResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -133,16 +149,19 @@ export default function TrialPage() {
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
-    setVoidResult(null); setLeakResult(null);
+    setVoidResult(null); setLeakResult(null); setLaborResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
-      const endpoint = mode === 'void' ? '/api/connect/void-hunter' : '/api/connect/leak-detector';
+      const endpoint = mode === 'void' ? '/api/connect/void-hunter'
+                     : mode === 'leak' ? '/api/connect/leak-detector'
+                     : '/api/connect/labor-drift';
       const res = await fetch(endpoint, { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
-        if (mode === 'void') setVoidResult(data as VoidResult);
-        else setLeakResult(data as LeakResult);
+        if (mode === 'void')  setVoidResult(data as VoidResult);
+        else if (mode === 'leak') setLeakResult(data as LeakResult);
+        else setLaborResult(data as LaborDriftResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
       } else {
@@ -298,7 +317,9 @@ export default function TrialPage() {
                   <p className="compass-body text-sm">
                     {mode === 'void'
                       ? 'Per-employee CSV · Location, Employee, Net Sales, Void Amount'
-                      : 'Per-ticket CSV · Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns'}
+                      : mode === 'leak'
+                      ? 'Per-ticket CSV · Location, Employee, Ticket Total, Tender, Void/Comp/Discount columns'
+                      : 'Timesheet CSV · Location, Employee, Scheduled Start/End, Clock In/Out (+ Net Sales for ghost-shift detection)'}
                   </p>
                 </>
               )}
@@ -454,6 +475,15 @@ export default function TrialPage() {
                     ))}
                   </div>
 
+                  <div className="compass-card" style={leakResult.signals.microCompPatterns?.length > 0 ? { borderColor: '#ff9500' } : {}}>
+                    <p className="compass-card-label" style={leakResult.signals.microCompPatterns?.length > 0 ? { color: '#ff9500' } : {}}>— Micro-comp pattern</p>
+                    <h3>{leakResult.signals.microCompPatterns?.length || 0} name{leakResult.signals.microCompPatterns?.length === 1 ? '' : 's'} flagged</h3>
+                    <p className="compass-body text-[13px] mt-2">10+ comps averaging under $5. Modifier-abuse proxy — &ldquo;no charge add bacon&rdquo; pattern.</p>
+                    {leakResult.signals.microCompPatterns?.slice(0, 5).map((f) => (
+                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.compsCount}× <span className="text-[#6e6e73]">avg</span> ${f.avgComp.toFixed(2)}</p>
+                    ))}
+                  </div>
+
                   <div className="compass-card">
                     <p className="compass-card-label">— Network rates</p>
                     <h3>Aggregate</h3>
@@ -496,6 +526,62 @@ export default function TrialPage() {
                           <td className="font-mono tabular-nums font-semibold" style={{ color: e.riskScore >= 50 ? '#ff453a' : e.riskScore >= 20 ? '#ff9500' : '#86868b' }}>
                             {e.riskScore}
                           </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && laborResult && mode === 'labor' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Labor Drift · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {laborResult.ghostShifts.length > 0
+                    ? <>Found <em>{laborResult.ghostShifts.length} ghost shift{laborResult.ghostShifts.length === 1 ? '' : 's'}</em> + {Math.round(laborResult.totalDriftMinutes/60*10)/10} hrs of drift.</>
+                    : <><em>{Math.round(laborResult.totalDriftMinutes/60*10)/10} hours</em> of drift across {laborResult.shifts} shifts.</>}
+                </h2>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Shifts</p><p className="compass-kpi-val">{laborResult.shifts}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Drift · min</p><p className="compass-kpi-val">{laborResult.totalDriftMinutes}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Drift · est $</p><p className="compass-kpi-val">${laborResult.totalDriftDollars}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Drift ratio</p><p className="compass-kpi-val">{(laborResult.driftRatio * 100).toFixed(2)}<span className="unit">%</span></p></div>
+                </div>
+
+                {laborResult.ghostShifts.length > 0 && (
+                  <div className="compass-card mb-10" style={{ borderColor: '#ff453a' }}>
+                    <p className="compass-card-label" style={{ color: '#ff453a' }}>— Ghost shifts</p>
+                    <h3>{laborResult.ghostShifts.length} shift{laborResult.ghostShifts.length === 1 ? '' : 's'} clocked &gt; 60 min · zero sales</h3>
+                    <ul className="mt-3 space-y-1">
+                      {laborResult.ghostShifts.slice(0, 8).map((g, i) => (
+                        <li key={`${g.store}-${g.name}-${i}`} className="text-[13px] text-white font-mono">{g.name} <span className="text-[#6e6e73]">·</span> {g.store} <span className="text-[#6e6e73]">·</span> {g.clockedMinutes} min <span className="text-[#6e6e73]">·</span> {g.shiftStart.slice(0, 10)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <p className="compass-eyebrow mb-3">— Top names · sorted by OT minutes</p>
+                <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr>
+                      <th className="!text-left">Name</th><th className="!text-left">Store</th>
+                      <th>Shifts</th><th>Early in</th><th>Early min</th><th>Late out</th><th>Late min</th><th>OT min</th>
+                    </tr></thead>
+                    <tbody>
+                      {laborResult.perEmployee.map((e) => (
+                        <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left">{e.store}</td>
+                          <td className="font-mono tabular-nums">{e.shiftsRun}</td>
+                          <td className="font-mono tabular-nums">{e.earlyClockIns}</td>
+                          <td className="font-mono tabular-nums">{Math.round(e.earlyMinutes)}</td>
+                          <td className="font-mono tabular-nums">{e.lateClockOuts}</td>
+                          <td className="font-mono tabular-nums">{Math.round(e.lateMinutes)}</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: e.totalOtMinutes > 120 ? '#ff453a' : e.totalOtMinutes > 30 ? '#ff9500' : '#86868b' }}>{Math.round(e.totalOtMinutes)}</td>
                         </tr>
                       ))}
                     </tbody>
