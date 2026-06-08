@@ -85,6 +85,8 @@ export default function TrialPage() {
   const [filename, setFilename] = useState('');
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const [email, setEmail] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
@@ -140,6 +142,7 @@ export default function TrialPage() {
       if (data.ok) {
         if (mode === 'void') setVoidResult(data as VoidResult);
         else setLeakResult(data as LeakResult);
+        if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
       } else {
         const err = data as Err;
@@ -165,17 +168,34 @@ export default function TrialPage() {
   async function saveLead(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email, name, restaurantName,
-          agentRequested: mode === 'void' ? 'Void Hunter · trial' : 'Leak Detector · trial',
-          sourcePage: '/trial',
-        }),
-      });
+      // If there's a saved run, claim it against this email so the
+      // operator can return to /trial/run/[shareToken].
+      if (shareToken) {
+        await fetch('/api/trial/claim', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shareToken, email, name, restaurantName }),
+        });
+      } else {
+        await fetch('/api/waitlist', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email, name, restaurantName,
+            agentRequested: mode === 'void' ? 'Void Hunter · trial' : 'Leak Detector · trial',
+            sourcePage: '/trial',
+          }),
+        });
+      }
       setLeadSaved(true);
     } catch {}
+  }
+
+  function copyShareUrl() {
+    if (!shareToken || typeof window === 'undefined') return;
+    const url = `${window.location.origin}/trial/run/${shareToken}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }).catch(() => {});
   }
 
   async function joinWaitlist(pos: string) {
@@ -297,6 +317,27 @@ export default function TrialPage() {
               </div>
             )}
           </section>
+
+          {status === 'done' && shareToken && (
+            <section className="px-6 pt-4 pb-2">
+              <div className="max-w-4xl mx-auto">
+                <div className="compass-card flex flex-wrap gap-3 items-center justify-between" style={{ borderColor: '#0066ff' }}>
+                  <div>
+                    <p className="compass-card-label" style={{ color: '#0066ff' }}>— Saved · bookmark this URL</p>
+                    <p className="font-mono text-white text-[13px] mt-2 break-all">
+                      {typeof window !== 'undefined' ? `${window.location.origin}/trial/run/${shareToken}` : `/trial/run/${shareToken}`}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={copyShareUrl} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+                      {shareCopied ? '✓ Copied' : 'Copy link'}
+                    </button>
+                    <a href={`/trial/run/${shareToken}`} target="_blank" rel="noopener" className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Open →</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
 
           {status === 'done' && voidResult && mode === 'void' && (
             <section className="border-t border-[#1f1f1f] py-16 px-6">
