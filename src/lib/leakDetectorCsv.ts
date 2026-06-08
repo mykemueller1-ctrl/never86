@@ -338,16 +338,16 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
   // The pattern detector — "they always void on Tuesday closes."
   const DOW_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dowVoidPatterns: DowPattern[] = [];
-  for (const [key, hist] of dowHistByKey.entries()) {
-    const total = hist.reduce((s, x) => s + x, 0);
-    if (total < 5) continue;
+  dowHistByKey.forEach((hist, key) => {
+    const total = hist.reduce((s: number, x: number) => s + x, 0);
+    if (total < 5) return;
     let maxDay = 0;
     let maxCount = 0;
     for (let i = 0; i < 7; i++) {
       if (hist[i] > maxCount) { maxCount = hist[i]; maxDay = i; }
     }
     const conc = maxCount / total;
-    if (conc < 0.40) continue;
+    if (conc < 0.40) return;
     const [store, name] = key.split('::');
     dowVoidPatterns.push({
       store, name,
@@ -356,7 +356,7 @@ export function runLeakDetector(csv: string): LeakReport | LeakError {
       totalVoids: total,
       concentration: conc,
     });
-  }
+  });
   dowVoidPatterns.sort((a, b) => b.concentration - a.concentration);
 
   // Discount-after-close
