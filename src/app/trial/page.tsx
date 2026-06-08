@@ -252,6 +252,27 @@ export default function TrialPage() {
     }).catch(() => {});
   }
 
+  // Sample-data path. Operators landing from LinkedIn often don't have
+  // an export ready — let them see the result on our synthetic fixture
+  // immediately, then prompt them to drop their own CSV.
+  async function runSample() {
+    const SAMPLE_URLS: Record<Mode, { url: string; name: string }> = {
+      void:     { url: '/samples/toast-employee-performance.csv', name: 'sample-void-hunter.csv' },
+      leak:     { url: '/samples/toast-sales-detail.csv',         name: 'sample-leak-detector.csv' },
+      labor:    { url: '/samples/timesheet-labor.csv',            name: 'sample-labor-drift.csv' },
+      tips:     { url: '/samples/tips-weekly.csv',                name: 'sample-tip-variance.csv' },
+      catering: { url: '/samples/catering-reconciliation.csv',    name: 'sample-catering-leak.csv' },
+    };
+    const s = SAMPLE_URLS[mode];
+    if (!s) return;
+    try {
+      const res = await fetch(s.url);
+      const blob = await res.blob();
+      const file = new File([blob], s.name, { type: 'text/csv' });
+      runFile(file);
+    } catch {}
+  }
+
   async function joinWaitlist(pos: string) {
     if (!email) { setWaitlistPos(pos); return; }
     setWaitlistStatus('sending');
@@ -313,9 +334,9 @@ export default function TrialPage() {
         <>
           <section className="max-w-4xl mx-auto px-6 pt-8 pb-4">
             <p className="compass-eyebrow mb-4">— Pick an agent</p>
-            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {MODES.map((m) => (
-                <button key={m.id} type="button" onClick={() => { setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); }}
+                <button key={m.id} type="button" onClick={() => { setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); }}
                   className="compass-card text-left transition-colors"
                   style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
                   <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
@@ -323,6 +344,13 @@ export default function TrialPage() {
                   <p className="compass-body text-sm mt-2">{m.blurb}</p>
                 </button>
               ))}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mb-4">
+              <p className="compass-eyebrow-dim">— Don&apos;t have your own export yet?</p>
+              <button onClick={runSample} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#0066ff', color: '#0066ff' }}>
+                Run on sample data →
+              </button>
             </div>
 
             <div

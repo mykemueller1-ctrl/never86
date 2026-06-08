@@ -32,6 +32,32 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
   const a = getAgentSpec(params.slug);
   if (!a) notFound();
 
+  // JSON-LD Product schema — helps Google AI Overviews + Rich Results
+  // cite the agent as a discrete product with capability bullets.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: `${a.name} · Never 86'd`,
+    description: a.intro,
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'Restaurant Financial Intelligence',
+    operatingSystem: 'Web',
+    url: `https://never86.ai/agents/${a.slug}`,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: '60-minute free trial · drop a CSV at /trial',
+      url: 'https://never86.ai/trial',
+    },
+    featureList: a.catches.join(' · '),
+    publisher: {
+      '@type': 'Organization',
+      name: "Never 86'd",
+      url: 'https://never86.ai',
+    },
+  };
+
   // Sibling agents — same seat first, then others.
   const siblings = AGENT_SPECS
     .filter((s) => s.slug !== a.slug)
@@ -44,6 +70,7 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
 
   return (
     <main className="compass min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <Link href="/" className="flex items-start gap-4 group">
