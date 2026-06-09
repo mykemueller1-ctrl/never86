@@ -93,7 +93,7 @@ export default function Home() {
                 Never 86&apos;d <span className="italic text-white/70">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">
-                Operator OS · 7 free agents · built by operators
+                Operator OS · 24-agent workforce · 7 free to try
               </p>
             </div>
           </div>
@@ -225,8 +225,8 @@ export default function Home() {
             <p className="compass-kpi-val">545<span className="unit">,677</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Free agents live</p>
-            <p className="compass-kpi-val">7<span className="unit"></span></p>
+            <p className="compass-kpi-label">Free to try</p>
+            <p className="compass-kpi-val">7<span className="unit">/24</span></p>
           </div>
           <div className="compass-kpi">
             <p className="compass-kpi-label">Self-onboard</p>
@@ -281,7 +281,7 @@ export default function Home() {
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute timed trial · drop a CSV · no card</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 free agents to try</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 CSV agents to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · BCS · Vendor Drift)</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
               <Link href="/trial" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
