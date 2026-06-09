@@ -140,6 +140,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
             <Link href="/trial" className="compass-pill"><span className="avatar">T</span><span>New run</span></Link>
+            <Link href={`/trial/run/${run.shareToken}/proposal`} className="compass-pill"><span className="avatar">P</span><span>Print proposal</span></Link>
             <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Wire it live →</Link>
           </nav>
         </div>
