@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type VoidResult = {
   ok: true;
@@ -161,7 +161,6 @@ export default function TrialPage() {
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
   const [filename, setFilename] = useState('');
   const [dragging, setDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
 
@@ -389,12 +388,12 @@ export default function TrialPage() {
               </button>
             </div>
 
-            <div
+            <label
+              htmlFor="trial-csv-input"
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
-              onClick={() => inputRef.current?.click()}
-              className="compass-card cursor-pointer text-center transition-all"
+              className="compass-card cursor-pointer text-center transition-all block"
               style={{
                 padding: '60px 20px',
                 borderStyle: 'dashed',
@@ -402,7 +401,7 @@ export default function TrialPage() {
                 background: dragging ? 'rgba(0,102,255,0.04)' : '#0a0a0a',
               }}
             >
-              <input ref={inputRef} type="file" accept=".csv,text/csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }} className="hidden" />
+              <input id="trial-csv-input" type="file" accept=".csv,text/csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }} className="sr-only" />
               {status === 'running' ? (
                 <>
                   <p className="compass-eyebrow mb-3">— Running {mode === 'void' ? 'Void Hunter' : 'Leak Detector'}</p>
@@ -429,7 +428,7 @@ export default function TrialPage() {
                   </p>
                 </>
               )}
-            </div>
+            </label>
 
             {status === 'error' && (
               <div className="compass-card mt-4" style={{ borderColor: '#ff453a' }}>
