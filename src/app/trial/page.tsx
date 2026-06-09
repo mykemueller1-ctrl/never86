@@ -47,11 +47,13 @@ type LeakResult = {
 type Err = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
 const MODES = [
-  { id: 'void',     label: 'Void Hunter',   blurb: 'Employee performance CSV · voids vs peer band' },
-  { id: 'leak',     label: 'Leak Detector', blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
-  { id: 'labor',    label: 'Labor Drift',   blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
-  { id: 'tips',     label: 'Tip Variance',  blurb: 'Weekly tip CSV · per-name week-over-week tip-rate delta' },
-  { id: 'catering', label: 'Catering Leak', blurb: 'Catering recon CSV · invoice-vs-POS gap · unmatched orders' },
+  { id: 'void',     label: 'Void Hunter',          blurb: 'Employee performance CSV · voids vs peer band' },
+  { id: 'leak',     label: 'Leak Detector',        blurb: 'Ticket-level CSV · 7 theft signals · risk score per name' },
+  { id: 'labor',    label: 'Labor Drift',          blurb: 'Timesheet CSV · OT drift · ghost shifts · early/late clocks' },
+  { id: 'tips',     label: 'Tip Variance',         blurb: 'Weekly tip CSV · per-name week-over-week tip-rate delta' },
+  { id: 'catering', label: 'Catering Leak',        blurb: 'Catering recon CSV · invoice-vs-POS gap · unmatched orders' },
+  { id: 'bcs',      label: 'Beverage Cost Score',  blurb: 'Pour vs inventory CSV · BCS 0-100 · per-category shrink' },
+  { id: 'drift',    label: 'Vendor Drift',         blurb: 'Vendor invoice CSV · per-SKU week-over-week price drift' },
 ] as const;
 type Mode = typeof MODES[number]['id'];
 
@@ -77,6 +79,32 @@ type TipVarianceResult = {
   networkCurrTips: number;
   networkWoW: number;
   perEmployee: Array<{ store: string; name: string; prevTipRate: number; currTipRate: number; deltaPp: number; prevTipDollars: number; currTipDollars: number; flagged: boolean }>;
+};
+
+type BcsResult = {
+  ok: true;
+  rowsParsed: number;
+  storesCount: number;
+  networkConsumed: number;
+  networkPoured: number;
+  networkShrinkUnits: number;
+  networkShrinkPct: number;
+  networkRevenueLost: number;
+  networkBcsScore: number;
+  perStore: Array<{ store: string; bcsScore: number; consumed: number; poured: number; shrinkUnits: number; shrinkPct: number; revenueLost: number; byCategory: Array<{ category: string; consumed: number; poured: number; shrinkUnits: number; shrinkPct: number; revenueLost: number }> }>;
+};
+
+type VendorDriftResult = {
+  ok: true;
+  rowsParsed: number;
+  vendors: string[];
+  periodsCount: number;
+  prevPeriod: string;
+  currPeriod: string;
+  totalSkus: number;
+  flaggedSkus: number;
+  totalDriftDollars: number;
+  perSku: Array<{ vendor: string; sku: string; category: string; prevPeriod: string; currPeriod: string; prevPrice: number; currPrice: number; driftPct: number; driftDollars: number; flagged: boolean }>;
 };
 
 type CateringResult = {
@@ -126,6 +154,8 @@ export default function TrialPage() {
   const [laborResult, setLaborResult] = useState<LaborDriftResult | null>(null);
   const [tipsResult, setTipsResult] = useState<TipVarianceResult | null>(null);
   const [cateringResult, setCateringResult] = useState<CateringResult | null>(null);
+  const [bcsResult, setBcsResult] = useState<BcsResult | null>(null);
+  const [driftResult, setDriftResult] = useState<VendorDriftResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -179,7 +209,7 @@ export default function TrialPage() {
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
-    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null);
+    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
@@ -187,7 +217,9 @@ export default function TrialPage() {
                      : mode === 'leak'     ? '/api/connect/leak-detector'
                      : mode === 'labor'    ? '/api/connect/labor-drift'
                      : mode === 'tips'     ? '/api/connect/tip-variance'
-                     : '/api/connect/catering-leak';
+                     : mode === 'catering' ? '/api/connect/catering-leak'
+                     : mode === 'bcs'      ? '/api/connect/beverage-score'
+                     : '/api/connect/vendor-drift';
       const res = await fetch(endpoint, { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
@@ -195,7 +227,9 @@ export default function TrialPage() {
         else if (mode === 'leak')     setLeakResult(data as LeakResult);
         else if (mode === 'labor')    setLaborResult(data as LaborDriftResult);
         else if (mode === 'tips')     setTipsResult(data as TipVarianceResult);
-        else                          setCateringResult(data as CateringResult);
+        else if (mode === 'catering') setCateringResult(data as CateringResult);
+        else if (mode === 'bcs')      setBcsResult(data as BcsResult);
+        else                          setDriftResult(data as VendorDriftResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
       } else {
@@ -262,6 +296,8 @@ export default function TrialPage() {
       labor:    { url: '/samples/timesheet-labor.csv',            name: 'sample-labor-drift.csv' },
       tips:     { url: '/samples/tips-weekly.csv',                name: 'sample-tip-variance.csv' },
       catering: { url: '/samples/catering-reconciliation.csv',    name: 'sample-catering-leak.csv' },
+      bcs:      { url: '/samples/beverage-pour.csv',              name: 'sample-beverage-score.csv' },
+      drift:    { url: '/samples/vendor-drift.csv',               name: 'sample-vendor-drift.csv' },
     };
     const s = SAMPLE_URLS[mode];
     if (!s) return;
@@ -385,7 +421,11 @@ export default function TrialPage() {
                       ? 'Timesheet CSV · Location, Employee, Scheduled Start/End, Clock In/Out (+ Net Sales for ghost-shift detection)'
                       : mode === 'tips'
                       ? 'Weekly tip CSV · Location, Employee, Week, Net Sales, Net Tips (must cover ≥ 2 weeks)'
-                      : 'Catering recon CSV · Location, Customer, Invoice Amount, POS Amount (+ Order ID + Event Date optional)'}
+                      : mode === 'catering'
+                      ? 'Catering recon CSV · Location, Customer, Invoice Amount, POS Amount (+ Order ID + Event Date optional)'
+                      : mode === 'bcs'
+                      ? 'Beverage close CSV · Location, Category, Consumed, Poured (+ Unit Price optional for revenue-lost calc)'
+                      : 'Vendor invoice CSV · Vendor, SKU, Period, Unit Price (must cover ≥ 2 periods · monthly buckets ideal)'}
                   </p>
                 </>
               )}
@@ -773,6 +813,87 @@ export default function TrialPage() {
                           <td className="font-mono tabular-nums">${Math.round(s.totalPos).toLocaleString()}</td>
                           <td className="font-mono tabular-nums font-semibold" style={{ color: s.totalGap > 1000 ? '#ff453a' : s.totalGap > 200 ? '#ff9500' : '#86868b' }}>${Math.round(s.totalGap).toLocaleString()}</td>
                           <td className="font-mono tabular-nums">{(s.gapRatio * 100).toFixed(2)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && bcsResult && mode === 'bcs' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Beverage Cost Score · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  Network BCS <em style={{ color: bcsResult.networkBcsScore >= 80 ? '#34c759' : bcsResult.networkBcsScore >= 60 ? '#ff9500' : '#ff453a' }}>{bcsResult.networkBcsScore}</em> / 100.
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Stores</p><p className="compass-kpi-val">{bcsResult.storesCount}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Shrink units</p><p className="compass-kpi-val">{Math.round(bcsResult.networkShrinkUnits).toLocaleString()}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Shrink %</p><p className="compass-kpi-val">{(bcsResult.networkShrinkPct * 100).toFixed(2)}<span className="unit">%</span></p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Revenue lost</p><p className="compass-kpi-val">${Math.round(bcsResult.networkRevenueLost).toLocaleString()}</p></div>
+                </div>
+                <p className="compass-eyebrow mb-3">— Per store · sorted by BCS ascending (worst first)</p>
+                <div className="space-y-3">
+                  {bcsResult.perStore.map((s) => (
+                    <div key={s.store} className="compass-card">
+                      <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+                        <h3>{s.store}</h3>
+                        <p className="font-mono text-3xl font-bold" style={{ color: s.bcsScore >= 80 ? '#34c759' : s.bcsScore >= 60 ? '#ff9500' : '#ff453a' }}>{s.bcsScore}</p>
+                      </div>
+                      <p className="compass-body text-[13px]" style={{ color: '#86868b' }}>
+                        Consumed {s.consumed} · Poured {s.poured} · Shrink {s.shrinkUnits} ({(s.shrinkPct * 100).toFixed(2)}%) · Lost ${Math.round(s.revenueLost).toLocaleString()}
+                      </p>
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
+                        {s.byCategory.map((c) => (
+                          <div key={c.category} className="px-3 py-2 rounded-lg" style={{ background: '#0a0a0a', border: '1px solid #2c2c2e' }}>
+                            <p className="text-[11px] uppercase tracking-wider" style={{ color: '#86868b' }}>{c.category}</p>
+                            <p className="font-mono text-[14px] font-semibold mt-1" style={{ color: c.shrinkPct > 0.10 ? '#ff453a' : c.shrinkPct > 0.05 ? '#ff9500' : '#d2d2d7' }}>
+                              {c.shrinkUnits} <span className="font-normal" style={{ color: '#86868b' }}>({(c.shrinkPct * 100).toFixed(1)}%)</span>
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && driftResult && mode === 'drift' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Vendor Drift · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {driftResult.flaggedSkus > 0
+                    ? <>{driftResult.flaggedSkus} SKU{driftResult.flaggedSkus === 1 ? '' : 's'} <em>drifted {'>'}5%</em> last period.</>
+                    : <>No SKUs <em>drifted &gt; 5%.</em></>}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Vendors</p><p className="compass-kpi-val">{driftResult.vendors.length}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">SKUs tracked</p><p className="compass-kpi-val">{driftResult.totalSkus}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Flagged ({'>'} 5%)</p><p className="compass-kpi-val" style={{ color: driftResult.flaggedSkus > 0 ? '#ff453a' : '#34c759' }}>{driftResult.flaggedSkus}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Upward $ drift / unit</p><p className="compass-kpi-val">${driftResult.totalDriftDollars.toFixed(2)}</p></div>
+                </div>
+                <p className="compass-eyebrow mb-3">— Per SKU · sorted by drift % descending · {driftResult.prevPeriod} → {driftResult.currPeriod}</p>
+                <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                  <table className="data-table w-full">
+                    <thead><tr><th className="!text-left">SKU</th><th className="!text-left">Vendor</th><th>Prev $</th><th>Curr $</th><th>Δ $</th><th>Δ %</th><th>Flag</th></tr></thead>
+                    <tbody>
+                      {driftResult.perSku.map((s) => (
+                        <tr key={`${s.vendor}-${s.sku}`} style={{ color: '#d2d2d7' }}>
+                          <td className="!text-left text-white font-medium">{s.sku}</td>
+                          <td className="!text-left">{s.vendor}</td>
+                          <td className="font-mono tabular-nums">${s.prevPrice.toFixed(2)}</td>
+                          <td className="font-mono tabular-nums">${s.currPrice.toFixed(2)}</td>
+                          <td className="font-mono tabular-nums">${s.driftDollars.toFixed(2)}</td>
+                          <td className="font-mono tabular-nums font-semibold" style={{ color: s.driftPct > 0.10 ? '#ff453a' : s.driftPct > 0.05 ? '#ff9500' : s.driftPct < -0.02 ? '#34c759' : '#86868b' }}>
+                            {s.driftPct > 0 ? '+' : ''}{(s.driftPct * 100).toFixed(2)}%
+                          </td>
+                          <td>{s.flagged ? <span className="badge badge-unverified">Flag</span> : '—'}</td>
                         </tr>
                       ))}
                     </tbody>
