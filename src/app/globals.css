@@ -3,12 +3,423 @@
 @tailwind utilities;
 
 :root {
-  --gold: #d4a017;
-  --dark: #121212;
+  --ink-50: #fbfbfd;
+  --ink-100: #f5f5f7;
+  --ink-200: #e8e8ed;
+  --ink-300: #d2d2d7;
+  --ink-500: #86868b;
+  --ink-600: #515154;
+  --ink-800: #1d1d1f;
+  --ink-900: #000000;
+  --gold: #d49a0e;
+  --accent: #0a2540;
+}
+
+html {
+  background: #000000;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--dark);
+  background: #000000;
+  color: #1d1d1f;
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+}
+
+::selection {
+  background: rgba(212, 154, 14, 0.20);
+  color: #1d1d1f;
+}
+
+/* Apple-style display utility — for hero headlines */
+.display {
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.07;
+  color: #1d1d1f;
+}
+
+/* Numeric figures */
+.tabular-nums { font-variant-numeric: tabular-nums; }
+.font-mono { font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace; }
+
+/* Cards — Apple-style flat with subtle shadow + border */
+.card {
+  background: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 12px 24px rgba(0,0,0,0.08);
+  border-color: #d2d2d7;
+}
+
+/* Alias for legacy class — keep existing elevated-card components looking right */
+.elevated-card {
+  background: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.elevated-card:hover { border-color: #d2d2d7; }
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Apple-style primary button — solid black */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1d1d1f;
   color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  letter-spacing: -0.011em;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.btn-primary:hover {
+  background: #000000;
+  transform: scale(1.015);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #1d1d1f;
+  font-weight: 500;
+  border-radius: 9999px;
+  border: 1px solid #d2d2d7;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  letter-spacing: -0.011em;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.btn-secondary:hover {
+  background: #f5f5f7;
+  border-color: #1d1d1f;
+}
+
+/* Subtle accent link for inline text */
+.link-accent { color: #2e69d4; }
+.link-accent:hover { color: #1d4ed8; text-decoration: underline; }
+
+/* Brand monogram — N86 gold mark */
+.brand-monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #d49a0e, #a3760a);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+}
+
+/* Live status dot */
+.live-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #34c759;
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.15);
+}
+
+/* Sticky header treatment */
+.nav-shell {
+  background: rgba(251, 251, 253, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ─── COMPASS DARK TREATMENT ─────────────────────────────────────────────
+   Editorial dark theme — black bg, white text, blue accent. Mirrors the
+   Editorial dark theme — black bg, white text, blue accent. Compass DNA
+*/
+
+.compass {
+  background: #000000;
+  color: #f5f5f7;
+}
+.compass-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #0066ff;
+}
+.compass-eyebrow-dim {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #86868b;
+}
+.compass-display {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  color: #ffffff;
+}
+.compass-display em, .compass-display .italic {
+  font-style: italic;
+  color: #0066ff;
+  font-weight: 500;
+}
+.compass-body {
+  color: #c7c7cc;
+  line-height: 1.55;
+}
+.compass-card {
+  background: #0a0a0a;
+  border: 1px solid #1f1f1f;
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.compass-card-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #86868b;
+}
+.compass-card h3 {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  margin: 8px 0 4px;
+}
+
+/* Compass KPI tile — dark variant matching the screenshot */
+.compass-kpi {
+  border-top: 1px solid #1f1f1f;
+  padding: 22px 4px 0;
+}
+.compass-kpi-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #6e6e73;
+}
+.compass-kpi-val {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-size: 56px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #ffffff;
+  margin-top: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.compass-kpi-val .unit {
+  font-size: 24px;
+  color: #6e6e73;
+  margin-left: 2px;
+}
+
+/* Persona pill row */
+.compass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f0f10;
+  border: 1px solid #1f1f1f;
+  border-radius: 9999px;
+  padding: 7px 14px 7px 7px;
+  font-size: 13px;
+  color: #d2d2d7;
+  white-space: nowrap;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.compass-pill:hover { border-color: #2c2c2e; }
+.compass-pill .avatar {
+  width: 22px; height: 22px;
+  border-radius: 9999px;
+  background: #1f1f1f;
+  color: #d2d2d7;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.compass-pill.is-active {
+  background: linear-gradient(100deg, #0066ff, #003bb5);
+  border-color: transparent;
+  color: #ffffff;
+}
+.compass-pill.is-active .avatar {
+  background: rgba(255,255,255,0.18);
+  color: #ffffff;
+}
+.compass-pill .tag {
+  font-size: 10.5px;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-left: 6px;
+}
+.compass-pill.is-active .tag { color: rgba(255,255,255,0.78); }
+
+/* Section nav numbered row */
+.compass-section-nav {
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  border-top: 1px solid #1f1f1f;
+  border-bottom: 1px solid #1f1f1f;
+  padding: 14px 0;
+}
+.compass-section-nav a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  color: #d2d2d7;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.compass-section-nav a:hover { color: #ffffff; }
+.compass-section-nav .num {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: #6e6e73;
+  border: 1px solid #2c2c2e;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+/* Live status chip on dark */
+.compass-live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 9999px;
+  background: #34c759;
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.18);
+  margin-right: 7px;
+  vertical-align: middle;
+}
+
+/* Compass monogram — bold square mark, blue */
+.compass-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0066ff, #003bb5);
+  color: #ffffff;
+  font-family: var(--font-serif), serif;
+  font-weight: 600;
+  font-size: 22px;
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+/* Compass-style brand gradient — Void Hunter blue. Thin top strip or hero band. */
+.brand-band {
+  background: linear-gradient(100deg, #0066ff, #003bb5);
+  color: #ffffff;
+}
+.brand-band .brand-monogram {
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+}
+.brand-band-thin {
+  height: 4px;
+  background: linear-gradient(100deg, #0066ff, #003bb5);
+}
+
+/* Compass KPI card — dense, uppercase mini-label, big tabular number,
+   optional delta. */
+.kpi {
+  background: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 200ms ease;
+}
+.kpi:hover { border-color: #d2d2d7; }
+.kpi-label {
+  font-size: 11px;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.kpi-val {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: -0.022em;
+  font-variant-numeric: tabular-nums;
+  color: #1d1d1f;
+}
+.kpi-delta { font-size: 12.5px; margin-top: 4px; font-weight: 600; }
+.kpi-delta.up { color: #34c759; }
+.kpi-delta.down { color: #ff3b30; }
+.kpi-delta.flat { color: #86868b; }
+
+/* Compass dense data table */
+.data-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.data-table th, .data-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #e8e8ed;
+  text-align: right;
+  white-space: nowrap;
+}
+.data-table th:first-child, .data-table td:first-child { text-align: left; }
+.data-table thead th {
+  color: #86868b;
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Source-tag badges — paired with the .kpi card */
+.badge { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 9px; }
+.badge-verified  { background: #e6f4ec; color: #1a8a4a; }
+.badge-estimated { background: #fbf2dd; color: #c47f00; }
+.badge-unverified{ background: #fbe7e4; color: #c0392b; }
+.badge-info      { background: #e8eefb; color: #0052d6; }
+
+/* Logic mode (operator-only provenance overlay) */
+.logic-only,
+.logic-only-inline { display: none; }
+body[data-logic-mode="true"] .logic-only { display: block; }
+body[data-logic-mode="true"] .logic-only-inline { display: inline; }
+
+/* Print kit — hide chrome */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #ffffff; }
 }
