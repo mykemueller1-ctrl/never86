@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { listPublishedAnswers } from '@/lib/answersDb';
 import { AGENT_SPECS } from '@/lib/agentSpecs';
+import { POS_SPECS } from '@/lib/posSpecs';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -63,5 +64,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.92,
   }));
 
-  return [...fixed, ...agentEntries, ...dynamicEntries];
+  const posEntries: MetadataRoute.Sitemap = Object.keys(POS_SPECS).map((slug) => ({
+    url: `${BASE}/connect/${slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  }));
+
+  return [...fixed, ...agentEntries, ...posEntries, ...dynamicEntries];
 }
