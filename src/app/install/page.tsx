@@ -1,47 +1,19 @@
-'use client';
-
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import type { Metadata } from 'next';
+import InstallForm from './InstallForm';
 
-function InstallContent() {
-  const params = useSearchParams();
-  const fromShareToken = params.get('from') ?? '';
+export const metadata: Metadata = {
+  title: "Install · Never 86'd",
+  description: 'Take the trial to your live floor. Install the operator app · 24 agents · The Brain · 30 ops screens · database-per-operator isolation.',
+  openGraph: {
+    title: "Never 86'd · Install the operator app",
+    description: 'From the trial wedge to the full operator OS. White-glove onboarding for the first 10 operators.',
+    url: 'https://never86.ai/install',
+  },
+  alternates: { canonical: 'https://never86.ai/install' },
+};
 
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [restaurantName, setRestaurantName] = useState('');
-  const [units, setUnits] = useState('');
-  const [posType, setPosType] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const [message, setMessage] = useState('');
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus('sending');
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email, name, restaurantName, units, posType,
-          agentRequested: 'Operator App · install request',
-          sourcePage: fromShareToken ? `/install · from /trial/run/${fromShareToken}` : '/install',
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setStatus('sent');
-        setMessage(data.message || 'Install request received.');
-      } else {
-        throw new Error(data.error || 'Failed');
-      }
-    } catch (err: unknown) {
-      setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Something went wrong');
-    }
-  }
-
+export default function InstallPage() {
   return (
     <main className="compass min-h-screen">
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
@@ -68,16 +40,8 @@ function InstallContent() {
           Take the trial <em>to your live floor.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl mb-6 max-w-2xl leading-relaxed">
-          You ran the trial. You saw the leak. The next step is the full operator app — same 5 CSV agents you tried, wired to your live POS, running every shift, plus the rest of the 24-agent workforce, the Brain, and the 30 ops screens.
+          You ran the trial. You saw the leak. The next step is the full operator app — the 7 CSV agents you tried, wired to your live POS and running every shift, plus the rest of the 24-agent workforce, the Brain, and the 30 ops screens.
         </p>
-        {fromShareToken && (
-          <div className="compass-card mb-8" style={{ borderColor: '#0066ff' }}>
-            <p className="compass-card-label" style={{ color: '#0066ff' }}>— Linked from your saved run</p>
-            <p className="compass-body text-sm mt-3">
-              Your trial result <span className="font-mono text-white">/trial/run/{fromShareToken}</span> is attached to this install request. Myke will reach out within 24 hours with your operator-app invite.
-            </p>
-          </div>
-        )}
       </section>
 
       <section className="border-t border-[#1f1f1f] py-12 md:py-16 px-6">
@@ -127,39 +91,7 @@ function InstallContent() {
           <h2 className="compass-display text-3xl md:text-5xl mb-8 text-center">
             One form. <em>24-hour SLA.</em>
           </h2>
-          {status === 'sent' ? (
-            <div className="compass-card text-center">
-              <p className="font-serif text-2xl text-white mb-2">You&apos;re in.</p>
-              <p className="compass-body">Myke will reach out within 24 hours from <span className="font-mono text-white">myke@n86.app</span> with your operator-app invite.</p>
-              {fromShareToken && <p className="compass-body text-[13px] mt-4" style={{ color: '#86868b' }}>Linked to /trial/run/{fromShareToken}</p>}
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="compass-card space-y-3">
-              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} required
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <div className="grid grid-cols-2 gap-3">
-                <input type="number" min="1" placeholder="Units" value={units} onChange={(e) => setUnits(e.target.value)}
-                  className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                <select value={posType} onChange={(e) => setPosType(e.target.value)}
-                  className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0066ff] transition-colors">
-                  <option value="">POS</option>
-                  <option>Toast</option><option>Square</option><option>Clover</option><option>PDQ</option>
-                  <option>Aloha</option><option>Lightspeed</option><option>Other</option>
-                </select>
-              </div>
-              <button type="submit" disabled={status === 'sending'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
-                {status === 'sending' ? 'Sending…' : 'Request install →'}
-              </button>
-              {status === 'error' && <p className="text-[#ff453a] text-sm text-center">{message}</p>}
-              <p className="text-[11px] text-center" style={{ color: '#6e6e73' }}>
-                White-glove onboarding for the first 10 operators. After that, self-serve install at never86.ai.
-              </p>
-            </form>
-          )}
+          <InstallForm />
         </div>
       </section>
 
@@ -178,13 +110,5 @@ function InstallContent() {
         </div>
       </footer>
     </main>
-  );
-}
-
-export default function InstallPage() {
-  return (
-    <Suspense fallback={<main className="compass min-h-screen" />}>
-      <InstallContent />
-    </Suspense>
   );
 }

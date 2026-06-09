@@ -86,7 +86,7 @@ export default async function OG() {
                 textTransform: 'uppercase',
               }}
             >
-              — Operator OS · 8 agents · source-tagged
+              — Operator OS · 10 agents · 7 CSV today · source-tagged
             </div>
           </div>
         </div>

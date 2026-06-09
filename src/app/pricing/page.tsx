@@ -33,7 +33,7 @@ const TIERS = [
     price: '$299/mo',
     blurb: 'Wire it to your live POS. Daily reads. Per-name alerts.',
     features: [
-      'All 7 free agents wired',
+      'All 7 CSV agents wired to live POS',
       'Daily auto-pull from Toast / Square / Clover',
       'Email + SMS alerts when a name spikes',
       'Command Center · single-tenant',

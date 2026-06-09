@@ -32,7 +32,7 @@ export default function AgentsPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· agents</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · 8 agents wired · every figure source-tagged</p>
+              <p className="compass-eyebrow-dim mt-2">Operator OS · 10 agents in the catalog · 7 runnable on a CSV today</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
