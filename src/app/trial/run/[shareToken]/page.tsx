@@ -141,7 +141,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
           <nav className="flex items-center gap-2 text-[13px]">
             <Link href="/trial" className="compass-pill"><span className="avatar">T</span><span>New run</span></Link>
             <Link href={`/trial/run/${run.shareToken}/proposal`} className="compass-pill"><span className="avatar">P</span><span>Print proposal</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Wire it live →</Link>
+            <Link href={`/install?from=${run.shareToken}`} className="btn-primary" style={{ background: '#0066ff' }}>Install on live data →</Link>
           </nav>
         </div>
       </div>
@@ -153,17 +153,17 @@ export default async function SavedRunPage({ params }: { params: Params }) {
 
       <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="compass-eyebrow mb-4">— What this read costs you to live with</p>
+          <p className="compass-eyebrow mb-4">— The bridge · trial → operator app</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
-            One leak a week. <em>For 52 weeks.</em>
+            Take this read <em>to your live floor.</em>
           </h2>
-          <p className="compass-body text-lg mb-8">
-            This is one snapshot from one CSV. Wire your live POS to never86&apos;d and the same agents run every shift, alert when a name spikes, and feed your CFO&apos;s board doc with figures that hold up to the penny.
+          <p className="compass-body text-lg mb-8 leading-relaxed">
+            This was one snapshot from one CSV. Install the operator app and the same agents run every shift, wired to your live POS — plus the full 24-agent workforce, the Brain, and the 30 ops screens. White-glove onboarding for the first 10 operators.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store →</Link>
+            <Link href={`/install?from=${run.shareToken}`} className="btn-primary" style={{ background: '#0066ff' }}>Install the operator app →</Link>
+            <Link href={`/trial/run/${run.shareToken}/proposal`} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Print proposal</Link>
             <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</Link>
-            <Link href="/trial" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Run another CSV</Link>
           </div>
         </div>
       </section>
