@@ -93,7 +93,7 @@ export default function Home() {
                 Never 86&apos;d <span className="italic text-white/70">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">
-                Operator OS · 10 agents · 7 runnable on a CSV today
+                Operator OS · 24-agent workforce · 7 free to try
               </p>
             </div>
           </div>
@@ -225,8 +225,8 @@ export default function Home() {
             <p className="compass-kpi-val">545<span className="unit">,677</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">CSV agents live</p>
-            <p className="compass-kpi-val">7<span className="unit">/10</span></p>
+            <p className="compass-kpi-label">Free to try</p>
+            <p className="compass-kpi-val">7<span className="unit">/24</span></p>
           </div>
           <div className="compass-kpi">
             <p className="compass-kpi-label">Self-onboard</p>

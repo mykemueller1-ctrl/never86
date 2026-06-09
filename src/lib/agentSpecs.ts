@@ -14,6 +14,7 @@ export type AgentSpec = {
   output: string;
   sampleSignal: string; // One-line example signal it surfaces
   posSupport: string;
+  csvRunnable?: boolean; // true = has a CSV adapter wired to /trial today
 };
 
 export const AGENT_SPECS: AgentSpec[] = [
@@ -35,6 +36,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'KPI strip · per-store table sorted by void rate · top-15 names sorted by void $.',
     sampleSignal: 'Mall Drive @ 3.36% void rate · 2.4× peer median · $14,840 annualized excess.',
     posSupport: 'Toast · Square · Clover · PDQ (CSV today) · Toast OAuth in approval',
+    csvRunnable: true,
   },
   {
     slug: 'leak-detector',
@@ -57,6 +59,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'Seven color-coded signal cards · top-20 employee table sorted by composite risk score (red ≥ 50, orange ≥ 20).',
     sampleSignal: 'James Wilson · 6 void-after-payment tickets · 100% cash tender · Tue 6/6 · risk score 83.',
     posSupport: 'Toast Sales Detail · Square Transactions · Clover Reports (CSV today)',
+    csvRunnable: true,
   },
   {
     slug: '3p-fee-finder',
@@ -97,6 +100,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'KPI strip · per-employee table sorted by OT minutes · ghost-shift list with start times · total drift $ at OT rate.',
     sampleSignal: 'James Wilson · 4 early clock-ins · 85 min early · 297 min OT over 4 shifts · $89 drift.',
     posSupport: '7shifts · Toast Payroll · Square Team · Homebase · When I Work (CSV today)',
+    csvRunnable: true,
   },
   {
     slug: 'tip-variance',
@@ -116,6 +120,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'Network WoW % · per-employee table sorted by most-negative delta · prev-rate vs curr-rate vs delta (pp) vs prev-$ vs curr-$.',
     sampleSignal: 'Chris Foster · prev 19.7% / curr 10.3% / Δ −9.4pp · prev $2,540 / curr $1,320. Flagged.',
     posSupport: 'Toast · Square · Clover · Lightspeed · Aloha (CSV today)',
+    csvRunnable: true,
   },
   {
     slug: 'catering-leak',
@@ -136,6 +141,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'KPI strip · per-store table sorted by total gap · unmatched orders list · flagged orders list · top customer concentration.',
     sampleSignal: 'Sukup Manufacturing · 2 unmatched orders · $6,021 gap · 100% gap ratio.',
     posSupport: 'Toast · Square · Aloha · ezCater · CaterCow · invoice CSV',
+    csvRunnable: true,
   },
   {
     slug: 'rate-card-audit',
@@ -175,6 +181,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'KPI strip · per-store table with BCS score · per-category breakdown with shrink units + %.',
     sampleSignal: 'Highway 7 · BCS 66 · liquor shrink 25% · revenue lost $1,140/wk.',
     posSupport: 'Toast IQ · BevSpot · BarVision · Provi · inventory CSV',
+    csvRunnable: true,
   },
   {
     slug: 'vendor-drift',
@@ -195,6 +202,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'Per-SKU table sorted by drift % · vendor rollup · total upward drift $.',
     sampleSignal: 'PFG · Olive Oil Pure 4/1 GAL · prev $68.40 / curr $79.20 · 15.8% drift.',
     posSupport: 'PFG · Sysco · US Foods · Northern Lights · Reinhart · Cheney Bros · invoice CSV',
+    csvRunnable: true,
   },
   {
     slug: 'shift-pulse',

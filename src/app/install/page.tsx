@@ -29,7 +29,7 @@ export default function InstallPage() {
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
             <Link href="/trial" className="compass-pill"><span className="avatar">T</span><span>Back to trial</span></Link>
-            <Link href="/pricing" className="btn-primary" style={{ background: '#0066ff' }}>Pricing</Link>
+            <a href="https://never86d-ctap.onrender.com" target="_blank" rel="noopener" className="btn-primary" style={{ background: '#0066ff' }}>Open operator app →</a>
           </nav>
         </div>
       </div>
