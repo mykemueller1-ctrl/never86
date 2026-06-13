@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { trackEvent } from '@/lib/track';
 
 export default function InstallForm() {
   const [fromShareToken, setFromShareToken] = useState('');
@@ -17,11 +18,14 @@ export default function InstallForm() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const u = new URL(window.location.href);
-    setFromShareToken(u.searchParams.get('from') ?? '');
+    const tok = u.searchParams.get('from') ?? '';
+    setFromShareToken(tok);
+    trackEvent('install_view', { meta: { fromShareToken: tok || null } });
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    trackEvent('install_submit', { meta: { posType, units: units || null, fromShareToken: fromShareToken || null } });
     setStatus('sending');
     try {
       const res = await fetch('/api/waitlist', {
