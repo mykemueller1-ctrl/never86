@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { trackEvent } from '@/lib/track';
 
 type VoidResult = {
   ok: true;
@@ -172,6 +173,8 @@ export default function TrialPage() {
   const [waitlistPos, setWaitlistPos] = useState<string | null>(null);
   const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
+  useEffect(() => { trackEvent('trial_view'); }, []);
+
   useEffect(() => {
     if (phase !== 'active' || !expiresAt) return;
     const id = setInterval(() => {
@@ -186,6 +189,7 @@ export default function TrialPage() {
   }, [phase, expiresAt]);
 
   async function startTrial() {
+    trackEvent('trial_start_click');
     setStarting(true);
     try {
       const res = await fetch('/api/trial/start', { method: 'POST' });
@@ -205,6 +209,7 @@ export default function TrialPage() {
   }
 
   async function runFile(file: File) {
+    trackEvent('trial_csv_dropped', { meta: { mode, filename: file.name, sizeBytes: file.size } });
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
@@ -231,16 +236,19 @@ export default function TrialPage() {
         else                          setDriftResult(data as VendorDriftResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
+        trackEvent('trial_run_complete', { meta: { mode, shareToken: typeof data.shareToken === 'string' ? data.shareToken : null } });
       } else {
         const err = data as Err;
         setErrMsg(err.error || 'Failed to parse');
         setErrHint(err.hint || '');
         setDetectedCols(err.detectedColumns || []);
         setStatus('error');
+        trackEvent('trial_run_error', { meta: { mode, error: err.error || 'parse_failed' } });
       }
     } catch (e: unknown) {
       setErrMsg(e instanceof Error ? e.message : 'Something went wrong');
       setStatus('error');
+      trackEvent('trial_run_error', { meta: { mode, error: e instanceof Error ? e.message : 'unknown' } });
     }
   }
 
@@ -254,6 +262,7 @@ export default function TrialPage() {
 
   async function saveLead(e: React.FormEvent) {
     e.preventDefault();
+    trackEvent('trial_lead_saved', { meta: { mode, hasShareToken: !!shareToken } });
     try {
       // If there's a saved run, claim it against this email so the
       // operator can return to /trial/run/[shareToken].
@@ -289,6 +298,7 @@ export default function TrialPage() {
   // an export ready — let them see the result on our synthetic fixture
   // immediately, then prompt them to drop their own CSV.
   async function runSample() {
+    trackEvent('trial_sample_run', { meta: { mode } });
     const SAMPLE_URLS: Record<Mode, { url: string; name: string }> = {
       void:     { url: '/samples/toast-employee-performance.csv', name: 'sample-void-hunter.csv' },
       leak:     { url: '/samples/toast-sales-detail.csv',         name: 'sample-leak-detector.csv' },
@@ -371,7 +381,7 @@ export default function TrialPage() {
             <p className="compass-eyebrow mb-4">— Pick an agent</p>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {MODES.map((m) => (
-                <button key={m.id} type="button" onClick={() => { setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); }}
+                <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); }}
                   className="compass-card text-left transition-colors"
                   style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
                   <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
