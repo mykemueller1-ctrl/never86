@@ -258,7 +258,7 @@ export default function Home() {
               We now serve a <span className="text-white font-semibold">16-unit chef-led group</span> as our first design partner. $15.72M reconciled across 545,677 orders. $1.81M recovery surface, sourced to the cent.
             </p>
             <p>
-              The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
+              The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
             <p>
               Today we serve the whole ladder — <span className="text-white font-semibold">solo operator on one Toast terminal, all the way to a CEO running 50 stores across three brands.</span> Same source-tag discipline. Same operator-first ethos. The price scales; the rule doesn&apos;t.
@@ -418,7 +418,7 @@ export default function Home() {
               <p className="compass-card-label">— How it works</p>
               <h3>30 seconds to first leak.</h3>
               <p className="compass-body text-[15px] mt-3 leading-relaxed">
-                Drop a Toast / Square / Clover / PDQ export at <Link href="/trial" className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>. Void Hunter and the Leak Detector run on your real numbers. 60-minute live read, no card, no human in the loop. If you like it, wire it to live data — we email per-POS when each OAuth ships.
+                Drop a Toast / Square / Clover / PDQ export at <Link href="/trial" onClick={() => trackEvent('home_inline_trial_link_click', { meta: { target: '/trial', label: '/trial inline' } })} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>. Void Hunter and the Leak Detector run on your real numbers. 60-minute live read, no card, no human in the loop. If you like it, wire it to live data — we email per-POS when each OAuth ships.
               </p>
             </div>
           </div>
@@ -509,11 +509,11 @@ export default function Home() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for"     className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/people"  className="hover:text-white transition-colors">People</Link>
-            <Link href="/onboard" className="hover:text-white transition-colors">Onboard</Link>
-            <Link href="/changelog" className="hover:text-white transition-colors">Changelog</Link>
-            <Link href="/reports/login" className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/for"     onClick={() => trackEvent('home_footer_click', { meta: { target: '/for', label: 'Seats' } })}        className="hover:text-white transition-colors">Seats</Link>
+            <Link href="/people"  onClick={() => trackEvent('home_footer_click', { meta: { target: '/people', label: 'People' } })}    className="hover:text-white transition-colors">People</Link>
+            <Link href="/onboard" onClick={() => trackEvent('home_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}  className="hover:text-white transition-colors">Onboard</Link>
+            <Link href="/changelog" onClick={() => trackEvent('home_footer_click', { meta: { target: '/changelog', label: 'Changelog' } })} className="hover:text-white transition-colors">Changelog</Link>
+            <Link href="/reports/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>
