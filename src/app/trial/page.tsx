@@ -214,6 +214,20 @@ export default function TrialPage() {
   }
 
   async function runFile(file: File) {
+    // Browsers honor `accept` for the native picker but NOT for drag-drop.
+    // Validate client-side so dropping an .xlsx / .pdf gives a useful error
+    // instead of a server-side parse failure.
+    const nameOk = file.name.toLowerCase().endsWith('.csv');
+    const typeOk = !file.type || file.type === 'text/csv' || file.type === 'application/csv' || file.type === 'application/vnd.ms-excel';
+    if (!nameOk && !typeOk) {
+      setErrMsg(`That doesn't look like a CSV — got "${file.type || 'unknown type'}" / "${file.name}".`);
+      setErrHint('Drop a Toast / Square / Clover / PDQ CSV export. If you have an .xlsx, open in Excel → File → Save As → CSV.');
+      setDetectedCols([]);
+      setStatus('error');
+      setFilename(file.name);
+      trackEvent('trial_csv_invalid_type', { meta: { mode, filename: file.name, fileType: file.type } });
+      return;
+    }
     trackEvent('trial_csv_dropped', { meta: { mode, filename: file.name, sizeBytes: file.size } });
     setFilename(file.name);
     setStatus('running');
@@ -341,6 +355,8 @@ export default function TrialPage() {
     } catch { setWaitlistStatus('error'); }
   }
 
+  const currentModeLabel = MODES.find((m) => m.id === mode)?.label ?? 'Agent';
+
   const networkLeakYr = voidResult
     ? Math.max(0, voidResult.networkVoids - voidResult.medianStoreVoidRate * voidResult.networkNet) * 3
     : 0;
@@ -425,12 +441,12 @@ export default function TrialPage() {
               <input id="trial-csv-input" type="file" accept=".csv,text/csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) runFile(f); }} className="sr-only" />
               {status === 'running' ? (
                 <>
-                  <p className="compass-eyebrow mb-3">— Running {mode === 'void' ? 'Void Hunter' : 'Leak Detector'}</p>
+                  <p className="compass-eyebrow mb-3">— Running {currentModeLabel}</p>
                   <p className="font-serif text-2xl text-white">Analyzing <em>{filename}</em>…</p>
                 </>
               ) : (
                 <>
-                  <p className="compass-eyebrow mb-3">— Drop a CSV for {mode === 'void' ? 'Void Hunter' : 'Leak Detector'}</p>
+                  <p className="compass-eyebrow mb-3">— Drop a CSV for {currentModeLabel}</p>
                   <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file</p>
                   <p className="compass-body text-sm">
                     {mode === 'void'
