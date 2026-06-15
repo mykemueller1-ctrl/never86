@@ -161,6 +161,7 @@ export default function Home() {
             <Link
               key={s.name}
               href={s.href}
+              onClick={() => trackEvent('home_persona_pill_click', { meta: { role: s.name, target: s.href, tag: s.tag, position: 'top_row' } })}
               className={`compass-pill ${s.active ? 'is-active' : ''}`}
             >
               <span className="avatar">{s.h}</span>
@@ -465,7 +466,7 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {SEATS.slice(1).map((s) => (
-              <Link key={s.name} href={s.href} className="compass-card hover:border-[#0066ff] transition-colors text-center block">
+              <Link key={s.name} href={s.href} onClick={() => trackEvent('home_persona_pill_click', { meta: { role: s.name, target: s.href, tag: s.tag, position: 'pick_seat_grid' } })} className="compass-card hover:border-[#0066ff] transition-colors text-center block">
                 <p className="compass-card-label">{s.tag}</p>
                 <p className="font-serif text-2xl md:text-3xl mt-2 text-white">{s.name}</p>
               </Link>
