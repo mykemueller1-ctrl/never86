@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { trackEvent } from '@/lib/track';
 
 const FREE_AGENTS = [
   { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'One name above the peer band, by store + cross-network.' },
@@ -192,10 +193,10 @@ export default function Home() {
               Every figure source-tagged. Every recovery owned by a name. The platform every operator wishes their POS gave them.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>
+              <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: '60 minutes free · drop a CSV', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
                 60 minutes free · drop a CSV →
               </Link>
-              <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+              <Link href="/pricing" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/pricing', label: 'See pricing', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
                 See pricing
               </Link>
             </div>
