@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ROLES, ROLE_ORDER } from '@/lib/roles';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Pick your seat · Never 86'd",
@@ -28,8 +29,8 @@ export default function ForIndex() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <TrackedLink href="/" event="for_nav_click" meta={{ target: '/', label: 'Home' }} className="compass-pill"><span className="avatar">H</span><span>Home</span></TrackedLink>
+            <TrackedLink href="/onboard" event="for_nav_click" meta={{ target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
           </nav>
         </div>
       </div>
@@ -51,12 +52,12 @@ export default function ForIndex() {
             {ROLE_ORDER.map((slug) => {
               const r = ROLES[slug];
               return (
-                <Link key={r.slug} href={`/for/${r.slug}`} className="compass-card hover:border-[#0066ff] transition-colors block group">
+                <TrackedLink key={r.slug} href={`/for/${r.slug}`} event="for_role_card_click" meta={{ role: r.badge, slug: r.slug, target: `/for/${r.slug}` }} className="compass-card hover:border-[#0066ff] transition-colors block group">
                   <p className="compass-card-label">For the</p>
                   <h3>{r.badge}</h3>
                   <p className="compass-body text-[14px] mt-1 mb-4">{r.oneWord}</p>
                   <p className="text-[14px] inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>See it <span aria-hidden>→</span></p>
-                </Link>
+                </TrackedLink>
               );
             })}
           </div>
@@ -70,9 +71,9 @@ export default function ForIndex() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/answers" className="hover:text-white transition-colors">Answers</Link>
-            <Link href="/press" className="hover:text-white transition-colors">Press</Link>
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <TrackedLink href="/answers" event="for_footer_click" meta={{ target: '/answers', label: 'Answers' }} className="hover:text-white transition-colors">Answers</TrackedLink>
+            <TrackedLink href="/press" event="for_footer_click" meta={{ target: '/press', label: 'Press' }} className="hover:text-white transition-colors">Press</TrackedLink>
+            <TrackedLink href="/" event="for_footer_click" meta={{ target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>

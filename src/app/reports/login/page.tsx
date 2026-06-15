@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { trackEvent } from '@/lib/track';
 
 export default function ReportsLogin() {
   const [password, setPassword] = useState('');
@@ -37,7 +38,7 @@ export default function ReportsLogin() {
   return (
     <main className="compass min-h-screen flex flex-col items-center justify-center px-6">
       <div className="max-w-sm w-full">
-        <Link href="/" className="flex items-center justify-center gap-3 mb-10 group">
+        <Link href="/" onClick={() => trackEvent('login_logo_click', { meta: { target: '/' } })} className="flex items-center justify-center gap-3 mb-10 group">
           <span className="compass-mark">N</span>
           <span className="font-serif text-[22px] text-white">
             Never 86&apos;d <span className="italic text-white/70">· sign in</span>
@@ -71,7 +72,7 @@ export default function ReportsLogin() {
         </div>
 
         <p className="text-[#6e6e73] text-[12px] mt-6 text-center">
-          Not an operator yet? <Link href="/onboard" className="text-white font-medium hover:underline">Onboard your store</Link>
+          Not an operator yet? <Link href="/onboard" onClick={() => trackEvent('login_onboard_link_click', { meta: { target: '/onboard', label: 'Onboard your store' } })} className="text-white font-medium hover:underline">Onboard your store</Link>
         </p>
       </div>
     </main>

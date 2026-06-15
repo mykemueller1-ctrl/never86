@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Press kit · Never 86'd",
@@ -42,8 +43,8 @@ export default function PressKit() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <TrackedLink href="/" event="press_nav_click" meta={{ target: '/', label: 'Home' }} className="compass-pill"><span className="avatar">H</span><span>Home</span></TrackedLink>
+            <TrackedLink href="/onboard" event="press_nav_click" meta={{ target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
           </nav>
         </div>
       </div>
@@ -103,7 +104,7 @@ export default function PressKit() {
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <a href="mailto:press@never86.ai" className="hover:text-white transition-colors">press@never86.ai</a>
+          <TrackedLink href="mailto:press@never86.ai" event="press_email_click" meta={{ target: 'mailto:press@never86.ai', label: 'press@never86.ai' }} className="hover:text-white transition-colors">press@never86.ai</TrackedLink>
         </div>
       </footer>
     </main>
