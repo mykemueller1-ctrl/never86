@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { trackEvent } from '@/lib/track';
 
 const POS_OPTIONS = ['Toast', 'Square', 'Clover', 'Aloha', 'Lightspeed', 'Other / not sure'];
 
@@ -48,12 +49,15 @@ export default function OnboardPage() {
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
 
+  useEffect(() => { trackEvent('onboard_view'); }, []);
+
   const step1Valid = name.trim() && email.trim() && restaurantName.trim();
   const step2Valid = !!posType;
   const step3Valid = !!interestedAgent;
   const step4Valid = !!dataPreference;
 
   async function handleSubmit() {
+    trackEvent('onboard_submit', { meta: { posType, interestedAgent, dataPreference, units: units || null } });
     setStatus('loading');
     try {
       const res = await fetch('/api/waitlist', {
@@ -75,12 +79,15 @@ export default function OnboardPage() {
         setStatus('success');
         setMessage(data.message || "You're in.");
         setStep(5);
+        trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference } });
       } else {
         throw new Error(data.error || 'Something went wrong');
       }
     } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong';
       setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Something went wrong');
+      setMessage(msg);
+      trackEvent('onboard_submit_error', { meta: { posType, interestedAgent, dataPreference, error: msg } });
     }
   }
 
@@ -126,7 +133,7 @@ export default function OnboardPage() {
               </h1>
               <p className="compass-body text-lg mb-10">Three things. Takes ten seconds.</p>
               <form
-                onSubmit={(e) => { e.preventDefault(); if (step1Valid) setStep(2); }}
+                onSubmit={(e) => { e.preventDefault(); if (step1Valid) { trackEvent('onboard_step_1_complete', { meta: { hasUnits: !!units } }); setStep(2); } }}
                 className="compass-card text-left space-y-3"
               >
                 <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
@@ -153,14 +160,14 @@ export default function OnboardPage() {
               <p className="compass-body text-lg mb-10">So we know what we&apos;re wiring into.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {POS_OPTIONS.map((opt) => (
-                  <button key={opt} type="button" onClick={() => setPosType(opt)} className={pickClass(posType === opt)}>
+                  <button key={opt} type="button" onClick={() => { if (opt !== posType) trackEvent('onboard_pos_selected', { meta: { posType: opt } }); setPosType(opt); }} className={pickClass(posType === opt)}>
                     <p className="font-serif text-xl text-white tracking-tight">{opt}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button onClick={() => setStep(1)} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
-                <button onClick={() => step2Valid && setStep(3)} disabled={!step2Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 2 } }); setStep(1); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={() => { if (step2Valid) { trackEvent('onboard_step_2_complete', { meta: { posType } }); setStep(3); } }} disabled={!step2Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
               </div>
             </div>
           )}
@@ -173,15 +180,15 @@ export default function OnboardPage() {
               <p className="compass-body text-lg mb-10">Pick one. You can have the rest later.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {AGENT_OPTIONS.map((a) => (
-                  <button key={a.v} type="button" onClick={() => setInterestedAgent(a.v)} className={pickClass(interestedAgent === a.v)}>
+                  <button key={a.v} type="button" onClick={() => { if (a.v !== interestedAgent) trackEvent('onboard_agent_selected', { meta: { interestedAgent: a.v } }); setInterestedAgent(a.v); }} className={pickClass(interestedAgent === a.v)}>
                     <p className="font-serif text-xl text-white tracking-tight mb-1">{a.v}</p>
                     <p className="compass-body text-sm leading-snug">{a.d}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button onClick={() => setStep(2)} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
-                <button onClick={() => step3Valid && setStep(4)} disabled={!step3Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 3 } }); setStep(2); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={() => { if (step3Valid) { trackEvent('onboard_step_3_complete', { meta: { interestedAgent } }); setStep(4); } }} disabled={!step3Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
               </div>
             </div>
           )}
@@ -194,15 +201,15 @@ export default function OnboardPage() {
               <p className="compass-body text-lg mb-10">Pick the path that fits where you are today.</p>
               <div className="grid gap-3">
                 {DATA_OPTIONS.map((d) => (
-                  <button key={d.v} type="button" onClick={() => setDataPreference(d.v)} className={pickClass(dataPreference === d.v)}>
+                  <button key={d.v} type="button" onClick={() => { if (d.v !== dataPreference) trackEvent('onboard_data_pref_selected', { meta: { dataPreference: d.v } }); setDataPreference(d.v); }} className={pickClass(dataPreference === d.v)}>
                     <p className="font-serif text-xl text-white tracking-tight mb-1">{d.v}</p>
                     <p className="compass-body text-sm leading-snug">{d.d}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button onClick={() => setStep(3)} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
-                <button onClick={handleSubmit} disabled={!step4Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 4 } }); setStep(3); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={handleSubmit} disabled={!step4Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
                   {status === 'loading' ? 'Sending…' : 'Finish →'}
                 </button>
               </div>
@@ -236,7 +243,8 @@ export default function OnboardPage() {
               <a
                 href="https://outlook.office.com/bookwithme/user/fe6663123f354f7da6e4bb9d76d223eb@n86.app?anonymous&ismsaljsauthenabled"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent('onboard_book_meeting_click', { meta: { interestedAgent, posType } })}
                 className="btn-primary"
                 style={{ background: '#0066ff' }}
               >
