@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Track } from '@/components/Track';
 import { AgentUnlock } from '@/components/AgentUnlock';
+import { TrackedLink } from '@/components/TrackedLink';
 
 const ALL_AGENTS = [
   { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids' },
@@ -42,8 +43,8 @@ export function DemoChrome({
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">A</span><span>All agents</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <TrackedLink href="/agents" event="demo_nav_click" meta={{ agent: title, target: '/agents', label: 'All agents' }} className="compass-pill"><span className="avatar">A</span><span>All agents</span></TrackedLink>
+            <TrackedLink href="/onboard" event="demo_nav_click" meta={{ agent: title, target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
           </nav>
         </div>
       </div>
@@ -69,13 +70,13 @@ export function DemoChrome({
           <p className="compass-eyebrow mb-4">— Try another agent</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {others.map((a) => (
-              <Link key={a.name} href={a.href} className="compass-card hover:border-[#0066ff] transition-colors block group">
+              <TrackedLink key={a.name} href={a.href} event="demo_try_another_click" meta={{ from: title, to: a.name, target: a.href }} className="compass-card hover:border-[#0066ff] transition-colors block group">
                 <p className="compass-card-label">{a.tag}</p>
                 <p className="font-serif text-[17px] mt-2 text-white leading-tight">{a.name}</p>
                 <p className="text-[12px] mt-2 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
                   Open <span aria-hidden>→</span>
                 </p>
-              </Link>
+              </TrackedLink>
             ))}
           </div>
         </div>
@@ -88,8 +89,8 @@ export function DemoChrome({
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <TrackedLink href="/for" event="demo_footer_click" meta={{ agent: title, target: '/for', label: 'Seats' }} className="hover:text-white transition-colors">Seats</TrackedLink>
+            <TrackedLink href="/" event="demo_footer_click" meta={{ agent: title, target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>
