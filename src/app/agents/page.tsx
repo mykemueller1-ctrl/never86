@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 import { AgentsNavLinks } from './AgentsNavLinks';
 import { AgentCardActions } from './AgentCardActions';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Agents · Never 86'd",
@@ -50,8 +51,8 @@ export default function AgentsPage() {
           Each one reads a slice of your operation — sales, labor, voids, 3P fees, tips, catering, shift sentiment — and tells you the one thing to fix. Per store. Per name. Every figure source-tagged.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>60 minutes free · drop a CSV →</Link>
-          <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</Link>
+          <TrackedLink href="/trial" event="agents_hero_cta_click" meta={{ target: '/trial', label: '60 minutes free · drop a CSV', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>60 minutes free · drop a CSV →</TrackedLink>
+          <TrackedLink href="/pricing" event="agents_hero_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
         </div>
       </section>
 
@@ -113,7 +114,7 @@ export default function AgentsPage() {
             ))}
           </div>
           <p className="compass-body text-[14px] mt-8 max-w-3xl">
-            No competitor in this category publicly source-tags figures. None publicly disclose model error. We checked. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case</Link> where we caught our own $8.3M number, walked it down to $1.81M in writing, and made source-tagging the operational rule that came out of it.
+            No competitor in this category publicly source-tags figures. None publicly disclose model error. We checked. <TrackedLink href="/case/walked-the-number-back" event="agents_case_link_click" meta={{ target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' }} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case</TrackedLink> where we caught our own $8.3M number, walked it down to $1.81M in writing, and made source-tagging the operational rule that came out of it.
           </p>
         </div>
       </section>
@@ -128,8 +129,8 @@ export default function AgentsPage() {
             Drop a Toast / Square / Clover / PDQ export at <span className="font-mono text-white">/trial</span>. Void Hunter and the Leak Detector run on your real data in 30 seconds. No card. No human in the loop.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</Link>
-            <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</Link>
+            <TrackedLink href="/trial" event="agents_bottom_cta_click" meta={{ target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
+            <TrackedLink href="/pricing" event="agents_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
           </div>
         </div>
       </section>
@@ -141,10 +142,10 @@ export default function AgentsPage() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/pricing"  className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="/trial"    className="hover:text-white transition-colors">Trial</Link>
-            <Link href="/for"      className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/"         className="hover:text-white transition-colors">Home</Link>
+            <TrackedLink href="/pricing"  event="agents_footer_click" meta={{ target: '/pricing', label: 'Pricing' }} className="hover:text-white transition-colors">Pricing</TrackedLink>
+            <TrackedLink href="/trial"    event="agents_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-white transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/for"      event="agents_footer_click" meta={{ target: '/for',     label: 'Seats' }}   className="hover:text-white transition-colors">Seats</TrackedLink>
+            <TrackedLink href="/"         event="agents_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-white transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>
