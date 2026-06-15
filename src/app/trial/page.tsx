@@ -386,7 +386,7 @@ export default function TrialPage() {
             <p className="compass-eyebrow mb-4">— Pick an agent</p>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {MODES.map((m) => (
-                <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); }}
+                <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null); setShareToken(null); }}
                   className="compass-card text-left transition-colors"
                   style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
                   <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
