@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { AGENT_SPECS, getAgentSpec } from '@/lib/agentSpecs';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export function generateStaticParams() {
   return AGENT_SPECS.map((a) => ({ slug: a.slug }));
@@ -83,8 +84,8 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/agents" className="compass-pill"><span className="avatar">A</span><span>All agents</span></Link>
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Try free →</Link>
+            <TrackedLink href="/agents" event="agent_detail_nav_click" meta={{ agentSlug: a.slug, target: '/agents', label: 'All agents' }} className="compass-pill"><span className="avatar">A</span><span>All agents</span></TrackedLink>
+            <TrackedLink href="/trial" event="agent_detail_nav_click" meta={{ agentSlug: a.slug, target: '/trial', label: 'Try free' }} className="btn-primary" style={{ background: '#0066ff' }}>Try free →</TrackedLink>
           </nav>
         </div>
       </div>
@@ -101,15 +102,15 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
           {a.intro}
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href={a.href} className="btn-primary" style={{ background: '#0066ff' }}>
+          <TrackedLink href={a.href} event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, agentName: a.name, target: a.href, label: `Try ${a.name} live`, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
             Try {a.name} live →
-          </Link>
-          <Link href="/trial" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+          </TrackedLink>
+          <TrackedLink href="/trial" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/trial', label: '60-minute trial', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
             60-minute trial
-          </Link>
-          <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+          </TrackedLink>
+          <TrackedLink href="/pricing" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
             Pricing
-          </Link>
+          </TrackedLink>
         </div>
       </section>
 
@@ -156,7 +157,7 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             {a.posSupport}
           </p>
           <p className="compass-body text-[14px] max-w-3xl" style={{ color: '#86868b' }}>
-            Don&apos;t see your POS? <Link href="/trial" className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>Drop a CSV at /trial</Link> — the parser auto-detects most column shapes. Or join the integration waitlist and we&apos;ll email you the moment the OAuth ships.
+            Don&apos;t see your POS? <TrackedLink href="/trial" event="agent_detail_inline_trial_click" meta={{ agentSlug: a.slug, label: 'Drop a CSV at /trial' }} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>Drop a CSV at /trial</TrackedLink> — the parser auto-detects most column shapes. Or join the integration waitlist and we&apos;ll email you the moment the OAuth ships.
           </p>
         </div>
       </section>
@@ -187,8 +188,8 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             60 minutes. <em>Your real numbers.</em>
           </h2>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</Link>
-            <Link href={a.href} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Open the demo</Link>
+            <TrackedLink href="/trial" event="agent_detail_bottom_cta_click" meta={{ agentSlug: a.slug, target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
+            <TrackedLink href={a.href} event="agent_detail_bottom_cta_click" meta={{ agentSlug: a.slug, agentName: a.name, target: a.href, label: 'Open the demo', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Open the demo</TrackedLink>
           </div>
         </div>
       </section>
@@ -200,10 +201,10 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/agents"  className="hover:text-white transition-colors">All agents</Link>
-            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="/trial"   className="hover:text-white transition-colors">Trial</Link>
-            <Link href="/"        className="hover:text-white transition-colors">Home</Link>
+            <TrackedLink href="/agents"  event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/agents',  label: 'All agents' }} className="hover:text-white transition-colors">All agents</TrackedLink>
+            <TrackedLink href="/pricing" event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing' }}    className="hover:text-white transition-colors">Pricing</TrackedLink>
+            <TrackedLink href="/trial"   event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/trial',   label: 'Trial' }}      className="hover:text-white transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/"        event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/',        label: 'Home' }}       className="hover:text-white transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>
