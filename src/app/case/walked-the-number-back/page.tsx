@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "$8.3M → $1.81M · The correction · Never 86'd",
@@ -35,8 +36,8 @@ export default function CaseWalkedBack() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <TrackedLink href="/" event="case_nav_click" meta={{ target: '/', label: 'Home' }} className="compass-pill"><span className="avatar">H</span><span>Home</span></TrackedLink>
+            <TrackedLink href="/onboard" event="case_nav_click" meta={{ target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
           </nav>
         </div>
       </div>
@@ -95,8 +96,8 @@ export default function CaseWalkedBack() {
         <div className="mt-16 pt-10 border-t border-[#1f1f1f]">
           <p className="compass-eyebrow mb-5">— Take it for a drive</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Link href="/demo/3p-fee-finder" className="btn-primary" style={{ background: '#0066ff' }}>Try a free agent</Link>
-            <Link href="/onboard" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>15 minutes on your data</Link>
+            <TrackedLink href="/demo/3p-fee-finder" event="case_bottom_cta_click" meta={{ target: '/demo/3p-fee-finder', label: 'Try a free agent', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Try a free agent</TrackedLink>
+            <TrackedLink href="/onboard" event="case_bottom_cta_click" meta={{ target: '/onboard', label: '15 minutes on your data', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>15 minutes on your data</TrackedLink>
           </div>
         </div>
       </article>
@@ -107,7 +108,7 @@ export default function CaseWalkedBack() {
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <TrackedLink href="/" event="case_footer_click" meta={{ target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
         </div>
       </footer>
     </main>
