@@ -5,15 +5,24 @@ import { useState } from 'react';
 
 const POS_OPTIONS = ['Toast', 'Square', 'Clover', 'Aloha', 'Lightspeed', 'Other / not sure'];
 
+// 7 CSV-runnable first (match agentSpecs.ts names exactly), then 3
+// not-yet-CSV agents we still wire on the full operator app, then
+// the catch-all. Drift caught in the button-walk audit: the 7-agent
+// expansion (Leak Detector / BCS / Vendor Drift) had never reached
+// this picker — operators couldn't even raise their hand for 3 of
+// the agents we publicly market on /trial and /agents.
 const AGENT_OPTIONS = [
-  { v: 'Void Hunter',     d: 'Catch the void pattern before it eats the night.' },
-  { v: '3P Fee Finder',   d: 'See what DoorDash, UberEats, GrubHub are actually keeping.' },
-  { v: 'Labor Leak',      d: 'Find the labor that ran without permission.' },
-  { v: 'Tip Variance',    d: 'Spot the tip drift that nobody talks about.' },
-  { v: 'Catering Leak',   d: 'Off-menu catering with no margin discipline.' },
-  { v: 'Rate Card Audit', d: 'Where your 3P contracted rate sits vs the peer band.' },
-  { v: 'Shift Pulse',     d: 'Crew + manager sentiment at the close of every shift.' },
-  { v: 'All of the above',d: 'Wire the whole stack — Command Center on your data.' },
+  { v: 'Void Hunter',            d: 'Catch the void pattern before it eats the night.' },
+  { v: 'Leak Detector',          d: '7 theft signals on a ticket-level CSV. Risk-scored per name.' },
+  { v: 'Labor Leak',             d: 'Find the labor that ran without permission.' },
+  { v: 'Tip Variance',           d: 'Spot the tip drift that nobody talks about.' },
+  { v: 'Catering Leak',          d: 'Off-menu catering with no margin discipline.' },
+  { v: 'Beverage Cost Score',    d: 'BCS 0–100 per store · per-category bar/wine shrink.' },
+  { v: 'Vendor Drift Detector',  d: 'Per-SKU price drift across vendors, week over week.' },
+  { v: '3P Fee Finder',          d: 'See what DoorDash, UberEats, GrubHub are actually keeping.' },
+  { v: 'Rate Card Audit',        d: 'Where your 3P contracted rate sits vs the peer band.' },
+  { v: 'Shift Pulse',            d: 'Crew + manager sentiment at the close of every shift.' },
+  { v: 'All of the above',       d: 'Wire the whole stack — Command Center on your data.' },
 ];
 
 const DATA_OPTIONS = [
