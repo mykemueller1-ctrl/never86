@@ -125,10 +125,11 @@ type CateringResult = {
 
 const POS_OPTIONS = [
   { v: 'Toast',      tag: 'Now',     status: 'csv',  note: 'Drop Toast Employee Performance or Sales Detail CSV today.' },
-  { v: 'Lightspeed', tag: 'Soon',    status: 'soon', note: 'Lightspeed dev-account OAuth in build.' },
-  { v: 'Aloha',      tag: 'Soon',    status: 'soon', note: 'NCR/Aloha integration in motion. Enterprise partner cycle.' },
+  { v: 'PDQ',        tag: 'CSV',     status: 'csv',  note: 'Drop your PDQ Z-Report or POS export — the one CTAP runs on every day.' },
   { v: 'Square',     tag: 'CSV',     status: 'csv',  note: 'Drop your Square employee summary CSV.' },
   { v: 'Clover',     tag: 'CSV',     status: 'csv',  note: 'Drop your Clover Reports export.' },
+  { v: 'Lightspeed', tag: 'Soon',    status: 'soon', note: 'Lightspeed dev-account OAuth in build.' },
+  { v: 'Aloha',      tag: 'Soon',    status: 'soon', note: 'NCR/Aloha integration in motion. Enterprise partner cycle.' },
   { v: 'Other',      tag: 'Tell us', status: 'soon', note: "Tell us your POS — we'll prioritize the ones operators ask for." },
 ];
 
@@ -368,15 +369,22 @@ export default function TrialPage() {
   }
 
   async function joinWaitlist(pos: string) {
+    trackEvent('trial_pos_waitlist_click', { meta: { pos, hasEmail: !!email } });
     if (!email) { setWaitlistPos(pos); return; }
     setWaitlistStatus('sending');
+    setWaitlistPos(pos);
     try {
-      await fetch('/api/integration-waitlist', {
+      const res = await fetch('/api/integration-waitlist', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, restaurantName, pos, sourcePage: '/trial' }),
       });
-      setWaitlistStatus('sent'); setWaitlistPos(pos);
-    } catch { setWaitlistStatus('error'); }
+      if (!res.ok) throw new Error(`Waitlist failed (HTTP ${res.status})`);
+      setWaitlistStatus('sent');
+      trackEvent('trial_pos_waitlist_success', { meta: { pos } });
+    } catch (e: unknown) {
+      setWaitlistStatus('error');
+      trackEvent('trial_pos_waitlist_error', { meta: { pos, error: e instanceof Error ? e.message : 'unknown' } });
+    }
   }
 
   const currentModeLabel = MODES.find((m) => m.id === mode)?.label ?? 'Agent';
@@ -971,7 +979,7 @@ export default function TrialPage() {
               </h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {POS_OPTIONS.map((p) => (
-                  <button key={p.v} onClick={() => joinWaitlist(p.v)} className="compass-card text-left hover:border-[#0066ff] transition-colors group">
+                  <button type="button" key={p.v} onClick={() => joinWaitlist(p.v)} disabled={waitlistStatus === 'sending' && waitlistPos === p.v} className="compass-card text-left hover:border-[#0066ff] transition-colors group disabled:opacity-50">
                     <div className="flex items-center justify-between">
                       <p className="compass-card-label">{p.tag}</p>
                       {p.status === 'csv'
@@ -980,7 +988,9 @@ export default function TrialPage() {
                     </div>
                     <h3>{p.v}</h3>
                     <p className="compass-body text-[13px] mt-2">{p.note}</p>
+                    {waitlistPos === p.v && waitlistStatus === 'sending' && <p className="text-[11px] mt-2" style={{ color: '#86868b' }}>Sending…</p>}
                     {waitlistPos === p.v && waitlistStatus === 'sent' && <p className="text-[11px] mt-2" style={{ color: '#34c759' }}>✓ On the list</p>}
+                    {waitlistPos === p.v && waitlistStatus === 'error' && <p className="text-[11px] mt-2" style={{ color: '#ff453a' }}>Couldn&apos;t reach the server. Tap to retry.</p>}
                   </button>
                 ))}
               </div>
