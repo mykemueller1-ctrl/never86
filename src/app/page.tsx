@@ -108,13 +108,15 @@ export default function Home() {
 
         {/* Top tab nav — Agents · For Operators ▾ · Pricing · Trial · Sign in */}
         <nav className="mt-6 flex flex-wrap items-center gap-2 text-[14px]" ref={dropRef}>
-          <Link href="/agents" className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
+          <Link href="/agents" onClick={() => trackEvent('home_nav_click', { meta: { target: '/agents', label: 'Agents' } })} className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
 
           <div className="relative">
             <button
-              onClick={() => setOpOpen((v) => !v)}
+              type="button"
+              onClick={() => { setOpOpen((v) => { const next = !v; if (next) trackEvent('home_nav_dropdown_open', { meta: { label: 'For multi-unit operators' } }); return next; }); }}
               className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
               aria-expanded={opOpen}
+              aria-haspopup="menu"
             >
               For multi-unit operators
               <span className="text-[10px]" style={{ color: '#0066ff' }}>{opOpen ? '▴' : '▾'}</span>
@@ -125,7 +127,7 @@ export default function Home() {
                   <Link
                     key={o.name}
                     href={o.href}
-                    onClick={() => setOpOpen(false)}
+                    onClick={() => { trackEvent('home_nav_dropdown_item_click', { meta: { target: o.href, label: o.name } }); setOpOpen(false); }}
                     className="block px-4 py-3 rounded-xl hover:bg-white/[0.05] transition-colors"
                   >
                     <div className="flex items-center justify-between">
@@ -137,7 +139,7 @@ export default function Home() {
                 ))}
                 <Link
                   href="/for"
-                  onClick={() => setOpOpen(false)}
+                  onClick={() => { trackEvent('home_nav_dropdown_item_click', { meta: { target: '/for', label: 'All seven seats' } }); setOpOpen(false); }}
                   className="block px-4 py-2 mt-1 border-t border-[#1f1f1f] text-[13px]"
                   style={{ color: '#0066ff' }}
                 >
@@ -147,10 +149,10 @@ export default function Home() {
             )}
           </div>
 
-          <Link href="/pricing"   className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Pricing</Link>
-          <Link href="/trial"     className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
+          <Link href="/pricing"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/pricing', label: 'Pricing' } })}      className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Pricing</Link>
+          <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
           <span className="flex-1" />
-          <Link href="/reports/login" className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
+          <Link href="/reports/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
         </nav>
 
         {/* Persona pill row */}
