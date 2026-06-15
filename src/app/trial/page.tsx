@@ -198,11 +198,16 @@ export default function TrialPage() {
         setExpiresAt(new Date(data.expiresAt).getTime());
         setRemaining(new Date(data.expiresAt).getTime() - Date.now());
         setPhase('active');
+        trackEvent('trial_start_success', { meta: { expiresAt: data.expiresAt } });
       } else {
-        setErrMsg(data.error || 'Could not start trial.');
+        const msg = data.error || 'Could not start trial.';
+        setErrMsg(msg);
+        trackEvent('trial_start_error', { meta: { error: msg, status: res.status } });
       }
     } catch (e: unknown) {
-      setErrMsg(e instanceof Error ? e.message : 'Could not start trial.');
+      const msg = e instanceof Error ? e.message : 'Could not start trial.';
+      setErrMsg(msg);
+      trackEvent('trial_start_error', { meta: { error: msg, status: 0 } });
     } finally {
       setStarting(false);
     }
