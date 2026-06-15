@@ -41,12 +41,15 @@ export default function InstallForm() {
       if (data.success) {
         setStatus('sent');
         setMessage(data.message || 'Install request received.');
+        trackEvent('install_submit_success', { meta: { posType, units: units || null, fromShareToken: fromShareToken || null } });
       } else {
         throw new Error(data.error || 'Failed');
       }
     } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong';
       setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Something went wrong');
+      setMessage(msg);
+      trackEvent('install_submit_error', { meta: { posType, units: units || null, fromShareToken: fromShareToken || null, error: msg } });
     }
   }
 
