@@ -317,10 +317,16 @@ export default function TrialPage() {
     if (!s) return;
     try {
       const res = await fetch(s.url);
+      if (!res.ok) throw new Error(`Sample fetch failed (HTTP ${res.status})`);
       const blob = await res.blob();
       const file = new File([blob], s.name, { type: 'text/csv' });
       runFile(file);
-    } catch {}
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Could not load sample';
+      setErrMsg(msg);
+      setStatus('error');
+      trackEvent('trial_sample_error', { meta: { mode, error: msg } });
+    }
   }
 
   async function joinWaitlist(pos: string) {
@@ -398,8 +404,8 @@ export default function TrialPage() {
 
             <div className="flex items-center justify-end gap-3 mb-4">
               <p className="compass-eyebrow-dim">— Don&apos;t have your own export yet?</p>
-              <button onClick={runSample} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#0066ff', color: '#0066ff' }}>
-                Run on sample data →
+              <button type="button" onClick={runSample} disabled={status === 'running'} className="btn-secondary text-[13px] disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'transparent', borderColor: '#0066ff', color: '#0066ff' }}>
+                {status === 'running' ? 'Loading…' : 'Run on sample data →'}
               </button>
             </div>
 
