@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Pricing · Never 86'd",
@@ -148,15 +149,17 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
+              <TrackedLink
                 href={t.cta.href}
+                event="pricing_tier_cta_click"
+                meta={{ tier: t.name.toLowerCase(), target: t.cta.href, label: t.cta.label, price: t.price, accent: !!t.accent }}
                 className="btn-primary mt-auto"
                 style={t.accent
                   ? { background: '#0066ff' }
                   : { background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}
               >
                 {t.cta.label}
-              </Link>
+              </TrackedLink>
             </div>
           ))}
         </div>
