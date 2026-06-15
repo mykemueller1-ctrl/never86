@@ -111,8 +111,8 @@ export default function PricingPage() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/trial"   className="compass-pill"><span className="avatar">T</span><span>Try free</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <TrackedLink href="/trial"   event="pricing_nav_click" meta={{ target: '/trial',   label: 'Try free' }} className="compass-pill"><span className="avatar">T</span><span>Try free</span></TrackedLink>
+            <TrackedLink href="/onboard" event="pricing_nav_click" meta={{ target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
           </nav>
         </div>
       </div>
@@ -189,9 +189,9 @@ export default function PricingPage() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/trial"   className="hover:text-white transition-colors">Trial</Link>
-            <Link href="/onboard" className="hover:text-white transition-colors">Onboard</Link>
-            <Link href="/"        className="hover:text-white transition-colors">Home</Link>
+            <TrackedLink href="/trial"   event="pricing_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-white transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/onboard" event="pricing_footer_click" meta={{ target: '/onboard', label: 'Onboard' }} className="hover:text-white transition-colors">Onboard</TrackedLink>
+            <TrackedLink href="/"        event="pricing_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-white transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>
