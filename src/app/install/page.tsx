@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import InstallForm from './InstallForm';
+import { InstallNavLinks } from './InstallNavLinks';
 
 export const metadata: Metadata = {
   title: "Install · Never 86'd",
@@ -27,10 +28,7 @@ export default function InstallPage() {
               <p className="compass-eyebrow-dim mt-2">Operator OS · upgrade from /trial to the live product</p>
             </span>
           </Link>
-          <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/trial" className="compass-pill"><span className="avatar">T</span><span>Back to trial</span></Link>
-            <a href="https://never86d-ctap.onrender.com" target="_blank" rel="noopener" className="btn-primary" style={{ background: '#0066ff' }}>Open operator app →</a>
-          </nav>
+          <InstallNavLinks />
         </div>
       </div>
 
