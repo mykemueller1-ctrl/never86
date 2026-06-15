@@ -285,7 +285,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 CSV agents to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · BCS · Vendor Drift)</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
-              <Link href="/trial" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'independent', target: '/trial', label: 'Start the trial' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
                 Start the trial
               </Link>
             </div>
@@ -301,7 +301,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Email + SMS alerts when a name spikes</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Single-tenant Command Center · 90-day history</span></li>
               </ul>
-              <Link href="/onboard" className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator', target: '/onboard', label: 'Onboard your store' } })} className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
                 Onboard your store →
               </Link>
             </div>
@@ -317,7 +317,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-role lenses · CEO · CFO · COO · Chef · Owner</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Slack + Teams integration · unlimited history</span></li>
               </ul>
-              <Link href="/onboard" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'multi_unit', target: '/onboard', label: 'Talk to us' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
                 Talk to us
               </Link>
             </div>
@@ -333,7 +333,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>SSO · Okta / Azure AD / Google</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Quarterly business review with the founder</span></li>
               </ul>
-              <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'enterprise', target: 'mailto', label: 'Email myke@n86.app' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
                 Email myke@n86.app
               </a>
             </div>
