@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Changelog · Never 86'd",
@@ -186,8 +187,8 @@ export default function ChangelogPage() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Try free →</Link>
+            <TrackedLink href="/" event="changelog_nav_click" meta={{ target: '/', label: 'Home' }} className="compass-pill"><span className="avatar">H</span><span>Home</span></TrackedLink>
+            <TrackedLink href="/trial" event="changelog_nav_click" meta={{ target: '/trial', label: 'Try free' }} className="btn-primary" style={{ background: '#0066ff' }}>Try free →</TrackedLink>
           </nav>
         </div>
       </div>
@@ -233,7 +234,7 @@ export default function ChangelogPage() {
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <TrackedLink href="/" event="changelog_footer_click" meta={{ target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
         </div>
       </footer>
     </main>

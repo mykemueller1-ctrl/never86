@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { trackEvent } from '@/lib/track';
 import { useState } from 'react';
 
 const PILLARS = [
@@ -58,8 +59,8 @@ export default function PeoplePage() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/for" className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <Link href="/for" onClick={() => trackEvent('people_nav_click', { meta: { target: '/for', label: 'Seats' } })} className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
+            <Link href="/onboard" onClick={() => trackEvent('people_nav_click', { meta: { target: '/onboard', label: 'Onboard your store' } })} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
           </nav>
         </div>
       </div>
@@ -73,7 +74,7 @@ export default function PeoplePage() {
         <p className="compass-body text-lg md:text-xl max-w-2xl mb-10">
           Built on a real restaurant. Fort Dodge, Iowa. 41 staff, 7 departments, every shift on one screen.
         </p>
-        <a href="#notify" className="btn-primary" style={{ background: '#0066ff' }}>Get notified →</a>
+        <a href="#notify" onClick={() => trackEvent('people_hero_cta_click', { meta: { target: '#notify', label: 'Get notified' } })} className="btn-primary" style={{ background: '#0066ff' }}>Get notified →</a>
       </section>
 
       <section className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
@@ -156,8 +157,8 @@ export default function PeoplePage() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/reports/login" className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/for" onClick={() => trackEvent('people_footer_click', { meta: { target: '/for', label: 'Seats' } })} className="hover:text-white transition-colors">Seats</Link>
+            <Link href="/reports/login" onClick={() => trackEvent('people_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>
