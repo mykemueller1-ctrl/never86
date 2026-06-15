@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 import { AgentsNavLinks } from './AgentsNavLinks';
+import { AgentCardActions } from './AgentCardActions';
 
 export const metadata: Metadata = {
   title: "Agents · Never 86'd",
@@ -65,14 +66,7 @@ export default function AgentsPage() {
                     <h3 className="!mt-2 text-2xl md:text-3xl">{a.name}</h3>
                     <p className="text-[12px] mt-2" style={{ color: '#86868b' }}>For the {a.seat}</p>
                     <p className="font-serif italic mt-4 text-lg" style={{ color: '#0066ff' }}>{a.headline}</p>
-                    <div className="flex gap-3 mt-5 flex-wrap">
-                      <Link href={`/agents/${a.slug}`} className="text-[13px] inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
-                        Read more <span aria-hidden>→</span>
-                      </Link>
-                      <Link href={a.href} className="text-[13px] inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#86868b' }}>
-                        Try {a.name} <span aria-hidden>→</span>
-                      </Link>
-                    </div>
+                    <AgentCardActions slug={a.slug} agentName={a.name} tryHref={a.href} />
                   </div>
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
