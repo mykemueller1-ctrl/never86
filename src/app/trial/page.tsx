@@ -169,6 +169,8 @@ export default function TrialPage() {
   const [restaurantName, setRestaurantName] = useState('');
   const [name, setName] = useState('');
   const [leadSaved, setLeadSaved] = useState(false);
+  const [leadSaving, setLeadSaving] = useState(false);
+  const [leadError, setLeadError] = useState('');
 
   const [waitlistPos, setWaitlistPos] = useState<string | null>(null);
   const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -282,26 +284,36 @@ export default function TrialPage() {
   async function saveLead(e: React.FormEvent) {
     e.preventDefault();
     trackEvent('trial_lead_saved', { meta: { mode, hasShareToken: !!shareToken } });
+    setLeadSaving(true);
+    setLeadError('');
     try {
       // If there's a saved run, claim it against this email so the
       // operator can return to /trial/run/[shareToken].
-      if (shareToken) {
-        await fetch('/api/trial/claim', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ shareToken, email, name, restaurantName }),
-        });
-      } else {
-        await fetch('/api/waitlist', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      const endpoint = shareToken ? '/api/trial/claim' : '/api/waitlist';
+      const body = shareToken
+        ? { shareToken, email, name, restaurantName }
+        : {
             email, name, restaurantName,
-            agentRequested: mode === 'void' ? 'Void Hunter · trial' : 'Leak Detector · trial',
+            agentRequested: `${currentModeLabel} · trial`,
             sourcePage: '/trial',
-          }),
-        });
+          };
+      const res = await fetch(endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) {
+        throw new Error(data?.error || `Save failed (HTTP ${res.status})`);
       }
       setLeadSaved(true);
-    } catch {}
+      trackEvent('trial_lead_save_success', { meta: { mode, endpoint } });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Could not save your read';
+      setLeadError(msg);
+      trackEvent('trial_lead_save_error', { meta: { mode, error: msg } });
+    } finally {
+      setLeadSaving(false);
+    }
   }
 
   function copyShareUrl() {
@@ -1008,7 +1020,10 @@ export default function TrialPage() {
                 <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
                 <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
                 <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                <button type="submit" className="btn-primary w-full" style={{ background: '#0066ff' }}>Save my read →</button>
+                <button type="submit" disabled={leadSaving} className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
+                  {leadSaving ? 'Saving…' : 'Save my read →'}
+                </button>
+                {leadError && <p className="text-[#ff453a] text-sm text-center mt-2">{leadError}</p>}
               </form>
             )}
           </div>
