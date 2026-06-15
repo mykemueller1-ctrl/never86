@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { SourceTag } from '@/components/SourceTag';
 import type { VoidHunter } from '@/lib/voidHunter';
+import { TrackedLink } from '@/components/TrackedLink';
 
 const usd = (v: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
@@ -38,9 +39,9 @@ function SampleBanner() {
         <p className="text-ink-800 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
         <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
       </div>
-      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
+      <TrackedLink href="/operators#talk" event="demo_connect_data_click" meta={{ agent: 'Void Hunter', target: '/operators#talk' }} className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
-      </Link>
+      </TrackedLink>
     </div>
   );
 }
