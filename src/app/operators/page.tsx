@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { trackEvent } from '@/lib/track';
 
 const FREE_AGENTS = [
   { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids' },
@@ -20,25 +21,31 @@ export default function OperatorsLanding() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
+  useEffect(() => { trackEvent('operators_view'); }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    trackEvent('operators_submit', { meta: { hasUnits: !!units } });
     setStatus('loading');
     try {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, restaurantName, units }),
+        body: JSON.stringify({ email, name, restaurantName, units, sourcePage: '/operators' }),
       });
       const data = await res.json();
       if (data.success) {
         setStatus('success');
         setMessage(data.message || "You're on the list.");
+        trackEvent('operators_submit_success', { meta: { hasUnits: !!units } });
       } else {
         throw new Error(data.error);
       }
     } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong';
       setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Something went wrong');
+      setMessage(msg);
+      trackEvent('operators_submit_error', { meta: { error: msg } });
     }
   }
 
@@ -56,8 +63,8 @@ export default function OperatorsLanding() {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/for" className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
-            <Link href="/onboard" className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <Link href="/for" onClick={() => trackEvent('operators_nav_click', { meta: { target: '/for', label: 'Seats' } })} className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
+            <Link href="/onboard" onClick={() => trackEvent('operators_nav_click', { meta: { target: '/onboard', label: 'Onboard your store' } })} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
           </nav>
         </div>
       </div>
@@ -69,8 +76,8 @@ export default function OperatorsLanding() {
           One <em>recovery.</em>
         </h1>
         <div className="flex flex-wrap gap-3">
-          <Link href="#talk" className="btn-primary" style={{ background: '#0066ff' }}>Talk to us →</Link>
-          <Link href="/onboard" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Onboard your store</Link>
+          <Link href="#talk" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '#talk', label: 'Talk to us', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>Talk to us →</Link>
+          <Link href="/onboard" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '/onboard', label: 'Onboard your store', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Onboard your store</Link>
         </div>
       </section>
 
@@ -124,8 +131,8 @@ export default function OperatorsLanding() {
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/reports/login" className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/for" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/for', label: 'Seats' } })} className="hover:text-white transition-colors">Seats</Link>
+            <Link href="/reports/login" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>
