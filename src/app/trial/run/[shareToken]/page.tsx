@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTrialRunByShareToken } from '@/lib/trialRunsDb';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -139,9 +140,9 @@ export default async function SavedRunPage({ params }: { params: Params }) {
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/trial" className="compass-pill"><span className="avatar">T</span><span>New run</span></Link>
-            <Link href={`/trial/run/${run.shareToken}/proposal`} className="compass-pill"><span className="avatar">P</span><span>Print proposal</span></Link>
-            <Link href={`/install?from=${run.shareToken}`} className="btn-primary" style={{ background: '#0066ff' }}>Install on live data →</Link>
+            <TrackedLink href="/trial" event="run_nav_click" meta={{ target: '/trial', label: 'New run', shareToken: run.shareToken, agent: run.agent }} className="compass-pill"><span className="avatar">T</span><span>New run</span></TrackedLink>
+            <TrackedLink href={`/trial/run/${run.shareToken}/proposal`} event="run_nav_click" meta={{ target: 'proposal', label: 'Print proposal', shareToken: run.shareToken, agent: run.agent }} className="compass-pill"><span className="avatar">P</span><span>Print proposal</span></TrackedLink>
+            <TrackedLink href={`/install?from=${run.shareToken}`} event="run_install_bridge_click" meta={{ shareToken: run.shareToken, agent: run.agent, position: 'top_nav' }} className="btn-primary" style={{ background: '#0066ff' }}>Install on live data →</TrackedLink>
           </nav>
         </div>
       </div>
@@ -161,9 +162,9 @@ export default async function SavedRunPage({ params }: { params: Params }) {
             This was one snapshot from one CSV. Install the operator app and the same agents run every shift, wired to your live POS — plus the full 24-agent workforce, the Brain, and the 30 ops screens. White-glove onboarding for the first 10 operators.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href={`/install?from=${run.shareToken}`} className="btn-primary" style={{ background: '#0066ff' }}>Install the operator app →</Link>
-            <Link href={`/trial/run/${run.shareToken}/proposal`} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Print proposal</Link>
-            <Link href="/pricing" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</Link>
+            <TrackedLink href={`/install?from=${run.shareToken}`} event="run_install_bridge_click" meta={{ shareToken: run.shareToken, agent: run.agent, position: 'bottom_cta' }} className="btn-primary" style={{ background: '#0066ff' }}>Install the operator app →</TrackedLink>
+            <TrackedLink href={`/trial/run/${run.shareToken}/proposal`} event="run_bottom_cta_click" meta={{ target: 'proposal', label: 'Print proposal', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Print proposal</TrackedLink>
+            <TrackedLink href="/pricing" event="run_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
           </div>
         </div>
       </section>
@@ -171,7 +172,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
       <footer className="border-t border-[#1f1f1f] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <span>This link is private. Share with your team — they can read but not edit.</span>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <TrackedLink href="/" event="run_footer_click" meta={{ target: '/', label: 'Home', shareToken: run.shareToken }} className="hover:text-white transition-colors">Home</TrackedLink>
         </div>
       </footer>
     </main>
