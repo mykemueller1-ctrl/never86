@@ -310,7 +310,19 @@ export default function TrialPage() {
     navigator.clipboard.writeText(url).then(() => {
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2000);
-    }).catch(() => {});
+      trackEvent('trial_share_copy', { meta: { mode, shareToken } });
+    }).catch((e) => {
+      trackEvent('trial_share_copy_error', { meta: { mode, error: e instanceof Error ? e.message : 'clipboard_denied' } });
+      // Fallback — prompt the OS share sheet on mobile, or window.prompt
+      // on desktop. Either way the user gets a path to the URL.
+      try {
+        if (typeof navigator !== 'undefined' && (navigator as Navigator & { share?: (data: ShareData) => Promise<void> }).share) {
+          (navigator as Navigator & { share: (data: ShareData) => Promise<void> }).share({ title: "Your Never 86'd trial run", url });
+        } else {
+          window.prompt('Copy this URL:', url);
+        }
+      } catch {}
+    });
   }
 
   // Sample-data path. Operators landing from LinkedIn often don't have
@@ -493,10 +505,10 @@ export default function TrialPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={copyShareUrl} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+                    <button type="button" onClick={copyShareUrl} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
                       {shareCopied ? '✓ Copied' : 'Copy link'}
                     </button>
-                    <a href={`/trial/run/${shareToken}`} target="_blank" rel="noopener" className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Open →</a>
+                    <a href={`/trial/run/${shareToken}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('trial_share_open', { meta: { mode, shareToken } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Open →</a>
                   </div>
                 </div>
               </div>
