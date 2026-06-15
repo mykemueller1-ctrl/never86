@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
+import { AgentsNavLinks } from './AgentsNavLinks';
 
 export const metadata: Metadata = {
   title: "Agents · Never 86'd",
@@ -35,10 +36,7 @@ export default function AgentsPage() {
               <p className="compass-eyebrow-dim mt-2">Operator OS · 24-agent workforce · 7 free to try</p>
             </span>
           </Link>
-          <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Try free →</Link>
-          </nav>
+          <AgentsNavLinks />
         </div>
       </div>
 
