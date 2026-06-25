@@ -450,13 +450,6 @@ export default function TrialPage() {
               ))}
             </div>
 
-            <div className="flex items-center justify-end gap-3 mb-4">
-              <p className="compass-eyebrow-dim">— Don&apos;t have your own export yet?</p>
-              <button type="button" onClick={runSample} disabled={status === 'running'} className="btn-secondary text-[13px] disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'transparent', borderColor: '#0066ff', color: '#0066ff' }}>
-                {status === 'running' ? 'Loading…' : 'Run on sample data →'}
-              </button>
-            </div>
-
             <label
               htmlFor="trial-csv-input"
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -495,6 +488,28 @@ export default function TrialPage() {
                       ? 'Beverage close CSV · Location, Category, Consumed, Poured (+ Unit Price optional for revenue-lost calc)'
                       : 'Vendor invoice CSV · Vendor, SKU, Period, Unit Price (must cover ≥ 2 periods · monthly buckets ideal)'}
                   </p>
+
+                  {/* Equal-weight escape hatch for visitors who don't have an
+                      export in hand. Without this they hit the dropzone, see
+                      "Drop a CSV" with no fallback, and bounce — the exact
+                      pattern session s_mqodz0lt_teiil0 caught on Jun 21
+                      (3× agent_selected then leave, no csv_dropped).
+                      stopPropagation keeps the label-click → file-picker chain
+                      from firing when the visitor taps the sample button. */}
+                  <div className="mt-7 flex items-center justify-center gap-3 text-[13px]" style={{ color: '#86868b' }}>
+                    <span className="h-px w-12" style={{ background: '#2c2c2e' }} />
+                    <span>or skip the export</span>
+                    <span className="h-px w-12" style={{ background: '#2c2c2e' }} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); runSample(); }}
+                    disabled={status === 'running'}
+                    className="mt-4 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: '#0066ff' }}
+                  >
+                    Run {currentModeLabel} on sample data →
+                  </button>
                 </>
               )}
             </label>
