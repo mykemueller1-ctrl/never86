@@ -29,27 +29,28 @@ const TIERS = [
     accent: false,
   },
   {
-    name: 'Operator',
-    tag: 'Up to 3 stores',
-    price: '$299/mo',
-    blurb: 'Wire it to your live POS. Daily reads. Per-name alerts.',
+    name: 'Pulse',
+    tag: '1–2 unit independents',
+    price: '$199/mo',
+    blurb: 'Your office. In your pocket. Daily food cost · cross-vendor cheapest-price · one coach card per leak.',
     features: [
-      'All 7 CSV agents wired to live POS',
-      'Daily auto-pull from Toast / Square / Clover',
-      'Email + SMS alerts when a name spikes',
-      'Command Center · single-tenant',
-      '90-day history retention',
+      'All 7 production agents wired to your live POS',
+      'Daily food cost · 30/60/90-day prime cost trend',
+      'Cross-vendor cheapest-price compare (PFG vs Sysco vs Nicholas & Co)',
+      'One coach card per leak — telling you what to do, not just showing it',
+      'Per-name alerts (email + SMS)',
+      '90-day history · operator_id isolation today, DB-per-operator Q3',
     ],
-    cta: { label: 'Onboard your store →', href: '/onboard' },
+    cta: { label: 'Join the Pulse waitlist →', href: '/onboard' },
     accent: true,
   },
   {
-    name: 'Network',
-    tag: '4–16 stores',
+    name: 'Operator Suite',
+    tag: '3–9 unit small chains',
     price: '$999/mo',
-    blurb: 'The compass view. Network-level peer bands. Roll-up + drill-down.',
+    blurb: 'The compass view. Network-level peer bands. Roll-up + drill-down. (Pricing TBD — flagged for Myke 2026-06-27.)',
     features: [
-      'Everything in Operator',
+      'Everything in Pulse',
       'Peer-band analysis across your fleet',
       'Per-role lens · CEO / CFO / COO / Owner',
       'Slack + Teams integration',
@@ -61,11 +62,11 @@ const TIERS = [
   },
   {
     name: 'Enterprise',
-    tag: '16+ stores',
-    price: 'Custom',
+    tag: '10+ units · PE-backed · multi-brand',
+    price: 'Contact us',
     blurb: 'Multi-brand · SSO · custom integrations · dedicated environment.',
     features: [
-      'Everything in Network',
+      'Everything in Operator Suite',
       'Per-brand isolation',
       'SSO (Okta · Azure AD · Google)',
       'Custom POS integration · NCR Aloha · PDQ · proprietary',
@@ -92,7 +93,7 @@ const FAQS = [
   },
   {
     q: 'What about data security?',
-    a: 'Your CSV uploads are processed in memory and never persisted on the trial path. On a paid plan, your data is isolated per tenant in Supabase with row-level security. We never train models on your data.',
+    a: 'Your CSV uploads are processed in memory and never persisted on the trial path. On a paid plan today: operator_id isolation across one Neon Postgres (every query scoped per tenant). Q3 roadmap: full DB-per-operator (one Neon project per signed operator). We never train models on your data.',
   },
 ];
 
@@ -107,7 +108,7 @@ export default function PricingPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· pricing</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · transparent tiers</p>
+              <p className="compass-eyebrow-dim mt-2">Pulse · Operator Suite · Enterprise · transparent tiers</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -120,10 +121,10 @@ export default function PricingPage() {
       <section className="max-w-5xl mx-auto px-6 pt-12 md:pt-16 pb-12">
         <p className="compass-eyebrow mb-6">— Pricing</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-6">
-          Three tiers. <em>No surprises.</em>
+          Pulse $199. <em>The back-office a small operator never had.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">
-          Built by an operator. Priced like one. Try it free for an hour — see your real leak before you decide.
+          Built by an operator. Priced like one. Try it free for an hour — see your real leak before you decide. Pulse is for 1–2 unit independents; Operator Suite for 3–9 units; Enterprise for 10+ unit multi-brand groups.
         </p>
       </section>
 
