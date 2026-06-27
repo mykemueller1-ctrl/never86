@@ -5,7 +5,7 @@ import { InstallNavLinks } from './InstallNavLinks';
 
 export const metadata: Metadata = {
   title: "Install · Never 86'd",
-  description: 'Take the trial to your live floor. Install the operator app · 24 agents · The Brain · 30 ops screens · database-per-operator isolation.',
+  description: 'Take the trial to your live floor. Install the operator app · 7 production agents live today (UNKNOWN bug detector, pour variance, weight adherence, driver payout audit, modifier mispricing, comp anomaly, void anomaly) · 17 more in the pipeline · operator_id isolation today · DB-per-operator on the Q3 roadmap.',
   openGraph: {
     title: "Never 86'd · Install the operator app",
     description: 'From the trial wedge to the full operator OS. White-glove onboarding for the first 10 operators.',
@@ -38,7 +38,7 @@ export default function InstallPage() {
           Take the trial <em>to your live floor.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl mb-6 max-w-2xl leading-relaxed">
-          You ran the trial. You saw the leak. The next step is the full operator app — the 7 CSV agents you tried, wired to your live POS and running every shift, plus the rest of the 24-agent workforce, the Brain, and the 30 ops screens.
+          You ran the trial. You saw the leak. The next step is the full operator app — the 7 CSV agents you tried, wired to your live POS and running every shift, plus 17 more agents in the Q3 pipeline, the Brain, and the 30 ops screens. (Today: 7 production agents wired. Tomorrow: the full workforce.)
         </p>
       </section>
 
@@ -50,9 +50,9 @@ export default function InstallPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             <div className="compass-card">
-              <p className="compass-card-label">— AI workforce</p>
-              <h3>24 agents wired</h3>
-              <p className="compass-body text-[14px] mt-3">Margin Hunter · Daily Brief · Voids &amp; Comps Watcher · Cash Reconciliation · Inventory/COGS Tracker · Schedule Optimizer · Vendor Drift Detector · Beverage Cost Score · Menu Engineer · Refund Auditor · Catering Channel · Loyalty · Competitive Pricing · Reviews · Catering × Loyalty · HR Write-Up Drafter · Onboarding · Shift Lead Coach · Operator Council Liaison · Margin Recovery Proposal Writer · Battlecard · Pour Cost Watchdog · Catering Margin · Falls Church Canary.</p>
+              <p className="compass-card-label">— AI workforce · today</p>
+              <h3>7 agents live · 17 in the pipeline</h3>
+              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Live in production today (7):</span> UNKNOWN bug detector · Pour variance · Weight adherence · Driver payout audit · Modifier mispricing · Comp anomaly · Void anomaly. <span style={{ color: '#0066ff' }}>Q3 ROADMAP (17 more):</span> Margin Hunter · Daily Brief · Voids &amp; Comps Watcher · Cash Reconciliation · Inventory/COGS · Schedule Optimizer · Vendor Drift · Beverage Cost · Menu Engineer · Refund Auditor · Catering Channel · Loyalty · Competitive Pricing · Reviews · HR Write-Up · Onboarding · Shift Lead Coach · Battlecard.</p>
             </div>
             <div className="compass-card">
               <p className="compass-card-label">— The Brain</p>
@@ -65,14 +65,14 @@ export default function InstallPage() {
               <p className="compass-body text-[14px] mt-3">Time clock, checklists, schedule, shift swaps, station broadcasts, shift handoff, Z-report upload, order optimizer, recipe cost, vendor products, waste log, gamification, write-ups.</p>
             </div>
             <div className="compass-card">
-              <p className="compass-card-label">— Multi-tenant</p>
-              <h3>Database-per-operator</h3>
-              <p className="compass-body text-[14px] mt-3">Your data lives in <span className="text-white font-semibold">your own database</span>. No shared tables. No &ldquo;tenant_id&rdquo; to trust. &ldquo;Never blend companies&rdquo; — the rule that makes operators sign.</p>
+              <p className="compass-card-label">— Multi-tenant · today</p>
+              <h3>Per-operator data isolation</h3>
+              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Today:</span> operator_id everywhere in one Neon Postgres — every query scoped per tenant. <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> full DB-per-operator (one Neon project per signed operator). &ldquo;Never blend companies&rdquo; is the contract — operator_id today, separate DB by Q3.</p>
             </div>
             <div className="compass-card">
-              <p className="compass-card-label">— Auth that fits the floor</p>
-              <h3>PIN-by-department</h3>
-              <p className="compass-body text-[14px] mt-3">Email/password for owners. PIN-by-department for managers and crew (no shared password). Face ID / fingerprint via WebAuthn where supported.</p>
+              <p className="compass-card-label">— Auth · honest state</p>
+              <h3>Magic-link · coming with Pulse</h3>
+              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Today:</span> shared password at <span className="font-mono">/reports/login</span> for charter partners only (per-tenant cookies, 12-hour lifetime). <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> magic-link signup at /pulse, per-user sessions, PIN-by-department for managers/crew. WebAuthn after that.</p>
             </div>
             <div className="compass-card" style={{ borderColor: '#0066ff' }}>
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— Source-tag · everywhere</p>
