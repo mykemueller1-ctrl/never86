@@ -504,7 +504,7 @@ export default function TrialPage() {
                   <button
                     type="button"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); runSample(); }}
-                    disabled={status === 'running'}
+                    disabled={false}
                     className="mt-4 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ background: '#0066ff' }}
                   >
