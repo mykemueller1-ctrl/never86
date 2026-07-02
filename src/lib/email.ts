@@ -72,3 +72,42 @@ export async function sendNotification(email: string, subject: string, message: 
 </html>`,
   });
 }
+
+// Plain-text, operator-voice follow-up. No graphic chrome. Like a real
+// founder emailing personally. agentName is optional — when set, the
+// subject line pulls the agent context the lead unlocked from.
+export async function sendFollowupEmail(opts: {
+  to: string;
+  firstName?: string;
+  agentName?: string;
+  kind: '24h' | '7d';
+}) {
+  const first = opts.firstName?.split(' ')[0] || 'there';
+  const agent = opts.agentName || null;
+
+  const subject24 = agent
+    ? `re: ${agent}`
+    : `re: never86`;
+  const subject7 = agent
+    ? `One question on ${agent}`
+    : 'One question';
+
+  const body24 = agent
+    ? `${first},\n\nQuick check — were you able to look at ${agent}? If not, no rush. If yes, the question I always have is: did it surface anything that surprised you?\n\nIf you want to see it on one of your own stores, drop me a note. 15 minutes, no setup, I'll bring the math.\n\n— Myke`
+    : `${first},\n\nQuick check — were you able to look at the demo? Either way, no rush.\n\nIf you want to see it on one of your own stores, drop me a note. 15 minutes, no setup.\n\n— Myke`;
+
+  const body7 = agent
+    ? `${first},\n\nOne question: at your size, what's the part of ${agent} that doesn't match how you actually run? I want to fix it before you spend any time on us.\n\nReply with one line, or if it's easier — never86.ai/operators#talk\n\n— Myke`
+    : `${first},\n\nOne question: what's the leak you'd want named first if we ran this on your numbers?\n\nReply with one line, or if it's easier — never86.ai/operators#talk\n\n— Myke`;
+
+  const subject = opts.kind === '24h' ? subject24 : subject7;
+  const text = opts.kind === '24h' ? body24 : body7;
+
+  return resend.emails.send({
+    from: "Myke Mueller <myke@n86.app>",
+    to: opts.to,
+    subject,
+    text,
+    reply_to: 'myke@n86.app',
+  });
+}
