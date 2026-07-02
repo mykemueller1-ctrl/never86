@@ -272,68 +272,71 @@ export default function Home() {
       <section id="offer-tiers" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 02 · What we offer</p>
-          <h2 className="compass-display text-4xl md:text-6xl mb-14">
+          <h2 className="compass-display text-4xl md:text-6xl mb-6">
             From the solo operator <em>to the C-suite.</em>
           </h2>
+          <p className="compass-body text-lg max-w-3xl mb-14">
+            Two products, one front door. <span className="text-white font-semibold">Pulse</span> is the back-office for a 1–2 unit independent — the agents that find your money, $199/mo. <span className="text-white font-semibold">The full platform</span> is the whole operating system for multi-unit groups — the 24-agent workforce, the Brain, and the floor screens. The free trial is where everyone starts.
+          </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Independent</p>
-              <h3>One store. One operator.</h3>
+              <p className="compass-card-label">— Free trial</p>
+              <h3>Start here. Free.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                You&apos;re running ops, finance, marketing, HR, and the floor yourself at 11pm. The free trial is built for you.
+                One store, running ops, finance, and the floor yourself at 11pm? Drop a CSV and see your leak in 30 seconds. No card.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute timed trial · drop a CSV · no card</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 CSV agents to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · BCS · Vendor Drift)</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 7 agents free to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · BCS · Vendor Drift)</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
-              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'independent', target: '/trial', label: 'Start the trial' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the trial' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
                 Start the trial
               </Link>
             </div>
 
             <div className="compass-card flex flex-col" style={{ borderColor: '#0066ff' }}>
-              <p className="compass-card-label" style={{ color: '#0066ff' }}>— Operator · $299/mo</p>
-              <h3>1–3 stores.</h3>
+              <p className="compass-card-label" style={{ color: '#0066ff' }}>— Pulse · $199/mo</p>
+              <h3>1–2 units. The back-office you never had.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                The full agent stack wired to your live POS. Daily auto-pull, per-name alerts, your Command Center.
+                Your office, in your pocket. All 7 agents wired to your live POS, running every shift — with one coach card per leak telling you what to do.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>All agents wired to Toast / Square / Clover</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Email + SMS alerts when a name spikes</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Single-tenant Command Center · 90-day history</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Daily food cost · 30/60/90-day prime cost trend</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Cross-vendor cheapest-price compare · per-name alerts</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>A coach card per leak — what to do, not just what broke</span></li>
               </ul>
-              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator', target: '/onboard', label: 'Onboard your store' } })} className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
-                Onboard your store →
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'pulse', target: '/onboard', label: 'Join the Pulse waitlist' } })} className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
+                Join the Pulse waitlist →
               </Link>
             </div>
 
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Multi-unit · $999/mo</p>
-              <h3>4–16 stores.</h3>
+              <p className="compass-card-label">— Operator Suite · $999/mo</p>
+              <h3>3–9 units.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                Network-level peer bands. Per-role lenses for CFO, COO, Chef, GM. Roll-up + drill-down.
+                Everything in Pulse, plus the network view. Peer bands across your fleet, per-role lenses for CFO / COO / Chef / Owner, roll-up and drill-down.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Peer-band analysis across your fleet</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-role lenses · CEO · CFO · COO · Chef · Owner</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Slack + Teams integration · unlimited history</span></li>
               </ul>
-              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'multi_unit', target: '/onboard', label: 'Talk to us' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator_suite', target: '/onboard', label: 'Talk to us' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
                 Talk to us
               </Link>
             </div>
 
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Enterprise · Custom</p>
-              <h3>16+ stores. Multi-brand.</h3>
+              <p className="compass-card-label">— Enterprise · 10+ units</p>
+              <h3>Multi-brand. The full platform.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                Per-brand isolation. SSO. Custom POS integrations (Aloha, PDQ, proprietary). MCP API. QBR.
+                The whole operating system — the 24-agent workforce, the Brain, and the floor screens — with per-brand isolation, SSO, and custom POS integrations.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-brand tenant isolation</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>SSO · Okta / Azure AD / Google</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>SSO · Okta / Azure AD / Google · custom POS (Aloha · PDQ)</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Quarterly business review with the founder</span></li>
               </ul>
               <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'enterprise', target: 'mailto', label: 'Email myke@n86.app' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
