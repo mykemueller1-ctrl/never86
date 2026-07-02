@@ -193,7 +193,7 @@ export default function Home() {
             </h1>
             <p className="compass-body text-lg md:text-xl max-w-2xl">
               Seven agents read your sales, labor, voids, 3P fees, tips, catering, and shift sentiment.
-              Every figure source-tagged. Every recovery owned by a name. The platform every operator wishes their POS gave them.
+              Every figure source-tagged. Every recovery owned by a name. The screen every operator wishes their POS gave them.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: '60 minutes free · drop a CSV', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
@@ -276,7 +276,7 @@ export default function Home() {
             From the solo operator <em>to the C-suite.</em>
           </h2>
           <p className="compass-body text-lg max-w-3xl mb-14">
-            Two products, one front door. <span className="text-white font-semibold">Pulse</span> is the back-office for a 1–2 unit independent — the agents that find your money, $199/mo. <span className="text-white font-semibold">The full platform</span> is the whole operating system for multi-unit groups — the 24-agent workforce, the Brain, and the floor screens. The free trial is where everyone starts.
+            Two products, one front door. <span className="text-white font-semibold">Pulse</span> is for the operator who doesn&apos;t know his prime cost today — it shows you daily, names the leak, and hands you the fix. $199/mo. <span className="text-white font-semibold">Full native</span> is the whole operating system built into a multi-unit group — it runs a 16-unit chef-led group right now. (What&apos;s under the hood isn&apos;t on the website. Ask.) The free trial is where everyone starts.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
@@ -298,9 +298,9 @@ export default function Home() {
 
             <div className="compass-card flex flex-col" style={{ borderColor: '#0066ff' }}>
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— Pulse · $199/mo</p>
-              <h3>1–2 units. The back-office you never had.</h3>
+              <h3>1–2 units. Your prime cost, daily.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                Your office, in your pocket. All 7 agents wired to your live POS, running every shift — with one coach card per leak telling you what to do.
+                Most independents see prime cost when the accountant sends it — weeks late. Pulse shows it every morning, wired to your live POS, with one coach card per leak telling you what to do.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Daily food cost · 30/60/90-day prime cost trend</span></li>
@@ -314,9 +314,9 @@ export default function Home() {
 
             <div className="compass-card flex flex-col">
               <p className="compass-card-label">— Operator Suite · $999/mo</p>
-              <h3>3–9 units.</h3>
+              <h3>3–9 units. Full native starts here.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                Everything in Pulse, plus the network view. Peer bands across your fleet, per-role lenses for CFO / COO / Chef / Owner, roll-up and drill-down.
+                The full operating system at group scale. Everything in Pulse, plus the network view — peer bands across your fleet, per-role lenses for CFO / COO / Chef / Owner, roll-up and drill-down.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Peer-band analysis across your fleet</span></li>
@@ -330,9 +330,9 @@ export default function Home() {
 
             <div className="compass-card flex flex-col">
               <p className="compass-card-label">— Enterprise · 10+ units</p>
-              <h3>Multi-brand. The full platform.</h3>
+              <h3>Multi-brand. Full native.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                The whole operating system — the 24-agent workforce, the Brain, and the floor screens — with per-brand isolation, SSO, and custom POS integrations.
+                The whole operating system under your brands — per-brand isolation, SSO, custom POS integrations. Running inside a 16-unit chef-led group today. We don&apos;t publish the rest — email Myke.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-brand tenant isolation</span></li>
@@ -465,7 +465,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 06 · Pick your seat</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
-            One platform. <em>Seven roles.</em>
+            One system. <em>Seven roles.</em>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {SEATS.slice(1).map((s) => (
