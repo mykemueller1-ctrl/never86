@@ -151,6 +151,7 @@ export default function Home() {
 
           <Link href="/pricing"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/pricing', label: 'Pricing' } })}      className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Pricing</Link>
           <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
+          <Link href="/team"      onClick={() => trackEvent('home_nav_click', { meta: { target: '/team', label: 'Team' } })}            className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Team</Link>
           <span className="flex-1" />
           <Link href="/reports/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
         </nav>
