@@ -1,6 +1,15 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy Resend client. Constructing it at module load ties every route that
+// imports this file to RESEND_API_KEY being present at import time. Defer to
+// first send so a missing key fails only the individual email call (which
+// callers already treat as best-effort) instead of the whole route.
+let _resend: Resend | null = null;
+function resendClient(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+const resend = { emails: { send: (...args: Parameters<Resend['emails']['send']>) => resendClient().emails.send(...args) } };
 
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
