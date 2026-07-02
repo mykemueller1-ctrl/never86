@@ -60,6 +60,30 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
+  // Scroll reveal — fade + rise each [data-reveal] section into view once.
+  // One observer for the whole page; unobserves after reveal so it never
+  // re-triggers. Reduced-motion users get everything visible via CSS.
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+    if (!('IntersectionObserver' in window) || els.length === 0) {
+      els.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('loading');
@@ -184,10 +208,11 @@ export default function Home() {
       </div>
 
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
-        <p className="compass-eyebrow mb-6">— Operator OS · Network Operating Layer</p>
-        <div className="grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start">
-          <div>
+      <section className="relative max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
+        <div className="n86-hero-glow" aria-hidden />
+        <p className="compass-eyebrow mb-6 relative z-10">— Operator OS · Network Operating Layer</p>
+        <div className="relative z-10 grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start">
+          <div className="n86-hero-enter">
             <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
               Find the leak. <em>Name who</em><br />
               owns it. <em>Keep</em> the receipt.
@@ -241,7 +266,7 @@ export default function Home() {
       </section>
 
       {/* § 01 · THE STORY */}
-      <section id="who" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="who" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           <div>
             <p className="compass-eyebrow mb-4">— 01 · The story</p>
@@ -270,7 +295,7 @@ export default function Home() {
       </section>
 
       {/* § 02 · WHAT WE OFFER — independent → enterprise */}
-      <section id="offer-tiers" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="offer-tiers" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 02 · What we offer</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-6">
@@ -351,7 +376,7 @@ export default function Home() {
       </section>
 
       {/* § 03 · MYKE'S STORY — first-person */}
-      <section id="myke" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="myke" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="compass-eyebrow mb-4">— 03 · Myke&apos;s story</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10">
@@ -379,7 +404,7 @@ export default function Home() {
       </section>
 
       {/* WHAT WE DO */}
-      <section id="what" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
+      <section id="what" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 04 · What we do</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-14">
@@ -440,7 +465,7 @@ export default function Home() {
       </section>
 
       {/* Free agents */}
-      <section id="agents" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="agents" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 05 · Free agents</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
@@ -462,7 +487,7 @@ export default function Home() {
       </section>
 
       {/* Pick your seat */}
-      <section id="seats" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="seats" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 06 · Pick your seat</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
@@ -480,7 +505,7 @@ export default function Home() {
       </section>
 
       {/* Talk to us */}
-      <section id="offer" className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="offer" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto">
           <p className="compass-eyebrow mb-4 text-center">— 07 · 15 minutes</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10 text-center">
