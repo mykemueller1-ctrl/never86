@@ -98,7 +98,7 @@ export async function bumpTrialRunCount(token: string): Promise<void> {
 export type IntegrationInterest = {
   email: string;
   restaurantName?: string;
-  pos: 'Toast' | 'Lightspeed' | 'Aloha' | 'Square' | 'Clover' | 'Other';
+  pos: 'Toast' | 'Lightspeed' | 'Aloha' | 'Square' | 'Clover' | 'PDQ' | 'Other';
   units?: number | null;
   sourcePage?: string;
   notes?: string;

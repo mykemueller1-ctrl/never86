@@ -5,7 +5,7 @@ import { z } from 'zod';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const POS_VALUES = ['Toast', 'Lightspeed', 'Aloha', 'Square', 'Clover', 'Other'] as const;
+const POS_VALUES = ['Toast', 'Lightspeed', 'Aloha', 'Square', 'Clover', 'PDQ', 'Other'] as const;
 const schema = z.object({
   email: z.string().email(),
   restaurantName: z.string().optional(),
@@ -28,7 +28,12 @@ export async function POST(req: NextRequest) {
       sourcePage: data.sourcePage,
       notes: data.notes,
     });
-    return NextResponse.json({ ok, message: ok ? "We'll email you the moment that integration ships." : 'Waitlist temporarily unavailable.' });
+    return NextResponse.json(
+      { ok, message: ok ? "We'll email you the moment that integration ships." : 'Waitlist temporarily unavailable.' },
+      // Non-2xx on persistence failure so the client's res.ok check trips its
+      // visible error state instead of showing "✓ On the list" for a lost lead.
+      { status: ok ? 200 : 503 },
+    );
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Bad request';
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
