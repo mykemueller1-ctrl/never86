@@ -339,8 +339,8 @@ export default function Home() {
               </div>
               <h3 className="!mt-3 text-2xl">It names whose tips fell.</h3>
               <div className="mt-5 flex items-baseline gap-3 flex-wrap">
-                <p className="font-serif text-3xl md:text-4xl text-white leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#14</p>
-                <span className="font-mono text-[13px]" style={{ color: '#86868b' }}>Downtown · server</span>
+                <p className="font-serif text-3xl md:text-4xl text-white leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#9</p>
+                <span className="font-mono text-[13px]" style={{ color: '#86868b' }}>University · server</span>
               </div>
               <div className="mt-4 flex items-center gap-3 flex-wrap">
                 <p className="font-serif text-2xl" style={{ color: '#ff453a' }}>−31%</p>
@@ -369,7 +369,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="font-mono text-[11px]" style={{ color: '#6e6e73' }}>SYSCO · HELD</p>
-                  <p className="font-serif text-xl text-white mt-0.5">$1.96 <span className="text-[14px]" style={{ color: '#34c759' }}>−17%</span></p>
+                  <p className="font-serif text-xl text-white mt-0.5">$1.96 <span className="text-[14px]" style={{ color: '#34c759' }}>17% under PFG</span></p>
                 </div>
               </div>
               <div className="flex gap-2 mt-5">
