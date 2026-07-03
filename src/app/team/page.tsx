@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ type Member = {
   where: string;
   bio: string;
   monogramTone: 'gold' | 'void' | 'ink';
+  photo?: string;
 };
 
 const TEAM: Member[] = [
@@ -32,6 +34,7 @@ const TEAM: Member[] = [
     where: 'Fort Dodge, Iowa',
     bio: "Restaurant operator. Co-owner of Community Tap & Pizza (the store the software is built against). Built Never 86'd because nothing on the market reads a Z-report the way a line does.",
     monogramTone: 'gold',
+    photo: '/team/mm.jpg',
   },
   {
     initials: 'VH',
@@ -40,6 +43,7 @@ const TEAM: Member[] = [
     where: 'Iowa',
     bio: 'Runs the operator pipeline. Talks to more independent restaurant owners in a week than most vendors talk to in a quarter. (That is the job.)',
     monogramTone: 'void',
+    photo: '/team/vh.jpg',
   },
   {
     initials: 'KA',
@@ -114,15 +118,25 @@ export default function TeamPage() {
               className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7 flex flex-col"
             >
               <div className="flex items-center gap-4">
-                <div
-                  className={
-                    'w-16 h-16 rounded-full flex items-center justify-center font-display font-semibold text-xl tracking-tight ' +
-                    monogramClasses(m.monogramTone)
-                  }
-                  aria-hidden="true"
-                >
-                  {m.initials}
-                </div>
+                {m.photo ? (
+                  <Image
+                    src={m.photo}
+                    alt={m.name}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover ring-1 ring-white/15"
+                  />
+                ) : (
+                  <div
+                    className={
+                      'w-16 h-16 rounded-full flex items-center justify-center font-display font-semibold text-xl tracking-tight ' +
+                      monogramClasses(m.monogramTone)
+                    }
+                    aria-hidden="true"
+                  >
+                    {m.initials}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <h2 className="font-display font-semibold text-white text-lg md:text-xl leading-tight">
                     {m.name}
