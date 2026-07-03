@@ -265,6 +265,72 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PROOF · see the actual output */}
+      <section data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="compass-eyebrow mb-4">— See it work · Void Hunter</p>
+          <h2 className="compass-display text-4xl md:text-6xl mb-4">
+            It doesn&apos;t say voids are up. <em>It names who.</em>
+          </h2>
+          <p className="compass-body text-lg max-w-2xl mb-12">
+            A real read on a sample 5-store network. Same math runs on your own export in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>.
+          </p>
+
+          <div className="grid lg:grid-cols-[340px_1fr] gap-4">
+            {/* The verdict */}
+            <div className="compass-card flex flex-col justify-between" style={{ borderColor: '#0066ff' }}>
+              <div>
+                <p className="compass-card-label" style={{ color: '#0066ff' }}>— The name</p>
+                <p className="font-serif text-4xl md:text-5xl text-white mt-3 leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#14</p>
+                <p className="compass-body text-[14px] mt-2" style={{ color: '#86868b' }}>Downtown · 41 voided items · $4,200 in voids</p>
+              </div>
+              <div className="mt-8">
+                <p className="font-mono text-[13px]" style={{ color: '#6e6e73' }}>EXCESS ABOVE PEER BAND · ANNUALIZED</p>
+                <p className="font-serif text-4xl text-white mt-1" style={{ letterSpacing: '-0.02em' }}>~$21,600<span className="text-[20px]" style={{ color: '#6e6e73' }}>/yr</span></p>
+                <div className="flex gap-2 mt-4">
+                  <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(52,199,89,0.10)', color: '#34c759', border: '1px solid rgba(52,199,89,0.25)' }}>VERIFIED · void counts</span>
+                  <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.10)', color: '#ff9500', border: '1px solid rgba(255,149,0,0.25)' }}>ESTIMATED · annualized</span>
+                </div>
+              </div>
+            </div>
+
+            {/* The store table */}
+            <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+              <div className="px-5 pt-5 pb-3 flex items-center justify-between flex-wrap gap-2">
+                <p className="compass-card-label">— 5 stores · void rate vs peer band</p>
+                <p className="font-mono text-[12px]" style={{ color: '#6e6e73' }}>PEER MEDIAN 0.51%</p>
+              </div>
+              <table className="w-full text-[14px]">
+                <tbody>
+                  {[
+                    { store: 'Downtown',  rate: '1.24%', bar: 100, flagged: true },
+                    { store: 'University',rate: '0.70%', bar: 56,  flagged: false },
+                    { store: 'Riverside', rate: '0.51%', bar: 41,  flagged: false },
+                    { store: 'Midtown',   rate: '0.40%', bar: 32,  flagged: false },
+                    { store: 'Airport',   rate: '0.30%', bar: 24,  flagged: false },
+                  ].map((r) => (
+                    <tr key={r.store} style={{ borderTop: '1px solid #1f1f1f' }}>
+                      <td className="px-5 py-3 text-white font-medium whitespace-nowrap" style={{ width: 130 }}>
+                        {r.store}
+                        {r.flagged && <span className="ml-2 font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,102,255,0.14)', color: '#0066ff' }}>ABOVE BAND</span>}
+                      </td>
+                      <td className="px-3 py-3" style={{ width: '100%' }}>
+                        <div className="h-2 rounded-full" style={{ width: `${r.bar}%`, background: r.flagged ? '#0066ff' : '#2c2c2e', transition: 'width 900ms cubic-bezier(0.16,1,0.3,1)' }} />
+                      </td>
+                      <td className="px-5 py-3 text-right font-mono tabular-nums whitespace-nowrap" style={{ color: r.flagged ? '#ffffff' : '#86868b', width: 80 }}>{r.rate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="px-5 py-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: '1px solid #1f1f1f' }}>
+                <p className="compass-body text-[13px]" style={{ color: '#86868b' }}>One store above the band. One name inside it. That&apos;s the whole job.</p>
+                <Link href="/trial" onClick={() => trackEvent('home_proof_cta_click', { meta: { target: '/trial', label: 'Run it on your numbers' } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Run it on your numbers →</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* § 01 · THE STORY */}
       <section id="who" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
