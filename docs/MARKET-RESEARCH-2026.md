@@ -138,12 +138,21 @@ This is structurally superior for a cold launch: it delivers the aha _before_ as
 3. **Pain top-of-mind (2024–26):** labor cost, food inflation, theft/shrinkage/voids, delivery-margin compression, tip/service-charge changes, minimum-wage. These map directly onto never86's agents (Void Hunter, Tip Variance, Vendor Drift, Labor Drift).
 4. **Independents are structurally underserved** — the big platforms optimize for multi-unit/enterprise ACV; the 1–9 unit operator gets the least-tailored tooling and the highest relative pain.
 
+**The under-tooling is measurable — and it's your best positioning hook:**
+- **Most independents calculate food cost _monthly_; virtually all major chains do it _weekly_.** That single cadence gap is the tooling gap in one sentence — and a sharper pitch than any feature list. [Verified: davidscottpeters]
+- **"Death by Excel"** — spreadsheets and paper are still the independent back-office norm. [Verified: marketman]
+- **R365 is explicitly "not designed for single-location first-time owners"** (~$469+/loc + $10–25k first-year all-in); **Crunchtime starts $5k+/mo** (enterprise only). The true single-unit operator is priced out of the serious platforms by design. [Verified: R365 comparison / selecthub]
+- **Toast serves only ~1 in 5 independents** → ~4 in 5 are still not on any modern integrated platform. The room is real. [Verified: paymentsdive / restaurantology]
+
 **Where a focused AI margin tool for independents fits — the strategic read:**
 - **Whitespace is real:** underserved segment + acute pain + priced-out of incumbents + a genuinely un-copied instant-proof mechanic. Timing (AI credible, margins crushed) is favorable.
 - **Risks to name honestly:**
   1. **Platform absorption** — Toast/R365 could bundle a similar analytics layer. _Defense:_ move fast on the instant-proof + operator-brand moat; be the tool that's already trusted before they ship a me-too.
   2. **Shrinking, cash-strapped buyer** — the independent base is contracting 2.3%/yr and 45% aren't profitable. _Defense:_ $199 price + provable ROI ("we find more than we cost") is the only message that survives a not-profitable buyer.
   3. **Belief, not demand** — tech fatigue means the default reaction is "another tool that won't pay off." _Defense:_ the entire homepage job is converting that skepticism with real, specific, verifiable proof — which is what the believability work is for.
+
+- **The bear case — why this segment stayed whitespace (know it going in):** SMB SaaS runs **15–25% annual churn** (vs 3–7% for enterprise); the buyer is price-sensitive and cuts fast when times tighten. Toast built a _special_ acquisition model for "mom-and-pop" restaurants precisely because the segment is "often overlooked due to high CAC and volatility." Under-served **because it's hard to acquire and hard to keep — not for lack of TAM.** And sub-$1M single locations where the owner is the bookkeeper may not clear the ROI threshold at all. [Verified: churnkey / restaurantology / restaurantinventorytools]
+  - **What this means for never86:** the moat isn't just getting them in the door — it's _retention through proven, recurring dollar value._ The instant-proof front door lowers CAC (the thing that killed everyone else here); the monthly recovered-dollar report has to keep earning the $199 every single month, or churn eats you. Target the operators _above_ the sub-$1M ROI floor first — the ones doing enough volume that 2 points of food cost is real money.
 
 ---
 
@@ -160,8 +169,10 @@ This is structurally superior for a cold launch: it delivers the aha _before_ as
 9. **Add a 30-second ROI calculator** ("enter monthly food spend → what 2 points is worth") — converts 2–3x a generic CTA and turns $199 into a rounding error against their own P&L.
 10. **State price openly + month-to-month + no setup fee** — hidden pricing reads as "about to be ripped off"; transparency signals confidence.
 11. **Instrument activation** (got-a-result rate), not just form-fills, as the launch KPI.
+12. **Consider a one-line positioning hook:** _"Big chains cost their food weekly. You're doing it monthly — if at all. never86 does it daily, automatically."_ — the monthly-vs-weekly cadence gap is the whole tooling gap in one sentence.
+13. **Target the ROI-positive tier first** — operators doing enough volume that 2 points of food cost is real money; sub-$1M owner-bookkeepers may not clear the ROI floor, so don't burn CAC on them at launch.
 
 ---
 
 ### Source notes
-Market sizing figures are directional (research-firm estimates vary 3x). Margin, closure, independent-count, tech-fatigue, and pricing figures are from the National Restaurant Association, NRN/Restaurant Business, and vendor pricing pages and are high-confidence. Competitor hero wording is reconstructed from indexed pages (sites 403 automated fetch) — positioning is high-confidence, exact copy is directional. SaaS conversion benchmarks are from userpilot / 1capture / ChartMogul 2025 datasets.
+Compiled from five parallel research passes (demand, operator belief, competitor teardown, funnel, vertical/segment) run 2026-07-03. Market sizing figures are directional (research-firm estimates vary 3x). Margin, closure, independent-count (~749k total US restaurants; ~412k independents = ~70% of locations but only ~30% of revenue), tech-fatigue, food-costing-cadence, and pricing figures are from the National Restaurant Association, NRN/Restaurant Business, and vendor pricing pages and are high-confidence. Competitor hero wording is reconstructed from indexed pages (most sites 403 automated fetch) — positioning is high-confidence, exact copy is directional. SaaS conversion and churn benchmarks are from userpilot / ChartMogul / pulseahead / churnkey 2025–26 datasets. Items depending on a single low-authority aggregator are flagged inline; re-verify before quoting externally.
