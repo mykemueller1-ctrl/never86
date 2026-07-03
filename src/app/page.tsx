@@ -273,7 +273,7 @@ export default function Home() {
             It doesn&apos;t say voids are up. <em>It names who.</em>
           </h2>
           <p className="compass-body text-lg max-w-2xl mb-12">
-            A real read on a sample 5-store network. Same math runs on your own export in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>.
+            A sample 5-store network — real math, masked names. The same engine reconciled <span className="text-white font-semibold">$15.72M across 545,677 real orders</span> for our design partner and surfaced <span className="text-white font-semibold">$1.81M</span>, sourced to the cent. On your own export it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>/trial</Link> — and it names <em>your</em> stores, not these.
           </p>
 
           <div className="grid lg:grid-cols-[340px_1fr] gap-4">
