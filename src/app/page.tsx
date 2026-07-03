@@ -328,6 +328,55 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Two more agents · same job, different leak */}
+          <div className="grid md:grid-cols-2 gap-4 mt-4">
+            {/* Tip Variance */}
+            <div className="compass-card">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <p className="compass-card-label" style={{ color: '#0066ff' }}>— See it work · Tip Variance</p>
+                <p className="font-mono text-[12px]" style={{ color: '#6e6e73' }}>NETWORK −8.2% WoW</p>
+              </div>
+              <h3 className="!mt-3 text-2xl">It names whose tips fell.</h3>
+              <div className="mt-5 flex items-baseline gap-3 flex-wrap">
+                <p className="font-serif text-3xl md:text-4xl text-white leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#14</p>
+                <span className="font-mono text-[13px]" style={{ color: '#86868b' }}>Downtown · server</span>
+              </div>
+              <div className="mt-4 flex items-center gap-3 flex-wrap">
+                <p className="font-serif text-2xl" style={{ color: '#ff453a' }}>−31%</p>
+                <p className="font-mono text-[13px]" style={{ color: '#86868b' }}>$980 this week · $1,420 last</p>
+              </div>
+              <div className="flex gap-2 mt-5">
+                <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(52,199,89,0.10)', color: '#34c759', border: '1px solid rgba(52,199,89,0.25)' }}>VERIFIED · tip totals</span>
+                <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.10)', color: '#ff9500', border: '1px solid rgba(255,149,0,0.25)' }}>ESTIMATED · WoW delta</span>
+              </div>
+            </div>
+
+            {/* Vendor Drift */}
+            <div className="compass-card">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <p className="compass-card-label" style={{ color: '#0066ff' }}>— See it work · Vendor Drift</p>
+                <p className="font-mono text-[12px]" style={{ color: '#6e6e73' }}>APR → MAY</p>
+              </div>
+              <h3 className="!mt-3 text-2xl">It names the SKU and the cheaper vendor.</h3>
+              <div className="mt-5">
+                <p className="font-serif text-2xl md:text-[28px] text-white leading-tight" style={{ letterSpacing: '-0.015em' }}>Mozzarella LMPS 6/5 LB</p>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div>
+                  <p className="font-mono text-[11px]" style={{ color: '#6e6e73' }}>PFG · DRIFTING</p>
+                  <p className="font-serif text-xl text-white mt-0.5">$2.37 <span className="text-[14px]" style={{ color: '#ff453a' }}>+7.2%</span></p>
+                </div>
+                <div>
+                  <p className="font-mono text-[11px]" style={{ color: '#6e6e73' }}>SYSCO · HELD</p>
+                  <p className="font-serif text-xl text-white mt-0.5">$1.96 <span className="text-[14px]" style={{ color: '#34c759' }}>−17%</span></p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-5">
+                <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(52,199,89,0.10)', color: '#34c759', border: '1px solid rgba(52,199,89,0.25)' }}>VERIFIED · invoice prices</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
