@@ -1,4 +1,4 @@
-public/reports/op-3/assets/FlowField-iJzQlFg5.jsimport{r as Ys,j as Oo}from"./index-Cx8rWcHV.js";/**
+import{r as Ys,j as Oo}from"./index-Cx8rWcHV.js";/**
  * @license
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
