@@ -9,7 +9,7 @@
 // - Excessive OT per employee per week
 // - Schedule-vs-actual gap concentration (one name owns most of the drift)
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn, num, parseDate } from './csv/core';
 
 export type EmpDrift = {
   store: string;
@@ -38,36 +38,10 @@ export type LaborError = { ok: false; error: string; hint?: string; detectedColu
 
 const NOT_A_COUNT = ['count', 'qty', 'quantity', 'items'];
 
-function norm(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
+// findColumn, num, parseDate come from ./csv/core. This thin wrapper keeps
+// Labor's own NOT_A_COUNT list and its excludeNeg call sites unchanged.
 function findCol(headers: string[], aliases: string[], excludeNeg = false): number {
-  const lc = headers.map(norm);
-  const negFilter = (i: number) => !excludeNeg || !NOT_A_COUNT.some((n) => lc[i].includes(n));
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i] === an && negFilter(i)) return i;
-    }
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i].includes(an) && negFilter(i)) return i;
-    }
-  }
-  return -1;
-}
-
-const num = (s: string | undefined): number => {
-  if (s == null) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
-
-function parseDate(s: string | undefined): number | null {
-  if (!s) return null;
-  const t = Date.parse(s);
-  return Number.isFinite(t) ? t : null;
+  return findColumn(headers, aliases, excludeNeg ? NOT_A_COUNT : []);
 }
 
 export function runLaborDrift(csv: string): LaborDriftReport | LaborError {

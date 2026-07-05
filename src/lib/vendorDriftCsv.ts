@@ -9,7 +9,7 @@
 // Required: Vendor, SKU (or SKU Description), Period (or Invoice Date),
 // Unit Price. Optional: Category, Pack Size.
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn, num } from './csv/core';
 
 export type DriftRow = {
   vendor: string;
@@ -38,26 +38,7 @@ export type VendorDriftReport = {
 
 export type DriftError = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
-function norm(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
-function findCol(headers: string[], aliases: string[]): number {
-  const lc = headers.map(norm);
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i] === an) return i;
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i].includes(an)) return i;
-  }
-  return -1;
-}
-
-const num = (s: string | undefined): number => {
-  if (s == null) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
+// parseCsv, findColumn, num imported from ./csv/core
 
 function periodKey(s: string): string {
   if (!s) return '';
@@ -74,11 +55,11 @@ export function runVendorDrift(csv: string): VendorDriftReport | DriftError {
     return { ok: false, error: 'CSV looked empty', hint: 'Vendor invoice / SKU price feed needed.' };
   }
 
-  const iVendor   = findCol(headers, ['Vendor', 'Supplier', 'VendorName']);
-  const iSku      = findCol(headers, ['SKU', 'ItemCode', 'ProductCode', 'ItemNumber', 'Description', 'ItemName']);
-  const iPeriod   = findCol(headers, ['Period', 'Month', 'InvoiceDate', 'Date', 'BusinessDate']);
-  const iPrice    = findCol(headers, ['UnitPrice', 'Price', 'CasePrice', 'ItemPrice']);
-  const iCategory = findCol(headers, ['Category', 'Department', 'Class']);
+  const iVendor   = findColumn(headers, ['Vendor', 'Supplier', 'VendorName']);
+  const iSku      = findColumn(headers, ['SKU', 'ItemCode', 'ProductCode', 'ItemNumber', 'Description', 'ItemName']);
+  const iPeriod   = findColumn(headers, ['Period', 'Month', 'InvoiceDate', 'Date', 'BusinessDate']);
+  const iPrice    = findColumn(headers, ['UnitPrice', 'Price', 'CasePrice', 'ItemPrice']);
+  const iCategory = findColumn(headers, ['Category', 'Department', 'Class']);
 
   const missing: string[] = [];
   if (iVendor < 0) missing.push('Vendor / Supplier');
