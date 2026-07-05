@@ -323,7 +323,7 @@ export default async function AdminNever86() {
       {/* QUICK WINS */}
       <section id="wins" className="max-w-6xl mx-auto px-6 py-8">
         <SectionHeader id="wins" kicker="Section 05" title="Quick wins lineup" />
-        <p className="text-dark-300 text-sm mb-4 max-w-3xl">The MCP-friendly drop-in tools. Owner · manager · frontline. These are the "holy shit" moments that get operators on the platform.</p>
+        <p className="text-dark-300 text-sm mb-4 max-w-3xl">The MCP-friendly drop-in tools. Owner · manager · frontline. These are the &ldquo;holy shit&rdquo; moments that get operators on the platform.</p>
         <div className="grid md:grid-cols-3 gap-4">
           {live.map((w: QuickWin) => (
             <a key={w.id} href={w.demo_url ?? '#'} className="bg-dark-700 border border-green-700/40 rounded-2xl p-5 block hover:border-green-500">

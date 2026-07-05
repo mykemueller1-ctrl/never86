@@ -67,7 +67,7 @@ export function LaborLeakBody({ data: d, sample }: { data: LaborLeak; sample?: b
       <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8">
         <p className="text-ink-800 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
         <p className="text-ink-600 text-sm">
-          A "ghost shift" is a clocked-in window with zero sales attached — sometimes it&apos;s legit (prep, dish, ops). Drift is the
+          A &ldquo;ghost shift&rdquo; is a clocked-in window with zero sales attached — sometimes it&apos;s legit (prep, dish, ops). Drift is the
           gap between scheduled and clocked hours. Read the pattern. Pull the timesheet. Then decide.
         </p>
       </div>
