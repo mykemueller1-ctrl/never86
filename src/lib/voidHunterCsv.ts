@@ -30,81 +30,13 @@ export type VoidHunterCsv = {
   employees: VoidEmployeeCsv[];
 };
 
-// Minimal CSV parser — handles quoted fields containing commas. Toast,
-// Square, and Clover all export this format. Returns { headers, rows }.
-export function parseCsv(input: string): { headers: string[]; rows: string[][] } {
-  const text = input.replace(/^﻿/, '').replace(/\r\n?/g, '\n').trim();
-  if (!text) return { headers: [], rows: [] };
-  const out: string[][] = [];
-  let field = '';
-  let row: string[] = [];
-  let inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; continue; }
-      if (c === '"') { inQuotes = false; continue; }
-      field += c;
-      continue;
-    }
-    if (c === '"') { inQuotes = true; continue; }
-    if (c === ',') { row.push(field); field = ''; continue; }
-    if (c === '\n') { row.push(field); out.push(row); row = []; field = ''; continue; }
-    field += c;
-  }
-  if (field.length || row.length) { row.push(field); out.push(row); }
-  const [headers, ...rows] = out;
-  return { headers: (headers ?? []).map((h) => h.trim()), rows };
-}
-
-// Column aliases — try a few common header names for each logical field.
-// Returns the index, or -1 if none match.
-//
-// `negativeTokens` is a list of substrings that, if present in a header,
-// disqualify that header even if it matches an alias. We use this to
-// avoid grabbing count/qty columns when the operator wants the dollar
-// column (e.g. Square has "Items Voided" = count, "Refunds" = dollars —
-// we want Refunds for void$).
-function findCol(headers: string[], aliases: string[], negativeTokens: string[] = []): number {
-  const lc = headers.map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
-  // Exact match first — strongest signal.
-  for (const alias of aliases) {
-    const a = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const exact = lc.findIndex((h) => h === a);
-    if (exact >= 0 && !negativeTokens.some((n) => lc[exact].includes(n))) return exact;
-  }
-  // Then substring match.
-  for (const alias of aliases) {
-    const a = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i].includes(a) && !negativeTokens.some((n) => lc[i].includes(n))) return i;
-    }
-  }
-  return -1;
-}
-
-// Negative tokens for any column we want to be a $ amount, not a count.
-const NOT_A_COUNT = ['count', 'qty', 'quantity', 'numof', 'items', 'transactions'];
-
-const num = (s: string | undefined): number => {
-  if (!s) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
-
-function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const s = [...xs].sort((a, b) => a - b);
-  const m = Math.floor(s.length / 2);
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-}
-
-export type CsvAnalysisError = {
-  ok: false;
-  error: string;
-  hint?: string;
-  detectedColumns?: string[];
-};
+// CSV mechanics (parser, column detection, number parsing, median) live in the
+// shared `csv/core` module so every agent stays consistent. Imported for local
+// use and re-exported here for the six sibling agents that already import these
+// names from this module.
+import { parseCsv, findColumn, num, median, NOT_A_COUNT, type CsvAnalysisError } from './csv/core';
+export { parseCsv, findColumn, num, median, NOT_A_COUNT };
+export type { CsvAnalysisError };
 
 export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
   const { headers, rows } = parseCsv(csv);
@@ -112,15 +44,15 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
     return { ok: false, error: 'CSV looked empty', hint: 'Make sure the first row is column headers and there are data rows below.' };
   }
 
-  const iStore    = findCol(headers, ['Location', 'LocationName', 'Store', 'StoreName', 'Site', 'Restaurant']);
+  const iStore    = findColumn(headers, ['Location', 'LocationName', 'Store', 'StoreName', 'Site', 'Restaurant']);
   // Employee should not be the Store column (which can also contain "name").
   // We bias toward strings that strongly imply an employee identifier.
-  const iEmployee = findCol(
+  const iEmployee = findColumn(
     headers,
     ['Employee', 'EmployeeName', 'Cashier', 'CashierName', 'TeamMember', 'Staff', 'Server', 'ServerName', 'Name'],
     [],
   );
-  const iNet  = findCol(
+  const iNet  = findColumn(
     headers,
     ['NetSales', 'NetTotal', 'PeriodNet', 'Net', 'Sales', 'Gross', 'Total'],
     NOT_A_COUNT,
@@ -132,7 +64,7 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
   //      grab "Items Voided" count columns)
   //   4. Generic "Refunds" / "Refunded" — last fallback (Square convention
   //      where a refund column doubles as the void$ surface)
-  const iVoid = findCol(
+  const iVoid = findColumn(
     headers,
     ['VoidAmount', 'VoidTotal', 'VoidedAmount', 'VoidedSales', 'VoidSales',
      'VoidDollars',
