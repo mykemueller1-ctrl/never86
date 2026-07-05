@@ -37,10 +37,11 @@ The mechanics every agent needs, in ONE tested place:
 re-implement them.** Keep only the agent's own column aliases and its own
 negative-token list (those legitimately differ per agent).
 
-> Migration status: `voidHunterCsv` sources everything from `csv/core` and
-> re-exports the shared names for backward-compat. The other six agents still
-> carry local copies of `num`/`findColumn` (historical) — migrate them to
-> `csv/core` incrementally; the vitest suite guards behavior on each change.
+> Migration status: **all 7 agents source parsing / column detection / number
+> parsing from `csv/core`** (verified byte-identical via golden snapshots). Two
+> agents keep a one-line local wrapper: Leak Detector and Labor Drift delegate
+> to `findColumn` while passing their own `NOT_A_COUNT` list; Tip Variance keeps
+> a local `%`-stripping `num`. Those are intentional — don't "simplify" them away.
 
 ## Testing (`npm test` → vitest)
 - `src/lib/csv/core.test.ts` — unit tests for the core (parser, column
