@@ -15,10 +15,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # NOTE: `next lint` is intentionally omitted — this repo has no ESLint
-      # config yet, so `next lint` drops into an interactive setup prompt and
-      # hangs in CI. Configuring ESLint is tracked separately; tests + build
-      # are the gates that matter for the agents.
+      - name: Lint
+        run: npm run lint
       - name: Test (vitest — core + all 7 agents)
         run: npm test
       - name: Build
