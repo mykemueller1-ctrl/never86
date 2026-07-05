@@ -12,11 +12,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
-      - name: Lint
-        run: npm run lint
+      # NOTE: `next lint` is intentionally omitted — this repo has no ESLint
+      # config yet, so `next lint` drops into an interactive setup prompt and
+      # hangs in CI. Configuring ESLint is tracked separately; tests + build
+      # are the gates that matter for the agents.
       - name: Test (vitest — core + all 7 agents)
         run: npm test
       - name: Build

@@ -16,7 +16,7 @@
 // invoice − POS where POS < invoice. Concentration by customer
 // surfaces "this one corporate account always under-rings."
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn, num } from './csv/core';
 
 export type CustomerConcentration = {
   customer: string;
@@ -61,26 +61,7 @@ export type CateringReport = {
 
 export type CateringError = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
-function norm(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
-function findCol(headers: string[], aliases: string[]): number {
-  const lc = headers.map(norm);
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i] === an) return i;
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i].includes(an)) return i;
-  }
-  return -1;
-}
-
-const num = (s: string | undefined): number => {
-  if (s == null) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
+// parseCsv, findColumn, num imported from ./csv/core
 
 export function runCateringLeak(csv: string): CateringReport | CateringError {
   const { headers, rows } = parseCsv(csv);
@@ -88,12 +69,12 @@ export function runCateringLeak(csv: string): CateringReport | CateringError {
     return { ok: false, error: 'CSV looked empty', hint: 'Catering reconciliation export with header row required.' };
   }
 
-  const iStore    = findCol(headers, ['Location', 'LocationName', 'Store', 'Site']);
-  const iOrderId  = findCol(headers, ['OrderID', 'OrderNumber', 'InvoiceNumber', 'TicketID']);
-  const iCustomer = findCol(headers, ['Customer', 'CustomerName', 'Client', 'Account', 'BusinessName']);
-  const iDate     = findCol(headers, ['EventDate', 'OrderDate', 'BusinessDate', 'Date']);
-  const iInvoice  = findCol(headers, ['InvoiceAmount', 'InvoiceTotal', 'CateringInvoice', 'InvoiceNet', 'Invoice']);
-  const iPos      = findCol(headers, ['POSAmount', 'POSTotal', 'CateringPOS', 'POSNet', 'POSSales', 'TicketTotal']);
+  const iStore    = findColumn(headers, ['Location', 'LocationName', 'Store', 'Site']);
+  const iOrderId  = findColumn(headers, ['OrderID', 'OrderNumber', 'InvoiceNumber', 'TicketID']);
+  const iCustomer = findColumn(headers, ['Customer', 'CustomerName', 'Client', 'Account', 'BusinessName']);
+  const iDate     = findColumn(headers, ['EventDate', 'OrderDate', 'BusinessDate', 'Date']);
+  const iInvoice  = findColumn(headers, ['InvoiceAmount', 'InvoiceTotal', 'CateringInvoice', 'InvoiceNet', 'Invoice']);
+  const iPos      = findColumn(headers, ['POSAmount', 'POSTotal', 'CateringPOS', 'POSNet', 'POSSales', 'TicketTotal']);
 
   const missing: string[] = [];
   if (iStore < 0)    missing.push('Location / Store');
