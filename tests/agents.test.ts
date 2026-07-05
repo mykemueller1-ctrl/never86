@@ -37,6 +37,17 @@ describe('agents · clean sample exports analyze successfully', () => {
   }
 });
 
+// Golden-output snapshots: lock each agent's EXACT current output on its clean
+// sample. Any change to an agent or the shared core that alters a number will
+// fail here — the safety net for migrating the remaining agents onto csv/core.
+describe('agents · golden output (exact) on clean samples', () => {
+  for (const a of AGENTS) {
+    it(`${a.name} output is unchanged`, () => {
+      expect(a.run(sample(a.sample))).toMatchSnapshot();
+    });
+  }
+});
+
 describe('agents · reject bad input cleanly (never throw)', () => {
   const bad = [
     ['empty file', 'empty-file.csv'],
