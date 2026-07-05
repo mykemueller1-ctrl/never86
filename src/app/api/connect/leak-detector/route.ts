@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runLeakDetector } from '@/lib/leakDetectorCsv';
 import { logVisitorEvent } from '@/lib/leadCapture';
+import { readCsvFromRequest } from '@/lib/csv/request';
 import { saveTrialRun } from '@/lib/trialRunsDb';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MAX_CSV_BYTES = 5 * 1024 * 1024;
 
 // POST /api/connect/leak-detector
 // Same shape as /api/connect/void-hunter — multipart file, JSON {csv},
@@ -15,29 +15,11 @@ const MAX_CSV_BYTES = 5 * 1024 * 1024;
 // comp abuse, discount-after-close.
 export async function POST(req: NextRequest) {
   try {
-    let csv = '';
-    let filename = '';
-    const ct = req.headers.get('content-type') || '';
-    if (ct.includes('application/json')) {
-      const body = await req.json();
-      csv = typeof body?.csv === 'string' ? body.csv : '';
-      filename = typeof body?.filename === 'string' ? body.filename : '';
-    } else if (ct.includes('multipart/form-data')) {
-      const form = await req.formData();
-      const file = form.get('file');
-      if (file && typeof file !== 'string') {
-        if (file.size > MAX_CSV_BYTES) {
-          return NextResponse.json({ ok: false, error: 'File too large (5 MB max)' }, { status: 413 });
-        }
-        csv = await file.text();
-        filename = file.name;
-      }
-    } else {
-      csv = await req.text();
+    const parsed = await readCsvFromRequest(req);
+    if (!parsed.ok) {
+      return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
     }
-    if (!csv || csv.length > MAX_CSV_BYTES) {
-      return NextResponse.json({ ok: false, error: 'Send a CSV in the body (json {csv}, form file, or raw text).' }, { status: 400 });
-    }
+    const { csv, filename } = parsed;
 
     const result = runLeakDetector(csv);
 
