@@ -5,7 +5,7 @@
 // significantly week-over-week — the leading indicator the P&L misses
 // by two weeks because tips drop before sales do.
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn } from './csv/core';
 
 export type TipDrift = {
   store: string;
@@ -30,25 +30,8 @@ export type TipReport = {
 
 export type TipError = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
-function norm(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
-function findCol(headers: string[], aliases: string[]): number {
-  const lc = headers.map(norm);
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i] === an) return i;
-    }
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i].includes(an)) return i;
-    }
-  }
-  return -1;
-}
-
+// findColumn imported from ./csv/core. `num` here also strips '%' (tips
+// exports sometimes carry a percent column), so it stays local on purpose.
 const num = (s: string | undefined): number => {
   if (s == null) return 0;
   const n = Number(String(s).replace(/[$,\s%]/g, ''));
@@ -70,12 +53,12 @@ export function runTipVariance(csv: string): TipReport | TipError {
     return { ok: false, error: 'CSV looked empty', hint: 'Tip summary export with header row required.' };
   }
 
-  const iStore    = findCol(headers, ['Location', 'LocationName', 'Store', 'Site']);
-  const iEmployee = findCol(headers, ['Employee', 'EmployeeName', 'Name', 'TeamMember', 'Server', 'Staff']);
-  const iWeek     = findCol(headers, ['Week', 'WeekStart', 'WeekEnding', 'Period']);
-  const iDate     = findCol(headers, ['Date', 'BusinessDate', 'ShiftDate']);
-  const iTips     = findCol(headers, ['NetTips', 'Tips', 'TipsCollected', 'TotalTips', 'TipAmount']);
-  const iNet      = findCol(headers, ['NetSales', 'Net', 'Sales']);
+  const iStore    = findColumn(headers, ['Location', 'LocationName', 'Store', 'Site']);
+  const iEmployee = findColumn(headers, ['Employee', 'EmployeeName', 'Name', 'TeamMember', 'Server', 'Staff']);
+  const iWeek     = findColumn(headers, ['Week', 'WeekStart', 'WeekEnding', 'Period']);
+  const iDate     = findColumn(headers, ['Date', 'BusinessDate', 'ShiftDate']);
+  const iTips     = findColumn(headers, ['NetTips', 'Tips', 'TipsCollected', 'TotalTips', 'TipAmount']);
+  const iNet      = findColumn(headers, ['NetSales', 'Net', 'Sales']);
 
   const missing: string[] = [];
   if (iStore < 0) missing.push('Location / Store');

@@ -5,7 +5,7 @@
 // after-payment, cash-only voiders, promo stacking, comp abuse,
 // discount-after-close.
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn as coreFindColumn, num, bool } from './csv/core';
 
 export type EmployeeFlag = {
   store: string;
@@ -80,44 +80,16 @@ export type LeakError = {
 
 const NOT_A_COUNT = ['count', 'qty', 'quantity', 'numof', 'items', 'transactions', 'tickets'];
 
-function norm(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
+// norm/num/bool and the column matcher live in ./csv/core. This wrapper keeps
+// Leak Detector's own NOT_A_COUNT list (which adds 'tickets') and its
+// {excludeNeg} call sites unchanged. (`preferDollar` was declared but unused.)
 function findColumn(
   headers: string[],
   aliases: string[],
-  opts: { excludeNeg?: boolean; preferDollar?: boolean } = {},
+  opts: { excludeNeg?: boolean } = {},
 ): number {
-  const lc = headers.map(norm);
-  const negFilter = (i: number) =>
-    !opts.excludeNeg || !NOT_A_COUNT.some((n) => lc[i].includes(n));
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i] === an && negFilter(i)) return i;
-    }
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) {
-      if (lc[i].includes(an) && negFilter(i)) return i;
-    }
-  }
-  return -1;
+  return coreFindColumn(headers, aliases, opts.excludeNeg ? NOT_A_COUNT : []);
 }
-
-const num = (s: string | undefined): number => {
-  if (s == null) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
-const bool = (s: string | undefined): boolean => {
-  if (!s) return false;
-  const t = String(s).toLowerCase().trim();
-  return t === '1' || t === 'y' || t === 'yes' || t === 'true' || t === 'voided'
-      || t === 'void' || t === 'comp' || t === 'comped' || t === 'refund' || t === 'refunded';
-};
 
 function median(xs: number[]): number {
   if (xs.length === 0) return 0;

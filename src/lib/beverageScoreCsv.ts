@@ -11,7 +11,7 @@
 // This is the "free outreach hook" called out in the brief — a one-page
 // score we can hand a prospect after one CSV drop.
 
-import { parseCsv } from './voidHunterCsv';
+import { parseCsv, findColumn, num } from './csv/core';
 
 export type BevCategoryRow = {
   category: string;       // 'Liquor' | 'Beer' | 'Wine' | 'NA' | other
@@ -47,26 +47,7 @@ export type BevReport = {
 
 export type BevError = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
-function norm(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
-function findCol(headers: string[], aliases: string[]): number {
-  const lc = headers.map(norm);
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i] === an) return i;
-  }
-  for (const a of aliases) {
-    const an = norm(a);
-    for (let i = 0; i < lc.length; i++) if (lc[i].includes(an)) return i;
-  }
-  return -1;
-}
-
-const num = (s: string | undefined): number => {
-  if (s == null) return 0;
-  const n = Number(String(s).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-};
+// parseCsv, findColumn, num imported from ./csv/core
 
 function classifyCategory(raw: string): string {
   const s = raw.toLowerCase();
@@ -91,11 +72,11 @@ export function runBeverageCostScore(csv: string): BevReport | BevError {
     return { ok: false, error: 'CSV looked empty', hint: 'Beverage inventory + pour close needed.' };
   }
 
-  const iStore    = findCol(headers, ['Location', 'LocationName', 'Store', 'Site', 'Restaurant']);
-  const iCategory = findCol(headers, ['Category', 'Department', 'Class']);
-  const iConsumed = findCol(headers, ['Consumed', 'UnitsConsumed', 'InventoryConsumed', 'BottlesUsed', 'PhysicalDelta']);
-  const iPoured   = findCol(headers, ['Poured', 'POSPours', 'UnitsPoured', 'BottlesPoured', 'TheoreticalPour']);
-  const iUnitPrice= findCol(headers, ['UnitPrice', 'AvgUnitPrice', 'AvgPrice', 'RetailPrice']);
+  const iStore    = findColumn(headers, ['Location', 'LocationName', 'Store', 'Site', 'Restaurant']);
+  const iCategory = findColumn(headers, ['Category', 'Department', 'Class']);
+  const iConsumed = findColumn(headers, ['Consumed', 'UnitsConsumed', 'InventoryConsumed', 'BottlesUsed', 'PhysicalDelta']);
+  const iPoured   = findColumn(headers, ['Poured', 'POSPours', 'UnitsPoured', 'BottlesPoured', 'TheoreticalPour']);
+  const iUnitPrice= findColumn(headers, ['UnitPrice', 'AvgUnitPrice', 'AvgPrice', 'RetailPrice']);
 
   const missing: string[] = [];
   if (iStore < 0)    missing.push('Location / Store');
