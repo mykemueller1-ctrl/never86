@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (trialCookie) {
       const saved = await saveTrialRun({
         sessionToken: trialCookie,
-        agent: 'leak-detector' as const,
+        agent: 'tip-variance',
         filename, rowsParsed: result.rowsParsed, result,
         ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
         userAgent: req.headers.get('user-agent') ?? undefined,

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (trialCookie) {
       const saved = await saveTrialRun({
         sessionToken: trialCookie,
-        agent: 'leak-detector' as const, // reuse type until schema accepts more agents
+        agent: 'labor-drift',
         filename,
         rowsParsed: result.rowsParsed,
         result,
