@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { trackEvent } from '@/lib/track';
+import RoiCalculator from '@/components/RoiCalculator';
 
 const FREE_AGENTS = [
   { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'One name above the peer band, by store + cross-network.' },
@@ -377,6 +378,20 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ROI · what a few points is worth */}
+      <section data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="compass-eyebrow mb-4">— The math</p>
+          <h2 className="compass-display text-4xl md:text-6xl mb-4">
+            What&apos;s a few points <em>worth to you?</em>
+          </h2>
+          <p className="compass-body text-lg max-w-2xl mb-12">
+            Drop in your monthly sales. Every point of food cost we help you claw back is real money — and it dwarfs the price.
+          </p>
+          <RoiCalculator />
         </div>
       </section>
 
