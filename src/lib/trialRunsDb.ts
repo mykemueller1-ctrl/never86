@@ -23,9 +23,19 @@ export function newShareToken(): string {
   return crypto.randomBytes(12).toString('hex');
 }
 
+/** The 7 leak agents that can persist a trial run (the ops column is free text). */
+export type TrialAgent =
+  | 'void-hunter'
+  | 'leak-detector'
+  | 'labor-drift'
+  | 'tip-variance'
+  | 'catering-leak'
+  | 'beverage-score'
+  | 'vendor-drift';
+
 export async function saveTrialRun(input: {
   sessionToken: string;
-  agent: 'void-hunter' | 'leak-detector';
+  agent: TrialAgent;
   filename?: string;
   rowsParsed?: number;
   result: unknown;

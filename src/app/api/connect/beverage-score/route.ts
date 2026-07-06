@@ -32,10 +32,7 @@ export async function POST(req: NextRequest) {
     if (trialCookie) {
       const saved = await saveTrialRun({
         sessionToken: trialCookie,
-        // NOTE: saveTrialRun's agent type is narrowed to 'void-hunter' |
-        // 'leak-detector'; other agents reuse 'leak-detector' as a placeholder
-        // until the type + ops schema accept all 7 slugs. Tracked as a fix.
-        agent: 'leak-detector' as const,
+        agent: 'beverage-score',
         filename, rowsParsed: result.rowsParsed, result,
         ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
         userAgent: req.headers.get('user-agent') ?? undefined,

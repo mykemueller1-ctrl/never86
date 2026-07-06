@@ -32,9 +32,7 @@ export async function POST(req: NextRequest) {
     if (trialCookie) {
       const saved = await saveTrialRun({
         sessionToken: trialCookie,
-        // See note in beverage-score route: agent type is narrowed to two
-        // slugs; other agents reuse 'leak-detector' as a placeholder for now.
-        agent: 'leak-detector' as const,
+        agent: 'vendor-drift',
         filename, rowsParsed: result.rowsParsed, result,
         ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
         userAgent: req.headers.get('user-agent') ?? undefined,
