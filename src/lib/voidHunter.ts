@@ -1,4 +1,5 @@
 import { opsDb } from './opsDb';
+import { analyzeStores, isEmployeeFlagged } from './voidAnalysis';
 
 export type VoidStore = { name: string; net: number; voids: number; voidRate: number; excessYr: number; flagged: boolean };
 export type VoidEmployee = { store: string; name: string; net: number; voidAmount: number; voidedItems: number; voidRate: number; flagged: boolean };
@@ -14,12 +15,6 @@ export type VoidHunter = {
 };
 
 const n = (v: unknown) => (v == null ? 0 : Number(v));
-function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const s = [...xs].sort((a, b) => a - b);
-  const m = Math.floor(s.length / 2);
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-}
 
 // Void Hunter — voids above the network's own peer median, by store and by name.
 // All measured from toast_employee_performance (Verified). Flags patterns to
@@ -49,22 +44,12 @@ export async function getVoidHunter(operatorId: number): Promise<VoidHunter> {
     const net = n(r.net), voids = n(r.voids);
     return { name: r.name, net, voids, voidRate: net > 0 ? voids / net : 0 };
   });
-  const networkNet = stores0.reduce((s, x) => s + x.net, 0);
-  const networkVoids = stores0.reduce((s, x) => s + x.voids, 0);
-  const med = median(stores0.map((s) => s.voidRate));
-
-  const stores: VoidStore[] = stores0
-    .map((s) => ({
-      ...s,
-      excessYr: Math.round(Math.max(0, s.voids - med * s.net) * 3),
-      flagged: med > 0 && s.voidRate > 1.5 * med,
-    }))
-    .sort((a, b) => b.voidRate - a.voidRate);
+  const { stores, networkNet, networkVoids, medianStoreVoidRate: med, storesFlagged } = analyzeStores(stores0);
 
   const employees: VoidEmployee[] = empRows.map((r) => {
     const net = n(r.net), va = n(r.void_amount);
     const rate = net > 0 ? va / net : 0;
-    return { store: r.store, name: r.name, net, voidAmount: va, voidedItems: n(r.voided), voidRate: rate, flagged: med > 0 && rate > 1.5 * med && va > 200 };
+    return { store: r.store, name: r.name, net, voidAmount: va, voidedItems: n(r.voided), voidRate: rate, flagged: isEmployeeFlagged(rate, va, med) };
   });
 
   return {
@@ -73,7 +58,7 @@ export async function getVoidHunter(operatorId: number): Promise<VoidHunter> {
     networkVoids,
     networkVoidRate: networkNet > 0 ? networkVoids / networkNet : 0,
     medianStoreVoidRate: med,
-    storesFlagged: stores.filter((s) => s.flagged).length,
+    storesFlagged,
     stores,
     employees,
   };
