@@ -37,6 +37,7 @@ export type VoidHunterCsv = {
 import { parseCsv, findColumn, num, median, NOT_A_COUNT, type CsvAnalysisError } from './csv/core';
 export { parseCsv, findColumn, num, median, NOT_A_COUNT };
 export type { CsvAnalysisError };
+import { analyzeStores, isEmployeeFlagged } from './voidAnalysis';
 
 export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
   const { headers, rows } = parseCsv(csv);
@@ -113,18 +114,7 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
     voids: v.voids,
     voidRate: v.net > 0 ? v.voids / v.net : 0,
   }));
-  const networkNet = stores0.reduce((s, x) => s + x.net, 0);
-  const networkVoids = stores0.reduce((s, x) => s + x.voids, 0);
-  const med = median(stores0.map((s) => s.voidRate));
-
-  const stores: VoidStoreCsv[] = stores0
-    .map((s) => ({
-      ...s,
-      // Excess voids vs peer median, annualized (×3 if this was a 4-month period — keep modest)
-      excessYr: Math.round(Math.max(0, s.voids - med * s.net) * 3),
-      flagged: med > 0 && s.voidRate > 1.5 * med,
-    }))
-    .sort((a, b) => b.voidRate - a.voidRate);
+  const { stores, networkNet, networkVoids, medianStoreVoidRate: med, storesFlagged } = analyzeStores(stores0);
 
   const employees: VoidEmployeeCsv[] = byStoreEmp
     .filter((r) => r.void > 0)
@@ -136,7 +126,7 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
         net: r.net,
         voidAmount: r.void,
         voidRate: rate,
-        flagged: med > 0 && rate > 1.5 * med && r.void > 200,
+        flagged: isEmployeeFlagged(rate, r.void, med),
       };
     })
     .sort((a, b) => b.voidAmount - a.voidAmount)
@@ -148,7 +138,7 @@ export function runVoidHunter(csv: string): VoidHunterCsv | CsvAnalysisError {
     networkVoids,
     networkVoidRate: networkNet > 0 ? networkVoids / networkNet : 0,
     medianStoreVoidRate: med,
-    storesFlagged: stores.filter((s) => s.flagged).length,
+    storesFlagged,
     stores,
     employees,
   };
