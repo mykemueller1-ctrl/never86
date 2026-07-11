@@ -7,10 +7,10 @@ export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
   title: "Answers · Never 86'd",
-  description: 'Operator-to-operator answers, sourced to the platform.',
+  description: 'Operator-to-operator answers, sourced to the live system.',
   openGraph: {
     title: "Answers · Never 86'd",
-    description: 'Operator-to-operator answers, sourced to the platform.',
+    description: 'Operator-to-operator answers, sourced to the live system.',
     url: 'https://never86.ai/answers',
   },
 };
@@ -44,7 +44,7 @@ export default async function AnswersIndex() {
           Answers, <em>not opinions.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">
-          Every answer sourced to the platform. No hot takes. No vendor pitches.
+          Every answer sourced to the live system. No hot takes. No vendor pitches.
         </p>
       </section>
 

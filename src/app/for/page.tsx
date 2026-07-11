@@ -38,7 +38,7 @@ export default function ForIndex() {
       <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-12">
         <p className="compass-eyebrow mb-6">— Pick your seat</p>
         <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-6">
-          One platform.<br />
+          One system.<br />
           <em>Seven roles.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">

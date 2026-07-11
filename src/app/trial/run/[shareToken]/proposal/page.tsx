@@ -127,7 +127,7 @@ export default async function ProposalPage({ params }: { params: Params }) {
           <h2>How we ran it.</h2>
           <p style={{ fontSize: 13, lineHeight: 1.55, margin: '6px 0 0' }}>
             Source CSV: <span className="mono">{run.filename || 'operator-provided'}</span> · {run.rowsParsed ?? '—'} rows parsed at {runAt}.
-            Methodology lives in the platform &mdash; this surface is the result, source-tagged for defensibility to the penny.
+            Methodology lives in the system &mdash; this surface is the result, source-tagged for defensibility to the penny.
           </p>
 
           <h2>What happens next.</h2>
