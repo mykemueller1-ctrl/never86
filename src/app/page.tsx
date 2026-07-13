@@ -178,7 +178,7 @@ export default function Home() {
           <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
           <Link href="/team"      onClick={() => trackEvent('home_nav_click', { meta: { target: '/team', label: 'Team' } })}            className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Team</Link>
           <span className="flex-1" />
-          <Link href="/reports/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
+          <Link href="/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
         </nav>
 
         {/* Persona pill row */}
@@ -674,7 +674,7 @@ export default function Home() {
             <Link href="/people"  onClick={() => trackEvent('home_footer_click', { meta: { target: '/people', label: 'People' } })}    className="hover:text-white transition-colors">People</Link>
             <Link href="/onboard" onClick={() => trackEvent('home_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}  className="hover:text-white transition-colors">Onboard</Link>
             <Link href="/changelog" onClick={() => trackEvent('home_footer_click', { meta: { target: '/changelog', label: 'Changelog' } })} className="hover:text-white transition-colors">Changelog</Link>
-            <Link href="/reports/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>
