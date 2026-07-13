@@ -18,11 +18,11 @@ const TIERS = [
     name: 'Trial',
     tag: '60 minutes',
     price: 'Free',
-    blurb: 'Drop a CSV. See your real leak. No card.',
+    blurb: 'Send one sales report. See your real leak. No card.',
     features: [
-      'Void Hunter on your live POS export',
-      'Per-store + per-name breakdown',
-      'Source-tagged Verified figures',
+      'Void Hunter on your own sales report',
+      'Broken down by store and by name',
+      'Every number labeled — confirmed, estimated, or a guess',
       'No signup required',
     ],
     cta: { label: 'Start the hour →', href: '/trial' },
@@ -32,14 +32,14 @@ const TIERS = [
     name: 'Pulse',
     tag: '1–2 unit independents',
     price: '$199/mo',
-    blurb: 'Your office. In your pocket. Daily food cost · cross-vendor cheapest-price · one coach card per leak.',
+    blurb: 'Your back office, in your pocket. Food cost every day, the cheapest vendor for each item, and one plain fix per leak.',
     features: [
-      'All 7 production agents wired to your live POS',
-      'Daily food cost · 30/60/90-day prime cost trend',
-      'Cross-vendor cheapest-price compare (PFG vs Sysco vs Nicholas & Co)',
-      'One coach card per leak — telling you what to do, not just showing it',
-      'Per-name alerts (email + SMS)',
-      '90-day history · operator_id isolation today, DB-per-operator Q3',
+      'All 8 tools connected to your register',
+      'Food cost every day, plus your prime cost trend over 30/60/90 days',
+      'Cheapest-price compare across your vendors (PFG vs Sysco vs Nicholas & Co)',
+      'One plain fix per leak — what to do, not just what broke',
+      'Per-name alerts (email + text)',
+      '90 days of history · your data walled off from every other operator',
     ],
     cta: { label: 'Join the Pulse waitlist →', href: '/onboard' },
     accent: true,
@@ -48,11 +48,11 @@ const TIERS = [
     name: 'Operator Suite',
     tag: '3–9 unit small chains',
     price: '$999/mo',
-    blurb: 'The compass view. Network-level peer bands. Roll-up + drill-down. Where full native starts.',
+    blurb: 'The whole-group view. Every store next to the others — roll up to the top or drill into one. Where the full system starts.',
     features: [
       'Everything in Pulse',
-      'Peer-band analysis across your fleet',
-      'Per-role lens · CEO / CFO / COO / Owner',
+      'Every store compared against the rest of your group',
+      'A screen built for each person · CEO / CFO / COO / Owner',
       'Slack + Teams integration',
       'Unlimited history',
       'Dedicated onboarding call with Myke',
@@ -70,7 +70,7 @@ const TIERS = [
       'Per-brand isolation',
       'SSO (Okta · Azure AD · Google)',
       'Custom POS integration · NCR Aloha · PDQ · proprietary',
-      'API access · MCP endpoint',
+      'API access for your own tools',
       'Quarterly business review',
     ],
     cta: { label: 'Email myke@n86.app', href: 'mailto:myke@n86.app?subject=Enterprise%20pricing%20-%20never86' },
@@ -81,19 +81,19 @@ const TIERS = [
 const FAQS = [
   {
     q: 'What if my POS isn\'t supported yet?',
-    a: 'Drop a CSV export from any POS — if the columns map (Location / Employee / Net / Voids), we run on it today. OAuth wiring for Toast / Lightspeed / Aloha is in motion — join the waitlist on /trial.',
+    a: 'Send a report from any POS — if it has the columns we need (store, employee, sales, voids), we run on it today. Direct connections to Toast, Lightspeed, and Aloha are on the way — join the waitlist on the trial page.',
   },
   {
-    q: 'Are figures audited?',
-    a: 'Every number ships source-tagged: Verified (re-pullable from a primary source), Estimated (modeled from a benchmark, assumption named), Unverified (illustrative, source not wired). The trail is on the page next to every figure.',
+    q: 'Can I trust the numbers?',
+    a: 'Every number is labeled: Verified (we can pull it straight from the source), Estimated (our best math, and we name the assumption), or Unverified (illustrative only). The label sits right next to the figure, so you always know what\'s solid.',
   },
   {
     q: 'How does the free trial work?',
-    a: 'Hit /trial, click Start. You get 60 minutes to drop as many CSVs as you want. After the hour, the read is saved if you entered an email — no credit card required to keep the saved read.',
+    a: 'Go to the trial page and click Start. You get 60 minutes to run as many reports as you want. After the hour, your read is saved if you entered an email — no credit card needed to keep it.',
   },
   {
     q: 'What about data security?',
-    a: 'Your CSV uploads are processed in memory and never persisted on the trial path. On a paid plan today: operator_id isolation across one Neon Postgres (every query scoped per tenant). Q3 roadmap: full DB-per-operator (one Neon project per signed operator). We never train models on your data.',
+    a: 'Files you upload on the trial are processed in memory and never stored. On a paid plan, your data is walled off from every other operator, and we\'re moving to a fully separate database for each one. We never train models on your data.',
   },
 ];
 
@@ -127,7 +127,7 @@ export default function PricingPage() {
           Built by an operator. Priced like one. Try it free for an hour — see your real leak before you decide. Pulse is for 1–2 unit independents; Operator Suite for 3–9 units; Enterprise for 10+ unit multi-brand groups.
         </p>
         <p className="compass-body text-lg md:text-xl max-w-2xl mt-4">
-          The price test: this engine surfaced <span className="text-white font-semibold">$1.81M of annualized leak across a 16-unit group</span> — 545,677 orders, reconciled to the cent. Measured against that find, every tier on this page runs under 6% of the leak per store. <span className="font-serif italic text-white/70">(If we don&apos;t find money, don&apos;t buy.)</span>
+          The price test: this tool found <span className="text-white font-semibold">$1.81M of leaks across a 16-unit group in a year</span> — 545,677 orders, checked to the cent. Against a find that size, every tier on this page costs under 6% of the leak per store. <span className="font-serif italic text-white/70">(If we don&apos;t find you money, don&apos;t buy.)</span>
         </p>
       </section>
 

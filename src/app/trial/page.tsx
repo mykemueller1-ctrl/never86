@@ -419,7 +419,7 @@ export default function TrialPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· live trial</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · 60 minutes · real reads on your locations</p>
+              <p className="compass-eyebrow-dim mt-2">60 free minutes · real numbers from your restaurant</p>
             </span>
           </Link>
           {phase === 'active' && (
@@ -440,13 +440,13 @@ export default function TrialPage() {
             One hour. <em>Your real numbers.</em>
           </h1>
           <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Two agents wired. Drop a CSV, see what&apos;s actually happening on your floor. No card. No human in the loop.
+            Two agents ready. Send a sales report and see what&apos;s really happening on your floor. No card. No salesperson.
           </p>
           <button onClick={startTrial} disabled={starting} className="btn-primary text-base disabled:opacity-50" style={{ background: '#0066ff' }}>
             {starting ? 'Starting…' : 'Start the hour →'}
           </button>
           {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
-          <p className="compass-eyebrow-dim mt-6">— Supported now: Toast · Square · Clover · PDQ (CSV) · OAuth for Toast/Lightspeed/Aloha in build</p>
+          <p className="compass-eyebrow-dim mt-6">— Works now with Toast, Square, Clover, and PDQ exports · direct connections to Toast, Lightspeed, and Aloha on the way</p>
         </section>
       )}
 
@@ -487,8 +487,8 @@ export default function TrialPage() {
                 </>
               ) : (
                 <>
-                  <p className="compass-eyebrow mb-3">— Drop a CSV for {currentModeLabel}</p>
-                  <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file</p>
+                  <p className="compass-eyebrow mb-3">— Send your report for {currentModeLabel}</p>
+                  <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file in</p>
                   <p className="compass-body text-sm">
                     {mode === 'void'
                       ? 'Per-employee CSV · Location, Employee, Net Sales, Void Amount'
@@ -1051,9 +1051,9 @@ export default function TrialPage() {
 
           <section className="border-t border-[#1f1f1f] py-16 px-6">
             <div className="max-w-3xl mx-auto">
-              <p className="compass-eyebrow mb-4">— Connect your POS · auto-read every shift</p>
+              <p className="compass-eyebrow mb-4">— Connect your register · reads every shift on its own</p>
               <h2 className="compass-display text-3xl md:text-5xl mb-10">
-                When OAuth lights up, <em>we email you first.</em>
+                When the direct connection is ready, <em>we email you first.</em>
               </h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {POS_OPTIONS.map((p) => (
@@ -1089,7 +1089,7 @@ export default function TrialPage() {
             Time&apos;s up. <em>The leak isn&apos;t.</em>
           </h1>
           <p className="compass-body text-lg md:text-xl mb-10">
-            You saw the read. Want it on every shift, wired to your live POS, every figure source-tagged? Drop your details — Myke reaches out personally within 24 hours.
+            You saw the read. Want it every day, connected straight to your register, every number labeled? Leave your details — Myke reaches out personally within 24 hours.
           </p>
         </section>
       )}

@@ -119,7 +119,7 @@ export default function Home() {
                 Never 86&apos;d <span className="italic text-white/70">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">
-                Operator OS · 24-agent workforce · 8 free to try
+                See where your restaurant is losing money · 8 tools free to try
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function Home() {
       {/* Hero */}
       <section className="relative max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
         <div className="n86-hero-glow" aria-hidden />
-        <p className="compass-eyebrow mb-6 relative z-10">— Operator OS · Network Operating Layer</p>
+        <p className="compass-eyebrow mb-6 relative z-10">— For restaurant owners and operators</p>
         <div className="relative z-10 grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start">
           <div className="n86-hero-enter">
             <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
@@ -219,12 +219,13 @@ export default function Home() {
               owns it. <em>Keep</em> the receipt.
             </h1>
             <p className="compass-body text-lg md:text-xl max-w-2xl">
-              Seven agents read your sales, labor, voids, 3P fees, tips, catering, and shift sentiment.
-              Every figure source-tagged. Every recovery owned by a name. The screen every operator wishes their POS gave them.
+              Send us a sales report from your register. In 30 seconds we show you where money is
+              slipping away — which store, which shift, whose name — and what to do about it.
+              No spreadsheets. No waiting on the accountant.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: '60 minutes free · drop a CSV', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
-                60 minutes free · drop a CSV →
+              <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: 'Try it free — no card', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
+                Try it free — no card needed →
               </Link>
               <Link href="/pricing" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/pricing', label: 'See pricing', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
                 See pricing
@@ -233,34 +234,34 @@ export default function Home() {
           </div>
 
           <aside className="compass-card">
-            <p className="compass-card-label">This view · primary audience</p>
-            <h3>You · Operator</h3>
+            <p className="compass-card-label">Who it&apos;s for</p>
+            <h3>You. The owner.</h3>
             <p className="compass-eyebrow mb-4" style={{ letterSpacing: '0.08em' }}>
-              Owner · Signing authority · Sees every figure
+              The one who signs the checks
             </p>
             <p className="compass-body text-[14.5px]">
-              <span className="text-white font-semibold">What you own:</span> P&amp;L,
-              vendor relationships, the next hire, the board narrative.
-              This view is the 30-second daily read on all of it.
+              You run the floor, the books, and the schedule — often all in the same day.
+              This is your 30-second morning read on where the money actually went,
+              in plain English.
             </p>
           </aside>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Recovered · network</p>
+            <p className="compass-kpi-label">Money found</p>
             <p className="compass-kpi-val">$<span>1.81</span><span className="unit">M</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Orders reconciled</p>
+            <p className="compass-kpi-label">Orders checked</p>
             <p className="compass-kpi-val">545<span className="unit">,677</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Free to try</p>
+            <p className="compass-kpi-label">Tools free to try</p>
             <p className="compass-kpi-val">8<span className="unit">/24</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Self-onboard</p>
+            <p className="compass-kpi-label">Set up yourself in</p>
             <p className="compass-kpi-val">15<span className="unit">min</span></p>
           </div>
         </div>
@@ -274,7 +275,7 @@ export default function Home() {
             It doesn&apos;t say voids are up. <em>It names who.</em>
           </h2>
           <p className="compass-body text-lg max-w-2xl mb-12">
-            A sample 5-store network — real math, masked names. The same engine reconciled <span className="text-white font-semibold">$15.72M across 545,677 real orders</span> for our design partner and surfaced <span className="text-white font-semibold">$1.81M</span>, sourced to the cent. On your own export it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>/trial</Link> — and it names <em>your</em> stores, not these.
+            A sample 5-store group — real math, names hidden. The same tool checked <span className="text-white font-semibold">$15.72M across 545,677 real orders</span> for our first partner and found <span className="text-white font-semibold">$1.81M</span> in leaks, every dollar traced back to its source. On your own report it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>the free trial</Link> — and it names <em>your</em> stores, not these.
           </p>
 
           <div className="grid lg:grid-cols-[340px_1fr] gap-4">
@@ -432,7 +433,7 @@ export default function Home() {
             From the solo operator <em>to the C-suite.</em>
           </h2>
           <p className="compass-body text-lg max-w-3xl mb-14">
-            Two products, one front door. <span className="text-white font-semibold">Pulse</span> is for the operator who doesn&apos;t know his prime cost today — it shows you daily, names the leak, and hands you the fix. $199/mo. <span className="text-white font-semibold">Full native</span> is the whole operating system built into a multi-unit group — it runs a 16-unit chef-led group right now. (What&apos;s under the hood isn&apos;t on the website. Ask.) The free trial is where everyone starts.
+            Two ways to use it. <span className="text-white font-semibold">Pulse</span> is for a 1–2 store operator — it shows your prime cost (food and labor as a share of sales) every morning, names the leak, and tells you the fix. $199/mo. <span className="text-white font-semibold">The full system</span> runs an entire multi-store group, and it&apos;s live inside a 16-unit chef-led group today. Not sure which fits? Start with the free trial — everyone does.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
@@ -440,11 +441,11 @@ export default function Home() {
               <p className="compass-card-label">— Free trial</p>
               <h3>Start here. Free.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                One store, running ops, finance, and the floor yourself at 11pm? Drop a CSV and see your leak in 30 seconds. No card.
+                One store, doing the ops, the books, and the floor yourself at 11pm? Send one sales report and see your leak in 30 seconds. No card.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute timed trial · drop a CSV · no card</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 8 agents free to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · BCS · Vendor Drift · Refund Auditor)</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute free trial · one sales report · no card</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 8 tools free to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · Beverage Cost · Vendor Drift · Refund Auditor)</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
               <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the trial' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
@@ -571,14 +572,14 @@ export default function Home() {
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— What we are</p>
               <h3>The Operator OS.</h3>
               <p className="compass-body text-[15px] mt-3 leading-relaxed">
-                Seven agents reading sales, labor, voids, 3P fees, tips, catering, shift sentiment. One screen per role. Every figure source-tagged <span style={{ color: '#34c759' }} className="font-semibold">Verified</span> / <span style={{ color: '#ff9500' }} className="font-semibold">Estimated</span> / <span style={{ color: '#ff453a' }} className="font-semibold">Unverified</span>. When we&apos;re wrong, we publish the correction.
+                Tools that watch your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. One simple screen per person. We label every number <span style={{ color: '#34c759' }} className="font-semibold">Verified</span> (confirmed), <span style={{ color: '#ff9500' }} className="font-semibold">Estimated</span> (our best math), or <span style={{ color: '#ff453a' }} className="font-semibold">Unverified</span> (still a guess) — so you always know what&apos;s solid. When we get one wrong, we tell you and fix it.
               </p>
             </div>
             <div className="compass-card">
               <p className="compass-card-label">— How it works</p>
               <h3>30 seconds to first leak.</h3>
               <p className="compass-body text-[15px] mt-3 leading-relaxed">
-                Drop a Toast / Square / Clover / PDQ export at <Link href="/trial" onClick={() => trackEvent('home_inline_trial_link_click', { meta: { target: '/trial', label: '/trial inline' } })} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>/trial</Link>. Void Hunter and the Leak Detector run on your real numbers. 60-minute live read, no card, no human in the loop. If you like it, wire it to live data — we email per-POS when each OAuth ships.
+                Send a report from Toast, Square, Clover, or PDQ at <Link href="/trial" onClick={() => trackEvent('home_inline_trial_link_click', { meta: { target: '/trial', label: '/trial inline' } })} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>the free trial</Link>. Two tools run on your real numbers right away — a 60-minute live look, no card, no salesperson. Like it? We&apos;ll connect it straight to your register so it updates on its own.
               </p>
             </div>
           </div>
