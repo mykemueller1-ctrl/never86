@@ -12,6 +12,7 @@ import { runTipVariance } from '../src/lib/tipVarianceCsv';
 import { runCateringLeak } from '../src/lib/cateringLeakCsv';
 import { runBeverageCostScore } from '../src/lib/beverageScoreCsv';
 import { runVendorDrift } from '../src/lib/vendorDriftCsv';
+import { runRefundAuditor } from '../src/lib/refundAuditorCsv';
 
 const sample = (f: string) => readFileSync(join(__dirname, '..', 'public', 'samples', f), 'utf8');
 const fixture = (f: string) => readFileSync(join(__dirname, 'fixtures', f), 'utf8');
@@ -24,6 +25,7 @@ const AGENTS = [
   { name: 'Catering Leak',  run: runCateringLeak,    sample: 'catering-reconciliation.csv' },
   { name: 'Beverage Score', run: runBeverageCostScore, sample: 'beverage-pour.csv' },
   { name: 'Vendor Drift',   run: runVendorDrift,     sample: 'vendor-drift.csv' },
+  { name: 'Refund Auditor', run: runRefundAuditor,   sample: 'refund-audit.csv' },
 ] as const;
 
 describe('agents · clean sample exports analyze successfully', () => {
