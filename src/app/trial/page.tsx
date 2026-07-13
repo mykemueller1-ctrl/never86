@@ -55,6 +55,7 @@ const MODES = [
   { id: 'catering', label: 'Catering Leak',        blurb: 'Catering recon CSV · invoice-vs-POS gap · unmatched orders' },
   { id: 'bcs',      label: 'Beverage Cost Score',  blurb: 'Pour vs inventory CSV · BCS 0-100 · per-category shrink' },
   { id: 'drift',    label: 'Vendor Drift',         blurb: 'Vendor invoice CSV · per-SKU week-over-week price drift' },
+  { id: 'refund',   label: 'Refund Auditor',       blurb: 'Per-employee CSV · post-payment refunds vs peer band, by name' },
 ] as const;
 type Mode = typeof MODES[number]['id'];
 
@@ -95,6 +96,17 @@ type BcsResult = {
   perStore: Array<{ store: string; bcsScore: number; consumed: number; poured: number; shrinkUnits: number; shrinkPct: number; revenueLost: number; byCategory: Array<{ category: string; consumed: number; poured: number; shrinkUnits: number; shrinkPct: number; revenueLost: number }> }>;
 };
 
+type RefundResult = {
+  ok: true;
+  rowsParsed: number;
+  networkNet: number;
+  networkRefunds: number;
+  networkRefundRate: number;
+  medianStoreRefundRate: number;
+  storesFlagged: number;
+  stores: Array<{ name: string; net: number; refunds: number; refundRate: number; excessYr: number; flagged: boolean }>;
+  employees: Array<{ store: string; name: string; net: number; refundAmount: number; refundRate: number; flagged: boolean }>;
+};
 type VendorDriftResult = {
   ok: true;
   rowsParsed: number;
@@ -158,6 +170,7 @@ export default function TrialPage() {
   const [cateringResult, setCateringResult] = useState<CateringResult | null>(null);
   const [bcsResult, setBcsResult] = useState<BcsResult | null>(null);
   const [driftResult, setDriftResult] = useState<VendorDriftResult | null>(null);
+  const [refundResult, setRefundResult] = useState<RefundResult | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [errHint, setErrHint] = useState('');
   const [detectedCols, setDetectedCols] = useState<string[]>([]);
@@ -235,7 +248,7 @@ export default function TrialPage() {
     setFilename(file.name);
     setStatus('running');
     setErrMsg(''); setErrHint(''); setDetectedCols([]);
-    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null);
+    setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null); setRefundResult(null);
     try {
       const form = new FormData();
       form.append('file', file);
@@ -245,7 +258,8 @@ export default function TrialPage() {
                      : mode === 'tips'     ? '/api/connect/tip-variance'
                      : mode === 'catering' ? '/api/connect/catering-leak'
                      : mode === 'bcs'      ? '/api/connect/beverage-score'
-                     : '/api/connect/vendor-drift';
+                     : mode === 'drift'    ? '/api/connect/vendor-drift'
+                     : '/api/connect/refund-auditor';
       const res = await fetch(endpoint, { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
@@ -255,7 +269,8 @@ export default function TrialPage() {
         else if (mode === 'tips')     setTipsResult(data as TipVarianceResult);
         else if (mode === 'catering') setCateringResult(data as CateringResult);
         else if (mode === 'bcs')      setBcsResult(data as BcsResult);
-        else                          setDriftResult(data as VendorDriftResult);
+        else if (mode === 'drift')    setDriftResult(data as VendorDriftResult);
+        else                          setRefundResult(data as RefundResult);
         if (typeof data.shareToken === 'string') setShareToken(data.shareToken);
         setStatus('done');
         trackEvent('trial_run_complete', { meta: { mode, shareToken: typeof data.shareToken === 'string' ? data.shareToken : null } });
@@ -351,6 +366,7 @@ export default function TrialPage() {
       catering: { url: '/samples/catering-reconciliation.csv',    name: 'sample-catering-leak.csv' },
       bcs:      { url: '/samples/beverage-pour.csv',              name: 'sample-beverage-score.csv' },
       drift:    { url: '/samples/vendor-drift.csv',               name: 'sample-vendor-drift.csv' },
+      refund:   { url: '/samples/refund-audit.csv',               name: 'sample-refund-auditor.csv' },
     };
     const s = SAMPLE_URLS[mode];
     if (!s) return;
@@ -440,7 +456,7 @@ export default function TrialPage() {
             <p className="compass-eyebrow mb-4">— Pick an agent</p>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {MODES.map((m) => (
-                <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null); setShareToken(null); }}
+                <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null); setRefundResult(null); setShareToken(null); }}
                   className="compass-card text-left transition-colors"
                   style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
                   <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
@@ -486,7 +502,9 @@ export default function TrialPage() {
                       ? 'Catering recon CSV · Location, Customer, Invoice Amount, POS Amount (+ Order ID + Event Date optional)'
                       : mode === 'bcs'
                       ? 'Beverage close CSV · Location, Category, Consumed, Poured (+ Unit Price optional for revenue-lost calc)'
-                      : 'Vendor invoice CSV · Vendor, SKU, Period, Unit Price (must cover ≥ 2 periods · monthly buckets ideal)'}
+                      : mode === 'drift'
+                      ? 'Vendor invoice CSV · Vendor, SKU, Period, Unit Price (must cover ≥ 2 periods · monthly buckets ideal)'
+                      : 'Per-employee CSV · Location, Employee, Net Sales, Refund Amount · post-payment refunds by name'}
                   </p>
 
                   {/* Equal-weight escape hatch for visitors who don't have an
@@ -546,6 +564,51 @@ export default function TrialPage() {
                     <a href={`/trial/run/${shareToken}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('trial_share_open', { meta: { mode, shareToken } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Open →</a>
                   </div>
                 </div>
+              </div>
+            </section>
+          )}
+
+          {status === 'done' && refundResult && mode === 'refund' && (
+            <section className="border-t border-[#1f1f1f] py-16 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="compass-eyebrow mb-4">— Refund Auditor · {filename}</p>
+                <h2 className="compass-display text-3xl md:text-5xl mb-10">
+                  {refundResult.storesFlagged > 0
+                    ? <>Found <em>{refundResult.storesFlagged} store{refundResult.storesFlagged === 1 ? '' : 's'}</em> refunding above the peer band.</>
+                    : <>No stores <em>above the refund peer band.</em></>}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network net</p><p className="compass-kpi-val">{usd(refundResult.networkNet)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Network refunds</p><p className="compass-kpi-val">{usd(refundResult.networkRefunds)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Refund rate</p><p className="compass-kpi-val">{pct(refundResult.networkRefundRate)}</p></div>
+                  <div className="compass-kpi"><p className="compass-kpi-label">Peer-median rate</p><p className="compass-kpi-val">{pct(refundResult.medianStoreRefundRate)}</p></div>
+                </div>
+                {refundResult.employees.some((e) => e.flagged) && (
+                  <div className="compass-card mb-10" style={{ borderColor: '#0066ff' }}>
+                    <p className="compass-card-label" style={{ color: '#0066ff' }}>— The name</p>
+                    {refundResult.employees.filter((e) => e.flagged).slice(0, 3).map((e) => (
+                      <h3 key={e.store + e.name} className="!mt-1">{e.name} · {e.store} — <em style={{ color: '#0066ff' }}>{usd(e.refundAmount)}</em> refunded ({pct(e.refundRate)})</h3>
+                    ))}
+                  </div>
+                )}
+                {refundResult.stores.length > 0 && (
+                  <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
+                    <table className="data-table w-full">
+                      <thead><tr><th className="!text-left">Store</th><th>Net</th><th>Refunds</th><th>Rate</th><th>Excess / yr</th></tr></thead>
+                      <tbody>
+                        {refundResult.stores.map((s) => (
+                          <tr key={s.name} style={{ color: '#d2d2d7' }}>
+                            <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
+                            <td className="font-mono tabular-nums">{usd(s.net)}</td>
+                            <td className="font-mono tabular-nums">{usd(s.refunds)}</td>
+                            <td className="font-mono tabular-nums">{pct(s.refundRate)}</td>
+                            <td className="font-mono tabular-nums">{s.excessYr > 0 ? usd(s.excessYr) : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </section>
           )}

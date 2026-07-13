@@ -31,7 +31,8 @@ export type TrialAgent =
   | 'tip-variance'
   | 'catering-leak'
   | 'beverage-score'
-  | 'vendor-drift';
+  | 'vendor-drift'
+  | 'refund-auditor';
 
 export async function saveTrialRun(input: {
   sessionToken: string;
