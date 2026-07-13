@@ -86,7 +86,7 @@ export default async function OG() {
                 textTransform: 'uppercase',
               }}
             >
-              — Operator OS · 24-agent workforce · 7 free to try
+              — For restaurant operators · 8 agents free to try
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default async function OG() {
             paddingTop: 24,
           }}
         >
-          <div>$1.81M recovered · 545,677 orders · built by operators</div>
+          <div>$1.81M surfaced · 545,677 orders · built by operators</div>
           <div
             style={{
               color: '#ffffff',
