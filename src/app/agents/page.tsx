@@ -7,17 +7,17 @@ import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Agents · Never 86'd",
-  description: 'Seven agents reading your sales, labor, voids, 3P fees, tips, catering, and shift sentiment. Every figure source-tagged.',
+  description: 'Eight agents that read your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. Every number labeled.',
   openGraph: {
-    title: "Never 86'd · Seven agents · One operator OS",
-    description: 'Find the leak. Name who owns it. Keep the receipt. Seven agents, every figure source-tagged Verified / Estimated / Unverified.',
+    title: "Never 86'd · Eight agents that find the leak",
+    description: 'Find the leak. Name who owns it. Keep the receipt. Eight agents, every number labeled Verified / Estimated / Unverified.',
     url: 'https://never86.ai/agents',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Never 86'd · Seven agents",
-    description: 'Seven agents reading the operator stack. Every figure source-tagged.',
+    title: "Never 86'd · Eight agents",
+    description: 'Eight agents that read your whole operation. Every number labeled.',
   },
   alternates: { canonical: 'https://never86.ai/agents' },
 };
@@ -35,7 +35,7 @@ export default function AgentsPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· agents</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · 24-agent workforce · 7 free to try</p>
+              <p className="compass-eyebrow-dim mt-2">The agents that find your leak · 8 free to try</p>
             </span>
           </Link>
           <AgentsNavLinks />
@@ -43,15 +43,15 @@ export default function AgentsPage() {
       </div>
 
       <section className="max-w-5xl mx-auto px-6 pt-12 md:pt-16 pb-12">
-        <p className="compass-eyebrow mb-6">— Eight agents · one operator OS</p>
+        <p className="compass-eyebrow mb-6">— Eight agents that find the leak</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-6">
           The agents that <em>name the leak.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl mb-10">
-          Each one reads a slice of your operation — sales, labor, voids, 3P fees, tips, catering, shift sentiment — and tells you the one thing to fix. Per store. Per name. Every figure source-tagged.
+          Each one watches a part of your business — sales, labor, voids, delivery fees, tips, catering, how shifts are going — and tells you the one thing to fix. By store. By name. Every number labeled.
         </p>
         <div className="flex flex-wrap gap-3">
-          <TrackedLink href="/trial" event="agents_hero_cta_click" meta={{ target: '/trial', label: '60 minutes free · drop a CSV', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>60 minutes free · drop a CSV →</TrackedLink>
+          <TrackedLink href="/trial" event="agents_hero_cta_click" meta={{ target: '/trial', label: 'Try it free — no card', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Try it free — no card needed →</TrackedLink>
           <TrackedLink href="/pricing" event="agents_hero_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
         </div>
       </section>
@@ -103,7 +103,7 @@ export default function AgentsPage() {
         <div className="max-w-5xl mx-auto">
           <p className="compass-eyebrow mb-4">— The rule that runs the agents</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
-            Every figure ships <em>source-tagged.</em>
+            Every number, <em>labeled.</em>
           </h2>
           <div className="grid md:grid-cols-3 gap-3">
             {SOURCE_TAGS.map((t) => (
@@ -114,7 +114,7 @@ export default function AgentsPage() {
             ))}
           </div>
           <p className="compass-body text-[14px] mt-8 max-w-3xl">
-            No competitor in this category publicly source-tags figures. None publicly disclose model error. We checked. <TrackedLink href="/case/walked-the-number-back" event="agents_case_link_click" meta={{ target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' }} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case</TrackedLink> where we caught our own $8.3M number, walked it down to $1.81M in writing, and made source-tagging the operational rule that came out of it.
+            No competitor we could find shows their work like this — labeling every number, and telling you out loud when they got one wrong. We checked. <TrackedLink href="/case/walked-the-number-back" event="agents_case_link_click" meta={{ target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' }} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case</TrackedLink> where we caught our own $8.3M number, walked it down to $1.81M in writing, and made labeling every figure the rule that came out of it.
           </p>
         </div>
       </section>
@@ -126,7 +126,7 @@ export default function AgentsPage() {
             60 minutes. <em>Your real numbers.</em>
           </h2>
           <p className="compass-body text-lg mb-8">
-            Drop a Toast / Square / Clover / PDQ export at <span className="font-mono text-white">/trial</span>. Void Hunter and the Leak Detector run on your real data in 30 seconds. No card. No human in the loop.
+            Send a report from Toast, Square, Clover, or PDQ. Two agents run on your real numbers in 30 seconds. No card. No salesperson.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href="/trial" event="agents_bottom_cta_click" meta={{ target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>

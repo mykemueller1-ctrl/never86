@@ -226,9 +226,9 @@ export const AGENT_SPECS: AgentSpec[] = [
 ];
 
 export const SOURCE_TAGS = [
-  { v: 'Verified',   color: '#34c759', meaning: 'We can re-pull this from a primary source and defend it to the penny.' },
-  { v: 'Estimated',  color: '#ff9500', meaning: 'Modeled from a benchmark or assumption. We name the assumption next to the number.' },
-  { v: 'Unverified', color: '#ff453a', meaning: 'Source not wired yet. Number is illustrative — operator-only.' },
+  { v: 'Verified',   color: '#34c759', meaning: 'We can pull this straight from the source and stand behind it to the penny.' },
+  { v: 'Estimated',  color: '#ff9500', meaning: 'Our best math from a benchmark or assumption — and we name that assumption right next to the number.' },
+  { v: 'Unverified', color: '#ff453a', meaning: 'Not connected to a source yet, so the number is just an example — for your eyes only.' },
 ] as const;
 
 export function getAgentSpec(slug: string): AgentSpec | undefined {
