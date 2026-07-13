@@ -124,7 +124,7 @@ export default function Home() {
             </div>
           </div>
           <div className="text-right">
-            <p className="font-mono text-[13px] text-white tabular-nums">$1.81M RECOVERED · 545,677 ORDERS</p>
+            <p className="font-mono text-[13px] text-white tabular-nums">$1.81M SURFACED · 545,677 ORDERS</p>
             <p className="compass-eyebrow-dim mt-1">
               MULTI-MARKET NETWORK <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
             </p>
@@ -539,8 +539,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 04 · What we do</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-14">
-            We sit on top of your POS<br />
-            and tell you <em>when one of them is lying.</em>
+            We sit on top of the systems you run<br />
+            and tell you <em>where the numbers stop agreeing.</em>
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-12">
