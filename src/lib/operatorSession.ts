@@ -23,7 +23,15 @@ export const OPERATOR_COOKIE_OPTS = {
 export type OperatorSession = { operatorId: number; email: string; exp: number };
 
 export function operatorSessionSecret(): string | null {
-  return process.env.OPERATOR_SESSION_SECRET || null;
+  const explicit = process.env.OPERATOR_SESSION_SECRET;
+  if (explicit) return explicit;
+  // Graceful fallback so the operator portal works out of the box without any
+  // extra config: derive a stable signing key from an existing server-only
+  // secret the deployment already has. Set OPERATOR_SESSION_SECRET explicitly
+  // for a clean separation, but login works either way.
+  const seed =
+    process.env.REPORTS_PASSWORD || process.env.ADMIN_PASSWORD || process.env.OPS_DATABASE_URL;
+  return seed ? `n86-operator-session:${seed}` : null;
 }
 
 function b64urlEncode(bytes: Uint8Array): string {

@@ -9,6 +9,10 @@ const NOW = 1_700_000_000_000; // fixed "now" in ms
 
 beforeAll(() => {
   process.env.OPERATOR_SESSION_SECRET = 'test-secret-please-change';
+  // Keep fallback seeds out of the test env so the "disabled" case is clean.
+  delete process.env.REPORTS_PASSWORD;
+  delete process.env.ADMIN_PASSWORD;
+  delete process.env.OPS_DATABASE_URL;
 });
 
 describe('operator session · sign/verify roundtrip', () => {
@@ -58,10 +62,21 @@ describe('operator session · expiry + missing config', () => {
     expect(await verifyOperatorSession('a.b', NOW)).toBeNull();
   });
 
-  it('with no secret set, signing is disabled (returns null)', async () => {
+  it('with no secret and no fallback seed, signing is disabled (returns null)', async () => {
     const saved = process.env.OPERATOR_SESSION_SECRET;
     delete process.env.OPERATOR_SESSION_SECRET;
     expect(await signOperatorSession(7, 'x@y.com', NOW)).toBeNull();
+    process.env.OPERATOR_SESSION_SECRET = saved;
+  });
+
+  it('falls back to an existing server secret so the portal works out of the box', async () => {
+    const saved = process.env.OPERATOR_SESSION_SECRET;
+    delete process.env.OPERATOR_SESSION_SECRET;
+    process.env.REPORTS_PASSWORD = 'some-existing-reports-password';
+    const token = await signOperatorSession(7, 'x@y.com', NOW);
+    expect(token).toBeTypeOf('string');
+    expect((await verifyOperatorSession(token!, NOW))!.operatorId).toBe(7);
+    delete process.env.REPORTS_PASSWORD;
     process.env.OPERATOR_SESSION_SECRET = saved;
   });
 });
