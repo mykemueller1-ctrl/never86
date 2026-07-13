@@ -64,6 +64,28 @@ negative-token list (those legitimately differ per agent).
   private repos only.
 - **Two databases:** Neon (`DATABASE_URL`, app) and Supabase ops
   (`OPS_DATABASE_URL`, via `src/lib/opsDb.ts`, transaction pooler, `prepare:false`).
+
+## Product north star (how to talk about it, how to build it)
+**This is an operator coaching & decision system, not a dashboard.** The value
+isn't the data or the agent count — it's the logic that goes **fact → why it
+matters → who owns it → what to do next.** Most restaurant tools stop at
+"sales down / labor up / voids high." We connect those facts, source-tag them,
+admit uncertainty, and route each finding to the person who owns the response.
+
+Rules that must hold in every surface we build or write:
+- **Sell the first win, never "24 agents."** Entry line: *"Give us one report.
+  We'll show you one leak, prove it, and tell you what to do next."* For a
+  multi-unit CEO: *"One daily read showing where the brand is drifting, why, and
+  who owns the next move."*
+- **Simple to enter, powerful underneath.** The front door must stay dead
+  simple even as the engine gets deeper. If a new operator can't tell where to
+  start in 5 seconds, it's too complex — cut, don't add.
+- **Every number carries its "now what."** One action + one owner + the $ at
+  stake. A figure with no next-step is half-built.
+- **Outcome, not "AI."** Describe the process/coaching and the recovered dollars.
+  Don't lead with the technology.
+- Keep this in mind alongside the guardrails above (source-tag everything;
+  public surfaces never name a real client).
 ```
 npm run dev     # local
 npm test        # vitest: core + all 7 agents
