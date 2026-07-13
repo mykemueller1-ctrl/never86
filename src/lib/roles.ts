@@ -57,7 +57,7 @@ export const ROLES: Record<string, RoleSpec> = {
   cfo: {
     slug: 'cfo',
     oneWord: 'Books',
-    subhead: 'Books that close to the penny. Every figure on the board doc, source-tagged.',
+    subhead: 'Books that close to the penny. Every figure on the board doc, labeled and defensible.',
     audience: 'For CFOs · finance leaders · controllers · 5 to 50 units',
     badge: 'CFO',
     tone: 'gold',

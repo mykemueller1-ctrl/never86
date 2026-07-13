@@ -16,7 +16,7 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">for {spec.badge}</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · {spec.badge} seat</p>
+              <p className="compass-eyebrow-dim mt-2">Built for the {spec.badge} · your daily screen</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">

@@ -14,23 +14,23 @@ const POS_OPTIONS = ['Toast', 'Square', 'Clover', 'Aloha', 'Lightspeed', 'Other 
 // the agents we publicly market on /trial and /agents.
 const AGENT_OPTIONS = [
   { v: 'Void Hunter',            d: 'Catch the void pattern before it eats the night.' },
-  { v: 'Leak Detector',          d: '7 theft signals on a ticket-level CSV. Risk-scored per name.' },
+  { v: 'Leak Detector',          d: '7 theft signals, ticket by ticket. Scored by name.' },
   { v: 'Labor Leak',             d: 'Find the labor that ran without permission.' },
   { v: 'Tip Variance',           d: 'Spot the tip drift that nobody talks about.' },
-  { v: 'Catering Leak',          d: 'Off-menu catering with no margin discipline.' },
-  { v: 'Beverage Cost Score',    d: 'BCS 0–100 per store · per-category bar/wine shrink.' },
-  { v: 'Vendor Drift Detector',  d: 'Per-SKU price drift across vendors, week over week.' },
+  { v: 'Catering Leak',          d: 'Off-menu catering with no margin left on it.' },
+  { v: 'Beverage Cost Score',    d: 'A 0–100 beverage score per store · bar/wine shrink by category.' },
+  { v: 'Vendor Drift Detector',  d: 'Price creep on each item across vendors, week to week.' },
   { v: '3P Fee Finder',          d: 'See what DoorDash, UberEats, GrubHub are actually keeping.' },
-  { v: 'Rate Card Audit',        d: 'Where your 3P contracted rate sits vs the peer band.' },
-  { v: 'Shift Pulse',            d: 'Crew + manager sentiment at the close of every shift.' },
-  { v: 'All of the above',       d: 'Wire the whole stack — Command Center on your data.' },
+  { v: 'Rate Card Audit',        d: 'Where your delivery rate sits vs similar restaurants.' },
+  { v: 'Shift Pulse',            d: 'Crew + manager read on how each shift closed.' },
+  { v: 'All of the above',       d: 'Set up everything — the full system on your data.' },
 ];
 
 const DATA_OPTIONS = [
-  { v: 'Toast IQ wiring',          d: 'You give us read-only Toast IQ — we pull what we need, you see every figure.' },
-  { v: 'CSV upload',               d: 'Drop a sales + labor export. We run the agent and send the read-back.' },
-  { v: 'Looker / email forwarding',d: 'Forward your daily rollup. We tag every number we use.' },
-  { v: 'Talk to us first',         d: '15 minutes. We decide together what makes sense for your stack.' },
+  { v: 'Connect Toast',            d: 'Give us read-only access to Toast — we pull what we need, you see every figure.' },
+  { v: 'Send a file',              d: 'Send a sales + labor export. We run the agent and send back what we find.' },
+  { v: 'Forward your daily email', d: 'Forward the daily numbers you already get. We label every figure we use.' },
+  { v: 'Talk to us first',         d: '15 minutes. We figure out together what makes sense for your setup.' },
 ];
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -104,7 +104,7 @@ export default function OnboardPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· onboard</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · self-serve · 4 steps</p>
+              <p className="compass-eyebrow-dim mt-2">Set yourself up · 4 quick steps</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -157,7 +157,7 @@ export default function OnboardPage() {
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
                 Your <em>POS?</em>
               </h1>
-              <p className="compass-body text-lg mb-10">So we know what we&apos;re wiring into.</p>
+              <p className="compass-body text-lg mb-10">So we know what you&apos;re running.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {POS_OPTIONS.map((opt) => (
                   <button key={opt} type="button" onClick={() => { if (opt !== posType) trackEvent('onboard_pos_selected', { meta: { posType: opt } }); setPosType(opt); }} className={pickClass(posType === opt)}>
