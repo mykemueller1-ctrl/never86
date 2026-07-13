@@ -3,6 +3,7 @@ import { getCommandCenterData, type CommandCenterData } from '@/lib/commandCente
 import { getVoidFindings, type VoidFindings } from '@/lib/voidFindings';
 import { opsDbConfigured } from '@/lib/opsDb';
 import { SourceTag } from './SourceTag';
+import { CoachCards } from './CoachCards';
 import { VoidFindingsSection } from './VoidFindingsSection';
 import { tagCounts, METRIC_REGISTRY, type TagLevel } from '@/lib/sourceTags';
 
@@ -203,8 +204,14 @@ export default async function UnifiedCommandCenter({ operatorId, displayName }: 
           <Kpi label="First-party %" value={d.firstPartyPct != null ? `${d.firstPartyPct}%` : '—'} level="verified" sub="target 50%" />
           <Kpi label="Open exceptions" value={String(d.exceptions.length)} level="verified" />
         </div>
-        <Subhead>What needs your attention</Subhead>
-        <div className="mb-6"><ExceptionList exceptions={d.exceptions} /></div>
+        <Subhead>Do this today</Subhead>
+        <div className="mb-8"><CoachCards exceptions={d.exceptions} limit={3} /></div>
+        {d.exceptions.length > 0 ? (
+          <>
+            <Subhead>All open findings</Subhead>
+            <div className="mb-6"><ExceptionList exceptions={d.exceptions} /></div>
+          </>
+        ) : null}
         {voidFindings ? <VoidFindingsSection data={voidFindings} /> : null}
         <div className="mt-6">
           <Subhead>Stores by net sales</Subhead>
