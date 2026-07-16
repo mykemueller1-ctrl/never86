@@ -28,7 +28,7 @@ const AGENT_OPTIONS = [
 
 const DATA_OPTIONS = [
   { v: 'Connect Toast',            d: 'Give us read-only access to Toast — we pull what we need, you see every figure.' },
-  { v: 'Send a file',              d: 'Send a sales + labor export. We run the agent and send back what we find.' },
+  { v: 'Send a file',              d: 'Send a sales + labor export. We run the check and send back what we find.' },
   { v: 'Forward your daily email', d: 'Forward the daily numbers you already get. We label every figure we use.' },
   { v: 'Talk to us first',         d: '15 minutes. We figure out together what makes sense for your setup.' },
 ];
@@ -175,7 +175,7 @@ export default function OnboardPage() {
           {step === 3 && (
             <div>
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
-                Which agent <em>first?</em>
+                What should we <em>check first?</em>
               </h1>
               <p className="compass-body text-lg mb-10">Pick one. You can have the rest later.</p>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -234,7 +234,7 @@ export default function OnboardPage() {
                 <ul className="space-y-2 mt-3" style={{ color: '#c7c7cc' }}>
                   <li><span style={{ color: '#6e6e73' }}>Restaurant ·</span> {restaurantName}{units ? ` (${units} units)` : ''}</li>
                   <li><span style={{ color: '#6e6e73' }}>POS ·</span> {posType}</li>
-                  <li><span style={{ color: '#6e6e73' }}>Agent ·</span> {interestedAgent}</li>
+                  <li><span style={{ color: '#6e6e73' }}>Checking ·</span> {interestedAgent}</li>
                   <li><span style={{ color: '#6e6e73' }}>Data path ·</span> {dataPreference}</li>
                 </ul>
               </div>

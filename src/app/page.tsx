@@ -28,7 +28,7 @@ const SEATS = [
 
 const OPERATOR_DROPDOWN = [
   { name: 'CEO',     tag: 'Network',     href: '/for/ceo',  blurb: 'One screen ranked by what costs you money this week.' },
-  { name: 'CFO',     tag: 'Books',       href: '/for/cfo',  blurb: 'Books that close to the penny. Every figure source-tagged.' },
+  { name: 'CFO',     tag: 'Books',       href: '/for/cfo',  blurb: 'Books that close to the penny. Every figure labeled and defensible.' },
   { name: 'COO · Ops', tag: 'Drift',     href: '/for/coo',  blurb: 'Labor leak before payroll posts. Voids named, ranked, coachable.' },
   { name: 'Chef',    tag: 'Kitchen',     href: '/for/chef', blurb: 'The chef who runs the books. The line that doesn\'t lie.' },
   { name: 'Owner',   tag: 'Solo',        href: '/for/owner',blurb: 'Solo operator. Same screen as the chain. None of the enterprise price.' },
@@ -39,7 +39,7 @@ const SECTIONS = [
   { n: '02', label: 'What we offer', href: '#offer-tiers' },
   { n: '03', label: "Myke's story", href: '#myke' },
   { n: '04', label: 'What we do', href: '#what' },
-  { n: '05', label: 'Free agents', href: '#agents' },
+  { n: '05', label: 'Free to try', href: '#agents' },
   { n: '06', label: 'Pick your seat', href: '#seats' },
 ];
 
@@ -133,7 +133,7 @@ export default function Home() {
 
         {/* Top tab nav — Agents · For Operators ▾ · Pricing · Trial · Sign in */}
         <nav className="mt-6 flex flex-wrap items-center gap-2 text-[14px]" ref={dropRef}>
-          <Link href="/agents" onClick={() => trackEvent('home_nav_click', { meta: { target: '/agents', label: 'Agents' } })} className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Agents</Link>
+          <Link href="/agents" onClick={() => trackEvent('home_nav_click', { meta: { target: '/agents', label: 'Agents' } })} className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">What we check</Link>
 
           <div className="relative">
             <button
@@ -419,7 +419,7 @@ export default function Home() {
               The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
             <p>
-              Today we serve the whole ladder — <span className="text-white font-semibold">solo operator on one Toast terminal, all the way to a CEO running 50 stores across three brands.</span> Same source-tag discipline. Same operator-first ethos. The price scales; the rule doesn&apos;t.
+              Today we serve the whole ladder — <span className="text-white font-semibold">solo operator on one Toast terminal, all the way to a CEO running 50 stores across three brands.</span> Same show-our-work discipline. Same operator-first ethos. The price scales; the rule doesn&apos;t.
             </p>
           </div>
         </div>
@@ -502,7 +502,7 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="compass-eyebrow-dim text-center">— Same source-tag discipline at every tier. The price scales; the rule doesn&apos;t.</p>
+          <p className="compass-eyebrow-dim text-center">— Same show-our-work discipline at every tier. The price scales; the rule doesn&apos;t.</p>
         </div>
       </section>
 
@@ -527,7 +527,7 @@ export default function Home() {
               <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — overstated by $6.5M. So I walked it back, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product.
             </p>
             <p>
-              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same code. Same source-tag rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
+              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same code. Same show-our-work rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
             </p>
             <p style={{ color: '#86868b' }}>— Myke Mueller · Fort Dodge, Iowa</p>
           </div>
@@ -570,9 +570,9 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-3 mb-12">
             <div className="compass-card" style={{ borderColor: '#0066ff' }}>
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— What we are</p>
-              <h3>The Operator OS.</h3>
+              <h3>Your back office, watching the money.</h3>
               <p className="compass-body text-[15px] mt-3 leading-relaxed">
-                Tools that watch your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. One simple screen per person. We label every number <span style={{ color: '#34c759' }} className="font-semibold">Verified</span> (confirmed), <span style={{ color: '#ff9500' }} className="font-semibold">Estimated</span> (our best math), or <span style={{ color: '#ff453a' }} className="font-semibold">Unverified</span> (still a guess) — so you always know what&apos;s solid. When we get one wrong, we tell you and fix it.
+                We watch your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. One simple screen per person. We label every number <span style={{ color: '#34c759' }} className="font-semibold">Verified</span> (confirmed), <span style={{ color: '#ff9500' }} className="font-semibold">Estimated</span> (our best math), or <span style={{ color: '#ff453a' }} className="font-semibold">Unverified</span> (still a guess) — so you always know what&apos;s solid. When we get one wrong, we tell you and fix it.
               </p>
             </div>
             <div className="compass-card">
@@ -598,7 +598,7 @@ export default function Home() {
       {/* Free agents */}
       <section id="agents" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 05 · Free agents</p>
+          <p className="compass-eyebrow mb-4">— 05 · Free to try</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             Try one. <em>Right now.</em>
           </h2>

@@ -136,7 +136,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· saved run</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · {run.agent === 'void-hunter' ? 'Void Hunter' : 'Leak Detector'} · {new Date(run.createdAt).toLocaleString()}</p>
+              <p className="compass-eyebrow-dim mt-2">{run.agent === 'void-hunter' ? 'Void Hunter' : 'Leak Detector'} · {new Date(run.createdAt).toLocaleString()}</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -159,7 +159,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
             Take this read <em>to your live floor.</em>
           </h2>
           <p className="compass-body text-lg mb-8 leading-relaxed">
-            This was one snapshot from one CSV. Install the operator app and the same agents run every shift, wired to your live POS — plus the full 24-agent workforce, the Brain, and the 30 ops screens. White-glove onboarding for the first 10 operators.
+            This was one look at one report. Connect your register and the same checks run every shift on their own — plus your full back office and a screen for every person on your team. Hands-on setup for the first 10 operators.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href={`/install?from=${run.shareToken}`} event="run_install_bridge_click" meta={{ shareToken: run.shareToken, agent: run.agent, position: 'bottom_cta' }} className="btn-primary" style={{ background: '#0066ff' }}>Install the operator app →</TrackedLink>

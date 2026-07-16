@@ -403,7 +403,7 @@ export default function TrialPage() {
     }
   }
 
-  const currentModeLabel = MODES.find((m) => m.id === mode)?.label ?? 'Agent';
+  const currentModeLabel = MODES.find((m) => m.id === mode)?.label ?? 'check';
 
   const networkLeakYr = voidResult
     ? Math.max(0, voidResult.networkVoids - voidResult.medianStoreVoidRate * voidResult.networkNet) * 3
@@ -440,7 +440,7 @@ export default function TrialPage() {
             One hour. <em>Your real numbers.</em>
           </h1>
           <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Two agents ready. Send a sales report and see what&apos;s really happening on your floor. No card. No salesperson.
+            Two checks ready. Send a sales report and see what&apos;s really happening on your floor. No card. No salesperson.
           </p>
           <button onClick={startTrial} disabled={starting} className="btn-primary text-base disabled:opacity-50" style={{ background: '#0066ff' }}>
             {starting ? 'Starting…' : 'Start the hour →'}
@@ -453,13 +453,13 @@ export default function TrialPage() {
       {phase === 'active' && (
         <>
           <section className="max-w-4xl mx-auto px-6 pt-8 pb-4">
-            <p className="compass-eyebrow mb-4">— Pick an agent</p>
+            <p className="compass-eyebrow mb-4">— Pick what to check</p>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {MODES.map((m) => (
                 <button key={m.id} type="button" onClick={() => { if (m.id !== mode) trackEvent('trial_agent_selected', { meta: { mode: m.id } }); setMode(m.id); setStatus('idle'); setVoidResult(null); setLeakResult(null); setLaborResult(null); setTipsResult(null); setCateringResult(null); setBcsResult(null); setDriftResult(null); setRefundResult(null); setShareToken(null); }}
                   className="compass-card text-left transition-colors"
                   style={mode === m.id ? { borderColor: '#0066ff' } : {}}>
-                  <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Agent'}</p>
+                  <p className="compass-card-label" style={mode === m.id ? { color: '#0066ff' } : {}}>{mode === m.id ? 'Selected' : 'Check'}</p>
                   <h3>{m.label}</h3>
                   <p className="compass-body text-sm mt-2">{m.blurb}</p>
                 </button>

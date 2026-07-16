@@ -9,7 +9,7 @@ type Params = { shareToken: string };
 
 export const metadata: Metadata = {
   title: "Margin Recovery Proposal · Never 86'd",
-  description: 'Printable one-page proposal · source-tagged.',
+  description: 'Printable one-page proposal · every number labeled.',
   robots: { index: false, follow: false },
 };
 
@@ -108,7 +108,7 @@ export default async function ProposalPage({ params }: { params: Params }) {
             <p style={{ margin: '6px 0 0', fontSize: 15, lineHeight: 1.5 }}>{primaryLine || 'See the agent output for the named lever.'}</p>
           </div>
 
-          <h2>Evidence <em>per-figure source-tagged.</em></h2>
+          <h2>Evidence, <em>every number labeled.</em></h2>
           <table>
             <thead>
               <tr><th>Metric</th><th>Value</th><th>Tag</th></tr>
@@ -127,7 +127,7 @@ export default async function ProposalPage({ params }: { params: Params }) {
           <h2>How we ran it.</h2>
           <p style={{ fontSize: 13, lineHeight: 1.55, margin: '6px 0 0' }}>
             Source CSV: <span className="mono">{run.filename || 'operator-provided'}</span> · {run.rowsParsed ?? '—'} rows parsed at {runAt}.
-            Methodology lives in the system &mdash; this surface is the result, source-tagged for defensibility to the penny.
+            The method lives in the system &mdash; this page is the result, every number labeled so it&apos;s defensible to the penny.
           </p>
 
           <h2>What happens next.</h2>

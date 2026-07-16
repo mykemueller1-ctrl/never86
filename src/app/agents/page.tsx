@@ -6,18 +6,18 @@ import { AgentCardActions } from './AgentCardActions';
 import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
-  title: "Agents · Never 86'd",
-  description: 'Eight agents that read your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. Every number labeled.',
+  title: "What we check · Never 86'd",
+  description: 'Eight checks that read your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. Every number labeled.',
   openGraph: {
-    title: "Never 86'd · Eight agents that find the leak",
-    description: 'Find the leak. Name who owns it. Keep the receipt. Eight agents, every number labeled Verified / Estimated / Unverified.',
+    title: "Never 86'd · Eight ways we find your leak",
+    description: 'Find the leak. Name who owns it. Keep the receipt. Eight checks, every number labeled Verified / Estimated / Unverified.',
     url: 'https://never86.ai/agents',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Never 86'd · Eight agents",
-    description: 'Eight agents that read your whole operation. Every number labeled.',
+    title: "Never 86'd · Eight ways we find your leak",
+    description: 'Eight checks that read your whole operation. Every number labeled.',
   },
   alternates: { canonical: 'https://never86.ai/agents' },
 };
@@ -33,9 +33,9 @@ export default function AgentsPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· agents</span>
+                Never 86&apos;d <span className="italic text-white/70">· what we check</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">The agents that find your leak · 8 free to try</p>
+              <p className="compass-eyebrow-dim mt-2">The checks that find your leak · 8 free to try</p>
             </span>
           </Link>
           <AgentsNavLinks />
@@ -43,12 +43,12 @@ export default function AgentsPage() {
       </div>
 
       <section className="max-w-5xl mx-auto px-6 pt-12 md:pt-16 pb-12">
-        <p className="compass-eyebrow mb-6">— Eight agents that find the leak</p>
+        <p className="compass-eyebrow mb-6">— Eight ways we find your leak</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-6">
-          The agents that <em>name the leak.</em>
+          We read your numbers. <em>We name the leak.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl mb-10">
-          Each one watches a part of your business — sales, labor, voids, delivery fees, tips, catering, how shifts are going — and tells you the one thing to fix. By store. By name. Every number labeled.
+          Each check watches a part of your business — sales, labor, voids, delivery fees, tips, catering, how shifts are going — and tells you the one thing to fix. By store. By name. In plain English.
         </p>
         <div className="flex flex-wrap gap-3">
           <TrackedLink href="/trial" event="agents_hero_cta_click" meta={{ target: '/trial', label: 'Try it free — no card', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Try it free — no card needed →</TrackedLink>
@@ -101,7 +101,7 @@ export default function AgentsPage() {
 
       <section className="border-t border-[#1f1f1f] px-6 py-16 md:py-20">
         <div className="max-w-5xl mx-auto">
-          <p className="compass-eyebrow mb-4">— The rule that runs the agents</p>
+          <p className="compass-eyebrow mb-4">— The rule behind every number</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
             Every number, <em>labeled.</em>
           </h2>
@@ -126,7 +126,7 @@ export default function AgentsPage() {
             60 minutes. <em>Your real numbers.</em>
           </h2>
           <p className="compass-body text-lg mb-8">
-            Send a report from Toast, Square, Clover, or PDQ. Two agents run on your real numbers in 30 seconds. No card. No salesperson.
+            Send a report from Toast, Square, Clover, or PDQ. Two checks run on your real numbers in 30 seconds. No card. No salesperson.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href="/trial" event="agents_bottom_cta_click" meta={{ target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
