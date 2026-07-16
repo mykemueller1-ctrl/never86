@@ -513,6 +513,13 @@ export default function Home() {
           <h2 className="compass-display text-4xl md:text-6xl mb-10">
             I built this <em>for myself first.</em>
           </h2>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/built-by-operators.jpg"
+            alt="Myke at the laptop after close — built by the people who lived it"
+            className="w-full rounded-2xl border border-[#1f1f1f] mb-10"
+            loading="lazy"
+          />
           <div className="space-y-6 compass-body text-lg leading-relaxed">
             <p>
               I&apos;m Myke. I run <span className="text-white font-semibold">Community Tap &amp; Pizza in Fort Dodge, Iowa</span>. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning.
