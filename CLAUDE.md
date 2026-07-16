@@ -65,6 +65,18 @@ negative-token list (those legitimately differ per agent).
 - **Two databases:** Neon (`DATABASE_URL`, app) and Supabase ops
   (`OPS_DATABASE_URL`, via `src/lib/opsDb.ts`, transaction pooler, `prepare:false`).
 
+## The three products (locked 2026-07-16)
+1. **The operator coach** (ex-"Pulse" — name retired, Aloha owns it): invoices +
+   sales in → daily prime cost, coach cards, one next move. For the 1–2 unit
+   indie. CTAP (Myke's own store, PDQ POS) is the proof install / test kitchen.
+2. **The Command Center**: multi-unit leadership intel — weekly brief, per-store
+   coaching cards, market threats, every figure labeled, an owner on every move.
+   The Taco Bamba (16 stores, Toast + R365, CEO Michael) demo is this product.
+3. **The store ops app**: everything inside the four walls — inventory,
+   checklists, PIN logins, Brain Q&A, payouts, order guide. Live at CTAP with
+   ~46 staff.
+For a 3–9 unit group, 2+3 ship together; for the indie, product 1 is the pitch.
+
 ## Product north star (how to talk about it, how to build it)
 **This is an operator coaching & decision system, not a dashboard.** The value
 isn't the data or the agent count — it's the logic that goes **fact → why it
