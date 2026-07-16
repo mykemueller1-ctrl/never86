@@ -1,4 +1,7 @@
-# Build Spec — Product 1: The Operator Coach (working name TBD; "Pulse" retired)
+# Build Spec — Product 1: Daily Prime (working name · "Pulse" retired)
+
+> Name status: Myke picked "Daily Prime" 2026-07-16. Run a quick USPTO +
+> domain check before it appears on public pages or reels.
 
 **Status:** approved scope · **Owner:** Myke Mueller · **Builder:** Claude (in-repo sessions)
 **Standard:** every phase ends in a demo-able acceptance check against real paper.

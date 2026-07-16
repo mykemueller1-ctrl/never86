@@ -65,17 +65,16 @@ negative-token list (those legitimately differ per agent).
 - **Two databases:** Neon (`DATABASE_URL`, app) and Supabase ops
   (`OPS_DATABASE_URL`, via `src/lib/opsDb.ts`, transaction pooler, `prepare:false`).
 
-## The three products (locked 2026-07-16)
-1. **The operator coach** (ex-"Pulse" — name retired, Aloha owns it): invoices +
-   sales in → daily prime cost, coach cards, one next move. For the 1–2 unit
-   indie. CTAP (Myke's own store, PDQ POS) is the proof install / test kitchen.
+## The products (locked 2026-07-16 · TWO products for now)
+1. **Daily Prime** (working name; "Pulse" retired — Aloha owns it): invoices +
+   sales in → daily prime cost, coach cards, one next move. $199/mo, for the
+   1–2 unit indie. CTAP (Myke's own store, PDQ POS) is the proof install.
+   Build spec: docs/BUILD_SPEC_operator_coach.md.
 2. **The Command Center**: multi-unit leadership intel — weekly brief, per-store
    coaching cards, market threats, every figure labeled, an owner on every move.
-   The Taco Bamba (16 stores, Toast + R365, CEO Michael) demo is this product.
-3. **The store ops app**: everything inside the four walls — inventory,
-   checklists, PIN logins, Brain Q&A, payouts, order guide. Live at CTAP with
-   ~46 staff.
-For a 3–9 unit group, 2+3 ship together; for the indie, product 1 is the pitch.
+   The 16-unit design-partner demo (Toast + R365) is this product.
+(The all-in store ops app — inventory, checklists, PIN logins, Brain — runs
+live at CTAP but is ON HOLD as a sellable product. Don't market it yet.)
 
 ## Product north star (how to talk about it, how to build it)
 **This is an operator coaching & decision system, not a dashboard.** The value
