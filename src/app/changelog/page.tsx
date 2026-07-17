@@ -125,7 +125,7 @@ const ENTRIES: Entry[] = [
   {
     date: '2026-06-04',
     title: '/pricing · 4 transparent tiers',
-    what: 'Trial / Operator $299 / Multi-unit $999 / Enterprise custom. No contact-us nonsense.',
+    what: 'Trial / Operator $299 / Multi-unit $999 / Enterprise custom. No contact-us nonsense. (Historical entry — tiers have since changed. Current pricing lives at /pricing.)',
     bullets: [
       'Same source-tag discipline at every tier',
       'FAQ section covering POS support, source-tag rule, data security',
