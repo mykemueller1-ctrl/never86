@@ -39,7 +39,7 @@ function SampleBanner() {
         <p className="text-ink-800 text-sm font-semibold mb-1">Sample shift — this isn&apos;t a real restaurant.</p>
         <p className="text-ink-600 text-sm">Made-up Friday-night numbers for a 5-unit demo. Wire your POS + scheduling to run this live, station-by-station.</p>
       </div>
-      <TrackedLink href="/operators#talk" event="demo_connect_data_click" meta={{ agent: 'Shift Pulse', target: '/operators#talk' }} className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
+      <TrackedLink href="/operators#talk" event="demo_connect_data_click" meta={{ agent: 'Shift Pulse', target: '/operators#talk' }} className="shrink-0 bg-ink-800 hover:bg-ink-900 text-ink-800 font-semibold rounded-full px-4 py-2 text-sm">
         Connect your data
       </TrackedLink>
     </div>

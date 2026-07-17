@@ -103,8 +103,8 @@ export default function PricingPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· pricing</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· pricing</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Owner · Command · Enterprise · transparent tiers</p>
             </span>
@@ -125,7 +125,7 @@ export default function PricingPage() {
           Built by an operator. Priced like one. Start with the free leak audit — see your real leak before you decide. Owner is for 1–2 location independents; Command for 3–9 location groups; Enterprise for 10+ multi-brand.
         </p>
         <p className="compass-body text-lg md:text-xl max-w-2xl mt-4">
-          The proof behind the price: in a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-white font-semibold">545,677 orders</span> — $15.72M checked to the cent — and surfaced an estimated $1.81M of annual leak, every figure labeled. <span className="font-serif italic text-white/70">(If we don&apos;t find you money, don&apos;t buy.)</span>
+          The proof behind the price: in a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-ink-800 font-semibold">545,677 orders</span> — $15.72M checked to the cent — and surfaced an estimated $1.81M of annual leak, every figure labeled. <span className="font-serif italic text-ink-600">(If we don&apos;t find you money, don&apos;t buy.)</span>
         </p>
       </section>
 
@@ -139,7 +139,7 @@ export default function PricingPage() {
             >
               <p className="compass-card-label" style={t.accent ? { color: '#0066ff' } : {}}>{t.tag}</p>
               <h3>{t.name}</h3>
-              <p className="font-serif text-4xl text-white mt-4 mb-2" style={{ letterSpacing: '-0.02em' }}>
+              <p className="font-serif text-4xl text-ink-800 mt-4 mb-2" style={{ letterSpacing: '-0.02em' }}>
                 {t.price}
               </p>
               <p className="compass-body text-[14px] mb-6">{t.blurb}</p>
@@ -158,7 +158,7 @@ export default function PricingPage() {
                 className="btn-primary mt-auto"
                 style={t.accent
                   ? { background: '#0066ff' }
-                  : { background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}
+                  : { background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f', border: '1px solid #d2d2d7' }}
               >
                 {t.cta.label}
               </TrackedLink>
@@ -167,7 +167,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="compass-eyebrow mb-4">— Questions</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
@@ -176,7 +176,7 @@ export default function PricingPage() {
           <div className="space-y-8">
             {FAQS.map((f) => (
               <div key={f.q}>
-                <h3 className="font-serif text-xl md:text-2xl text-white mb-3">{f.q}</h3>
+                <h3 className="font-serif text-xl md:text-2xl text-ink-800 mb-3">{f.q}</h3>
                 <p className="compass-body leading-relaxed">{f.a}</p>
               </div>
             ))}
@@ -184,16 +184,16 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <TrackedLink href="/trial"   event="pricing_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-white transition-colors">Trial</TrackedLink>
-            <TrackedLink href="/onboard" event="pricing_footer_click" meta={{ target: '/onboard', label: 'Onboard' }} className="hover:text-white transition-colors">Onboard</TrackedLink>
-            <TrackedLink href="/"        event="pricing_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-white transition-colors">Home</TrackedLink>
+            <TrackedLink href="/trial"   event="pricing_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-ink-800 transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/onboard" event="pricing_footer_click" meta={{ target: '/onboard', label: 'Onboard' }} className="hover:text-ink-800 transition-colors">Onboard</TrackedLink>
+            <TrackedLink href="/"        event="pricing_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-ink-800 transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>

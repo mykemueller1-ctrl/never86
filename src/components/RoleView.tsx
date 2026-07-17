@@ -38,7 +38,7 @@ function Kpi({ label, value, level, sub }: { label: string; value: string; level
         <p className="text-dark-300 text-xs uppercase tracking-wide">{label}</p>
         <SourceTag level={level} />
       </div>
-      <p className="text-2xl font-bold text-white leading-tight">{value}</p>
+      <p className="text-2xl font-bold text-ink-800 leading-tight">{value}</p>
       {sub ? <p className="text-dark-400 text-xs mt-1">{sub}</p> : null}
     </div>
   );
@@ -57,7 +57,7 @@ function Pending({ label, source }: { label: string; source: string }) {
   return (
     <div className="bg-dark-700/60 border border-dark-600 rounded-xl p-5 flex items-center justify-between gap-4">
       <div>
-        <p className="text-white text-sm font-medium">{label}</p>
+        <p className="text-ink-800 text-sm font-medium">{label}</p>
         <p className="text-dark-400 text-xs mt-1">{source}</p>
       </div>
       <SourceTag level="unverified" title="Source not yet wired" />
@@ -113,7 +113,7 @@ function StoreTable({ stores }: { stores: CommandCenterData['stores'] }) {
             const w = Math.max(4, Math.round((s.net / max) * 100));
             return (
               <tr key={s.name} className="border-b border-dark-600/60 last:border-0">
-                <td className="px-4 py-2 text-white">
+                <td className="px-4 py-2 text-ink-800">
                   <span className="flex items-center gap-2">
                     {s.name}
                     {lowFp ? (
@@ -129,7 +129,7 @@ function StoreTable({ stores }: { stores: CommandCenterData['stores'] }) {
                     <span className="text-gold-300 tabular-nums font-semibold">{usd(s.net)}</span>
                   </span>
                 </td>
-                <td className={`px-4 py-2 text-right tabular-nums ${lowFp ? 'text-gold-300 font-semibold' : 'text-white'}`}>
+                <td className={`px-4 py-2 text-right tabular-nums ${lowFp ? 'text-gold-300 font-semibold' : 'text-ink-800'}`}>
                   {s.firstPartyPct != null ? `${s.firstPartyPct}%` : '—'}
                 </td>
                 <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{usd(s.thirdParty)}</td>
@@ -155,7 +155,7 @@ function ExceptionList({ exceptions }: { exceptions: CommandCenterData['exceptio
               </span>
               <SourceTag level={e.basis === 'measured_leak' ? 'verified' : 'estimated'} />
             </div>
-            <p className="text-white text-sm">
+            <p className="text-ink-800 text-sm">
               {e.store} — {humanize(e.rule)} ({e.observed}% vs {e.benchmark}% network)
             </p>
           </div>
@@ -171,7 +171,7 @@ function ExceptionList({ exceptions }: { exceptions: CommandCenterData['exceptio
 function NotConnected() {
   return (
     <div className="bg-dark-700 border border-dark-600 rounded-xl p-6">
-      <p className="text-white font-semibold mb-2">Your live data isn&apos;t connected yet.</p>
+      <p className="text-ink-800 font-semibold mb-2">Your live data isn&apos;t connected yet.</p>
       <p className="text-dark-300 text-sm">If you&apos;re seeing this, contact the team and we&apos;ll bring you online.</p>
     </div>
   );
@@ -196,7 +196,7 @@ export default async function RoleView({
     return (
       <Shell role={role}>
         <div className="bg-dark-700 border border-dark-600 rounded-xl p-6">
-          <p className="text-white font-semibold mb-2">Couldn’t reach your live data.</p>
+          <p className="text-ink-800 font-semibold mb-2">Couldn’t reach your live data.</p>
           <p className="font-mono text-xs text-dark-400 break-all">{msg}</p>
         </div>
       </Shell>
@@ -254,7 +254,7 @@ export default async function RoleView({
         <Section title="Integration health">
           <div className="space-y-2">
             <div className="bg-dark-700 border border-dark-600 rounded-xl p-4 flex items-center justify-between">
-              <p className="text-white text-sm">Toast — last sync {prettyDate(d.lastIngest)}</p><SourceTag level="verified" />
+              <p className="text-ink-800 text-sm">Toast — last sync {prettyDate(d.lastIngest)}</p><SourceTag level="verified" />
             </div>
             {['SEC EDGAR', 'BLS OEWS', 'FRED', 'NOAA', 'USDA FoodData'].map((s) => (
               <div key={s} className="bg-dark-700/60 border border-dark-600 rounded-xl p-4 flex items-center justify-between">
@@ -295,7 +295,7 @@ export default async function RoleView({
               <tbody>
                 {METRIC_REGISTRY.map((m) => (
                   <tr key={m.metric} className="border-b border-dark-600/60 last:border-0">
-                    <td className="px-4 py-2 text-white">{m.metric}</td>
+                    <td className="px-4 py-2 text-ink-800">{m.metric}</td>
                     <td className="px-4 py-2"><SourceTag level={m.tag} /></td>
                     <td className="px-4 py-2 text-dark-300 text-xs">{m.source}</td>
                   </tr>

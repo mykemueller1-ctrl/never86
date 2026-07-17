@@ -40,7 +40,7 @@ export function AgentUnlock({ agentName }: { agentName: string }) {
 
   if (status === 'success') {
     return (
-      <section className="py-16 md:py-20 px-6 border-t border-[#1f1f1f]">
+      <section className="py-16 md:py-20 px-6 border-t border-[#e8e8ed]">
         <div className="max-w-xl mx-auto text-center">
           <p className="compass-eyebrow mb-3">{agentName} · unlocked</p>
           <h2 className="compass-display text-4xl md:text-5xl mb-5">{message}</h2>
@@ -54,7 +54,7 @@ export function AgentUnlock({ agentName }: { agentName: string }) {
   }
 
   return (
-    <section className="py-16 md:py-20 px-6 border-t border-[#1f1f1f]">
+    <section className="py-16 md:py-20 px-6 border-t border-[#e8e8ed]">
       <div className="max-w-xl mx-auto text-center">
         <p className="compass-eyebrow mb-4">— Unlock this agent</p>
         <h2 className="compass-display text-4xl md:text-5xl mb-3">
@@ -67,7 +67,7 @@ export function AgentUnlock({ agentName }: { agentName: string }) {
             placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
+            className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
           />
           <input
             type="email"
@@ -75,14 +75,14 @@ export function AgentUnlock({ agentName }: { agentName: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
+            className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
           />
           <input
             type="text"
             placeholder="Restaurant or group"
             value={restaurantName}
             onChange={(e) => setRestaurantName(e.target.value)}
-            className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors"
+            className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
           />
           <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
             {status === 'loading' ? 'Sending…' : `Unlock ${agentName} →`}

@@ -77,8 +77,8 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· {a.name}</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· {a.name}</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">What we check · {a.tag}</p>
             </span>
@@ -105,16 +105,16 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
           <TrackedLink href={a.href} event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, agentName: a.name, target: a.href, label: `Try ${a.name} live`, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
             Try {a.name} live →
           </TrackedLink>
-          <TrackedLink href="/trial" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/trial', label: '60-minute trial', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+          <TrackedLink href="/trial" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/trial', label: '60-minute trial', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
             60-minute trial
           </TrackedLink>
-          <TrackedLink href="/pricing" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+          <TrackedLink href="/pricing" event="agent_detail_hero_cta_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
             Pricing
           </TrackedLink>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-3">
           <div className="compass-card">
             <p className="compass-card-label">— What it catches</p>
@@ -141,13 +141,13 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             </div>
             <div className="compass-card" style={{ borderColor: '#0066ff' }}>
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— Sample signal</p>
-              <p className="font-serif italic text-lg mt-3 text-white leading-relaxed">{a.sampleSignal}</p>
+              <p className="font-serif italic text-lg mt-3 text-ink-800 leading-relaxed">{a.sampleSignal}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <p className="compass-eyebrow mb-4">— POS support</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-6">
@@ -157,12 +157,12 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
             {a.posSupport}
           </p>
           <p className="compass-body text-[14px] max-w-3xl" style={{ color: '#86868b' }}>
-            Don&apos;t see your POS? <TrackedLink href="/trial" event="agent_detail_inline_trial_click" meta={{ agentSlug: a.slug, label: 'Drop a CSV at /trial' }} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>Drop a CSV at /trial</TrackedLink> — the parser auto-detects most column shapes. Or join the integration waitlist and we&apos;ll email you the moment the OAuth ships.
+            Don&apos;t see your POS? <TrackedLink href="/trial" event="agent_detail_inline_trial_click" meta={{ agentSlug: a.slug, label: 'Drop a CSV at /trial' }} className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>Drop a CSV at /trial</TrackedLink> — the parser auto-detects most column shapes. Or join the integration waitlist and we&apos;ll email you the moment the OAuth ships.
           </p>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <p className="compass-eyebrow mb-4">— Sibling agents</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -181,7 +181,7 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <p className="compass-eyebrow mb-4">— Try {a.name} on your data</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
@@ -189,22 +189,22 @@ export default function AgentDetail({ params }: { params: { slug: string } }) {
           </h2>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href="/trial" event="agent_detail_bottom_cta_click" meta={{ agentSlug: a.slug, target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
-            <TrackedLink href={a.href} event="agent_detail_bottom_cta_click" meta={{ agentSlug: a.slug, agentName: a.name, target: a.href, label: 'Open the demo', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Open the demo</TrackedLink>
+            <TrackedLink href={a.href} event="agent_detail_bottom_cta_click" meta={{ agentSlug: a.slug, agentName: a.name, target: a.href, label: 'Open the demo', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Open the demo</TrackedLink>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <TrackedLink href="/agents"  event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/agents',  label: 'All agents' }} className="hover:text-white transition-colors">All agents</TrackedLink>
-            <TrackedLink href="/pricing" event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing' }}    className="hover:text-white transition-colors">Pricing</TrackedLink>
-            <TrackedLink href="/trial"   event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/trial',   label: 'Trial' }}      className="hover:text-white transition-colors">Trial</TrackedLink>
-            <TrackedLink href="/"        event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/',        label: 'Home' }}       className="hover:text-white transition-colors">Home</TrackedLink>
+            <TrackedLink href="/agents"  event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/agents',  label: 'All agents' }} className="hover:text-ink-800 transition-colors">All agents</TrackedLink>
+            <TrackedLink href="/pricing" event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/pricing', label: 'Pricing' }}    className="hover:text-ink-800 transition-colors">Pricing</TrackedLink>
+            <TrackedLink href="/trial"   event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/trial',   label: 'Trial' }}      className="hover:text-ink-800 transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/"        event="agent_detail_footer_click" meta={{ agentSlug: a.slug, target: '/',        label: 'Home' }}       className="hover:text-ink-800 transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>

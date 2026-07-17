@@ -114,8 +114,8 @@ export default function Home() {
           <div className="flex items-start gap-4">
             <span className="compass-mark">N</span>
             <div>
-              <p className="font-serif text-[28px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">for operators</span>
+              <p className="font-serif text-[28px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">
                 Daily margin control for restaurant operators
@@ -123,7 +123,7 @@ export default function Home() {
             </div>
           </div>
           <div className="text-right">
-            <p className="font-mono text-[13px] text-white tabular-nums">545,677 ORDERS ANALYZED · EVERY NUMBER SOURCED</p>
+            <p className="font-mono text-[13px] text-ink-800 tabular-nums">545,677 ORDERS ANALYZED · EVERY NUMBER SOURCED</p>
             <p className="compass-eyebrow-dim mt-1">
               16-UNIT DESIGN PILOT <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
             </p>
@@ -132,13 +132,13 @@ export default function Home() {
 
         {/* Top tab nav — Agents · For Operators ▾ · Pricing · Trial · Sign in */}
         <nav className="mt-6 flex flex-wrap items-center gap-2 text-[14px]" ref={dropRef}>
-          <Link href="/agents" onClick={() => trackEvent('home_nav_click', { meta: { target: '/agents', label: 'Agents' } })} className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">What we check</Link>
+          <Link href="/agents" onClick={() => trackEvent('home_nav_click', { meta: { target: '/agents', label: 'Agents' } })} className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">What we check</Link>
 
           <div className="relative">
             <button
               type="button"
               onClick={() => { setOpOpen((v) => { const next = !v; if (next) trackEvent('home_nav_dropdown_open', { meta: { label: 'For multi-unit operators' } }); return next; }); }}
-              className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors flex items-center gap-1.5"
               aria-expanded={opOpen}
               aria-haspopup="menu"
             >
@@ -146,16 +146,16 @@ export default function Home() {
               <span className="text-[10px]" style={{ color: '#0066ff' }}>{opOpen ? '▴' : '▾'}</span>
             </button>
             {opOpen && (
-              <div className="absolute left-0 top-full mt-2 w-80 z-50 bg-[#0a0a0a] border border-[#1f1f1f] rounded-2xl p-2 shadow-2xl">
+              <div className="absolute left-0 top-full mt-2 w-80 z-50 bg-white border border-[#e8e8ed] rounded-2xl p-2 shadow-2xl">
                 {OPERATOR_DROPDOWN.map((o) => (
                   <Link
                     key={o.name}
                     href={o.href}
                     onClick={() => { trackEvent('home_nav_dropdown_item_click', { meta: { target: o.href, label: o.name } }); setOpOpen(false); }}
-                    className="block px-4 py-3 rounded-xl hover:bg-white/[0.05] transition-colors"
+                    className="block px-4 py-3 rounded-xl hover:bg-black/[0.04] transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="font-serif text-lg text-white">{o.name}</p>
+                      <p className="font-serif text-lg text-ink-800">{o.name}</p>
                       <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#0066ff' }}>{o.tag}</p>
                     </div>
                     <p className="text-[13px] mt-1" style={{ color: '#86868b' }}>{o.blurb}</p>
@@ -164,7 +164,7 @@ export default function Home() {
                 <Link
                   href="/for"
                   onClick={() => { trackEvent('home_nav_dropdown_item_click', { meta: { target: '/for', label: 'All seven seats' } }); setOpOpen(false); }}
-                  className="block px-4 py-2 mt-1 border-t border-[#1f1f1f] text-[13px]"
+                  className="block px-4 py-2 mt-1 border-t border-[#e8e8ed] text-[13px]"
                   style={{ color: '#0066ff' }}
                 >
                   All the seats →
@@ -173,11 +173,11 @@ export default function Home() {
             )}
           </div>
 
-          <Link href="/pricing"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/pricing', label: 'Pricing' } })}      className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Pricing</Link>
-          <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Trial</Link>
-          <Link href="/team"      onClick={() => trackEvent('home_nav_click', { meta: { target: '/team', label: 'Team' } })}            className="px-4 py-2 rounded-full text-white hover:bg-white/[0.06] transition-colors">Team</Link>
+          <Link href="/pricing"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/pricing', label: 'Pricing' } })}      className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Pricing</Link>
+          <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Trial</Link>
+          <Link href="/team"      onClick={() => trackEvent('home_nav_click', { meta: { target: '/team', label: 'Team' } })}            className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Team</Link>
           <span className="flex-1" />
-          <Link href="/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-white font-medium hover:bg-white/[0.06] transition-colors">Sign in</Link>
+          <Link href="/login" onClick={() => trackEvent('home_nav_click', { meta: { target: '/login', label: 'Sign in' } })} className="px-4 py-2 rounded-full text-ink-800 font-medium hover:bg-black/[0.05] transition-colors">Sign in</Link>
         </nav>
 
         {/* Persona pill row */}
@@ -199,7 +199,7 @@ export default function Home() {
       </div>
 
       {/* Numbered section nav — sticky tab bar */}
-      <div className="sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid #1f1f1f' }}>
+      <div className="sticky top-0 z-40" style={{ background: 'rgba(251,251,253,0.9)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid #e8e8ed' }}>
         <nav className="compass-section-nav max-w-7xl mx-auto px-6 py-3">
           {SECTIONS.map((s) => (
             <Link key={s.n} href={s.href} onClick={() => trackEvent('home_section_tab_click', { meta: { target: s.href, label: s.label } })}>
@@ -229,7 +229,7 @@ export default function Home() {
               <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: 'Start the free leak audit', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
                 Start the free leak audit →
               </Link>
-              <a href="#what" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '#what', label: 'See how it works', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+              <a href="#what" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '#what', label: 'See how it works', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
                 See how it works
               </a>
             </div>
@@ -270,14 +270,14 @@ export default function Home() {
       </section>
 
       {/* PROOF · see the actual output */}
-      <section data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— See it work · Void Hunter</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-4">
             It doesn&apos;t say voids are up. <em>It names who.</em>
           </h2>
           <p className="compass-body text-lg max-w-2xl mb-12">
-            A sample 5-store group — real math, names hidden. In a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-white font-semibold">545,677 real orders</span> — $15.72M checked to the cent — and surfaced <span className="text-white font-semibold">an estimated $1.81M</span> of annual leak, every figure labeled. On your own report it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>the free leak audit</Link> — and it names <em>your</em> stores, not these.
+            A sample 5-store group — real math, names hidden. In a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-ink-800 font-semibold">545,677 real orders</span> — $15.72M checked to the cent — and surfaced <span className="text-ink-800 font-semibold">an estimated $1.81M</span> of annual leak, every figure labeled. On your own report it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>the free leak audit</Link> — and it names <em>your</em> stores, not these.
           </p>
 
           <div className="grid lg:grid-cols-[340px_1fr] gap-4">
@@ -285,12 +285,12 @@ export default function Home() {
             <div className="compass-card flex flex-col justify-between" style={{ borderColor: '#0066ff' }}>
               <div>
                 <p className="compass-card-label" style={{ color: '#0066ff' }}>— The name</p>
-                <p className="font-serif text-4xl md:text-5xl text-white mt-3 leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#14</p>
+                <p className="font-serif text-4xl md:text-5xl text-ink-800 mt-3 leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#14</p>
                 <p className="compass-body text-[14px] mt-2" style={{ color: '#86868b' }}>Downtown · 41 voided items · $4,200 in voids</p>
               </div>
               <div className="mt-8">
                 <p className="font-mono text-[13px]" style={{ color: '#6e6e73' }}>MORE VOIDS THAN A NORMAL STORE · FULL-YEAR PACE</p>
-                <p className="font-serif text-4xl text-white mt-1" style={{ letterSpacing: '-0.02em' }}>~$21,600<span className="text-[20px]" style={{ color: '#6e6e73' }}>/yr</span></p>
+                <p className="font-serif text-4xl text-ink-800 mt-1" style={{ letterSpacing: '-0.02em' }}>~$21,600<span className="text-[20px]" style={{ color: '#6e6e73' }}>/yr</span></p>
                 <div className="flex gap-2 mt-4">
                   <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(52,199,89,0.10)', color: '#34c759', border: '1px solid rgba(52,199,89,0.25)' }}>VERIFIED · void counts</span>
                   <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.10)', color: '#ff9500', border: '1px solid rgba(255,149,0,0.25)' }}>ESTIMATED · full-year pace</span>
@@ -313,8 +313,8 @@ export default function Home() {
                     { store: 'Midtown',   rate: '0.40%', bar: 32,  flagged: false },
                     { store: 'Airport',   rate: '0.30%', bar: 24,  flagged: false },
                   ].map((r) => (
-                    <tr key={r.store} style={{ borderTop: '1px solid #1f1f1f' }}>
-                      <td className="px-5 py-3 text-white font-medium whitespace-nowrap" style={{ width: 130 }}>
+                    <tr key={r.store} style={{ borderTop: '1px solid #e8e8ed' }}>
+                      <td className="px-5 py-3 text-ink-800 font-medium whitespace-nowrap" style={{ width: 130 }}>
                         {r.store}
                         {r.flagged && <span className="ml-2 font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,102,255,0.14)', color: '#0066ff' }}>ABOVE NORMAL</span>}
                       </td>
@@ -326,7 +326,7 @@ export default function Home() {
                   ))}
                 </tbody>
               </table>
-              <div className="px-5 py-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: '1px solid #1f1f1f' }}>
+              <div className="px-5 py-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: '1px solid #e8e8ed' }}>
                 <p className="compass-body text-[13px]" style={{ color: '#86868b' }}>One store above the normal range. One name inside it. That&apos;s the whole job.</p>
                 <Link href="/trial" onClick={() => trackEvent('home_proof_cta_click', { meta: { target: '/trial', label: 'Run it on your numbers' } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Run it on your numbers →</Link>
               </div>
@@ -343,7 +343,7 @@ export default function Home() {
               </div>
               <h3 className="!mt-3 text-2xl">It names whose tips fell.</h3>
               <div className="mt-5 flex items-baseline gap-3 flex-wrap">
-                <p className="font-serif text-3xl md:text-4xl text-white leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#9</p>
+                <p className="font-serif text-3xl md:text-4xl text-ink-800 leading-none" style={{ letterSpacing: '-0.02em' }}>Server&nbsp;#9</p>
                 <span className="font-mono text-[13px]" style={{ color: '#86868b' }}>University · server</span>
               </div>
               <div className="mt-4 flex items-center gap-3 flex-wrap">
@@ -364,16 +364,16 @@ export default function Home() {
               </div>
               <h3 className="!mt-3 text-2xl">It names the SKU and the cheaper vendor.</h3>
               <div className="mt-5">
-                <p className="font-serif text-2xl md:text-[28px] text-white leading-tight" style={{ letterSpacing: '-0.015em' }}>Mozzarella LMPS 6/5 LB</p>
+                <p className="font-serif text-2xl md:text-[28px] text-ink-800 leading-tight" style={{ letterSpacing: '-0.015em' }}>Mozzarella LMPS 6/5 LB</p>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
                   <p className="font-mono text-[11px]" style={{ color: '#6e6e73' }}>PFG · DRIFTING</p>
-                  <p className="font-serif text-xl text-white mt-0.5">$2.37 <span className="text-[14px]" style={{ color: '#ff453a' }}>+7.2%</span></p>
+                  <p className="font-serif text-xl text-ink-800 mt-0.5">$2.37 <span className="text-[14px]" style={{ color: '#ff453a' }}>+7.2%</span></p>
                 </div>
                 <div>
                   <p className="font-mono text-[11px]" style={{ color: '#6e6e73' }}>SYSCO · HELD</p>
-                  <p className="font-serif text-xl text-white mt-0.5">$1.96 <span className="text-[14px]" style={{ color: '#34c759' }}>17% under PFG</span></p>
+                  <p className="font-serif text-xl text-ink-800 mt-0.5">$1.96 <span className="text-[14px]" style={{ color: '#34c759' }}>17% under PFG</span></p>
                 </div>
               </div>
               <div className="flex gap-2 mt-5">
@@ -385,7 +385,7 @@ export default function Home() {
       </section>
 
       {/* ROI · what a few points is worth */}
-      <section data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— The math</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-4">
@@ -399,14 +399,14 @@ export default function Home() {
       </section>
 
       {/* § 01 · WHAT WE OFFER — independent → enterprise */}
-      <section id="offer-tiers" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="offer-tiers" data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 01 · What we offer</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-6">
             From the solo operator <em>to the C-suite.</em>
           </h2>
           <p className="compass-body text-lg max-w-3xl mb-14">
-            Two ways to use it. <span className="text-white font-semibold">Never 86&apos;d Owner</span> is for a 1–2 store operator — a ranked Morning Brief from your own numbers: where margin leaked, who owns the fix, what happens next. $199/mo. <span className="text-white font-semibold">Never 86&apos;d Command</span> runs a whole group, proven in a working design pilot with a 16-unit chef-led group. Not sure which fits? Start with the free leak audit — everyone does.
+            Two ways to use it. <span className="text-ink-800 font-semibold">Never 86&apos;d Owner</span> is for a 1–2 store operator — a ranked Morning Brief from your own numbers: where margin leaked, who owns the fix, what happens next. $199/mo. <span className="text-ink-800 font-semibold">Never 86&apos;d Command</span> runs a whole group, proven in a working design pilot with a 16-unit chef-led group. Not sure which fits? Start with the free leak audit — everyone does.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
@@ -421,7 +421,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>2 checks run live on your own numbers today · 6 more as interactive demos</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
-              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the free leak audit' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the free leak audit' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f', border: '1px solid #d2d2d7' }}>
                 Start the free leak audit
               </Link>
             </div>
@@ -453,7 +453,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>A screen built for each person · CEO / CFO / COO / Chef / Owner</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Entry: a three-location, 90-day paid pilot</span></li>
               </ul>
-              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator_suite', target: '/onboard', label: 'Start a three-store pilot' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator_suite', target: '/onboard', label: 'Start a three-store pilot' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f', border: '1px solid #d2d2d7' }}>
                 Start a three-store pilot
               </Link>
             </div>
@@ -469,7 +469,7 @@ export default function Home() {
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Scoped and priced with you — no off-the-shelf promises</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Quarterly business review with the founder</span></li>
               </ul>
-              <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'enterprise', target: 'mailto', label: 'Email myke@n86.app' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+              <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'enterprise', target: 'mailto', label: 'Email myke@n86.app' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f', border: '1px solid #d2d2d7' }}>
                 Email myke@n86.app
               </a>
             </div>
@@ -480,7 +480,7 @@ export default function Home() {
       </section>
 
       {/* § 02 · MYKE'S STORY — first-person */}
-      <section id="myke" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="myke" data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="compass-eyebrow mb-4">— 02 · Myke&apos;s story</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10">
@@ -490,12 +490,12 @@ export default function Home() {
           <img
             src="/brand/built-by-operators.jpg"
             alt="Myke at the laptop after close — built by the people who lived it"
-            className="w-full rounded-2xl border border-[#1f1f1f] mb-10"
+            className="w-full rounded-2xl border border-[#e8e8ed] mb-10"
             loading="lazy"
           />
           <div className="space-y-6 compass-body text-lg leading-relaxed">
             <p>
-              I&apos;m Myke. I run <span className="text-white font-semibold">Community Tap &amp; Pizza in Fort Dodge, Iowa</span>. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning.
+              I&apos;m Myke. I run <span className="text-ink-800 font-semibold">Community Tap &amp; Pizza in Fort Dodge, Iowa</span>. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning.
             </p>
             <p>
               I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line.
@@ -504,10 +504,10 @@ export default function Home() {
               The first version was a single HTML file on my laptop. I was trying to figure out why food cost drifted four points one week and nobody could explain it. I wrote the math, fed in my own Z-reports, and it pointed at the right station. Then it pointed at the next leak. Then the next.
             </p>
             <p>
-              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — $8.3M that walked back to $1.81M. So I corrected it, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
+              <span className="text-ink-800 font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — $8.3M that walked back to $1.81M. So I corrected it, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
             <p>
-              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same show-our-work rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
+              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same show-our-work rule. Same operator-to-operator language. <span className="text-ink-800 font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
             </p>
             <p style={{ color: '#86868b' }}>— Myke Mueller · Fort Dodge, Iowa</p>
           </div>
@@ -515,7 +515,7 @@ export default function Home() {
       </section>
 
       {/* WHAT WE DO */}
-      <section id="what" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
+      <section id="what" data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6 bg-gradient-to-b from-[#f5f5f7] to-[#fbfbfd]">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 03 · What we do</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-14">
@@ -559,7 +559,7 @@ export default function Home() {
               <p className="compass-card-label">— How it works</p>
               <h3>30 seconds to first leak.</h3>
               <p className="compass-body text-[15px] mt-3 leading-relaxed">
-                Send a report from Toast, Square, Clover, or PDQ at <Link href="/trial" onClick={() => trackEvent('home_inline_trial_link_click', { meta: { target: '/trial', label: '/trial inline' } })} className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>the free trial</Link>. Two tools run on your real numbers right away — a 60-minute live look, no card, no salesperson. Like it? We&apos;ll connect it straight to your register so it updates on its own.
+                Send a report from Toast, Square, Clover, or PDQ at <Link href="/trial" onClick={() => trackEvent('home_inline_trial_link_click', { meta: { target: '/trial', label: '/trial inline' } })} className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>the free trial</Link>. Two tools run on your real numbers right away — a 60-minute live look, no card, no salesperson. Like it? We&apos;ll connect it straight to your register so it updates on its own.
               </p>
             </div>
           </div>
@@ -568,7 +568,7 @@ export default function Home() {
       </section>
 
       {/* Free agents */}
-      <section id="agents" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="agents" data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="compass-eyebrow mb-4">— 04 · Try it free</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
@@ -586,7 +586,7 @@ export default function Home() {
               </Link>
             ))}
             <Link href="/agents" onClick={() => trackEvent('home_all_tools_click', { meta: { target: '/agents', label: 'See all 8 tools' } })} className="compass-card hover:border-[#0066ff] transition-colors block group flex flex-col justify-center text-center" style={{ borderStyle: 'dashed' }}>
-              <p className="font-serif text-3xl text-white leading-none">8</p>
+              <p className="font-serif text-3xl text-ink-800 leading-none">8</p>
               <h3 className="!mt-2">See all the tools</h3>
               <p className="compass-body text-[14px] mt-3 inline-flex items-center justify-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
                 What we check <span aria-hidden>→</span>
@@ -597,7 +597,7 @@ export default function Home() {
       </section>
 
       {/* Talk to us */}
-      <section id="offer" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
+      <section id="offer" data-reveal className="border-t border-[#e8e8ed] py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto">
           <p className="compass-eyebrow mb-4 text-center">— 05 · 15 minutes</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10 text-center">
@@ -605,16 +605,16 @@ export default function Home() {
           </h2>
           {status === 'success' ? (
             <div className="compass-card text-center">
-              <p className="font-serif text-2xl text-white">{message}</p>
+              <p className="font-serif text-2xl text-ink-800">{message}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="compass-card space-y-3">
               <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
               <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)}
-                className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
               <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                 {status === 'loading' ? 'Sending…' : 'Talk to us'}
               </button>
@@ -624,18 +624,18 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for"     onClick={() => trackEvent('home_footer_click', { meta: { target: '/for', label: 'Seats' } })}        className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/people"  onClick={() => trackEvent('home_footer_click', { meta: { target: '/people', label: 'People' } })}    className="hover:text-white transition-colors">People</Link>
-            <Link href="/onboard" onClick={() => trackEvent('home_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}  className="hover:text-white transition-colors">Onboard</Link>
-            <Link href="/changelog" onClick={() => trackEvent('home_footer_click', { meta: { target: '/changelog', label: 'Changelog' } })} className="hover:text-white transition-colors">Changelog</Link>
-            <Link href="/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/for"     onClick={() => trackEvent('home_footer_click', { meta: { target: '/for', label: 'Seats' } })}        className="hover:text-ink-800 transition-colors">Seats</Link>
+            <Link href="/people"  onClick={() => trackEvent('home_footer_click', { meta: { target: '/people', label: 'People' } })}    className="hover:text-ink-800 transition-colors">People</Link>
+            <Link href="/onboard" onClick={() => trackEvent('home_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}  className="hover:text-ink-800 transition-colors">Onboard</Link>
+            <Link href="/changelog" onClick={() => trackEvent('home_footer_click', { meta: { target: '/changelog', label: 'Changelog' } })} className="hover:text-ink-800 transition-colors">Changelog</Link>
+            <Link href="/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/login', label: 'Sign in' } })} className="hover:text-ink-800 transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>

@@ -416,8 +416,8 @@ export default function TrialPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· live trial</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· live trial</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">60 free minutes · real numbers from your restaurant</p>
             </span>
@@ -483,12 +483,12 @@ export default function TrialPage() {
               {status === 'running' ? (
                 <>
                   <p className="compass-eyebrow mb-3">— Running {currentModeLabel}</p>
-                  <p className="font-serif text-2xl text-white">Analyzing <em>{filename}</em>…</p>
+                  <p className="font-serif text-2xl text-ink-800">Analyzing <em>{filename}</em>…</p>
                 </>
               ) : (
                 <>
                   <p className="compass-eyebrow mb-3">— Send your report for {currentModeLabel}</p>
-                  <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file in</p>
+                  <p className="font-serif text-3xl text-ink-800 mb-2">Click to choose · or drag a file in</p>
                   <p className="compass-body text-sm">
                     {mode === 'void'
                       ? 'Per-employee CSV · Location, Employee, Net Sales, Void Amount'
@@ -535,12 +535,12 @@ export default function TrialPage() {
             {status === 'error' && (
               <div className="compass-card mt-4" style={{ borderColor: '#ff453a' }}>
                 <p className="compass-card-label" style={{ color: '#ff453a' }}>— Couldn&apos;t parse</p>
-                <p className="font-serif text-xl text-white mt-3">{errMsg}</p>
+                <p className="font-serif text-xl text-ink-800 mt-3">{errMsg}</p>
                 {errHint && <p className="compass-body text-sm mt-3">{errHint}</p>}
                 {detectedCols.length > 0 && (
                   <p className="compass-body text-sm mt-3">
                     <span className="text-[#6e6e73]">Columns we saw:</span>{' '}
-                    <span className="font-mono text-white">{detectedCols.join(' · ')}</span>
+                    <span className="font-mono text-ink-800">{detectedCols.join(' · ')}</span>
                   </p>
                 )}
               </div>
@@ -553,12 +553,12 @@ export default function TrialPage() {
                 <div className="compass-card flex flex-wrap gap-3 items-center justify-between" style={{ borderColor: '#0066ff' }}>
                   <div>
                     <p className="compass-card-label" style={{ color: '#0066ff' }}>— Saved · bookmark this URL</p>
-                    <p className="font-mono text-white text-[13px] mt-2 break-all">
+                    <p className="font-mono text-ink-800 text-[13px] mt-2 break-all">
                       {typeof window !== 'undefined' ? `${window.location.origin}/trial/run/${shareToken}` : `/trial/run/${shareToken}`}
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <button type="button" onClick={copyShareUrl} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+                    <button type="button" onClick={copyShareUrl} className="btn-secondary text-[13px]" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
                       {shareCopied ? '✓ Copied' : 'Copy link'}
                     </button>
                     <a href={`/trial/run/${shareToken}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('trial_share_open', { meta: { mode, shareToken } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Open →</a>
@@ -569,7 +569,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && refundResult && mode === 'refund' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Refund Auditor · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -598,7 +598,7 @@ export default function TrialPage() {
                       <tbody>
                         {refundResult.stores.map((s) => (
                           <tr key={s.name} style={{ color: '#d2d2d7' }}>
-                            <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
+                            <td className="!text-left text-ink-800 font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
                             <td className="font-mono tabular-nums">{usd(s.net)}</td>
                             <td className="font-mono tabular-nums">{usd(s.refunds)}</td>
                             <td className="font-mono tabular-nums">{pct(s.refundRate)}</td>
@@ -614,7 +614,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && voidResult && mode === 'void' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Void Hunter · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -641,7 +641,7 @@ export default function TrialPage() {
                       <tbody>
                         {voidResult.stores.map((s) => (
                           <tr key={s.name} style={{ color: '#d2d2d7' }}>
-                            <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
+                            <td className="!text-left text-ink-800 font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
                             <td className="font-mono tabular-nums">{usd(s.net)}</td>
                             <td className="font-mono tabular-nums">{usd(s.voids)}</td>
                             <td className="font-mono tabular-nums">{pct(s.voidRate)}</td>
@@ -657,7 +657,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && leakResult && mode === 'leak' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-6xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Leak Detector · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-8">
@@ -678,7 +678,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.voidAfterPayment.totalCount} tickets · <em>{usd(leakResult.signals.voidAfterPayment.totalDollars)}</em></h3>
                     <p className="compass-body text-[13px] mt-2">Ticket was paid, then voided. The classic skim.</p>
                     {leakResult.signals.voidAfterPayment.flagged.slice(0, 5).map((f) => (
-                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                      <p key={f.name} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
                     ))}
                   </div>
 
@@ -687,7 +687,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.cashOnlyVoiders.length} name{leakResult.signals.cashOnlyVoiders.length === 1 ? '' : 's'} flagged</h3>
                     <p className="compass-body text-[13px] mt-2">≥80% of their voids on cash tickets. Strong theft signal.</p>
                     {leakResult.signals.cashOnlyVoiders.slice(0, 5).map((f) => (
-                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
+                      <p key={f.name} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
                     ))}
                   </div>
 
@@ -696,7 +696,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.compAbuse.length} name{leakResult.signals.compAbuse.length === 1 ? '' : 's'} flagged</h3>
                     <p className="compass-body text-[13px] mt-2">Comp rate above peer band, or {'>'}10% of own revenue comped.</p>
                     {leakResult.signals.compAbuse.slice(0, 5).map((f) => (
-                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
+                      <p key={f.name} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {pct(f.rate)}</p>
                     ))}
                   </div>
 
@@ -705,7 +705,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.promoStacking.totalCount} tickets · <em>{usd(leakResult.signals.promoStacking.totalDollars)}</em></h3>
                     <p className="compass-body text-[13px] mt-2">Two or more discounts applied to a single ticket.</p>
                     {leakResult.signals.promoStacking.flagged.slice(0, 5).map((f) => (
-                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                      <p key={f.name} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
                     ))}
                   </div>
 
@@ -714,7 +714,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.discountAfterClose.totalCount} tickets · <em>{usd(leakResult.signals.discountAfterClose.totalDollars)}</em></h3>
                     <p className="compass-body text-[13px] mt-2">Discount applied after the ticket was closed.</p>
                     {leakResult.signals.discountAfterClose.flagged.slice(0, 5).map((f) => (
-                      <p key={f.name} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
+                      <p key={f.name} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.count}</p>
                     ))}
                   </div>
 
@@ -723,7 +723,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.dowVoidPatterns?.length || 0} name{leakResult.signals.dowVoidPatterns?.length === 1 ? '' : 's'} flagged</h3>
                     <p className="compass-body text-[13px] mt-2">≥40% of their voids cluster on one weekday. The shift pattern.</p>
                     {leakResult.signals.dowVoidPatterns?.slice(0, 5).map((f) => (
-                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.dow} <span className="text-[#6e6e73]">·</span> {f.voidsOnDow}/{f.totalVoids}</p>
+                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.dow} <span className="text-[#6e6e73]">·</span> {f.voidsOnDow}/{f.totalVoids}</p>
                     ))}
                   </div>
 
@@ -732,7 +732,7 @@ export default function TrialPage() {
                     <h3>{leakResult.signals.microCompPatterns?.length || 0} name{leakResult.signals.microCompPatterns?.length === 1 ? '' : 's'} flagged</h3>
                     <p className="compass-body text-[13px] mt-2">10+ comps averaging under $5. Modifier-abuse proxy — &ldquo;no charge add bacon&rdquo; pattern.</p>
                     {leakResult.signals.microCompPatterns?.slice(0, 5).map((f) => (
-                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-white font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.compsCount}× <span className="text-[#6e6e73]">avg</span> ${f.avgComp.toFixed(2)}</p>
+                      <p key={`${f.store}-${f.name}`} className="text-[13px] mt-1 text-ink-800 font-mono">{f.name} <span className="text-[#6e6e73]">·</span> {f.compsCount}× <span className="text-[#6e6e73]">avg</span> ${f.avgComp.toFixed(2)}</p>
                     ))}
                   </div>
 
@@ -740,9 +740,9 @@ export default function TrialPage() {
                     <p className="compass-card-label">— Network rates</p>
                     <h3>Aggregate</h3>
                     <p className="compass-body text-[13px] mt-2">
-                      Void: <span className="font-mono text-white">{pct(leakResult.networkVoids / Math.max(1, leakResult.networkNet))}</span>
-                      <br />Comp: <span className="font-mono text-white">{pct(leakResult.networkComps / Math.max(1, leakResult.networkNet))}</span>
-                      <br />Discount: <span className="font-mono text-white">{pct(leakResult.networkDiscounts / Math.max(1, leakResult.networkNet))}</span>
+                      Void: <span className="font-mono text-ink-800">{pct(leakResult.networkVoids / Math.max(1, leakResult.networkNet))}</span>
+                      <br />Comp: <span className="font-mono text-ink-800">{pct(leakResult.networkComps / Math.max(1, leakResult.networkNet))}</span>
+                      <br />Discount: <span className="font-mono text-ink-800">{pct(leakResult.networkDiscounts / Math.max(1, leakResult.networkNet))}</span>
                     </p>
                   </div>
                 </div>
@@ -766,7 +766,7 @@ export default function TrialPage() {
                     <tbody>
                       {leakResult.employees.slice(0, 20).map((e) => (
                         <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left text-ink-800 font-medium">{e.name}</td>
                           <td className="!text-left">{e.store}</td>
                           <td className="font-mono tabular-nums">{e.ticketsRung}</td>
                           <td className="font-mono tabular-nums">{usd(e.netSales)}</td>
@@ -788,7 +788,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && laborResult && mode === 'labor' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Labor Drift · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -810,7 +810,7 @@ export default function TrialPage() {
                     <h3>{laborResult.ghostShifts.length} shift{laborResult.ghostShifts.length === 1 ? '' : 's'} clocked &gt; 60 min · zero sales</h3>
                     <ul className="mt-3 space-y-1">
                       {laborResult.ghostShifts.slice(0, 8).map((g, i) => (
-                        <li key={`${g.store}-${g.name}-${i}`} className="text-[13px] text-white font-mono">{g.name} <span className="text-[#6e6e73]">·</span> {g.store} <span className="text-[#6e6e73]">·</span> {g.clockedMinutes} min <span className="text-[#6e6e73]">·</span> {g.shiftStart.slice(0, 10)}</li>
+                        <li key={`${g.store}-${g.name}-${i}`} className="text-[13px] text-ink-800 font-mono">{g.name} <span className="text-[#6e6e73]">·</span> {g.store} <span className="text-[#6e6e73]">·</span> {g.clockedMinutes} min <span className="text-[#6e6e73]">·</span> {g.shiftStart.slice(0, 10)}</li>
                       ))}
                     </ul>
                   </div>
@@ -826,7 +826,7 @@ export default function TrialPage() {
                     <tbody>
                       {laborResult.perEmployee.map((e) => (
                         <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left text-ink-800 font-medium">{e.name}</td>
                           <td className="!text-left">{e.store}</td>
                           <td className="font-mono tabular-nums">{e.shiftsRun}</td>
                           <td className="font-mono tabular-nums">{e.earlyClockIns}</td>
@@ -844,7 +844,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && tipsResult && mode === 'tips' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Tip Variance · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -875,7 +875,7 @@ export default function TrialPage() {
                     <tbody>
                       {tipsResult.perEmployee.map((e) => (
                         <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{e.name}</td>
+                          <td className="!text-left text-ink-800 font-medium">{e.name}</td>
                           <td className="!text-left">{e.store}</td>
                           <td className="font-mono tabular-nums">{(e.prevTipRate * 100).toFixed(2)}%</td>
                           <td className="font-mono tabular-nums">{(e.currTipRate * 100).toFixed(2)}%</td>
@@ -895,7 +895,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && cateringResult && mode === 'catering' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Catering Leak · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -922,7 +922,7 @@ export default function TrialPage() {
                     <h3>{cateringResult.unmatchedOrders.length} invoice{cateringResult.unmatchedOrders.length === 1 ? '' : 's'} · no POS ticket</h3>
                     <ul className="mt-3 space-y-1">
                       {cateringResult.unmatchedOrders.slice(0, 10).map((o, i) => (
-                        <li key={`${o.orderId}-${i}`} className="text-[13px] text-white font-mono">{o.customer} <span className="text-[#6e6e73]">·</span> {o.store} <span className="text-[#6e6e73]">·</span> ${Math.round(o.invoiceAmount).toLocaleString()} <span className="text-[#6e6e73]">·</span> {o.eventDate}</li>
+                        <li key={`${o.orderId}-${i}`} className="text-[13px] text-ink-800 font-mono">{o.customer} <span className="text-[#6e6e73]">·</span> {o.store} <span className="text-[#6e6e73]">·</span> ${Math.round(o.invoiceAmount).toLocaleString()} <span className="text-[#6e6e73]">·</span> {o.eventDate}</li>
                       ))}
                     </ul>
                   </div>
@@ -935,7 +935,7 @@ export default function TrialPage() {
                     <tbody>
                       {cateringResult.topCustomerConcentration.slice(0, 10).map((c) => (
                         <tr key={c.customer} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{c.customer}</td>
+                          <td className="!text-left text-ink-800 font-medium">{c.customer}</td>
                           <td className="font-mono tabular-nums">{c.orders}</td>
                           <td className="font-mono tabular-nums">${Math.round(c.totalInvoice).toLocaleString()}</td>
                           <td className="font-mono tabular-nums font-semibold" style={{ color: c.totalGap > 1000 ? '#ff453a' : c.totalGap > 200 ? '#ff9500' : '#86868b' }}>${Math.round(c.totalGap).toLocaleString()}</td>
@@ -953,7 +953,7 @@ export default function TrialPage() {
                     <tbody>
                       {cateringResult.perStore.map((s) => (
                         <tr key={s.store} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{s.store}</td>
+                          <td className="!text-left text-ink-800 font-medium">{s.store}</td>
                           <td className="font-mono tabular-nums">{s.orders}</td>
                           <td className="font-mono tabular-nums">${Math.round(s.totalInvoice).toLocaleString()}</td>
                           <td className="font-mono tabular-nums">${Math.round(s.totalPos).toLocaleString()}</td>
@@ -969,7 +969,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && bcsResult && mode === 'bcs' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Beverage Cost Score · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -994,7 +994,7 @@ export default function TrialPage() {
                       </p>
                       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-3">
                         {s.byCategory.map((c) => (
-                          <div key={c.category} className="px-3 py-2 rounded-lg" style={{ background: '#0a0a0a', border: '1px solid #2c2c2e' }}>
+                          <div key={c.category} className="px-3 py-2 rounded-lg" style={{ background: '#0a0a0a', border: '1px solid #d2d2d7' }}>
                             <p className="text-[11px] uppercase tracking-wider" style={{ color: '#86868b' }}>{c.category}</p>
                             <p className="font-mono text-[14px] font-semibold mt-1" style={{ color: c.shrinkPct > 0.10 ? '#ff453a' : c.shrinkPct > 0.05 ? '#ff9500' : '#d2d2d7' }}>
                               {c.shrinkUnits} <span className="font-normal" style={{ color: '#86868b' }}>({(c.shrinkPct * 100).toFixed(1)}%)</span>
@@ -1010,7 +1010,7 @@ export default function TrialPage() {
           )}
 
           {status === 'done' && driftResult && mode === 'drift' && (
-            <section className="border-t border-[#1f1f1f] py-16 px-6">
+            <section className="border-t border-[#e8e8ed] py-16 px-6">
               <div className="max-w-5xl mx-auto">
                 <p className="compass-eyebrow mb-4">— Vendor Drift · {filename}</p>
                 <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -1031,7 +1031,7 @@ export default function TrialPage() {
                     <tbody>
                       {driftResult.perSku.map((s) => (
                         <tr key={`${s.vendor}-${s.sku}`} style={{ color: '#d2d2d7' }}>
-                          <td className="!text-left text-white font-medium">{s.sku}</td>
+                          <td className="!text-left text-ink-800 font-medium">{s.sku}</td>
                           <td className="!text-left">{s.vendor}</td>
                           <td className="font-mono tabular-nums">${s.prevPrice.toFixed(2)}</td>
                           <td className="font-mono tabular-nums">${s.currPrice.toFixed(2)}</td>
@@ -1049,7 +1049,7 @@ export default function TrialPage() {
             </section>
           )}
 
-          <section className="border-t border-[#1f1f1f] py-16 px-6">
+          <section className="border-t border-[#e8e8ed] py-16 px-6">
             <div className="max-w-3xl mx-auto">
               <p className="compass-eyebrow mb-4">— Connect your register · reads every shift on its own</p>
               <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -1095,19 +1095,19 @@ export default function TrialPage() {
       )}
 
       {phase !== 'start' && (
-        <section className="border-t border-[#1f1f1f] py-16 px-6">
+        <section className="border-t border-[#e8e8ed] py-16 px-6">
           <div className="max-w-xl mx-auto">
             <p className="compass-eyebrow mb-4 text-center">— Save your read · wire it to live data</p>
             {leadSaved ? (
               <div className="compass-card text-center">
-                <p className="font-serif text-2xl text-white">You&apos;re saved.</p>
+                <p className="font-serif text-2xl text-ink-800">You&apos;re saved.</p>
                 <p className="compass-body mt-3">Myke will reach out within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={saveLead} className="compass-card space-y-3">
-                <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
                 <button type="submit" disabled={leadSaving} className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
                   {leadSaving ? 'Saving…' : 'Save my read →'}
                 </button>
@@ -1118,16 +1118,16 @@ export default function TrialPage() {
         </section>
       )}
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/pricing"  className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="/onboard"  className="hover:text-white transition-colors">Full onboard</Link>
-            <Link href="/"         className="hover:text-white transition-colors">Home</Link>
+            <Link href="/pricing"  className="hover:text-ink-800 transition-colors">Pricing</Link>
+            <Link href="/onboard"  className="hover:text-ink-800 transition-colors">Full onboard</Link>
+            <Link href="/"         className="hover:text-ink-800 transition-colors">Home</Link>
           </div>
         </div>
       </footer>

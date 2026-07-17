@@ -32,8 +32,8 @@ export default function AgentsPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· what we check</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· what we check</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">The checks that find your leak · 8 free to try</p>
             </span>
@@ -52,11 +52,11 @@ export default function AgentsPage() {
         </p>
         <div className="flex flex-wrap gap-3">
           <TrackedLink href="/trial" event="agents_hero_cta_click" meta={{ target: '/trial', label: 'Try it free — no card', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Try it free — no card needed →</TrackedLink>
-          <TrackedLink href="/pricing" event="agents_hero_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
+          <TrackedLink href="/pricing" event="agents_hero_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See pricing</TrackedLink>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] px-6 py-16 md:py-20">
+      <section className="border-t border-[#e8e8ed] px-6 py-16 md:py-20">
         <div className="max-w-7xl mx-auto">
           <div className="space-y-3">
             {AGENT_SPECS.filter((a) => a.csvRunnable).map((a, i) => (
@@ -99,7 +99,7 @@ export default function AgentsPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] px-6 py-16 md:py-20">
+      <section className="border-t border-[#e8e8ed] px-6 py-16 md:py-20">
         <div className="max-w-5xl mx-auto">
           <p className="compass-eyebrow mb-4">— The rule behind every number</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
@@ -119,7 +119,7 @@ export default function AgentsPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] px-6 py-16 md:py-20">
+      <section className="border-t border-[#e8e8ed] px-6 py-16 md:py-20">
         <div className="max-w-2xl mx-auto text-center">
           <p className="compass-eyebrow mb-4">— Try one. Right now.</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
@@ -130,22 +130,22 @@ export default function AgentsPage() {
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href="/trial" event="agents_bottom_cta_click" meta={{ target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
-            <TrackedLink href="/pricing" event="agents_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
+            <TrackedLink href="/pricing" event="agents_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See pricing</TrackedLink>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <TrackedLink href="/pricing"  event="agents_footer_click" meta={{ target: '/pricing', label: 'Pricing' }} className="hover:text-white transition-colors">Pricing</TrackedLink>
-            <TrackedLink href="/trial"    event="agents_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-white transition-colors">Trial</TrackedLink>
-            <TrackedLink href="/for"      event="agents_footer_click" meta={{ target: '/for',     label: 'Seats' }}   className="hover:text-white transition-colors">Seats</TrackedLink>
-            <TrackedLink href="/"         event="agents_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-white transition-colors">Home</TrackedLink>
+            <TrackedLink href="/pricing"  event="agents_footer_click" meta={{ target: '/pricing', label: 'Pricing' }} className="hover:text-ink-800 transition-colors">Pricing</TrackedLink>
+            <TrackedLink href="/trial"    event="agents_footer_click" meta={{ target: '/trial',   label: 'Trial' }}   className="hover:text-ink-800 transition-colors">Trial</TrackedLink>
+            <TrackedLink href="/for"      event="agents_footer_click" meta={{ target: '/for',     label: 'Seats' }}   className="hover:text-ink-800 transition-colors">Seats</TrackedLink>
+            <TrackedLink href="/"         event="agents_footer_click" meta={{ target: '/',        label: 'Home' }}    className="hover:text-ink-800 transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>

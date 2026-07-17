@@ -62,8 +62,8 @@ export default async function AnswerPage({ params }: { params: Params }) {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· answer</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· answer</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · published</p>
             </span>
@@ -76,7 +76,7 @@ export default async function AnswerPage({ params }: { params: Params }) {
       </div>
 
       <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-20">
-        <Link href="/answers" className="text-[#6e6e73] hover:text-white text-[12px] font-medium inline-flex items-center gap-1 mb-6 transition-colors">← All answers</Link>
+        <Link href="/answers" className="text-[#6e6e73] hover:text-ink-800 text-[12px] font-medium inline-flex items-center gap-1 mb-6 transition-colors">← All answers</Link>
         {a.audience ? <p className="compass-eyebrow mb-4">— For the {a.audience}</p> : null}
         <h1 className="compass-display text-3xl md:text-5xl mb-6">{a.title}</h1>
         {a.question ? (
@@ -90,12 +90,12 @@ export default async function AnswerPage({ params }: { params: Params }) {
         </div>
 
         {others.length > 0 ? (
-          <div className="mt-16 pt-8 border-t border-[#1f1f1f]">
+          <div className="mt-16 pt-8 border-t border-[#e8e8ed]">
             <p className="compass-eyebrow mb-5">— More answers</p>
             <ul className="space-y-3">
               {others.map((o) => (
                 <li key={o.id}>
-                  <Link href={`/answers/${o.slug}`} className="text-white font-medium hover:underline" style={{ textDecorationColor: '#0066ff' }}>
+                  <Link href={`/answers/${o.slug}`} className="text-ink-800 font-medium hover:underline" style={{ textDecorationColor: '#0066ff' }}>
                     {o.title} <span style={{ color: '#0066ff' }} className="text-sm">→</span>
                   </Link>
                 </li>
@@ -105,13 +105,13 @@ export default async function AnswerPage({ params }: { params: Params }) {
         ) : null}
       </article>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <Link href="/answers" className="hover:text-white transition-colors">All answers</Link>
+          <Link href="/answers" className="hover:text-ink-800 transition-colors">All answers</Link>
         </div>
       </footer>
     </main>

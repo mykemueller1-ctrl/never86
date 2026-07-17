@@ -36,8 +36,8 @@ export default function PressKit() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· press kit</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· press kit</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · press</p>
             </span>
@@ -64,7 +64,7 @@ export default function PressKit() {
             {RECEIPTS.map((r) => (
               <div key={r.l} className="compass-card">
                 <p className="compass-card-label">{r.l}</p>
-                <p className="font-mono tabular-nums text-2xl font-bold mt-3 text-white">{r.v}</p>
+                <p className="font-mono tabular-nums text-2xl font-bold mt-3 text-ink-800">{r.v}</p>
               </div>
             ))}
           </div>
@@ -89,7 +89,7 @@ export default function PressKit() {
                 {FACTS.map(([k, v]) => (
                   <tr key={k}>
                     <td className="px-5 py-3 text-[#6e6e73] text-[11px] uppercase tracking-wider font-mono w-1/3">{k}</td>
-                    <td className="px-5 py-3 text-white">{v}</td>
+                    <td className="px-5 py-3 text-ink-800">{v}</td>
                   </tr>
                 ))}
               </tbody>
@@ -98,13 +98,13 @@ export default function PressKit() {
         </section>
       </article>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6 print:hidden">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6 print:hidden">
         <div className="max-w-4xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <TrackedLink href="mailto:press@never86.ai" event="press_email_click" meta={{ target: 'mailto:press@never86.ai', label: 'press@never86.ai' }} className="hover:text-white transition-colors">press@never86.ai</TrackedLink>
+          <TrackedLink href="mailto:press@never86.ai" event="press_email_click" meta={{ target: 'mailto:press@never86.ai', label: 'press@never86.ai' }} className="hover:text-ink-800 transition-colors">press@never86.ai</TrackedLink>
         </div>
       </footer>
     </main>
