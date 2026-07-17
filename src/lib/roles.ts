@@ -47,7 +47,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '/demo/catering-leak' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
       { slug: 'catering-economics-multi-unit', t: 'How catering economics break for multi-unit operators' },
     ],
@@ -70,7 +70,7 @@ export const ROLES: Record<string, RoleSpec> = {
       'Banking covenants want trailing-twelve net. Each store reports it differently.',
     ],
     reliefs: [
-      'De-duplicated leaf-channel net sales — the rule that caught $31M and walked it back to $15.7M for our design partner.',
+      'Sales counted once, not twice — the double-counting rule that caught our own $8.3M number and walked it back to $1.81M.',
       'Per-partner 3P take rate (DD 10% / UE 18% / GH 18% confirmed for our design partner) vs blended-effective.',
       'Source-tag discipline on every figure that hits a board doc.',
       'When the model is wrong we publish the correction. No vendor in this industry does that.',
@@ -83,7 +83,7 @@ export const ROLES: Record<string, RoleSpec> = {
     answers: [
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
       { slug: 'renegotiate-ue-gh-to-dd', t: 'How to renegotiate Uber Eats and GrubHub to the DoorDash rate' },
-      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
     ],
     bookCtaLine: '15 minutes. Bring last month\'s 3P payout statements. We\'ll show the contract-vs-effective gap live.',
   },
@@ -149,7 +149,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: 'Labor Leak', line: 'Schedule system + POS reconciled against actual clocked hours.', href: '/demo/labor-leak' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
       { slug: 'people-native-ai-restaurants', t: 'What does "people-native AI" mean for restaurants' },
       { slug: 'labor-screen-managers-want', t: 'Why the labor screen managers actually want looks different' },
     ],
@@ -184,7 +184,7 @@ export const ROLES: Record<string, RoleSpec> = {
     ],
     answers: [
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
-      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
       { slug: 'labor-screen-managers-want', t: 'Why the labor screen managers actually want looks different' },
     ],
     bookCtaLine: '15 minutes. Bring your last month\'s Toast export. I\'ll run our reconciliation on it during the call.',
@@ -284,7 +284,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: '3P Fee Finder', line: 'What DD/UE/GH actually keep — so menu pricing on 3P is honest.', href: '/demo/3p-fee-finder' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught $31M and walked it back to $15.7M' },
+      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
       { slug: 'catering-economics-multi-unit', t: 'How catering economics break for multi-unit operators' },
       { slug: 'people-native-ai-restaurants', t: 'What does "people-native AI" mean for restaurants' },
     ],

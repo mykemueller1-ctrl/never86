@@ -39,7 +39,7 @@ export default function PressKit() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· press kit</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · press</p>
+              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · press</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">

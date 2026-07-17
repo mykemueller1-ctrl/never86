@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     url: 'https://never86.ai/changelog',
   },
   alternates: { canonical: 'https://never86.ai/changelog' },
+  robots: { index: false, follow: true },
 };
 
 type Entry = {
@@ -183,7 +184,7 @@ export default function ChangelogPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· changelog</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · what shipped, when, and why</p>
+              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · what shipped, when, and why</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">

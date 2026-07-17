@@ -32,16 +32,16 @@ const TEAM: Member[] = [
     name: 'Myke Mueller',
     role: 'Founder / CEO',
     where: 'Fort Dodge, Iowa',
-    bio: "Restaurant operator. Co-owner of Community Tap & Pizza (the store the software is built against). Built Never 86'd because nothing on the market reads a Z-report the way a line does.",
+    bio: "Founder and CEO. Third-generation restaurant operator and co-owner of Community Tap & Pizza — the restaurant where Never 86'd began, and where it runs every shift.",
     monogramTone: 'gold',
     photo: '/team/mm.jpg',
   },
   {
     initials: 'VH',
     name: 'Victor Hatungimana',
-    role: 'Growth',
+    role: 'Marketing · On the Line',
     where: 'Iowa',
-    bio: 'Runs the operator pipeline. Talks to more independent restaurant owners in a week than most vendors talk to in a quarter. (That is the job.)',
+    bio: "Builds the operator audience and runs On the Line — Never 86'd's owner-to-owner show. Real conversations, real restaurants. (That is the channel.)",
     monogramTone: 'void',
     photo: '/team/vh.jpg',
   },
@@ -50,7 +50,7 @@ const TEAM: Member[] = [
     name: 'Kristin Aduna',
     role: 'Head of Product',
     where: '',
-    bio: 'Owns the product — the demo, the buyer journey, what ships next. If a prospect touches it, she shaped it. (The rough edges you never saw? She caught them first.)',
+    bio: 'Restaurant-technology product leader with early years at Compeat and Restaurant365. Owns product discipline, customer discovery, and the Charter Operator experience.',
     monogramTone: 'ink',
   },
 ];
@@ -101,11 +101,8 @@ export default function TeamPage() {
           </span>
         </h1>
         <p className="mt-6 max-w-2xl text-base md:text-lg text-white/60 leading-relaxed">
-          Small team. Every hire has run a shift, sold a plate, or reconciled a
-          Z-report the hard way.{' '}
-          <span className="font-serif italic text-white/80">
-            (Nothing is subcontracted.)
-          </span>
+          Small team. Every hire has run a shift, sold a plate, or closed out a
+          register the hard way.
         </p>
       </section>
 

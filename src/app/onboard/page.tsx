@@ -196,7 +196,7 @@ export default function OnboardPage() {
           {step === 4 && (
             <div>
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
-                How <em>share data?</em>
+                How do you want to <em>share data?</em>
               </h1>
               <p className="compass-body text-lg mb-10">Pick the path that fits where you are today.</p>
               <div className="grid gap-3">
