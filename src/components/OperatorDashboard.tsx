@@ -23,9 +23,10 @@ const usd = (v: number) =>
 const briefDate = (iso: string | null) =>
   iso ?? '—';
 
-function Stamp({ level }: { level: 'verified' | 'estimated' }) {
+function Stamp({ level }: { level: 'verified' | 'estimated' | 'pending' }) {
   const c = level === 'verified' ? BLUE : AMBER;
-  const label = level === 'verified' ? 'VERIFIED' : 'ESTIMATED - method stated';
+  const label =
+    level === 'verified' ? 'VERIFIED' : level === 'pending' ? 'UNVERIFIED - PENDING RECONCILE' : 'ESTIMATED - method stated';
   return (
     <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color: c, border: `1px solid ${c}`, padding: '2px 5px', whiteSpace: 'nowrap' }}>
       {label}
@@ -39,7 +40,7 @@ function MonoLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function KpiBox({ label, value, level, valueColor }: { label: string; value: string; level: 'verified' | 'estimated'; valueColor?: string }) {
+function KpiBox({ label, value, level, valueColor }: { label: string; value: string; level: 'verified' | 'estimated' | 'pending'; valueColor?: string }) {
   return (
     <div style={{ border: `1px solid ${BLUE}`, background: 'transparent', padding: '14px 16px 12px' }}>
       <MonoLabel>{label}</MonoLabel>
@@ -143,13 +144,17 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
   const cards = buildCoachCards(d.exceptions);
   const nextMoves = cards.reduce((s, c) => s + (c.level === 'verified' && c.dollarsYr ? c.dollarsYr : 0), 0);
   const flagged = new Set(d.exceptions.map((e) => e.store));
-  const stores = [...d.stores].sort((a, b) => b.net - a.net);
+  const wk = d.latestWeek;
+  const wkVerified = wk?.verification === 'VERIFIED';
+  const useWeekly = wk != null && d.stores.some((s) => s.weekNet != null);
+  const stores = [...d.stores].sort((a, b) => (useWeekly ? (b.weekNet ?? 0) - (a.weekNet ?? 0) : b.net - a.net));
+  const wkShort = (iso: string) => iso.slice(5).replace('-', '-');
 
   return (
     <Shell name={name}>
       {/* Brief opening */}
       <MonoLabel>
-        / DAILY BRIEF — {name} — SYNCED {briefDate(d.lastIngest)} — EVERY NUMBER SOURCE-STAMPED
+        / WEEKLY BRIEF — {wk ? `WEEK ENDING ${wk.weekEnd}` : `SYNCED ${briefDate(d.lastIngest)}`} — EVERY NUMBER SOURCE-STAMPED
       </MonoLabel>
       <h1 className="font-serif" style={{ fontSize: 56, lineHeight: 1.02, letterSpacing: '-0.02em', margin: '14px 0 6px' }}>
         The week, verified.
@@ -160,14 +165,24 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
 
       {/* KPI boxes */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 14 }}>
-        <KpiBox label={`NET SALES — ${d.storesLoaded} STORE${d.storesLoaded === 1 ? '' : 'S'}`} value={usd(d.networkNet)} level="verified" />
+        {wk ? (
+          <KpiBox label={`GROUP NET — WK ENDING ${wkShort(wk.weekEnd)}`} value={usd(wk.groupNet)} level={wkVerified ? 'verified' : 'pending'} />
+        ) : (
+          <KpiBox label={`NET SALES — ${d.storesLoaded} STORE${d.storesLoaded === 1 ? '' : 'S'}`} value={usd(d.networkNet)} level="verified" />
+        )}
         <KpiBox label="NEXT MOVES — MEASURED" value={usd(nextMoves)} level="verified" valueColor={BLUE} />
         <KpiBox label="THINGS TO FIX" value={String(d.exceptions.length)} level="verified" />
         <KpiBox label="STORES REPORTING" value={`${d.storesLoaded}/${d.totalStores}`} level="verified" />
       </div>
-      <p className="font-mono" style={{ fontSize: 9.5, color: MUTED, lineHeight: 1.6, marginBottom: 40 }}>
+      <p className="font-mono" style={{ fontSize: 9.5, color: MUTED, lineHeight: 1.6, marginBottom: wk && !wkVerified ? 8 : 40 }}>
         Where a number is modeled, the method is stated next to it. Nothing rounded up.
       </p>
+      {wk && !wkVerified ? (
+        <p className="font-mono" style={{ fontSize: 9.5, color: AMBER, lineHeight: 1.6, marginBottom: 40 }}>
+          NOTE — the {wk.weekStart} to {wk.weekEnd} pull is quarantined pending cross-check. It is shown with its stamp and is
+          not counted as verified anywhere on this page.
+        </p>
+      ) : null}
 
       {/* 01 — Do this today */}
       <SectionRule left={`01 — DO THIS TODAY — ${Math.min(cards.length, 5)} MOVES`} right={`COMPASS — ${d.totalStores}-UNIT — NEVER 86'D`} />
@@ -182,7 +197,10 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
       ) : <div style={{ marginBottom: 40 }} />}
 
       {/* 02 — Stores */}
-      <SectionRule left="02 — STORES BY NET SALES" right="ACTUAL — THIS PERIOD" />
+      <SectionRule
+        left={useWeekly ? `02 — STORES — WK ENDING ${wkShort(wk!.weekEnd)}` : '02 — STORES BY NET SALES'}
+        right={useWeekly ? (wkVerified ? 'ACTUAL — VERIFIED' : 'ACTUAL — PENDING RECONCILE') : 'ACTUAL — THIS PERIOD'}
+      />
       <h2 className="font-serif" style={{ fontSize: 30, letterSpacing: '-0.015em', borderBottom: `2px solid ${INK}`, paddingBottom: 8, marginBottom: 0 }}>
         Store by store.
       </h2>
@@ -190,7 +208,8 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
         <thead>
           <tr style={{ background: INK }}>
             <th className="font-mono uppercase text-left" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Restaurant</th>
-            <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Net sales</th>
+            <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>{useWeekly ? 'Actual wk' : 'Net sales'}</th>
+            {useWeekly ? <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Avg check</th> : null}
             <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Status</th>
           </tr>
         </thead>
@@ -198,7 +217,14 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
           {stores.map((s) => (
             <tr key={s.name} style={{ borderBottom: `1px solid ${RULE}` }}>
               <td className="font-serif" style={{ fontSize: 15, padding: '8px 10px', color: INK }}>{s.name}</td>
-              <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, padding: '8px 10px', color: INK }}>{usd(s.net)}</td>
+              <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, padding: '8px 10px', color: INK }}>
+                {usd(useWeekly ? (s.weekNet ?? 0) : s.net)}
+              </td>
+              {useWeekly ? (
+                <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, padding: '8px 10px', color: MUTED }}>
+                  {s.weekAvgCheck != null ? `$${s.weekAvgCheck.toFixed(2)}` : '—'}
+                </td>
+              ) : null}
               <td className="text-right" style={{ padding: '8px 10px' }}>
                 {flagged.has(s.name)
                   ? <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color: RED, border: `1px solid ${RED}`, padding: '2px 5px' }}>NEEDS A LOOK</span>
@@ -208,7 +234,8 @@ export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
           ))}
           <tr style={{ background: INK }}>
             <td className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: PAPER, padding: '8px 10px' }}>GROUP</td>
-            <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, color: PAPER, padding: '8px 10px' }}>{usd(d.networkNet)}</td>
+            <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, color: PAPER, padding: '8px 10px' }}>{usd(useWeekly ? wk!.groupNet : d.networkNet)}</td>
+            {useWeekly ? <td /> : null}
             <td />
           </tr>
         </tbody>
