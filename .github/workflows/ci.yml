@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main, recovery-apr12, 'code-**', 'claude/**', 'home-**']
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test (vitest — core + all 7 agents)
+        run: npm test
+      - name: Build
+        # Lazy db/email clients let the build succeed with no live secrets.
+        run: npm run build
