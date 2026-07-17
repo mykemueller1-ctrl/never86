@@ -1,77 +1,114 @@
 import Link from 'next/link';
 import { getCommandCenterData, type CommandCenterData } from '@/lib/commandCenter';
-import { buildCoachCards } from '@/lib/coachCards';
+import { buildCoachCards, type CoachCard } from '@/lib/coachCards';
 import { opsDbConfigured } from '@/lib/opsDb';
-import { CoachCards } from './CoachCards';
-import { SourceTag } from './SourceTag';
 import SignOutButton from './SignOutButton';
 
-// The operator's home, in the executive-brief style built for the multi-unit
-// CEO read (clean, calm, every figure carrying its verification pill) — not
-// the dark marketing look. Reads like a brief: the week, verified → the next
-// moves → the stores.
+// The operator's home in the COMPASS brief design — the exact language of the
+// demo docs (Weekly Brief / coaching cards): cream paper, serif display, mono
+// source-stamps, thin blue-ruled KPI boxes, outlined VERIFIED / ESTIMATED
+// stamps, black table bands, SRC footnote. A printed intelligence document,
+// not an app.
+
+const PAPER = '#f7f4ec';
+const INK = '#141414';
+const BLUE = '#2424cf';
+const AMBER = '#b45309';
+const RED = '#c0392b';
+const MUTED = '#6b6b66';
+const RULE = '#d8d3c5';
 
 const usd = (v: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
-const usdCompact = (v: number) => {
-  if (Math.abs(v) >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(v) >= 10_000) return `$${Math.round(v / 1000)}k`;
-  return usd(v);
-};
-const prettyDate = (iso: string | null) =>
-  iso ? new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '—';
+const briefDate = (iso: string | null) =>
+  iso ?? '—';
 
-function Shell({ name, children }: { name: string; children: React.ReactNode }) {
+function Stamp({ level }: { level: 'verified' | 'estimated' }) {
+  const c = level === 'verified' ? BLUE : AMBER;
+  const label = level === 'verified' ? 'VERIFIED' : 'ESTIMATED - method stated';
   return (
-    <main className="min-h-screen text-ink-800" style={{ background: '#f5f5f7' }}>
-      <header className="nav-shell sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
-            <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
-            <span className="text-ink-500 text-[12px] font-medium ml-1">· {name}</span>
-          </Link>
-          <SignOutButton />
-        </div>
-      </header>
-      <div className="max-w-5xl mx-auto px-6 pt-12 pb-20">{children}</div>
-    </main>
+    <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color: c, border: `1px solid ${c}`, padding: '2px 5px', whiteSpace: 'nowrap' }}>
+      {label}
+    </span>
   );
 }
 
-function Kpi({ label, value, level, sub }: { label: string; value: string; level: 'verified' | 'estimated'; sub?: string }) {
+function MonoLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between mb-1 gap-2">
-        <p className="text-ink-500 text-xs uppercase tracking-wide font-medium">{label}</p>
-        <SourceTag level={level} />
-      </div>
-      <p className="text-2xl font-bold text-ink-800 leading-tight tracking-tighter">{value}</p>
-      {sub ? <p className="text-ink-500 text-xs mt-1">{sub}</p> : null}
+    <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>{children}</p>
+  );
+}
+
+function KpiBox({ label, value, level, valueColor }: { label: string; value: string; level: 'verified' | 'estimated'; valueColor?: string }) {
+  return (
+    <div style={{ border: `1px solid ${BLUE}`, background: 'transparent', padding: '14px 16px 12px' }}>
+      <MonoLabel>{label}</MonoLabel>
+      <p className="font-serif" style={{ fontSize: 30, lineHeight: 1.15, color: valueColor ?? INK, letterSpacing: '-0.01em', margin: '6px 0 10px' }}>{value}</p>
+      <Stamp level={level} />
     </div>
   );
 }
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-2">{children}</p>;
+function SectionRule({ left, right }: { left: string; right: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 flex-wrap" style={{ marginBottom: 6 }}>
+      <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: INK }}>{left}</p>
+      <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>{right}</p>
+    </div>
+  );
+}
+
+function BriefCoachCard({ c, rank }: { c: CoachCard; rank: number }) {
+  return (
+    <div style={{ border: `1px solid ${RULE}`, borderLeft: `3px solid ${BLUE}`, background: '#fffdf7', padding: '16px 18px' }}>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="font-mono" style={{ fontSize: 11, color: MUTED }}>{String(rank).padStart(2, '0')}</span>
+          <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: INK }}>OWNER: {c.owner}</span>
+          <Stamp level={c.level} />
+        </div>
+        <p className="font-serif" style={{ fontSize: 20, color: INK, letterSpacing: '-0.01em' }}>
+          {c.dollarsYr != null ? <>{usd(c.dollarsYr)}<span style={{ fontSize: 13, color: MUTED }}>/yr</span></> : <span style={{ color: MUTED, fontSize: 15 }}>opportunity</span>}
+        </p>
+      </div>
+      <h3 className="font-serif" style={{ fontSize: 22, color: INK, letterSpacing: '-0.01em', marginTop: 8 }}>{c.title}</h3>
+      <p style={{ fontSize: 13.5, color: '#3d3d38', lineHeight: 1.55, marginTop: 4 }}>{c.why}</p>
+      <div className="flex items-start gap-3" style={{ marginTop: 10, borderTop: `1px solid ${RULE}`, paddingTop: 10 }}>
+        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE, whiteSpace: 'nowrap', marginTop: 2 }}>DO THIS →</span>
+        <p style={{ fontSize: 13.5, color: INK, lineHeight: 1.55, fontWeight: 500 }}>{c.action}</p>
+      </div>
+    </div>
+  );
+}
+
+function Shell({ name, children }: { name: string; children: React.ReactNode }) {
+  return (
+    <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
+      <header style={{ borderBottom: `1px solid ${INK}` }}>
+        <div className="max-w-5xl mx-auto px-6 h-11 flex items-center justify-between gap-4">
+          <Link href="/" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: INK }}>
+            / NEVER 86&apos;D — COMMAND CENTER — {name}
+          </Link>
+          <SignOutButton />
+        </div>
+      </header>
+      <div className="max-w-5xl mx-auto px-6 pt-10 pb-16">{children}</div>
+    </main>
+  );
 }
 
 function EmptyState({ name }: { name: string }) {
   return (
-    <div className="max-w-xl mx-auto text-center pt-12">
-      <Eyebrow>{name}</Eyebrow>
-      <h1 className="display text-4xl md:text-5xl mb-4">Your numbers aren&apos;t in yet.</h1>
-      <p className="text-ink-600 text-[15px] leading-relaxed mb-8">
-        Send one sales report and we&apos;ll show you your first leak in 30 seconds — which store,
-        which shift, whose name, and what to do about it.
+    <div className="max-w-xl mx-auto pt-10">
+      <MonoLabel>/ {name} — NO DATA ON FILE YET</MonoLabel>
+      <h1 className="font-serif" style={{ fontSize: 44, letterSpacing: '-0.015em', margin: '10px 0 6px' }}>Your numbers aren&apos;t in yet.</h1>
+      <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>Send one report - we&apos;ll show you the first leak, with receipts.</p>
+      <p style={{ fontSize: 14, color: '#3d3d38', lineHeight: 1.6, marginBottom: 22 }}>
+        Which store, which shift, whose name, and what to do about it — in 30 seconds.
       </p>
-      <div className="flex flex-wrap gap-3 justify-center">
-        <Link href="/trial" className="inline-flex items-center rounded-full px-5 py-2.5 text-[14px] font-medium text-white" style={{ background: '#1d1d1f' }}>
-          Drop your first report →
-        </Link>
-        <a href="mailto:myke@n86.app?subject=Connect%20my%20store" className="inline-flex items-center rounded-full px-5 py-2.5 text-[14px] font-medium text-ink-800 border border-ink-300">
-          Connect my POS
-        </a>
+      <div className="flex gap-3 flex-wrap">
+        <Link href="/trial" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>Drop your first report →</Link>
+        <a href="mailto:myke@n86.app?subject=Connect%20my%20store" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px' }}>Connect my POS</a>
       </div>
     </div>
   );
@@ -79,17 +116,17 @@ function EmptyState({ name }: { name: string }) {
 
 export default async function OperatorDashboard({ operatorId, displayName }: { operatorId: number; displayName?: string }) {
   if (!opsDbConfigured()) {
-    return <Shell name="Dashboard"><EmptyState name="Your restaurant" /></Shell>;
+    return <Shell name="DASHBOARD"><EmptyState name="YOUR RESTAURANT" /></Shell>;
   }
   let d: CommandCenterData;
   try {
     d = await getCommandCenterData(operatorId, displayName);
   } catch {
     return (
-      <Shell name="Dashboard">
-        <div className="card p-6 max-w-xl mx-auto text-center">
-          <p className="text-ink-800 font-semibold mb-1">We couldn&apos;t reach your numbers.</p>
-          <p className="text-ink-500 text-sm">Give it a second and refresh — if it keeps happening, email myke@n86.app.</p>
+      <Shell name="DASHBOARD">
+        <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 24, maxWidth: 560 }}>
+          <p className="font-serif" style={{ fontSize: 22 }}>We couldn&apos;t reach your numbers.</p>
+          <p style={{ fontSize: 13, color: MUTED, marginTop: 6 }}>Give it a second and refresh — if it keeps happening, email myke@n86.app.</p>
         </div>
       </Shell>
     );
@@ -97,80 +134,90 @@ export default async function OperatorDashboard({ operatorId, displayName }: { o
   return <OperatorDashboardView d={d} />;
 }
 
-// Pure render — data in, screen out. Kept separate so it can be previewed and
-// tested with fixture data.
+// Pure render — data in, brief out. Separated for fixture preview + testing.
 export function OperatorDashboardView({ d }: { d: CommandCenterData }) {
-  const name = d.operatorName ?? 'Your restaurant';
+  const name = (d.operatorName ?? 'Your restaurant').toUpperCase();
   const hasData = d.networkNet > 0 || d.exceptions.length > 0;
   if (!hasData) return <Shell name={name}><EmptyState name={name} /></Shell>;
 
   const cards = buildCoachCards(d.exceptions);
-  // Headline = the defensible number: verified measured leaks only.
   const nextMoves = cards.reduce((s, c) => s + (c.level === 'verified' && c.dollarsYr ? c.dollarsYr : 0), 0);
   const flagged = new Set(d.exceptions.map((e) => e.store));
-  const maxNet = Math.max(1, ...d.stores.map((s) => s.net));
+  const stores = [...d.stores].sort((a, b) => b.net - a.net);
 
   return (
     <Shell name={name}>
-      {/* The brief opening */}
-      <div className="mb-10">
-        <Eyebrow>{name} · {d.storesLoaded} of {d.totalStores} store{d.totalStores === 1 ? '' : 's'} · synced {prettyDate(d.lastIngest)}</Eyebrow>
-        <h1 className="display text-4xl md:text-6xl">The week, verified.</h1>
-        <p className="text-ink-600 text-[15px] mt-3 max-w-2xl leading-relaxed">
-          {nextMoves > 0 ? (
-            <><span className="font-semibold text-ink-800">{usd(nextMoves)}</span> in verified next moves — money we can trace,
-            store by store, each with the person who owns it and the one thing to do next.</>
-          ) : (
-            'Your reads, ready — every figure carrying its source.'
-          )}
-        </p>
-      </div>
+      {/* Brief opening */}
+      <MonoLabel>
+        / DAILY BRIEF — {name} — SYNCED {briefDate(d.lastIngest)} — EVERY NUMBER SOURCE-STAMPED
+      </MonoLabel>
+      <h1 className="font-serif" style={{ fontSize: 56, lineHeight: 1.02, letterSpacing: '-0.02em', margin: '14px 0 6px' }}>
+        The week, verified.
+      </h1>
+      <p className="font-serif italic" style={{ fontSize: 22, color: BLUE, marginBottom: 26 }}>
+        Sales, voids, discounts, catering - with receipts.
+      </p>
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-        <Kpi label="Net sales" value={usdCompact(d.networkNet)} level="verified" />
-        <Kpi label="Next moves" value={usdCompact(nextMoves)} level="verified" sub="measured leaks only" />
-        <Kpi label="Things to fix" value={String(d.exceptions.length)} level="verified" />
-        <Kpi label="Stores reporting" value={`${d.storesLoaded} / ${d.totalStores}`} level="verified" />
+      {/* KPI boxes */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 14 }}>
+        <KpiBox label={`NET SALES — ${d.storesLoaded} STORE${d.storesLoaded === 1 ? '' : 'S'}`} value={usd(d.networkNet)} level="verified" />
+        <KpiBox label="NEXT MOVES — MEASURED" value={usd(nextMoves)} level="verified" valueColor={BLUE} />
+        <KpiBox label="THINGS TO FIX" value={String(d.exceptions.length)} level="verified" />
+        <KpiBox label="STORES REPORTING" value={`${d.storesLoaded}/${d.totalStores}`} level="verified" />
       </div>
+      <p className="font-mono" style={{ fontSize: 9.5, color: MUTED, lineHeight: 1.6, marginBottom: 40 }}>
+        Where a number is modeled, the method is stated next to it. Nothing rounded up.
+      </p>
 
-      {/* Do this today */}
-      <div className="mb-12">
-        <Eyebrow>Do this today</Eyebrow>
-        <CoachCards exceptions={d.exceptions} limit={5} />
+      {/* 01 — Do this today */}
+      <SectionRule left={`01 — DO THIS TODAY — ${Math.min(cards.length, 5)} MOVES`} right={`COMPASS — ${d.totalStores}-UNIT — NEVER 86'D`} />
+      <h2 className="font-serif" style={{ fontSize: 30, letterSpacing: '-0.015em', borderBottom: `2px solid ${INK}`, paddingBottom: 8, marginBottom: 14 }}>
+        Your next moves, ranked.
+      </h2>
+      <div className="space-y-3" style={{ marginBottom: 8 }}>
+        {cards.slice(0, 5).map((c, i) => <BriefCoachCard key={`${c.store}-${c.rule}`} c={c} rank={i + 1} />)}
       </div>
+      {cards.length > 5 ? (
+        <p className="font-mono" style={{ fontSize: 10, color: MUTED, marginBottom: 40 }}>+ {cards.length - 5} MORE ON FILE</p>
+      ) : <div style={{ marginBottom: 40 }} />}
 
-      {/* Stores */}
-      {d.stores.length > 0 ? (
-        <div>
-          <Eyebrow>Stores by net sales</Eyebrow>
-          <div className="card overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <tbody>
-                {[...d.stores].sort((a, b) => b.net - a.net).map((s) => {
-                  const w = Math.round((s.net / maxNet) * 100);
-                  return (
-                    <tr key={s.name} className="border-b border-ink-200/60 last:border-0">
-                      <td className="px-4 py-3 text-ink-800 whitespace-nowrap">
-                        {s.name}
-                        {flagged.has(s.name) ? (
-                          <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-warning-500/10 text-warning-500">needs a look</span>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3" style={{ width: '45%' }}>
-                        <span className="relative inline-block h-1.5 w-full rounded bg-ink-200 overflow-hidden align-middle">
-                          <span className="absolute inset-y-0 left-0 rounded bg-ink-800" style={{ width: `${w}%` }} />
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right text-ink-800 tabular-nums font-semibold whitespace-nowrap">{usd(s.net)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : null}
+      {/* 02 — Stores */}
+      <SectionRule left="02 — STORES BY NET SALES" right="ACTUAL — THIS PERIOD" />
+      <h2 className="font-serif" style={{ fontSize: 30, letterSpacing: '-0.015em', borderBottom: `2px solid ${INK}`, paddingBottom: 8, marginBottom: 0 }}>
+        Store by store.
+      </h2>
+      <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ background: INK }}>
+            <th className="font-mono uppercase text-left" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Restaurant</th>
+            <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Net sales</th>
+            <th className="font-mono uppercase text-right" style={{ fontSize: 9.5, letterSpacing: '0.1em', color: PAPER, padding: '7px 10px' }}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stores.map((s) => (
+            <tr key={s.name} style={{ borderBottom: `1px solid ${RULE}` }}>
+              <td className="font-serif" style={{ fontSize: 15, padding: '8px 10px', color: INK }}>{s.name}</td>
+              <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, padding: '8px 10px', color: INK }}>{usd(s.net)}</td>
+              <td className="text-right" style={{ padding: '8px 10px' }}>
+                {flagged.has(s.name)
+                  ? <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color: RED, border: `1px solid ${RED}`, padding: '2px 5px' }}>NEEDS A LOOK</span>
+                  : <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color: MUTED }}>INSIDE</span>}
+              </td>
+            </tr>
+          ))}
+          <tr style={{ background: INK }}>
+            <td className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: PAPER, padding: '8px 10px' }}>GROUP</td>
+            <td className="font-mono text-right tabular-nums" style={{ fontSize: 12.5, color: PAPER, padding: '8px 10px' }}>{usd(d.networkNet)}</td>
+            <td />
+          </tr>
+        </tbody>
+      </table>
+
+      {/* SRC footnote */}
+      <p className="font-mono" style={{ fontSize: 9, color: MUTED, lineHeight: 1.7, marginTop: 34, borderTop: `1px solid ${RULE}`, paddingTop: 10 }}>
+        SRC — POS pulls, cross-checked to the penny — every figure traceable to a stored document — leaks measured against your own stores&apos; median, not an industry benchmark — nothing rounded up.
+      </p>
     </Shell>
   );
 }
