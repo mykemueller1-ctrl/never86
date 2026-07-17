@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "The story · Never 86'd",
-  description: 'How a single HTML file on an operator\'s laptop became the operator OS for chef-led groups and 16-unit chains.',
+  description: 'How a single HTML file on an operator\'s laptop became daily margin control for independent restaurants and a 16-unit chef-led group.',
   openGraph: {
     title: "Never 86'd · the story",
     description: "I built this for myself first. Then I gave it away. — Myke Mueller",
@@ -29,7 +29,7 @@ export default function StoryPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· the story</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · founder narrative</p>
+              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · founder narrative</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -66,10 +66,10 @@ export default function StoryPage() {
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The first number was wrong</h2>
           <p>
-            I ran the model on his data and produced a recovery surface of <span className="font-mono tabular-nums text-white">$8.3M / year</span>. It was on the screen. It came out of the math. It was internally consistent. It was also wrong.
+            I ran the model on his data and it said the group was leaking <span className="font-mono tabular-nums text-white">$8.3M a year</span>. It was on the screen. It came out of the math. It was internally consistent. It was also wrong.
           </p>
           <p>
-            The signal was a sales rollup that physically couldn&apos;t be real — the model was reading a doubled view of the network total and confidently extrapolating from it. I caught it the next day. The honest number, after I de-duplicated the rollup, came out at <span className="font-mono tabular-nums text-white">$1.81M</span> — about 22% of what I&apos;d reported.
+            The tell was a sales total that physically couldn&apos;t be real — the model was counting the same sales twice and building a big number on top of it. I caught it the next day. The honest number, after I removed the double-counting, came out at <span className="font-mono tabular-nums text-white">$1.81M</span> — about 22% of what I&apos;d reported.
           </p>
           <p>
             Every other vendor in this category would have left the $8.3M number in the deck and never spoken of it again. I walked it back in writing to the design partner who&apos;d already seen the original figure.

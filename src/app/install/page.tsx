@@ -25,7 +25,7 @@ export default function InstallPage() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">· install the operator app</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · upgrade from /trial to the live product</p>
+              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · upgrade from /trial to the live product</p>
             </span>
           </Link>
           <InstallNavLinks />
@@ -71,7 +71,7 @@ export default function InstallPage() {
             </div>
             <div className="compass-card">
               <p className="compass-card-label">— Auth · honest state</p>
-              <h3>Magic-link · coming with Pulse</h3>
+              <h3>Magic-link · coming with Owner</h3>
               <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Today:</span> shared password at <span className="font-mono">/reports/login</span> for charter partners only (per-tenant cookies, 12-hour lifetime). <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> magic-link signup at /pulse, per-user sessions, PIN-by-department for managers/crew. WebAuthn after that.</p>
             </div>
             <div className="compass-card" style={{ borderColor: '#0066ff' }}>

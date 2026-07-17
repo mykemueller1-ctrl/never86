@@ -76,7 +76,7 @@ export const AGENT_SPECS: AgentSpec[] = [
       'The $585K UE+GH lever for our design partner — sourced',
     ],
     needs: 'Per-partner 3P payout statements + your contracted rates.',
-    output: 'Per-partner table showing contracted % · blended-effective % · annualized recovery surface if renegotiated to floor.',
+    output: 'Per-partner table: contracted % · what you actually pay · what you\'d save in a year at the lower rate.',
     sampleSignal: 'UberEats contract 18% / blended-effective 19.4% · 1.4pp gap · $312K annualized.',
     posSupport: 'DoorDash · UberEats · GrubHub · ChowNow · Olo (payout statements)',
   },

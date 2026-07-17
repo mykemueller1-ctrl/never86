@@ -6,12 +6,12 @@ import { trackEvent } from '@/lib/track';
 import RoiCalculator from '@/components/RoiCalculator';
 
 const FREE_AGENTS = [
-  { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'One name above the peer band, by store + cross-network.' },
-  { name: '3P Fee Finder',  href: '/demo/3p-fee-finder',  tag: 'Delivery', line: 'Contract vs blended-effective DD/UE/GH take rate.' },
+  { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'The one name voiding more than everyone else — by store, and across all your stores.' },
+  { name: '3P Fee Finder',  href: '/demo/3p-fee-finder',  tag: 'Delivery', line: 'What DoorDash, Uber Eats, and Grubhub actually take vs what your contract says.' },
   { name: 'Labor Leak',     href: '/demo/labor-leak',     tag: 'Labor',    line: 'OT drift, ghost shifts, schedule-vs-clocked gaps.' },
   { name: 'Tip Variance',   href: '/demo/tip-variance',   tag: 'Tips',     line: 'Week-over-week tip movement, per store + per name.' },
-  { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.' },
-  { name: 'Rate Card Audit',href: '/demo/rate-card-audit',tag: '3P Rates', line: 'Where your DD/UE/GH rates sit vs peer band.' },
+  { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering', line: 'Catering money per store — and where the invoice and the register don\'t match.' },
+  { name: 'Rate Card Audit',href: '/demo/rate-card-audit',tag: '3P Rates', line: 'Where your delivery rates sit vs restaurants like yours.' },
   { name: 'Shift Pulse',    href: '/demo/shift-pulse',    tag: 'Shift',    line: 'Crew + manager sentiment at the close of every shift.' },
 ];
 
@@ -118,14 +118,14 @@ export default function Home() {
                 Never 86&apos;d <span className="italic text-white/70">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">
-                See where your restaurant is losing money · 8 tools free to try
+                Daily margin control for restaurant operators
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="font-mono text-[13px] text-white tabular-nums">$1.81M SURFACED · 545,677 ORDERS</p>
+            <p className="font-mono text-[13px] text-white tabular-nums">545,677 ORDERS ANALYZED · EVERY NUMBER SOURCED</p>
             <p className="compass-eyebrow-dim mt-1">
-              MULTI-MARKET NETWORK <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
+              16-UNIT DESIGN PILOT <span className="ml-3"><span className="compass-live-dot" />LIVE</span>
             </p>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function Home() {
                   className="block px-4 py-2 mt-1 border-t border-[#1f1f1f] text-[13px]"
                   style={{ color: '#0066ff' }}
                 >
-                  All seven seats →
+                  All the seats →
                 </Link>
               </div>
             )}
@@ -213,25 +213,25 @@ export default function Home() {
       {/* Hero */}
       <section className="relative max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
         <div className="n86-hero-glow" aria-hidden />
-        <p className="compass-eyebrow mb-6 relative z-10">— For restaurant owners and operators</p>
+        <p className="compass-eyebrow mb-6 relative z-10">— Find the leak. Assign the fix. Keep the receipt.</p>
         <div className="relative z-10 grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start">
           <div className="n86-hero-enter">
             <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
-              Find the leak. <em>Name who</em><br />
-              owns it. <em>Keep</em> the receipt.
+              Your P&amp;L is 30 days late.<br />
+              <em>Your problems aren&apos;t.</em>
             </h1>
             <p className="compass-body text-lg md:text-xl max-w-2xl">
-              Send us a sales report from your register. In 30 seconds we show you where money is
-              slipping away — which store, which shift, whose name — and what to do about it.
-              No spreadsheets. No waiting on the accountant.
+              Never 86&apos;d turns yesterday&apos;s restaurant numbers into today&apos;s ranked actions —
+              where margin leaked, who owns the fix, and what happens next. In plain English,
+              every morning. No spreadsheets. No waiting on the accountant.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: 'Try it free — no card', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
-                Try it free — no card needed →
+              <Link href="/trial" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: 'Start the free leak audit', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>
+                Start the free leak audit →
               </Link>
-              <Link href="/pricing" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/pricing', label: 'See pricing', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
-                See pricing
-              </Link>
+              <a href="#what" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '#what', label: 'See how it works', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+                See how it works
+              </a>
             </div>
           </div>
 
@@ -251,20 +251,20 @@ export default function Home() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Money found</p>
-            <p className="compass-kpi-val">$<span>1.81</span><span className="unit">M</span></p>
-          </div>
-          <div className="compass-kpi">
-            <p className="compass-kpi-label">Orders checked</p>
+            <p className="compass-kpi-label">Real orders analyzed</p>
             <p className="compass-kpi-val">545<span className="unit">,677</span></p>
           </div>
           <div className="compass-kpi">
-            <p className="compass-kpi-label">Tools free to try</p>
-            <p className="compass-kpi-val">8<span className="unit">/24</span></p>
+            <p className="compass-kpi-label">Checks live on your numbers today</p>
+            <p className="compass-kpi-val">2<span className="unit">free</span></p>
           </div>
           <div className="compass-kpi">
             <p className="compass-kpi-label">Set up yourself in</p>
             <p className="compass-kpi-val">15<span className="unit">min</span></p>
+          </div>
+          <div className="compass-kpi">
+            <p className="compass-kpi-label">Money-back window</p>
+            <p className="compass-kpi-val">30<span className="unit">days</span></p>
           </div>
         </div>
       </section>
@@ -277,7 +277,7 @@ export default function Home() {
             It doesn&apos;t say voids are up. <em>It names who.</em>
           </h2>
           <p className="compass-body text-lg max-w-2xl mb-12">
-            A sample 5-store group — real math, names hidden. The same tool checked <span className="text-white font-semibold">$15.72M across 545,677 real orders</span> for our first partner and found <span className="text-white font-semibold">$1.81M</span> in leaks, every dollar traced back to its source. On your own report it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>the free trial</Link> — and it names <em>your</em> stores, not these.
+            A sample 5-store group — real math, names hidden. In a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-white font-semibold">545,677 real orders</span> — $15.72M checked to the cent — and surfaced <span className="text-white font-semibold">an estimated $1.81M</span> of annual leak, every figure labeled. On your own report it runs in 30 seconds at <Link href="/trial" className="underline" style={{ textDecorationColor: '#0066ff' }}>the free leak audit</Link> — and it names <em>your</em> stores, not these.
           </p>
 
           <div className="grid lg:grid-cols-[340px_1fr] gap-4">
@@ -289,11 +289,11 @@ export default function Home() {
                 <p className="compass-body text-[14px] mt-2" style={{ color: '#86868b' }}>Downtown · 41 voided items · $4,200 in voids</p>
               </div>
               <div className="mt-8">
-                <p className="font-mono text-[13px]" style={{ color: '#6e6e73' }}>EXCESS ABOVE PEER BAND · ANNUALIZED</p>
+                <p className="font-mono text-[13px]" style={{ color: '#6e6e73' }}>MORE VOIDS THAN A NORMAL STORE · FULL-YEAR PACE</p>
                 <p className="font-serif text-4xl text-white mt-1" style={{ letterSpacing: '-0.02em' }}>~$21,600<span className="text-[20px]" style={{ color: '#6e6e73' }}>/yr</span></p>
                 <div className="flex gap-2 mt-4">
                   <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(52,199,89,0.10)', color: '#34c759', border: '1px solid rgba(52,199,89,0.25)' }}>VERIFIED · void counts</span>
-                  <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.10)', color: '#ff9500', border: '1px solid rgba(255,149,0,0.25)' }}>ESTIMATED · annualized</span>
+                  <span className="font-mono text-[11px] px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.10)', color: '#ff9500', border: '1px solid rgba(255,149,0,0.25)' }}>ESTIMATED · full-year pace</span>
                 </div>
               </div>
             </div>
@@ -301,8 +301,8 @@ export default function Home() {
             {/* The store table */}
             <div className="compass-card overflow-x-auto" style={{ padding: 0 }}>
               <div className="px-5 pt-5 pb-3 flex items-center justify-between flex-wrap gap-2">
-                <p className="compass-card-label">— 5 stores · void rate vs peer band</p>
-                <p className="font-mono text-[12px]" style={{ color: '#6e6e73' }}>PEER MEDIAN 0.51%</p>
+                <p className="compass-card-label">— 5 stores · void rate vs the normal range</p>
+                <p className="font-mono text-[12px]" style={{ color: '#6e6e73' }}>TYPICAL STORE 0.51%</p>
               </div>
               <table className="w-full text-[14px]">
                 <tbody>
@@ -316,7 +316,7 @@ export default function Home() {
                     <tr key={r.store} style={{ borderTop: '1px solid #1f1f1f' }}>
                       <td className="px-5 py-3 text-white font-medium whitespace-nowrap" style={{ width: 130 }}>
                         {r.store}
-                        {r.flagged && <span className="ml-2 font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,102,255,0.14)', color: '#0066ff' }}>ABOVE BAND</span>}
+                        {r.flagged && <span className="ml-2 font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,102,255,0.14)', color: '#0066ff' }}>ABOVE NORMAL</span>}
                       </td>
                       <td className="px-3 py-3" style={{ width: '100%' }}>
                         <div className="h-2 rounded-full" style={{ width: `${r.bar}%`, background: r.flagged ? '#0066ff' : '#2c2c2e', transition: 'width 900ms cubic-bezier(0.16,1,0.3,1)' }} />
@@ -327,7 +327,7 @@ export default function Home() {
                 </tbody>
               </table>
               <div className="px-5 py-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: '1px solid #1f1f1f' }}>
-                <p className="compass-body text-[13px]" style={{ color: '#86868b' }}>One store above the band. One name inside it. That&apos;s the whole job.</p>
+                <p className="compass-body text-[13px]" style={{ color: '#86868b' }}>One store above the normal range. One name inside it. That&apos;s the whole job.</p>
                 <Link href="/trial" onClick={() => trackEvent('home_proof_cta_click', { meta: { target: '/trial', label: 'Run it on your numbers' } })} className="btn-primary text-[13px]" style={{ background: '#0066ff' }}>Run it on your numbers →</Link>
               </div>
             </div>
@@ -406,67 +406,67 @@ export default function Home() {
             From the solo operator <em>to the C-suite.</em>
           </h2>
           <p className="compass-body text-lg max-w-3xl mb-14">
-            Two ways to use it. <span className="text-white font-semibold">Pulse</span> is for a 1–2 store operator — it shows your prime cost (food and labor as a share of sales) every morning, names the leak, and tells you the fix. $199/mo. <span className="text-white font-semibold">The full system</span> runs an entire multi-store group, and it&apos;s live inside a 16-unit chef-led group today. Not sure which fits? Start with the free trial — everyone does.
+            Two ways to use it. <span className="text-white font-semibold">Never 86&apos;d Owner</span> is for a 1–2 store operator — a ranked Morning Brief from your own numbers: where margin leaked, who owns the fix, what happens next. $199/mo. <span className="text-white font-semibold">Never 86&apos;d Command</span> runs a whole group, proven in a working design pilot with a 16-unit chef-led group. Not sure which fits? Start with the free leak audit — everyone does.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Free trial</p>
+              <p className="compass-card-label">— Free Leak Audit</p>
               <h3>Start here. Free.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
                 One store, doing the ops, the books, and the floor yourself at 11pm? Send one sales report and see your leak in 30 seconds. No card.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60-minute free trial · one sales report · no card</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>All 8 tools free to try (Void Hunter · Leak Detector · Labor Drift · Tip Variance · Catering Leak · Beverage Cost · Vendor Drift · Refund Auditor)</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>60 minutes · one sales report · no card</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>2 checks run live on your own numbers today · 6 more as interactive demos</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Direct line to the founder</span></li>
               </ul>
-              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the trial' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
-                Start the trial
+              <Link href="/trial" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'trial', target: '/trial', label: 'Start the free leak audit' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+                Start the free leak audit
               </Link>
             </div>
 
             <div className="compass-card flex flex-col" style={{ borderColor: '#0066ff' }}>
-              <p className="compass-card-label" style={{ color: '#0066ff' }}>— Pulse · $199/mo</p>
-              <h3>1–2 units. Your prime cost, daily.</h3>
+              <p className="compass-card-label" style={{ color: '#0066ff' }}>— Never 86&apos;d Owner · $199/mo</p>
+              <h3>1–2 stores. Your Morning Brief.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                Most independents see prime cost when the accountant sends it — weeks late. Pulse shows it every morning, wired to your live POS, with one coach card per leak telling you what to do.
+                Most independents see prime cost when the accountant sends it — weeks late. Owner gives you a ranked Morning Brief from your own numbers every day: the leak, the owner of the fix, the next move.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Daily food cost · 30/60/90-day prime cost trend</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Cross-vendor cheapest-price compare · per-name alerts</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>A coach card per leak — what to do, not just what broke</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>Cheapest-price compare across your vendors · per-name alerts</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#0066ff' }}>✓</span><span>$199/mo Charter rate — first 100 operators · 30-day refund</span></li>
               </ul>
-              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'pulse', target: '/onboard', label: 'Join the Pulse waitlist' } })} className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
-                Join the Pulse waitlist →
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'pulse', target: '/onboard', label: 'Become a Charter Operator' } })} className="btn-primary mt-auto" style={{ background: '#0066ff' }}>
+                Become a Charter Operator →
               </Link>
             </div>
 
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Operator Suite · $999/mo</p>
-              <h3>3–9 units. Full native starts here.</h3>
+              <p className="compass-card-label">— Never 86&apos;d Command · $499/location/mo</p>
+              <h3>3–9 locations. The whole group, one screen.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                The full operating system at group scale. Everything in Pulse, plus the network view — peer bands across your fleet, per-role lenses for CFO / COO / Chef / Owner, roll-up and drill-down.
+                Everything in Owner, for every store at once — roll up to the top, drill into one, see each store against the normal range for your group, and every fix assigned to a name.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Peer-band analysis across your fleet</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-role lenses · CEO · CFO · COO · Chef · Owner</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Slack + Teams integration · unlimited history</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Every store compared against the rest of your group</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>A screen built for each person · CEO / CFO / COO / Chef / Owner</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Entry: a three-location, 90-day paid pilot</span></li>
               </ul>
-              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator_suite', target: '/onboard', label: 'Talk to us' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
-                Talk to us
+              <Link href="/onboard" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'operator_suite', target: '/onboard', label: 'Start a three-store pilot' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
+                Start a three-store pilot
               </Link>
             </div>
 
             <div className="compass-card flex flex-col">
-              <p className="compass-card-label">— Enterprise · 10+ units</p>
-              <h3>Multi-brand. Full native.</h3>
+              <p className="compass-card-label">— Never 86&apos;d Enterprise · 10+ locations</p>
+              <h3>Multi-brand. Custom scope.</h3>
               <p className="compass-body text-[14px] mt-3 mb-5">
-                The whole operating system under your brands — per-brand isolation, SSO, custom POS integrations. Running inside a 16-unit chef-led group today. We don&apos;t publish the rest — email Myke.
+                The whole system under your brands, scoped with you — integrations, controls, and deployment sized to how your group actually runs. We don&apos;t publish the rest — email Myke.
               </p>
               <ul className="space-y-2 mb-6 flex-1">
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Per-brand tenant isolation</span></li>
-                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>SSO · Okta / Azure AD / Google · custom POS (Aloha · PDQ)</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Custom scope: SSO (one company login) · custom POS · per-brand controls</span></li>
+                <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Scoped and priced with you — no off-the-shelf promises</span></li>
                 <li className="compass-body text-[13px] flex gap-2"><span style={{ color: '#34c759' }}>✓</span><span>Quarterly business review with the founder</span></li>
               </ul>
               <a href="mailto:myke@n86.app?subject=Enterprise%20pricing" onClick={() => trackEvent('home_audience_cta_click', { meta: { tier: 'enterprise', target: 'mailto', label: 'Email myke@n86.app' } })} className="btn-secondary mt-auto" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff', border: '1px solid #2c2c2e' }}>
@@ -504,10 +504,10 @@ export default function Home() {
               The first version was a single HTML file on my laptop. I was trying to figure out why food cost drifted four points one week and nobody could explain it. I wrote the math, fed in my own Z-reports, and it pointed at the right station. Then it pointed at the next leak. Then the next.
             </p>
             <p>
-              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — overstated by $6.5M. So I walked it back, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
+              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — $8.3M that walked back to $1.81M. So I corrected it, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
             <p>
-              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same code. Same show-our-work rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
+              Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same show-our-work rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
             </p>
             <p style={{ color: '#86868b' }}>— Myke Mueller · Fort Dodge, Iowa</p>
           </div>

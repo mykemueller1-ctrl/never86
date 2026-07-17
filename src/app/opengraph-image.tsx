@@ -128,7 +128,7 @@ export default async function OG() {
             paddingTop: 24,
           }}
         >
-          <div>$1.81M surfaced · 545,677 orders · built by operators</div>
+          <div>545,677 orders analyzed · every number sourced · built by operators</div>
           <div
             style={{
               color: '#ffffff',

@@ -43,7 +43,7 @@ export default function PosLandingPage({ params }: { params: { pos: string } }) 
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">for {p.name}</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · POS-specific guide</p>
+              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · POS-specific guide</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">

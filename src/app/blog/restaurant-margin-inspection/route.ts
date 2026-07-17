@@ -126,7 +126,7 @@ const html = `<!DOCTYPE html>
     <li><strong>Cash handling.</strong> Daily deposits matched to POS sales. Gaps mean skimming — which means the real revenue is higher than reported, or the controls are broken. Either changes the price.</li>
     <li><strong>Prime cost trend.</strong> Food plus labor over 65% of revenue signals recipe drift, theft, or scheduling problems the seller either can't see or doesn't want you to.</li>
   </ul>
-  <p>For a 16-unit chef-led group, Never 86'd reconciled $15.72M across 545,677 orders and documented a $1.81M recovery surface — voids, 3P fees, labor drift, catering leaks — sourced to the cent against their own POS data. Our first model overstated that number; we walked it back in writing, in front of the client. In diligence, the discipline of publishing corrections is the product.</p>
+  <p>In a working design pilot with a 16-unit chef-led group, Never 86'd checked $15.72M across 545,677 orders to the cent and surfaced an estimated $1.81M of annual leak — voids, delivery fees, labor drift, catering gaps — every figure labeled against their own POS data. Our first model overstated that number; we walked it back in writing, in front of the design partner. In diligence, the discipline of publishing corrections is the product.</p>
 
   <div class="oneliner">
     The P&amp;L review = the seller's story.<br>

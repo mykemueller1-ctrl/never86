@@ -59,7 +59,7 @@ export default function OperatorsLanding() {
               <p className="font-serif text-[24px] leading-none text-white">
                 Never 86&apos;d <span className="italic text-white/70">for operators</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Operator OS · 15 minutes</p>
+              <p className="compass-eyebrow-dim mt-2">Built by an operator · 15 minutes</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -72,8 +72,8 @@ export default function OperatorsLanding() {
       <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-16">
         <p className="compass-eyebrow mb-6">— For operators</p>
         <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
-          15 minutes. <em>One signal.</em><br />
-          One <em>recovery.</em>
+          15 minutes. <em>One leak.</em><br />
+          One <em>name.</em>
         </h1>
         <div className="flex flex-wrap gap-3">
           <Link href="#talk" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '#talk', label: 'Talk to us', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>Talk to us →</Link>
