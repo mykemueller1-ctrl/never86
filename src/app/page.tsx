@@ -35,12 +35,11 @@ const OPERATOR_DROPDOWN = [
 ];
 
 const SECTIONS = [
-  { n: '01', label: 'The story', href: '#who' },
-  { n: '02', label: 'What we offer', href: '#offer-tiers' },
-  { n: '03', label: "Myke's story", href: '#myke' },
-  { n: '04', label: 'What we do', href: '#what' },
-  { n: '05', label: 'Free to try', href: '#agents' },
-  { n: '06', label: 'Pick your seat', href: '#seats' },
+  { n: '01', label: 'What we offer', href: '#offer-tiers' },
+  { n: '02', label: "Myke's story", href: '#myke' },
+  { n: '03', label: 'What we do', href: '#what' },
+  { n: '04', label: 'Try it free', href: '#agents' },
+  { n: '05', label: 'Talk to us', href: '#offer' },
 ];
 
 export default function Home() {
@@ -197,10 +196,13 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Numbered section nav */}
-        <nav className="compass-section-nav mt-6">
+      </div>
+
+      {/* Numbered section nav — sticky tab bar */}
+      <div className="sticky top-0 z-40" style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid #1f1f1f' }}>
+        <nav className="compass-section-nav max-w-7xl mx-auto px-6 py-3">
           {SECTIONS.map((s) => (
-            <Link key={s.n} href={s.href}>
+            <Link key={s.n} href={s.href} onClick={() => trackEvent('home_section_tab_click', { meta: { target: s.href, label: s.label } })}>
               <span className="num">{s.n}</span>
               <span>{s.label}</span>
             </Link>
@@ -396,39 +398,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* § 01 · THE STORY */}
-      <section id="who" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
-          <div>
-            <p className="compass-eyebrow mb-4">— 01 · The story</p>
-            <h2 className="compass-display text-4xl md:text-6xl">
-              Built by an operator. <em>For operators.</em>
-            </h2>
-          </div>
-          <div className="space-y-7 compass-body text-lg leading-relaxed max-w-2xl">
-            <p>
-              Never 86&apos;d started as the calculator we made for our own restaurant — <span className="text-white font-semibold">Community Tap &amp; Pizza, Fort Dodge, Iowa</span>. Myke Mueller (founder) was an operator first, founder second. Still is.
-            </p>
-            <p>
-              The first version was an HTML page open on Myke&apos;s laptop on a Tuesday at 11pm trying to figure out why food cost drifted four points week-over-week. The math caught it. So did the next leak. And the next.
-            </p>
-            <p>
-              We now serve a <span className="text-white font-semibold">16-unit chef-led group</span> as our first design partner. $15.72M reconciled across 545,677 orders. $1.81M recovery surface, sourced to the cent.
-            </p>
-            <p>
-              The rule that runs the company: <span className="text-white font-semibold">when our model is wrong, we publish the correction.</span> The first time it happened we walked an $8.3M number down to $1.81M, in writing, to the design partner who&apos;d already seen the original figure. That&apos;s why they stayed. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
-            </p>
-            <p>
-              Today we serve the whole ladder — <span className="text-white font-semibold">solo operator on one Toast terminal, all the way to a CEO running 50 stores across three brands.</span> Same show-our-work discipline. Same operator-first ethos. The price scales; the rule doesn&apos;t.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* § 02 · WHAT WE OFFER — independent → enterprise */}
+      {/* § 01 · WHAT WE OFFER — independent → enterprise */}
       <section id="offer-tiers" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 02 · What we offer</p>
+          <p className="compass-eyebrow mb-4">— 01 · What we offer</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-6">
             From the solo operator <em>to the C-suite.</em>
           </h2>
@@ -506,10 +479,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* § 03 · MYKE'S STORY — first-person */}
+      {/* § 02 · MYKE'S STORY — first-person */}
       <section id="myke" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-3xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 03 · Myke&apos;s story</p>
+          <p className="compass-eyebrow mb-4">— 02 · Myke&apos;s story</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10">
             I built this <em>for myself first.</em>
           </h2>
@@ -531,7 +504,7 @@ export default function Home() {
               The first version was a single HTML file on my laptop. I was trying to figure out why food cost drifted four points one week and nobody could explain it. I wrote the math, fed in my own Z-reports, and it pointed at the right station. Then it pointed at the next leak. Then the next.
             </p>
             <p>
-              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — overstated by $6.5M. So I walked it back, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product.
+              <span className="text-white font-semibold">I knew it was a real product the day a chef-led 16-unit group asked if I could run it on their data.</span> I did. The first number we produced was wrong — overstated by $6.5M. So I walked it back, in writing, in front of them. That&apos;s when I knew the discipline of publishing corrections was the actual product. <Link href="/case/walked-the-number-back" onClick={() => trackEvent('home_case_link_click', { meta: { target: '/case/walked-the-number-back', label: 'Read the case · walkback' } })} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case.</Link>
             </p>
             <p>
               Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same code. Same show-our-work rule. Same operator-to-operator language. <span className="text-white font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
@@ -544,7 +517,7 @@ export default function Home() {
       {/* WHAT WE DO */}
       <section id="what" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6 bg-gradient-to-b from-[#0a0a0a] to-black">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 04 · What we do</p>
+          <p className="compass-eyebrow mb-4">— 03 · What we do</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-14">
             We sit on top of the systems you run<br />
             and tell you <em>where the numbers stop agreeing.</em>
@@ -591,26 +564,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-7 gap-2">
-            {FREE_AGENTS.map((a) => (
-              <Link key={a.name} href={a.href} className="compass-card text-center hover:border-[#0066ff] transition-colors block">
-                <p className="compass-card-label">{a.tag}</p>
-                <p className="font-serif text-[15px] mt-2 text-white leading-tight">{a.name}</p>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* Free agents */}
       <section id="agents" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 05 · Free to try</p>
+          <p className="compass-eyebrow mb-4">— 04 · Try it free</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-12">
             Try one. <em>Right now.</em>
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {FREE_AGENTS.map((a) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {FREE_AGENTS.slice(0, 3).map((a) => (
               <Link key={a.name} href={a.href} className="compass-card hover:border-[#0066ff] transition-colors block group">
                 <p className="compass-card-label">{a.tag}</p>
                 <h3 className="!mt-3">{a.name}</h3>
@@ -620,24 +585,13 @@ export default function Home() {
                 </p>
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pick your seat */}
-      <section id="seats" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
-        <div className="max-w-7xl mx-auto">
-          <p className="compass-eyebrow mb-4">— 06 · Pick your seat</p>
-          <h2 className="compass-display text-4xl md:text-6xl mb-12">
-            One system. <em>Seven roles.</em>
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            {SEATS.slice(1).map((s) => (
-              <Link key={s.name} href={s.href} onClick={() => trackEvent('home_persona_pill_click', { meta: { role: s.name, target: s.href, tag: s.tag, position: 'pick_seat_grid' } })} className="compass-card hover:border-[#0066ff] transition-colors text-center block">
-                <p className="compass-card-label">{s.tag}</p>
-                <p className="font-serif text-2xl md:text-3xl mt-2 text-white">{s.name}</p>
-              </Link>
-            ))}
+            <Link href="/agents" onClick={() => trackEvent('home_all_tools_click', { meta: { target: '/agents', label: 'See all 8 tools' } })} className="compass-card hover:border-[#0066ff] transition-colors block group flex flex-col justify-center text-center" style={{ borderStyle: 'dashed' }}>
+              <p className="font-serif text-3xl text-white leading-none">8</p>
+              <h3 className="!mt-2">See all the tools</h3>
+              <p className="compass-body text-[14px] mt-3 inline-flex items-center justify-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
+                What we check <span aria-hidden>→</span>
+              </p>
+            </Link>
           </div>
         </div>
       </section>
@@ -645,7 +599,7 @@ export default function Home() {
       {/* Talk to us */}
       <section id="offer" data-reveal className="border-t border-[#1f1f1f] py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto">
-          <p className="compass-eyebrow mb-4 text-center">— 07 · 15 minutes</p>
+          <p className="compass-eyebrow mb-4 text-center">— 05 · 15 minutes</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10 text-center">
             One call. <em>One signal.</em>
           </h2>
