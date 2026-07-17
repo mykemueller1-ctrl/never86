@@ -48,9 +48,9 @@ const TEAM: Member[] = [
   {
     initials: 'KA',
     name: 'Kristin Aduna',
-    role: 'Head of Ops',
+    role: 'Head of Product',
     where: '',
-    bio: 'Runs the day-to-day. Onboarding, support, the boring parts nobody sees. (Nobody sees them because she caught them first.)',
+    bio: 'Owns the product — the demo, the buyer journey, what ships next. If a prospect touches it, she shaped it. (The rough edges you never saw? She caught them first.)',
     monogramTone: 'ink',
   },
 ];
