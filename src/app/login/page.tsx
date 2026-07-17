@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const inputClass =
-  'w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors';
+  'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
 
 function LoginForm() {
   const router = useRouter();
@@ -81,8 +81,8 @@ export default function OperatorLoginPage() {
         <Link href="/" className="flex items-start gap-4 group">
           <span className="compass-mark">N</span>
           <span>
-            <p className="font-serif text-[24px] leading-none text-white">
-              Never 86&apos;d <span className="italic text-white/70">· sign in</span>
+            <p className="font-serif text-[24px] leading-none text-ink-800">
+              Never 86&apos;d <span className="italic text-ink-600">· sign in</span>
             </p>
             <p className="compass-eyebrow-dim mt-2">Your restaurant. Your numbers.</p>
           </span>

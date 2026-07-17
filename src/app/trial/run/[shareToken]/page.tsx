@@ -50,7 +50,7 @@ function VoidHunterView({ r, filename }: { r: any; filename: string | null }) {
             <tbody>
               {r.stores.map((s: any) => (
                 <tr key={s.name} style={{ color: '#d2d2d7' }}>
-                  <td className="!text-left text-white font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
+                  <td className="!text-left text-ink-800 font-medium">{s.name}{s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}</td>
                   <td className="font-mono tabular-nums">{usd(s.net)}</td>
                   <td className="font-mono tabular-nums">{usd(s.voids)}</td>
                   <td className="font-mono tabular-nums">{pct(s.voidRate)}</td>
@@ -105,7 +105,7 @@ function LeakDetectorView({ r, filename }: { r: any; filename: string | null }) 
             <tbody>
               {r.employees.slice(0, 20).map((e: any) => (
                 <tr key={`${e.store}-${e.name}`} style={{ color: '#d2d2d7' }}>
-                  <td className="!text-left text-white font-medium">{e.name}</td>
+                  <td className="!text-left text-ink-800 font-medium">{e.name}</td>
                   <td className="!text-left">{e.store}</td>
                   <td className="font-mono tabular-nums">{usd(e.netSales)}</td>
                   <td className="font-mono tabular-nums">{usd(e.voidsDollars)}</td>
@@ -133,8 +133,8 @@ export default async function SavedRunPage({ params }: { params: Params }) {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· saved run</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· saved run</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">{run.agent === 'void-hunter' ? 'Void Hunter' : 'Leak Detector'} · {new Date(run.createdAt).toLocaleString()}</p>
             </span>
@@ -152,7 +152,7 @@ export default async function SavedRunPage({ params }: { params: Params }) {
         {run.agent === 'leak-detector' && <LeakDetectorView r={r} filename={run.filename} />}
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <p className="compass-eyebrow mb-4">— The bridge · trial → operator app</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
@@ -163,16 +163,16 @@ export default async function SavedRunPage({ params }: { params: Params }) {
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <TrackedLink href={`/install?from=${run.shareToken}`} event="run_install_bridge_click" meta={{ shareToken: run.shareToken, agent: run.agent, position: 'bottom_cta' }} className="btn-primary" style={{ background: '#0066ff' }}>Install the operator app →</TrackedLink>
-            <TrackedLink href={`/trial/run/${run.shareToken}/proposal`} event="run_bottom_cta_click" meta={{ target: 'proposal', label: 'Print proposal', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Print proposal</TrackedLink>
-            <TrackedLink href="/pricing" event="run_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See pricing</TrackedLink>
+            <TrackedLink href={`/trial/run/${run.shareToken}/proposal`} event="run_bottom_cta_click" meta={{ target: 'proposal', label: 'Print proposal', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Print proposal</TrackedLink>
+            <TrackedLink href="/pricing" event="run_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', shareToken: run.shareToken, agent: run.agent }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See pricing</TrackedLink>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <span>This link is private. Share with your team — they can read but not edit.</span>
-          <TrackedLink href="/" event="run_footer_click" meta={{ target: '/', label: 'Home', shareToken: run.shareToken }} className="hover:text-white transition-colors">Home</TrackedLink>
+          <TrackedLink href="/" event="run_footer_click" meta={{ target: '/', label: 'Home', shareToken: run.shareToken }} className="hover:text-ink-800 transition-colors">Home</TrackedLink>
         </div>
       </footer>
     </main>

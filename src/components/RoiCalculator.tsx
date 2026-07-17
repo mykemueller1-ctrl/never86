@@ -31,7 +31,7 @@ export default function RoiCalculator() {
               value={sales}
               onChange={(e) => setSales(Math.max(0, Number(e.target.value) || 0))}
               aria-label="Monthly sales in dollars"
-              className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white text-2xl font-serif tabular-nums focus:outline-none focus:border-[#0066ff] transition-colors"
+              className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 text-2xl font-serif tabular-nums focus:outline-none focus:border-[#0066ff] transition-colors"
             />
           </div>
           <input
@@ -57,7 +57,7 @@ export default function RoiCalculator() {
                 style={
                   points === p
                     ? { background: '#0066ff', color: '#fff', border: '1px solid #0066ff' }
-                    : { background: 'transparent', color: '#86868b', border: '1px solid #2c2c2e' }
+                    : { background: 'transparent', color: '#86868b', border: '1px solid #d2d2d7' }
                 }
               >
                 {p} pt{p === 1 ? '' : 's'}
@@ -70,18 +70,18 @@ export default function RoiCalculator() {
         </div>
 
         {/* Output */}
-        <div className="text-center md:text-left md:border-l md:border-[#1f1f1f] md:pl-8">
+        <div className="text-center md:text-left md:border-l md:border-[#e8e8ed] md:pl-8">
           <p className="compass-card-label" style={{ color: '#86868b' }}>— That&apos;s worth</p>
-          <p className="font-serif text-white leading-none mt-3" style={{ fontSize: 'clamp(44px, 7vw, 72px)', letterSpacing: '-0.02em' }}>
+          <p className="font-serif text-ink-800 leading-none mt-3" style={{ fontSize: 'clamp(44px, 7vw, 72px)', letterSpacing: '-0.02em' }}>
             {usd(annual)}<span className="text-[24px]" style={{ color: '#6e6e73' }}>/yr</span>
           </p>
           <p className="font-mono text-[15px] mt-3" style={{ color: '#86868b' }}>
             {usd(monthly)}/mo · {points} point{points === 1 ? '' : 's'} of food cost
           </p>
           <p className="compass-body text-[14px] mt-5">
-            Pulse is <span className="text-white font-semibold">$199/mo</span>
+            Pulse is <span className="text-ink-800 font-semibold">$199/mo</span>
             {monthly >= 199
-              ? <> — this pace pays for it <span className="text-white font-semibold">{Math.round(monthly / 199)}× over</span> every month.</>
+              ? <> — this pace pays for it <span className="text-ink-800 font-semibold">{Math.round(monthly / 199)}× over</span> every month.</>
               : <>. Even a fraction of a point covers it.</>}
           </p>
           <Link

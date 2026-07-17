@@ -36,8 +36,8 @@ export function DemoChrome({
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· free agent</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· free agent</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Operator OS · agent demo</p>
             </span>
@@ -58,21 +58,21 @@ export function DemoChrome({
       {/* Demo body — light card on dark page so the existing interactive UI
           stays readable. The surrounding chrome is compass-dark. */}
       <div className="max-w-5xl mx-auto px-6 pb-12">
-        <div className="bg-white text-ink-800 rounded-2xl p-6 md:p-8 border border-[#1f1f1f]">
+        <div className="bg-white text-ink-800 rounded-2xl p-6 md:p-8 border border-[#e8e8ed]">
           {children}
         </div>
       </div>
 
       <AgentUnlock agentName={title} />
 
-      <section className="border-t border-[#1f1f1f] px-6 py-12">
+      <section className="border-t border-[#e8e8ed] px-6 py-12">
         <div className="max-w-6xl mx-auto">
           <p className="compass-eyebrow mb-4">— Try another agent</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {others.map((a) => (
               <TrackedLink key={a.name} href={a.href} event="demo_try_another_click" meta={{ from: title, to: a.name, target: a.href }} className="compass-card hover:border-[#0066ff] transition-colors block group">
                 <p className="compass-card-label">{a.tag}</p>
-                <p className="font-serif text-[17px] mt-2 text-white leading-tight">{a.name}</p>
+                <p className="font-serif text-[17px] mt-2 text-ink-800 leading-tight">{a.name}</p>
                 <p className="text-[12px] mt-2 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
                   Open <span aria-hidden>→</span>
                 </p>
@@ -82,15 +82,15 @@ export function DemoChrome({
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <TrackedLink href="/for" event="demo_footer_click" meta={{ agent: title, target: '/for', label: 'Seats' }} className="hover:text-white transition-colors">Seats</TrackedLink>
-            <TrackedLink href="/" event="demo_footer_click" meta={{ agent: title, target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
+            <TrackedLink href="/for" event="demo_footer_click" meta={{ agent: title, target: '/for', label: 'Seats' }} className="hover:text-ink-800 transition-colors">Seats</TrackedLink>
+            <TrackedLink href="/" event="demo_footer_click" meta={{ agent: title, target: '/', label: 'Home' }} className="hover:text-ink-800 transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>

@@ -110,8 +110,8 @@ export default function ConnectPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· connect</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· connect</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · Void Hunter · CSV upload</p>
             </span>
@@ -150,13 +150,13 @@ export default function ConnectPage() {
             {status === 'running' ? (
               <>
                 <p className="compass-eyebrow mb-3">— Running</p>
-                <p className="font-serif text-2xl text-white">Analyzing <em>{filename}</em>…</p>
+                <p className="font-serif text-2xl text-ink-800">Analyzing <em>{filename}</em>…</p>
                 <p className="compass-body text-sm mt-3">Should be done in a moment.</p>
               </>
             ) : (
               <>
                 <p className="compass-eyebrow mb-3">— Drop a CSV here</p>
-                <p className="font-serif text-3xl text-white mb-2">Click to choose · or drag a file</p>
+                <p className="font-serif text-3xl text-ink-800 mb-2">Click to choose · or drag a file</p>
                 <p className="compass-body text-sm">Required columns: Location · Employee · Net Sales · Void Amount</p>
               </>
             )}
@@ -166,18 +166,18 @@ export default function ConnectPage() {
         {status === 'error' && (
           <div className="compass-card mt-4" style={{ borderColor: '#ff453a' }}>
             <p className="compass-card-label" style={{ color: '#ff453a' }}>— Couldn&apos;t parse</p>
-            <p className="font-serif text-xl text-white mt-3">{errMsg}</p>
+            <p className="font-serif text-xl text-ink-800 mt-3">{errMsg}</p>
             {errHint && <p className="compass-body text-sm mt-3">{errHint}</p>}
             {detectedCols.length > 0 && (
               <p className="compass-body text-sm mt-3">
                 <span className="text-[#6e6e73]">Columns we saw:</span>{' '}
-                <span className="font-mono text-white">{detectedCols.join(' · ')}</span>
+                <span className="font-mono text-ink-800">{detectedCols.join(' · ')}</span>
               </p>
             )}
             <button
               onClick={() => { setStatus('idle'); setErrMsg(''); }}
               className="btn-secondary mt-5"
-              style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}
+              style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}
             >
               Try another file
             </button>
@@ -187,7 +187,7 @@ export default function ConnectPage() {
 
       {status === 'done' && result && (
         <>
-          <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+          <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
             <div className="max-w-5xl mx-auto">
               <p className="compass-eyebrow mb-4">— Result · {filename}</p>
               <h2 className="compass-display text-3xl md:text-5xl mb-10">
@@ -242,7 +242,7 @@ export default function ConnectPage() {
                       <tbody>
                         {result.stores.map((s) => (
                           <tr key={s.name} style={{ color: '#d2d2d7' }}>
-                            <td className="!text-left text-white font-medium">
+                            <td className="!text-left text-ink-800 font-medium">
                               {s.name}
                               {s.flagged ? <span className="badge badge-unverified ml-2">Above band</span> : null}
                             </td>
@@ -275,7 +275,7 @@ export default function ConnectPage() {
                       <tbody>
                         {result.employees.map((e, i) => (
                           <tr key={`${e.store}-${e.name}-${i}`} style={{ color: '#d2d2d7' }}>
-                            <td className="!text-left text-white font-medium">
+                            <td className="!text-left text-ink-800 font-medium">
                               {e.name}
                               {e.flagged ? <span className="badge badge-unverified ml-2">Review</span> : null}
                             </td>
@@ -295,7 +295,7 @@ export default function ConnectPage() {
             </div>
           </section>
 
-          <section className="border-t border-[#1f1f1f] py-16 md:py-20 px-6">
+          <section className="border-t border-[#e8e8ed] py-16 md:py-20 px-6">
             <div className="max-w-xl mx-auto">
               <p className="compass-eyebrow mb-4 text-center">— Want this on every shift</p>
               <h2 className="compass-display text-3xl md:text-5xl mb-8 text-center">
@@ -303,14 +303,14 @@ export default function ConnectPage() {
               </h2>
               {saveStatus === 'sent' ? (
                 <div className="compass-card text-center">
-                  <p className="font-serif text-2xl text-white">You&apos;re in.</p>
+                  <p className="font-serif text-2xl text-ink-800">You&apos;re in.</p>
                   <p className="compass-body mt-3">Myke will reach out within 24 hours to wire Void Hunter to your live POS feed.</p>
                 </div>
               ) : (
                 <form onSubmit={saveResult} className="compass-card space-y-3">
-                  <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-                  <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                  <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+                  <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
                   <button
                     type="submit"
                     disabled={saveStatus === 'sending'}
@@ -327,16 +327,16 @@ export default function ConnectPage() {
         </>
       )}
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/onboard"  className="hover:text-white transition-colors">Full onboard</Link>
-            <Link href="/answers"  className="hover:text-white transition-colors">Answers</Link>
-            <Link href="/"         className="hover:text-white transition-colors">Home</Link>
+            <Link href="/onboard"  className="hover:text-ink-800 transition-colors">Full onboard</Link>
+            <Link href="/answers"  className="hover:text-ink-800 transition-colors">Answers</Link>
+            <Link href="/"         className="hover:text-ink-800 transition-colors">Home</Link>
           </div>
         </div>
       </footer>

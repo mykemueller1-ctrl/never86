@@ -16,7 +16,7 @@ export async function GET(req: Request) {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #0066ff 0%, #003bb5 100%)',
-          color: '#ffffff',
+          color: '#1d1d1f',
           fontFamily: 'Georgia, "Times New Roman", serif',
           fontStyle: 'italic',
           fontWeight: 500,

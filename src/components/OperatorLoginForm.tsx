@@ -5,7 +5,7 @@ import { useState } from 'react';
 type OperatorOption = { operatorId: number; name: string };
 
 const inputClass =
-  'w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors';
+  'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
 
 export default function OperatorLoginForm({ operators }: { operators: OperatorOption[] }) {
   const [operatorId, setOperatorId] = useState(operators[0]?.operatorId?.toString() ?? '');

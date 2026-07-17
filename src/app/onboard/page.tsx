@@ -35,7 +35,7 @@ const DATA_OPTIONS = [
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-const inputClass = "w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors";
+const inputClass = "w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors";
 
 export default function OnboardPage() {
   const [step, setStep] = useState(1);
@@ -92,7 +92,7 @@ export default function OnboardPage() {
   }
 
   const pickClass = (selected: boolean) =>
-    `compass-card text-left transition-all cursor-pointer ${selected ? '!border-[#0066ff]' : 'hover:border-[#2c2c2e]'}`;
+    `compass-card text-left transition-all cursor-pointer ${selected ? '!border-[#0066ff]' : 'hover:border-[#d2d2d7]'}`;
 
   return (
     <main className="compass min-h-screen">
@@ -101,8 +101,8 @@ export default function OnboardPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· onboard</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· onboard</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Set yourself up · 4 quick steps</p>
             </span>
@@ -161,12 +161,12 @@ export default function OnboardPage() {
               <div className="grid sm:grid-cols-2 gap-3">
                 {POS_OPTIONS.map((opt) => (
                   <button key={opt} type="button" onClick={() => { if (opt !== posType) trackEvent('onboard_pos_selected', { meta: { posType: opt } }); setPosType(opt); }} className={pickClass(posType === opt)}>
-                    <p className="font-serif text-xl text-white tracking-tight">{opt}</p>
+                    <p className="font-serif text-xl text-ink-800 tracking-tight">{opt}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 2 } }); setStep(1); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 2 } }); setStep(1); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
                 <button type="button" onClick={() => { if (step2Valid) { trackEvent('onboard_step_2_complete', { meta: { posType } }); setStep(3); } }} disabled={!step2Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
               </div>
             </div>
@@ -181,13 +181,13 @@ export default function OnboardPage() {
               <div className="grid sm:grid-cols-2 gap-3">
                 {AGENT_OPTIONS.map((a) => (
                   <button key={a.v} type="button" onClick={() => { if (a.v !== interestedAgent) trackEvent('onboard_agent_selected', { meta: { interestedAgent: a.v } }); setInterestedAgent(a.v); }} className={pickClass(interestedAgent === a.v)}>
-                    <p className="font-serif text-xl text-white tracking-tight mb-1">{a.v}</p>
+                    <p className="font-serif text-xl text-ink-800 tracking-tight mb-1">{a.v}</p>
                     <p className="compass-body text-sm leading-snug">{a.d}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 3 } }); setStep(2); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 3 } }); setStep(2); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
                 <button type="button" onClick={() => { if (step3Valid) { trackEvent('onboard_step_3_complete', { meta: { interestedAgent } }); setStep(4); } }} disabled={!step3Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
               </div>
             </div>
@@ -202,13 +202,13 @@ export default function OnboardPage() {
               <div className="grid gap-3">
                 {DATA_OPTIONS.map((d) => (
                   <button key={d.v} type="button" onClick={() => { if (d.v !== dataPreference) trackEvent('onboard_data_pref_selected', { meta: { dataPreference: d.v } }); setDataPreference(d.v); }} className={pickClass(dataPreference === d.v)}>
-                    <p className="font-serif text-xl text-white tracking-tight mb-1">{d.v}</p>
+                    <p className="font-serif text-xl text-ink-800 tracking-tight mb-1">{d.v}</p>
                     <p className="compass-body text-sm leading-snug">{d.d}</p>
                   </button>
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 4 } }); setStep(3); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>← Back</button>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 4 } }); setStep(3); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
                 <button type="button" onClick={handleSubmit} disabled={!step4Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
                   {status === 'loading' ? 'Sending…' : 'Finish →'}
                 </button>
@@ -224,14 +224,14 @@ export default function OnboardPage() {
                 <em>Welcome.</em>
               </h1>
               <p className="compass-body text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-                <span className="text-white font-semibold">{interestedAgent}</span> is queued for{' '}
-                <span className="text-white font-semibold">{restaurantName}</span>.
-                Myke will reach out from <span className="font-mono text-white">myke@n86.app</span> within 24 hours.
+                <span className="text-ink-800 font-semibold">{interestedAgent}</span> is queued for{' '}
+                <span className="text-ink-800 font-semibold">{restaurantName}</span>.
+                Myke will reach out from <span className="font-mono text-ink-800">myke@n86.app</span> within 24 hours.
               </p>
 
               <div className="compass-card text-left mb-8">
                 <p className="compass-card-label">What you told us</p>
-                <ul className="space-y-2 mt-3" style={{ color: '#c7c7cc' }}>
+                <ul className="space-y-2 mt-3" style={{ color: '#515154' }}>
                   <li><span style={{ color: '#6e6e73' }}>Restaurant ·</span> {restaurantName}{units ? ` (${units} units)` : ''}</li>
                   <li><span style={{ color: '#6e6e73' }}>POS ·</span> {posType}</li>
                   <li><span style={{ color: '#6e6e73' }}>Checking ·</span> {interestedAgent}</li>
@@ -255,13 +255,13 @@ export default function OnboardPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6 mt-10">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6 mt-10">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
         </div>
       </footer>
     </main>

@@ -22,8 +22,8 @@ export default function InstallPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· install the operator app</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· install the operator app</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · upgrade from /trial to the live product</p>
             </span>
@@ -42,7 +42,7 @@ export default function InstallPage() {
         </p>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-12 md:py-16 px-6">
+      <section className="border-t border-[#e8e8ed] py-12 md:py-16 px-6">
         <div className="max-w-5xl mx-auto">
           <p className="compass-eyebrow mb-4">— What ships when we install your operator app</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
@@ -52,7 +52,7 @@ export default function InstallPage() {
             <div className="compass-card">
               <p className="compass-card-label">— AI workforce · today</p>
               <h3>7 agents live · 17 in the pipeline</h3>
-              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Live in production today (7):</span> UNKNOWN bug detector · Pour variance · Weight adherence · Driver payout audit · Modifier mispricing · Comp anomaly · Void anomaly. <span style={{ color: '#0066ff' }}>Q3 ROADMAP (17 more):</span> Margin Hunter · Daily Brief · Voids &amp; Comps Watcher · Cash Reconciliation · Inventory/COGS · Schedule Optimizer · Vendor Drift · Beverage Cost · Menu Engineer · Refund Auditor · Catering Channel · Loyalty · Competitive Pricing · Reviews · HR Write-Up · Onboarding · Shift Lead Coach · Battlecard.</p>
+              <p className="compass-body text-[14px] mt-3"><span className="text-ink-800 font-semibold">Live in production today (7):</span> UNKNOWN bug detector · Pour variance · Weight adherence · Driver payout audit · Modifier mispricing · Comp anomaly · Void anomaly. <span style={{ color: '#0066ff' }}>Q3 ROADMAP (17 more):</span> Margin Hunter · Daily Brief · Voids &amp; Comps Watcher · Cash Reconciliation · Inventory/COGS · Schedule Optimizer · Vendor Drift · Beverage Cost · Menu Engineer · Refund Auditor · Catering Channel · Loyalty · Competitive Pricing · Reviews · HR Write-Up · Onboarding · Shift Lead Coach · Battlecard.</p>
             </div>
             <div className="compass-card">
               <p className="compass-card-label">— The Brain</p>
@@ -67,12 +67,12 @@ export default function InstallPage() {
             <div className="compass-card">
               <p className="compass-card-label">— Multi-tenant · today</p>
               <h3>Per-operator data isolation</h3>
-              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Today:</span> operator_id everywhere in one Neon Postgres — every query scoped per tenant. <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> full DB-per-operator (one Neon project per signed operator). &ldquo;Never blend companies&rdquo; is the contract — operator_id today, separate DB by Q3.</p>
+              <p className="compass-body text-[14px] mt-3"><span className="text-ink-800 font-semibold">Today:</span> operator_id everywhere in one Neon Postgres — every query scoped per tenant. <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> full DB-per-operator (one Neon project per signed operator). &ldquo;Never blend companies&rdquo; is the contract — operator_id today, separate DB by Q3.</p>
             </div>
             <div className="compass-card">
               <p className="compass-card-label">— Auth · honest state</p>
               <h3>Magic-link · coming with Owner</h3>
-              <p className="compass-body text-[14px] mt-3"><span className="text-white font-semibold">Today:</span> shared password at <span className="font-mono">/reports/login</span> for charter partners only (per-tenant cookies, 12-hour lifetime). <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> magic-link signup at /pulse, per-user sessions, PIN-by-department for managers/crew. WebAuthn after that.</p>
+              <p className="compass-body text-[14px] mt-3"><span className="text-ink-800 font-semibold">Today:</span> shared password at <span className="font-mono">/reports/login</span> for charter partners only (per-tenant cookies, 12-hour lifetime). <span style={{ color: '#0066ff' }}>Q3 ROADMAP:</span> magic-link signup at /pulse, per-user sessions, PIN-by-department for managers/crew. WebAuthn after that.</p>
             </div>
             <div className="compass-card" style={{ borderColor: '#0066ff' }}>
               <p className="compass-card-label" style={{ color: '#0066ff' }}>— Source-tag · everywhere</p>
@@ -83,7 +83,7 @@ export default function InstallPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-12 md:py-16 px-6">
+      <section className="border-t border-[#e8e8ed] py-12 md:py-16 px-6">
         <div className="max-w-xl mx-auto">
           <p className="compass-eyebrow mb-4 text-center">— Request your install</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-8 text-center">
@@ -93,17 +93,17 @@ export default function InstallPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/trial"   className="hover:text-white transition-colors">Trial</Link>
-            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="/agents"  className="hover:text-white transition-colors">Agents</Link>
-            <Link href="/"        className="hover:text-white transition-colors">Home</Link>
+            <Link href="/trial"   className="hover:text-ink-800 transition-colors">Trial</Link>
+            <Link href="/pricing" className="hover:text-ink-800 transition-colors">Pricing</Link>
+            <Link href="/agents"  className="hover:text-ink-800 transition-colors">Agents</Link>
+            <Link href="/"        className="hover:text-ink-800 transition-colors">Home</Link>
           </div>
         </div>
       </footer>

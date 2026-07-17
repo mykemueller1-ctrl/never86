@@ -56,8 +56,8 @@ export default function OperatorsLanding() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">for operators</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">for operators</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Built by an operator · 15 minutes</p>
             </span>
@@ -77,11 +77,11 @@ export default function OperatorsLanding() {
         </h1>
         <div className="flex flex-wrap gap-3">
           <Link href="#talk" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '#talk', label: 'Talk to us', variant: 'primary' } })} className="btn-primary" style={{ background: '#0066ff' }}>Talk to us →</Link>
-          <Link href="/onboard" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '/onboard', label: 'Onboard your store', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Onboard your store</Link>
+          <Link href="/onboard" onClick={() => trackEvent('operators_hero_cta_click', { meta: { target: '/onboard', label: 'Onboard your store', variant: 'secondary' } })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Onboard your store</Link>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+      <section className="border-t border-[#e8e8ed] py-20 md:py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="compass-eyebrow mb-4">— Try a free agent</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
@@ -99,7 +99,7 @@ export default function OperatorsLanding() {
         </div>
       </section>
 
-      <section id="talk" className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+      <section id="talk" className="border-t border-[#e8e8ed] py-20 md:py-24 px-6">
         <div className="max-w-xl mx-auto">
           <p className="compass-eyebrow mb-4 text-center">— Talk to us</p>
           <h2 className="compass-display text-4xl md:text-5xl mb-8 text-center">
@@ -107,14 +107,14 @@ export default function OperatorsLanding() {
           </h2>
           {status === 'success' ? (
             <div className="compass-card text-center">
-              <p className="font-serif text-2xl text-white">{message}</p>
+              <p className="font-serif text-2xl text-ink-800">{message}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="compass-card space-y-3">
-              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="number" min="1" placeholder="Units" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-black border border-[#2c2c2e] rounded-xl px-4 py-3 text-white placeholder-[#6e6e73] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input type="number" min="1" placeholder="Units" value={units} onChange={(e) => setUnits(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
               <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                 {status === 'loading' ? 'Sending…' : 'Talk to us →'}
               </button>
@@ -124,15 +124,15 @@ export default function OperatorsLanding() {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/for', label: 'Seats' } })} className="hover:text-white transition-colors">Seats</Link>
-            <Link href="/reports/login" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-white transition-colors">Sign in</Link>
+            <Link href="/for" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/for', label: 'Seats' } })} className="hover:text-ink-800 transition-colors">Seats</Link>
+            <Link href="/reports/login" onClick={() => trackEvent('operators_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-ink-800 transition-colors">Sign in</Link>
           </div>
         </div>
       </footer>

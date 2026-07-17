@@ -41,7 +41,7 @@ export default async function OG() {
               height: 64,
               borderRadius: 14,
               background: 'linear-gradient(135deg, #0066ff, #003bb5)',
-              color: '#ffffff',
+              color: '#1d1d1f',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -62,7 +62,7 @@ export default async function OG() {
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 fontWeight: 500,
                 fontSize: 32,
-                color: '#ffffff',
+                color: '#1d1d1f',
                 letterSpacing: '-0.018em',
                 lineHeight: 1,
               }}
@@ -101,7 +101,7 @@ export default async function OG() {
             fontSize: 88,
             lineHeight: 1.04,
             letterSpacing: '-0.022em',
-            color: '#ffffff',
+            color: '#1d1d1f',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
@@ -124,14 +124,14 @@ export default async function OG() {
             color: '#86868b',
             fontSize: 20,
             letterSpacing: '-0.011em',
-            borderTop: '1px solid #1f1f1f',
+            borderTop: '1px solid #e8e8ed',
             paddingTop: 24,
           }}
         >
           <div>545,677 orders analyzed · every number sourced · built by operators</div>
           <div
             style={{
-              color: '#ffffff',
+              color: '#1d1d1f',
               fontWeight: 500,
               fontFamily: 'Georgia, serif',
               fontSize: 22,

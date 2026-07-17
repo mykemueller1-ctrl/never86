@@ -26,8 +26,8 @@ export default function StoryPage() {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">· the story</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">· the story</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · founder narrative</p>
             </span>
@@ -44,16 +44,16 @@ export default function StoryPage() {
         <h1 className="compass-display text-5xl md:text-7xl mb-8">
           I built this <em>for myself first.</em>
         </h1>
-        <p className="compass-body text-2xl md:text-3xl mb-12 font-serif italic leading-snug" style={{ color: '#c7c7cc' }}>
+        <p className="compass-body text-2xl md:text-3xl mb-12 font-serif italic leading-snug" style={{ color: '#515154' }}>
           Then I gave it away.
         </p>
 
         <div className="space-y-7 compass-body text-lg leading-relaxed">
           <p>
-            I&apos;m <span className="text-white font-semibold">Myke Mueller</span>. I run Community Tap &amp; Pizza in Fort Dodge, Iowa. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning, payroll on Sunday afternoon.
+            I&apos;m <span className="text-ink-800 font-semibold">Myke Mueller</span>. I run Community Tap &amp; Pizza in Fort Dodge, Iowa. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning, payroll on Sunday afternoon.
           </p>
           <p>
-            I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line. The screen I wanted answered one question: <span className="text-white font-semibold">what costs me money this week, and what&apos;s the name attached to it.</span>
+            I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line. The screen I wanted answered one question: <span className="text-ink-800 font-semibold">what costs me money this week, and what&apos;s the name attached to it.</span>
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">A single HTML file at 11pm</h2>
@@ -66,19 +66,19 @@ export default function StoryPage() {
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The first number was wrong</h2>
           <p>
-            I ran the model on his data and it said the group was leaking <span className="font-mono tabular-nums text-white">$8.3M a year</span>. It was on the screen. It came out of the math. It was internally consistent. It was also wrong.
+            I ran the model on his data and it said the group was leaking <span className="font-mono tabular-nums text-ink-800">$8.3M a year</span>. It was on the screen. It came out of the math. It was internally consistent. It was also wrong.
           </p>
           <p>
-            The tell was a sales total that physically couldn&apos;t be real — the model was counting the same sales twice and building a big number on top of it. I caught it the next day. The honest number, after I removed the double-counting, came out at <span className="font-mono tabular-nums text-white">$1.81M</span> — about 22% of what I&apos;d reported.
+            The tell was a sales total that physically couldn&apos;t be real — the model was counting the same sales twice and building a big number on top of it. I caught it the next day. The honest number, after I removed the double-counting, came out at <span className="font-mono tabular-nums text-ink-800">$1.81M</span> — about 22% of what I&apos;d reported.
           </p>
           <p>
             Every other vendor in this category would have left the $8.3M number in the deck and never spoken of it again. I walked it back in writing to the design partner who&apos;d already seen the original figure.
           </p>
-          <p className="text-white font-semibold text-xl">
+          <p className="text-ink-800 font-semibold text-xl">
             That&apos;s the moment I knew the discipline of correcting your own number down is the product.
           </p>
           <p>
-            It&apos;s why he stayed. It&apos;s why the next number we shipped — <span className="font-mono tabular-nums text-white">$15.72M reconciled across 545,677 orders</span> — landed without anyone needing to verify it twice. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>The case</Link> is the public version of that walk-back.
+            It&apos;s why he stayed. It&apos;s why the next number we shipped — <span className="font-mono tabular-nums text-ink-800">$15.72M reconciled across 545,677 orders</span> — landed without anyone needing to verify it twice. <Link href="/case/walked-the-number-back" className="underline" style={{ textDecorationColor: '#0066ff' }}>The case</Link> is the public version of that walk-back.
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">Why source-tagging is the moat</h2>
@@ -97,12 +97,12 @@ export default function StoryPage() {
             Eight agents. Sales, labor, voids, 3P fees, tips, catering, rate-card audit, shift sentiment. Each one reads a slice and tells you the one thing to fix. Per store. Per name. Every figure source-tagged.
           </p>
           <p>
-            <Link href="/trial" className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>60-minute free trial.</Link> Drop a CSV, see the read, no card. <Link href="/pricing" className="underline text-white" style={{ textDecorationColor: '#0066ff' }}>Pricing</Link> from a solo operator (free) to enterprise (custom). Same source-tag discipline at every tier. The price scales; the rule doesn&apos;t.
+            <Link href="/trial" className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>60-minute free trial.</Link> Drop a CSV, see the read, no card. <Link href="/pricing" className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>Pricing</Link> from a solo operator (free) to enterprise (custom). Same source-tag discipline at every tier. The price scales; the rule doesn&apos;t.
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The direct line</h2>
           <p>
-            If something on the screen doesn&apos;t make sense, you can email me directly. I read everything. I respond personally. <a href="mailto:myke@n86.app" className="underline text-white font-mono" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.
+            If something on the screen doesn&apos;t make sense, you can email me directly. I read everything. I respond personally. <a href="mailto:myke@n86.app" className="underline text-ink-800 font-mono" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.
           </p>
           <p>
             If we&apos;re wrong about a number on your data, we&apos;ll walk it back in writing — same rule we ran on the first $8.3M.
@@ -113,23 +113,23 @@ export default function StoryPage() {
           </p>
         </div>
 
-        <div className="mt-16 pt-10 border-t border-[#1f1f1f]">
+        <div className="mt-16 pt-10 border-t border-[#e8e8ed]">
           <p className="compass-eyebrow mb-5">— Next step</p>
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Start the 60-minute trial</Link>
-            <Link href="/agents" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>See the eight agents</Link>
-            <Link href="/case/walked-the-number-back" className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>Read the case</Link>
+            <Link href="/agents" className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See the eight agents</Link>
+            <Link href="/case/walked-the-number-back" className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Read the case</Link>
           </div>
         </div>
       </article>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
         </div>
       </footer>
     </main>

@@ -13,8 +13,8 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
           <Link href="/" className="flex items-start gap-4 group">
             <span className="compass-mark">N</span>
             <span>
-              <p className="font-serif text-[24px] leading-none text-white">
-                Never 86&apos;d <span className="italic text-white/70">for {spec.badge}</span>
+              <p className="font-serif text-[24px] leading-none text-ink-800">
+                Never 86&apos;d <span className="italic text-ink-600">for {spec.badge}</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Built for the {spec.badge} · your daily screen</p>
             </span>
@@ -37,13 +37,13 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
           <TrackedLink href={spec.freeAgents[0].href} event="role_hero_cta_click" meta={{ role: spec.badge, target: spec.freeAgents[0].href, agentName: spec.freeAgents[0].name, label: `Try ${spec.freeAgents[0].name}`, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
             Try {spec.freeAgents[0].name} →
           </TrackedLink>
-          <TrackedLink href="/onboard" event="role_hero_cta_click" meta={{ role: spec.badge, target: '/onboard', label: 'Onboard your store', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#2c2c2e', color: '#ffffff' }}>
+          <TrackedLink href="/onboard" event="role_hero_cta_click" meta={{ role: spec.badge, target: '/onboard', label: 'Onboard your store', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
             Onboard your store
           </TrackedLink>
         </div>
       </section>
 
-      <section className="border-t border-[#1f1f1f] py-20 md:py-24 px-6">
+      <section className="border-t border-[#e8e8ed] py-20 md:py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="compass-eyebrow mb-4">— Free agents for the {spec.badge}</p>
           <h2 className="compass-display text-3xl md:text-5xl mb-12">
@@ -63,15 +63,15 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
         </div>
       </section>
 
-      <footer className="border-t border-[#1f1f1f] py-10 px-6">
+      <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
             <span>Never 86&apos;d · Built by operators</span>
           </div>
           <div className="flex items-center gap-5">
-            <TrackedLink href="/for" event="role_footer_click" meta={{ role: spec.badge, target: '/for', label: 'Seats' }} className="hover:text-white transition-colors">Seats</TrackedLink>
-            <TrackedLink href="/" event="role_footer_click" meta={{ role: spec.badge, target: '/', label: 'Home' }} className="hover:text-white transition-colors">Home</TrackedLink>
+            <TrackedLink href="/for" event="role_footer_click" meta={{ role: spec.badge, target: '/for', label: 'Seats' }} className="hover:text-ink-800 transition-colors">Seats</TrackedLink>
+            <TrackedLink href="/" event="role_footer_click" meta={{ role: spec.badge, target: '/', label: 'Home' }} className="hover:text-ink-800 transition-colors">Home</TrackedLink>
           </div>
         </div>
       </footer>
