@@ -1,0 +1,17 @@
+Location,Category,Consumed,Poured,Unit Price
+Storm Lake Main,Liquor,180,165,8.50
+Storm Lake Main,Beer,420,418,4.50
+Storm Lake Main,Wine,84,78,12.00
+Storm Lake Main,NA,310,310,2.50
+Mall Drive,Liquor,210,170,9.00
+Mall Drive,Beer,510,495,4.50
+Mall Drive,Wine,95,82,11.50
+Mall Drive,NA,420,420,2.50
+Lake Front,Liquor,150,148,8.75
+Lake Front,Beer,380,380,4.25
+Lake Front,Wine,72,71,12.50
+Lake Front,NA,280,280,2.50
+Highway 7,Liquor,240,180,9.50
+Highway 7,Beer,490,450,4.75
+Highway 7,Wine,108,82,12.00
+Highway 7,NA,395,395,2.50

@@ -3,6 +3,8 @@ import { db } from '@/db';
 import { invoices } from '@/db/schema';
 import { parseInvoice } from '@/lib/anthropic';
 import { z } from 'zod';
+import { cookies } from 'next/headers';
+import crypto from 'crypto';
 
 const invoiceInput = z.object({
   rawText: z.string().min(1),
@@ -10,8 +12,26 @@ const invoiceInput = z.object({
   fileUrl: z.string().optional(),
 });
 
-// POST /api/invoices — Upload and process an invoice
+function isAuthorized(): boolean {
+  const adminPw = process.env.ADMIN_PASSWORD;
+  const reportsPw = process.env.REPORTS_PASSWORD;
+  const jar = cookies();
+  const tryMatch = (pw: string | undefined, cookie: string | undefined) => {
+    if (!pw || !cookie) return false;
+    try {
+      const expected = crypto.createHash('sha256').update(pw).digest('hex');
+      return crypto.timingSafeEqual(Buffer.from(cookie, 'hex'), Buffer.from(expected, 'hex'));
+    } catch { return false; }
+  };
+  return tryMatch(adminPw, jar.get('n86_admin_auth')?.value)
+      || tryMatch(reportsPw, jar.get('n86_report_auth')?.value);
+}
+
+// POST /api/invoices — Upload and process an invoice (operator/admin only)
 export async function POST(req: NextRequest) {
+  if (!isAuthorized()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = await req.json();
     const { rawText, userId, fileUrl } = invoiceInput.parse(body);
@@ -46,10 +66,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET /api/invoices — List invoices
+// GET /api/invoices — List invoices (operator/admin only)
 export async function GET(req: NextRequest) {
+  if (!isAuthorized()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
-    const userId = req.nextUrl.searchParams.get('userId') || 'default';
+    const _userId = req.nextUrl.searchParams.get('userId') || 'default';
     const results = await db.select().from(invoices);
     return NextResponse.json({ invoices: results });
   } catch (error: any) {

@@ -3,14 +3,34 @@ import { db } from '@/db';
 import { zReports } from '@/db/schema';
 import { parseZReport } from '@/lib/anthropic';
 import { z } from 'zod';
+import { cookies } from 'next/headers';
+import crypto from 'crypto';
 
 const zReportInput = z.object({
   rawText: z.string().min(1),
   userId: z.string().default('default'),
 });
 
-// POST /api/z-reports — Upload and process a Z-Report
+function isAuthorized(): boolean {
+  const adminPw = process.env.ADMIN_PASSWORD;
+  const reportsPw = process.env.REPORTS_PASSWORD;
+  const jar = cookies();
+  const tryMatch = (pw: string | undefined, cookie: string | undefined) => {
+    if (!pw || !cookie) return false;
+    try {
+      const expected = crypto.createHash('sha256').update(pw).digest('hex');
+      return crypto.timingSafeEqual(Buffer.from(cookie, 'hex'), Buffer.from(expected, 'hex'));
+    } catch { return false; }
+  };
+  return tryMatch(adminPw, jar.get('n86_admin_auth')?.value)
+      || tryMatch(reportsPw, jar.get('n86_report_auth')?.value);
+}
+
+// POST /api/z-reports — Upload and process a Z-Report (operator/admin only)
 export async function POST(req: NextRequest) {
+  if (!isAuthorized()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = await req.json();
     const { rawText, userId } = zReportInput.parse(body);

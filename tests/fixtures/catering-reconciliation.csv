@@ -1,0 +1,21 @@
+Location,Order ID,Customer,Event Date,Invoice Amount,POS Amount
+Storm Lake Main,INV-1001,Acme Corp,2026-05-04,2480.50,2480.50
+Storm Lake Main,INV-1002,Wellmark Wellness,2026-05-05,1820.30,1820.30
+Storm Lake Main,INV-1003,Acme Corp,2026-05-06,3210.40,2810.30
+Storm Lake Main,INV-1004,Hagie Manufacturing,2026-05-07,1420.50,0
+Storm Lake Main,INV-1005,Acme Corp,2026-05-08,2810.40,2480.30
+Mall Drive,INV-1006,Iowa Realty,2026-05-04,1810.30,1810.30
+Mall Drive,INV-1007,Acme Corp,2026-05-05,2410.50,2200.40
+Mall Drive,INV-1008,Sukup Manufacturing,2026-05-06,3210.50,0
+Mall Drive,INV-1009,Iowa Realty,2026-05-07,1620.30,1620.30
+Mall Drive,INV-1010,Acme Corp,2026-05-08,2810.40,2410.50
+Lake Front,INV-1011,Pella Corp,2026-05-04,1410.40,1410.40
+Lake Front,INV-1012,Casey's General Stores,2026-05-05,2210.50,2210.50
+Lake Front,INV-1013,Pella Corp,2026-05-06,1820.30,1820.30
+Lake Front,INV-1014,Pella Corp,2026-05-07,1610.40,1610.40
+Lake Front,INV-1015,Casey's General Stores,2026-05-08,2310.50,2310.50
+Highway 7,INV-1016,DuPont Pioneer,2026-05-04,3810.30,3810.30
+Highway 7,INV-1017,Acme Corp,2026-05-05,2210.40,1810.30
+Highway 7,INV-1018,DuPont Pioneer,2026-05-06,4210.50,4210.50
+Highway 7,INV-1019,Sukup Manufacturing,2026-05-07,2810.30,0
+Highway 7,INV-1020,Acme Corp,2026-05-08,2110.40,1810.20
