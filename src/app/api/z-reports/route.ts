@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { zReports } from '@/db/schema';
 import { parseZReport } from '@/lib/anthropic';
-import { z } from 'zod';
-
-const zReportInput = z.object({
-  rawText: z.string().min(1),
-  userId: z.string().default('default'),
-});
+import { zReportInput } from '@/lib/validation';
+import { computeCostPercentages } from '@/lib/metrics';
 
 // POST /api/z-reports — Upload and process a Z-Report
 export async function POST(req: NextRequest) {
@@ -19,16 +15,8 @@ export async function POST(req: NextRequest) {
     const parsed = await parseZReport(rawText);
 
     // Calculate cost percentages
-    const foodCostPercent = parsed.foodSales && parsed.netSales
-      ? ((parsed.foodSales / parsed.netSales) * 100).toFixed(2)
-      : null;
-    const liquorCostPercent = parsed.liquorSales && parsed.netSales
-      ? ((parsed.liquorSales / parsed.netSales) * 100).toFixed(2)
-      : null;
-    const primeCost = (parsed.foodSales || 0) + (parsed.laborCost || 0);
-    const primeCostPercent = parsed.netSales
-      ? ((primeCost / parsed.netSales) * 100).toFixed(2)
-      : null;
+    const { foodCostPercent, liquorCostPercent, primeCostPercent } =
+      computeCostPercentages(parsed);
 
     const [report] = await db
       .insert(zReports)

@@ -2,13 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { invoices } from '@/db/schema';
 import { parseInvoice } from '@/lib/anthropic';
-import { z } from 'zod';
-
-const invoiceInput = z.object({
-  rawText: z.string().min(1),
-  userId: z.string().default('default'),
-  fileUrl: z.string().optional(),
-});
+import { invoiceInput } from '@/lib/validation';
+import { eq } from 'drizzle-orm';
 
 // POST /api/invoices — Upload and process an invoice
 export async function POST(req: NextRequest) {
@@ -50,7 +45,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const userId = req.nextUrl.searchParams.get('userId') || 'default';
-    const results = await db.select().from(invoices);
+    const results = await db.select().from(invoices).where(eq(invoices.userId, userId));
     return NextResponse.json({ invoices: results });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
