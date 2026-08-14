@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { captureLead } from '@/lib/leadCapture';
-import { sendAuditIntakeEmail, sendNotification } from '@/lib/email';
+import { getOwnerEmail, sendAuditIntakeEmail, sendNotification } from '@/lib/email';
 
 const auditIntakeInput = z.object({
   email: z.string().trim().email(),
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const ownerEmail = process.env.OWNER_EMAIL || 'myke@n86.app';
+    const ownerEmail = getOwnerEmail();
     const sourceDetails = [
       input.utmSource && `Source: ${escapeHtml(input.utmSource)}`,
       input.utmMedium && `Medium: ${escapeHtml(input.utmMedium)}`,
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       emailSent,
       message: emailSent
         ? 'Check your inbox. Reply to Myke with one redacted marketplace statement.'
-        : 'Your request is in. Email one redacted marketplace statement to myke@n86.app.',
+        : 'Your request is in. Email one redacted marketplace statement to mykemueller1@gmail.com.',
     });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
