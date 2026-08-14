@@ -34,7 +34,22 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-dark-800 flex flex-col items-center justify-center px-6">
+    <main className="min-h-screen bg-dark-800 flex flex-col items-center justify-center px-6 py-12">
+      <a
+        href="/audit?utm_source=never86&utm_medium=owned&utm_campaign=100_statement_audit&utm_content=homepage_banner"
+        className="mb-10 w-full max-w-2xl border border-gold-700 bg-dark-900 px-5 py-4 text-center transition hover:border-gold-400"
+      >
+        <span className="block text-xs font-black uppercase tracking-[0.22em] text-gold-400">
+          Restaurant owners
+        </span>
+        <span className="mt-2 block text-lg font-black uppercase text-white">
+          Your DoorDash commission is not your DoorDash cost.
+        </span>
+        <span className="mt-2 block text-sm font-bold text-dark-200">
+          Send one redacted statement. Free audit. No login. No integration. →
+        </span>
+      </a>
+
       <div className="max-w-2xl w-full text-center">
         {/* Logo */}
         <h1 className="text-5xl md:text-7xl font-bold text-gold-500 mb-4 tracking-tight">
