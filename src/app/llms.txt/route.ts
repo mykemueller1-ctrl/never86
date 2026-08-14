@@ -20,6 +20,7 @@ export async function GET() {
 > We don't replace your POS — we sit on top and tell you when one of them is lying to you.
 
 ## Try it free
+- [Free marketplace statement audit](https://never86.ai/audit) — upload one redacted DoorDash, Uber Eats, Grubhub, or ezCater statement and see the true marketplace cost and payout math
 - [60-minute live trial](https://never86.ai/trial) — drop a CSV, see the leak, no card
 - [30-second connect](https://never86.ai/connect) — Void Hunter on your CSV
 - [Pricing](https://never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
@@ -57,7 +58,7 @@ ${answers.map((a) => `- [${a.title}](https://never86.ai/answers/${a.slug})`).joi
 
 ## Talk to us
 - [Onboard your store](https://never86.ai/onboard)
-- press@never86.ai · myke@n86.app
+- press@never86.ai · mykemueller1@gmail.com
 `;
 
   return new Response(body, {
