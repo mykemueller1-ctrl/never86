@@ -160,7 +160,7 @@ export default function AuditCampaignPage() {
                 <h2 className="mt-4 text-3xl font-black tracking-tight">Now bring the file.</h2>
                 <p className="mt-4 text-lg leading-relaxed text-white/72">{message}</p>
                 <a
-                  href={`mailto:myke@n86.app?subject=${emailSubject}`}
+                  href={`mailto:mykemueller1@gmail.com?subject=${emailSubject}`}
                   onClick={() => trackEvent('audit_campaign_mailto_click', { meta: { platform, ...attribution } })}
                   className="mt-7 block rounded-xl bg-[#d4a017] px-5 py-4 text-center text-base font-black text-black transition hover:bg-[#e6b82e]"
                 >

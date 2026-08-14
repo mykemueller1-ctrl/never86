@@ -11,6 +11,15 @@ function resendClient(): Resend {
 }
 const resend = { emails: { send: (...args: Parameters<Resend['emails']['send']>) => resendClient().emails.send(...args) } };
 
+const FALLBACK_OWNER_EMAIL = 'mykemueller1@gmail.com';
+
+export function getOwnerEmail(): string {
+  const configured = process.env.OWNER_EMAIL?.trim();
+  return configured && configured.toLowerCase() !== 'myke@n86.app'
+    ? configured
+    : FALLBACK_OWNER_EMAIL;
+}
+
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
 
@@ -60,7 +69,7 @@ export async function sendAuditIntakeEmail(email: string, name?: string) {
   return resend.emails.send({
     from: 'Myke at Never 86\'d <hello@never86.ai>',
     to: email,
-    reply_to: process.env.OWNER_EMAIL || 'myke@n86.app',
+    reply_to: getOwnerEmail(),
     subject: 'Reply with your redacted marketplace statement',
     html: `
 <!DOCTYPE html>
@@ -159,10 +168,10 @@ export async function sendFollowupEmail(opts: {
   const text = opts.kind === '24h' ? body24 : body7;
 
   return resend.emails.send({
-    from: "Myke Mueller <myke@n86.app>",
+    from: "Myke at Never 86'd <hello@never86.ai>",
     to: opts.to,
     subject,
     text,
-    reply_to: 'myke@n86.app',
+    reply_to: getOwnerEmail(),
   });
 }
