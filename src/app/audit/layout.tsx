@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: "Free DoorDash Statement Audit | Never 86'd",
   description:
     'Send one redacted DoorDash, Uber Eats, or Grubhub statement. See commission, fees, promotions, refunds, true marketplace cost, and payout math.',
   alternates: {
-    canonical: '/audit',
+    canonical: 'https://never86.ai/audit',
   },
   openGraph: {
     title: 'Your DoorDash commission is not your DoorDash cost.',
@@ -22,6 +23,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AuditLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function AuditLayout({ children }: Readonly<{ children: ReactNode }>) {
   return children;
 }
