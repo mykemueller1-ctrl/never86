@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+
+// The campaign page reads UTM parameters with useSearchParams. Forcing dynamic
+// rendering prevents Next.js production builds from requiring a separate
+// Suspense wrapper for the page-level client component.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Free Marketplace Statement Audit | Never 86'd",
   description:
     'Send one redacted DoorDash, Uber Eats, Grubhub, or ezCater statement. See commission, fees, promotions, error charges, true marketplace cost, and payout math.',
   alternates: {
-    canonical: '/audit',
+    canonical: 'https://never86.ai/audit',
   },
   openGraph: {
     title: 'Your DoorDash commission is not your DoorDash cost.',
@@ -22,6 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AuditLayout({ children }: { children: React.ReactNode }) {
+export default function AuditLayout({ children }: { children: ReactNode }) {
   return children;
 }
