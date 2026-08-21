@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { MarketplaceCostSnapshot } from '@/components/MarketplaceCostSnapshot';
 import { trackEvent } from '@/lib/track';
 
 const BREAKDOWN = [
   ['Commission', '$787.55'],
+  ['Merchant fees', '$39.92'],
   ['Promotions + marketing', '$887.80'],
   ['Error charges', '$49.02'],
   ['True marketplace cost', '$1,764.29'],
@@ -25,6 +27,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 
 export default function AuditCampaignPage() {
   const params = useSearchParams();
+  const intent = params.get('intent') || 'true-cost';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
@@ -134,6 +137,9 @@ export default function AuditCampaignPage() {
             <p className="mt-7 max-w-2xl text-xl leading-relaxed text-white/72 md:text-2xl">
               Send one redacted marketplace statement. We&apos;ll show you where the money went — free.
             </p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
+              Built from firsthand operating experience inside a 28-location, private-equity-backed restaurant group—because the tools were not good enough for the operator questions that mattered.
+            </p>
 
             <div className="mt-9 flex flex-wrap gap-3 text-sm font-bold">
               {['No portal password', 'No integration', 'No fake recovery claim'].map((item) => (
@@ -173,9 +179,25 @@ export default function AuditCampaignPage() {
             ) : (
               <form onSubmit={submitAuditRequest} className="space-y-4">
                 <div>
-                  <p className="text-sm font-black uppercase tracking-[0.2em] text-[#d4a017]">Claim a free audit</p>
-                  <h2 className="mt-3 text-3xl font-black tracking-tight">Send the statement. Get the receipt.</h2>
-                  <p className="mt-3 text-sm leading-relaxed text-white/55">We&apos;ll email you. Reply with one redacted statement.</p>
+                  <p className="text-sm font-black uppercase tracking-[0.2em] text-[#d4a017]">Start with the answer</p>
+                  <h2 className="mt-3 text-3xl font-black tracking-tight">See your cost before you share a file.</h2>
+                  <a
+                    href="#true-cost-snapshot"
+                    onClick={() => trackEvent('audit_campaign_snapshot_click', { meta: { platform, intent, ...attribution } })}
+                    className="mt-5 flex items-center justify-between gap-4 rounded-xl border border-[#d4a017]/45 bg-[#d4a017]/10 px-4 py-4 transition hover:border-[#d4a017] hover:bg-[#d4a017]/15"
+                  >
+                    <span>
+                      <strong className="block text-base text-white">Use the free 3P cost snapshot</strong>
+                      <span className="mt-1 block text-xs leading-relaxed text-white/55">No login and no email. Enter statement totals and see the math now.</span>
+                    </span>
+                    <span className="shrink-0 text-xl font-black text-[#d4a017]">→</span>
+                  </a>
+                  <div className="my-5 flex items-center gap-3" aria-hidden="true">
+                    <span className="h-px flex-1 bg-white/10" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">or get a human-reviewed receipt</span>
+                    <span className="h-px flex-1 bg-white/10" />
+                  </div>
+                  <p className="text-sm leading-relaxed text-white/55">We&apos;ll email you. Reply with one redacted statement.</p>
                 </div>
 
                 <label className="block">
@@ -252,13 +274,15 @@ export default function AuditCampaignPage() {
 
                 {status === 'error' && <p className="text-sm font-semibold text-red-400">{message}</p>}
                 <p className="text-center text-[11px] leading-relaxed text-white/40">
-                  No card. No commitment. Operational reconciliation only — not legal, tax, or accounting advice.
+                  No card. Never send passwords. Redact guest names, contact details, bank/account/routing numbers, card data, tax IDs, credentials, and unrelated identifiers. Operational reconciliation only—not legal, tax, or accounting advice.
                 </p>
               </form>
             )}
           </aside>
         </div>
       </section>
+
+      <MarketplaceCostSnapshot intent={intent} pagePath="/audit" />
 
       <section className="border-b border-white/10 bg-[#111111]">
         <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-20">

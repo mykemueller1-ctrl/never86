@@ -66,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     name: "Never86'd",
     alternateName: ["Never 86'd", 'Never86d'],
     url: 'https://never86.ai/',
+    sameAs: ['https://www.linkedin.com/company/never-86-d'],
     founder: { '@id': 'https://never86.ai/#myke-mueller' },
     slogan: 'The restaurant and its problems come first.',
     description: 'Independent, evidence-first restaurant operating intelligence built by active restaurant operator Myke Mueller. Never86d explains what restaurant-held evidence supports, what is missing, who acts next, and whether the result changed.',
