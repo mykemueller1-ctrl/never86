@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { MarketplaceAuditFooter, MarketplaceAuditHeader } from '@/components/MarketplaceAuditShell';
 
 export const metadata: Metadata = {
   title: "Evidence, privacy, and corrections standard | Never86'd",
@@ -49,16 +50,7 @@ export default function EvidenceStandardPage() {
   return (
     <main className="compass min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }} />
-      <header className="max-w-7xl mx-auto px-6 pt-6 pb-4 flex items-start justify-between gap-6 flex-wrap">
-        <Link href="/" className="flex items-start gap-4">
-          <span className="compass-mark">N</span>
-          <span>
-            <p className="font-serif text-[24px] leading-none text-ink-800">Never 86&apos;d <span className="italic text-ink-600">· standard</span></p>
-            <p className="compass-eyebrow-dim mt-2">Evidence · privacy · corrections</p>
-          </span>
-        </Link>
-        <nav className="flex items-center gap-2 text-[13px]"><Link href="/answers" className="compass-pill">Operator answers</Link><Link href="/audit" className="btn-primary" style={{ background: '#0066ff' }}>Audit one statement</Link></nav>
-      </header>
+      <MarketplaceAuditHeader label="Evidence · privacy · corrections" />
 
       <section className="max-w-4xl mx-auto px-6 pt-16 md:pt-24 pb-16">
         <p className="compass-eyebrow mb-6">— The public rule</p>
@@ -94,7 +86,7 @@ export default function EvidenceStandardPage() {
         <p className="compass-body text-lg mt-4 max-w-2xl">If a public page misstates a platform policy, source, or calculation, email the URL and supporting evidence to <a className="underline" href="mailto:myke@n86.app">myke@n86.app</a>. Material corrections will be reflected in the page and updated date.</p>
       </section>
 
-      <footer className="border-t border-[#e8e8ed] py-10 px-6"><div className="max-w-4xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]"><span>Never 86&apos;d · Evidence standard published August 21, 2026</span><Link href="/delivery-marketplace-reconciliation">3P evidence center</Link></div></footer>
+      <MarketplaceAuditFooter />
     </main>
   );
 }

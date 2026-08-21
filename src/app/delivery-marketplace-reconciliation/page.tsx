@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { MarketplaceAuditFooter, MarketplaceAuditHeader } from '@/components/MarketplaceAuditShell';
 import { listPublishedAnswers } from '@/lib/answersDb';
 
 export const dynamic = 'force-dynamic';
@@ -85,19 +86,7 @@ export default async function DeliveryMarketplaceReconciliationPage() {
     <main className="compass min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
 
-      <header className="max-w-7xl mx-auto px-6 pt-6 pb-4 flex items-start justify-between gap-6 flex-wrap">
-        <Link href="/" className="flex items-start gap-4 group min-w-0">
-          <span className="compass-mark">N</span>
-          <span>
-            <p className="font-serif text-[24px] leading-none text-ink-800">Never 86&apos;d <span className="italic text-ink-600">· 3P evidence</span></p>
-            <p className="compass-eyebrow-dim mt-2">Restaurant delivery marketplace reconciliation</p>
-          </span>
-        </Link>
-        <nav className="flex items-center gap-2 text-[13px]">
-          <Link href="/answers" className="compass-pill"><span className="avatar">52</span><span>Field guides</span></Link>
-          <Link href="/audit" className="btn-primary" style={{ background: '#0066ff' }}>Audit one statement</Link>
-        </nav>
-      </header>
+      <MarketplaceAuditHeader label="Restaurant delivery marketplace reconciliation" />
 
       <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-16">
         <p className="compass-eyebrow mb-6">— The operator question</p>
@@ -200,12 +189,7 @@ export default async function DeliveryMarketplaceReconciliationPage() {
         <p className="compass-body text-sm leading-relaxed" style={{ color: '#6e6e73' }}>Never86&apos;d is independent and is not affiliated with or endorsed by DoorDash, Uber Eats, Grubhub, or ezCater. This is operational reconciliation guidance, not legal, tax, or accounting advice. Platform sources were checked August 21, 2026. <Link href="/evidence-standard" className="underline">Read the evidence, privacy, and corrections standard.</Link></p>
       </section>
 
-      <footer className="py-10 px-6">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px] gap-5 flex-wrap">
-          <span>Never 86&apos;d · Built by operators · Evidence updated August 21, 2026</span>
-          <div className="flex items-center gap-5"><Link href="/answers">All answers</Link><Link href="/audit">Free audit</Link></div>
-        </div>
-      </footer>
+      <MarketplaceAuditFooter />
     </main>
   );
 }
