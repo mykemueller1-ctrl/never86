@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Image from 'next/image';
+import { HumanSiteFooter, HumanSiteHeader } from '@/components/HumanSiteShell';
 
 export const metadata: Metadata = {
   title: "The story · Never 86'd",
@@ -20,33 +22,24 @@ export const metadata: Metadata = {
 
 export default function StoryPage() {
   return (
-    <main className="compass min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <Link href="/" className="flex items-start gap-4 group">
-            <span className="compass-mark">N</span>
-            <span>
-              <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· the story</span>
-              </p>
-              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · founder narrative</p>
-            </span>
-          </Link>
-          <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Try free →</Link>
-          </nav>
-        </div>
-      </div>
+    <main className="human-page min-h-screen">
+      <HumanSiteHeader />
 
       <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-20">
-        <p className="compass-eyebrow mb-6">— The story · first person · Myke Mueller</p>
-        <h1 className="compass-display text-5xl md:text-7xl mb-8">
-          I have nothing <em>to hide.</em>
+        <p className="human-kicker mb-6">The story · first person · Myke Mueller</p>
+        <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-[-0.05em] text-[#171717] md:text-8xl mb-8">
+          I have nothing <span className="italic text-[#005de8]">to hide.</span>
         </h1>
         <p className="compass-body text-2xl md:text-3xl mb-12 font-serif italic leading-snug" style={{ color: '#515154' }}>
           I&apos;m the operator. That&apos;s why I&apos;m here.
         </p>
+
+        <figure className="mb-12">
+          <div className="human-photo min-h-[430px] md:min-h-[520px]">
+            <Image src="/field/myke-kitchen.jpg" alt="Myke Mueller in the Community Tap kitchen" fill priority sizes="(max-width: 768px) 100vw, 768px" className="object-cover object-bottom" />
+            <span className="human-photo-caption">Community Tap &amp; Pizza · Fort Dodge, Iowa · inside the work</span>
+          </div>
+        </figure>
 
         <div className="space-y-7 compass-body text-lg leading-relaxed">
           <p>
@@ -54,6 +47,9 @@ export default function StoryPage() {
           </p>
           <p className="text-ink-800 font-semibold text-xl">
             I am not looking at a restaurant from a software office. I am living the same problems I am asking Never 86&apos;d to explain.
+          </p>
+          <p>
+            The work grew from firsthand operating experience inside independent restaurants and a <span className="text-ink-800 font-semibold">28-location, private-equity-backed restaurant group</span>. I brought those operating scars back to the problem.
           </p>
           <p>
             I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line. The screen I wanted answered one question: <span className="text-ink-800 font-semibold">what costs me money this week, and what&apos;s the name attached to it.</span>
@@ -64,7 +60,7 @@ export default function StoryPage() {
             The first version was a single HTML file on my laptop. I was trying to figure out why food cost drifted four points one week and nobody could explain it. I wrote the math, fed in my own Z-reports, and it pointed at the right station within the hour.
           </p>
           <p>
-            Then it pointed at the next leak. Then the next. By the end of the month I had a tool I trusted more than any of the dashboards I&apos;d been paying for. I kept it on my own restaurant for nine months, refined it, and then a chef I trust asked if I could run it on his 16-unit group.
+            Then it pointed at the next exception. Then the next. By the end of the month I had a tool I trusted more than any of the dashboards I&apos;d been paying for. Then a chef I trust asked if I could run it on his 16-unit group.
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The first number was wrong</h2>
@@ -105,10 +101,10 @@ export default function StoryPage() {
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">What I&apos;m building now</h2>
           <p>
-            Eight agents. Sales, labor, voids, 3P fees, tips, catering, rate-card audit, shift sentiment. Each one reads a slice and tells you the one thing to fix. Per store. Per name. Every figure source-tagged.
+            The clearest starting point is one redacted DoorDash statement. We separate the documented deductions, calculate what the statement supports, bridge sales to expected payout, and name the record needed for the next conclusion. Uber Eats and Grubhub are early-access validation tracks.
           </p>
           <p>
-            <Link href="/trial" className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>60-minute free trial.</Link> Drop a CSV, see the read, no card. <Link href="/pricing" className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>Pricing</Link> from a solo operator (free) to enterprise (custom). Same source-tag discipline at every tier. The price scales; the rule doesn&apos;t.
+            <Link href="/audit" className="underline text-ink-800" style={{ textDecorationColor: '#0066ff' }}>The free marketplace audit</Link> starts without an integration or a login. Broader daily controls come next, once the first answer proves useful. Same source discipline at every step.
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The direct line</h2>
@@ -127,22 +123,14 @@ export default function StoryPage() {
         <div className="mt-16 pt-10 border-t border-[#e8e8ed]">
           <p className="compass-eyebrow mb-5">— Next step</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Link href="/trial" className="btn-primary" style={{ background: '#0066ff' }}>Start the 60-minute trial</Link>
-            <Link href="/agents" className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See the eight agents</Link>
+            <Link href="/audit" className="human-button human-button-primary">Start with one statement</Link>
+            <Link href="/team" className="human-button human-button-secondary">Meet the team</Link>
             <Link href="/case/walked-the-number-back" className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Read the case</Link>
           </div>
         </div>
       </article>
 
-      <footer className="border-t border-[#e8e8ed] py-10 px-6">
-        <div className="max-w-3xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
-          <div className="flex items-center gap-2">
-            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d · Built by operators</span>
-          </div>
-          <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
-        </div>
-      </footer>
+      <HumanSiteFooter />
     </main>
   );
 }

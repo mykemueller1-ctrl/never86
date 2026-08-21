@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = "Never 86'd — Find the leak. Name who owns it. Keep the receipt.";
+export const alt = "Never 86'd — Month-end is too late. Built by restaurant operators.";
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -13,131 +13,100 @@ export default async function OG() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '70px',
-          background: '#000000',
-          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-          backgroundImage: 'linear-gradient(180deg, #050505 0%, #000000 100%)',
+          background: '#f4efe6',
+          color: '#171717',
+          fontFamily: 'Georgia, Times New Roman, serif',
         }}
       >
-        {/* Top brand band */}
         <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 6,
-            background: 'linear-gradient(100deg, #0066ff 0%, #003bb5 100%)',
-          }}
-        />
-
-        {/* Brand mark + eyebrow */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 14,
-              background: 'linear-gradient(135deg, #0066ff, #003bb5)',
-              color: '#1d1d1f',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 600,
-              fontSize: 36,
-              fontStyle: 'italic',
-              fontFamily: 'Georgia, "Times New Roman", serif',
-            }}
-          >
-            N
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 8,
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontWeight: 500,
-                fontSize: 32,
-                color: '#1d1d1f',
-                letterSpacing: '-0.018em',
-                lineHeight: 1,
-              }}
-            >
-              <span>Never 86&apos;d</span>
-              <span
-                style={{
-                  fontStyle: 'italic',
-                  color: 'rgba(255,255,255,0.7)',
-                }}
-              >
-                for operators
-              </span>
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#0066ff',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-              }}
-            >
-              — For restaurant operators · 8 agents free to try
-            </div>
-          </div>
-        </div>
-
-        {/* Headline */}
-        <div
-          style={{
+            width: 735,
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontWeight: 500,
-            fontSize: 88,
-            lineHeight: 1.04,
-            letterSpacing: '-0.022em',
-            color: '#1d1d1f',
+            justifyContent: 'space-between',
+            padding: '58px 56px 48px',
+            backgroundImage:
+              'linear-gradient(rgba(90,80,68,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(90,80,68,0.07) 1px, transparent 1px)',
+            backgroundSize: '34px 34px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
-            <span>Find the leak.</span>
-            <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Name who</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div
+              style={{
+                width: 58,
+                height: 58,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+                background: '#005de8',
+                color: 'white',
+                fontSize: 34,
+                fontStyle: 'italic',
+                boxShadow: '5px 5px 0 #17304c',
+              }}
+            >
+              N
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: 31, letterSpacing: '-0.02em' }}>
+                Never 86&apos;d <span style={{ color: '#5f574f', fontStyle: 'italic' }}>for operators</span>
+              </div>
+              <div
+                style={{
+                  marginTop: 5,
+                  color: '#005de8',
+                  fontFamily: 'Arial, sans-serif',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Fort Dodge, Iowa · built inside the work
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
-            <span>owns it.</span>
-            <span style={{ color: '#0066ff', fontStyle: 'italic' }}>Keep</span>
-            <span>the receipt.</span>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: 83, lineHeight: 0.92, letterSpacing: '-0.055em' }}>
+              Month-end is
+            </div>
+            <div style={{ marginTop: 10, color: '#005de8', fontSize: 96, fontStyle: 'italic', lineHeight: 0.9, letterSpacing: '-0.055em' }}>
+              too late.
+            </div>
+            <div
+              style={{
+                marginTop: 30,
+                maxWidth: 590,
+                fontFamily: 'Arial, sans-serif',
+                fontSize: 22,
+                lineHeight: 1.35,
+                color: '#514b43',
+              }}
+            >
+              One DoorDash statement. The documented cost, the payout bridge, and the missing proof—plain English, source attached.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #bfb3a5', paddingTop: 18, fontFamily: 'Arial, sans-serif', fontSize: 16, color: '#615950' }}>
+            <span>Restaurant work first · software second</span>
+            <span style={{ color: '#005de8', fontWeight: 700 }}>never86.ai</span>
           </div>
         </div>
 
-        {/* Footer */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            color: '#86868b',
-            fontSize: 20,
-            letterSpacing: '-0.011em',
-            borderTop: '1px solid #e8e8ed',
-            paddingTop: 24,
-          }}
-        >
-          <div>545,677 orders analyzed · every number sourced · built by operators</div>
-          <div
-            style={{
-              color: '#1d1d1f',
-              fontWeight: 500,
-              fontFamily: 'Georgia, serif',
-              fontSize: 22,
-            }}
-          >
-            never86.ai
+        <div style={{ position: 'relative', width: 465, height: '100%', display: 'flex', overflow: 'hidden', background: '#17304c' }}>
+          <img
+            src="https://www.never86.ai/field/myke-kitchen.jpg"
+            alt=""
+            width="465"
+            height="630"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 78%' }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,20,30,0.68), transparent 45%)' }} />
+          <div style={{ position: 'absolute', left: 28, right: 28, bottom: 27, color: 'white', fontFamily: 'Arial, sans-serif', fontSize: 13, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase' }}>
+            Myke · Community Tap kitchen · Fort Dodge
           </div>
         </div>
       </div>
