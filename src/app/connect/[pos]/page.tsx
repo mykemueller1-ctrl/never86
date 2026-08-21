@@ -8,8 +8,9 @@ export function generateStaticParams() {
   return Object.keys(POS_SPECS).map((slug) => ({ pos: slug }));
 }
 
-export function generateMetadata({ params }: { params: { pos: string } }): Metadata {
-  const p = getPosSpec(params.pos);
+export async function generateMetadata({ params }: { params: Promise<{ pos: string }> }): Promise<Metadata> {
+  const { pos } = await params;
+  const p = getPosSpec(pos);
   if (!p) return { title: "POS not found · Never 86'd" };
   return {
     title: `${p.name} · Never 86'd`,
@@ -29,8 +30,9 @@ export function generateMetadata({ params }: { params: { pos: string } }): Metad
   };
 }
 
-export default function PosLandingPage({ params }: { params: { pos: string } }) {
-  const p = getPosSpec(params.pos);
+export default async function PosLandingPage({ params }: { params: Promise<{ pos: string }> }) {
+  const { pos } = await params;
+  const p = getPosSpec(pos);
   if (!p) notFound();
 
   return (

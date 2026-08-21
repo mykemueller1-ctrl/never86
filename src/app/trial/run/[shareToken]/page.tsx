@@ -7,7 +7,7 @@ import { TrackedLink } from '@/components/TrackedLink';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-type Params = { shareToken: string };
+type Params = Promise<{ shareToken: string }>;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -122,7 +122,8 @@ function LeakDetectorView({ r, filename }: { r: any; filename: string | null }) 
 }
 
 export default async function SavedRunPage({ params }: { params: Params }) {
-  const run = await getTrialRunByShareToken(params.shareToken);
+  const { shareToken } = await params;
+  const run = await getTrialRunByShareToken(shareToken);
   if (!run) notFound();
   const r = run.result as any;
 

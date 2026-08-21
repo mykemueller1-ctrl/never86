@@ -174,6 +174,7 @@ export default function Home() {
           </div>
 
           <Link href="/pricing"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/pricing', label: 'Pricing' } })}      className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Pricing</Link>
+          <Link href="/answers"   onClick={() => trackEvent('home_nav_click', { meta: { target: '/answers', label: 'Operator answers' } })} className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Operator answers</Link>
           <Link href="/trial"     onClick={() => trackEvent('home_nav_click', { meta: { target: '/trial', label: 'Trial' } })}          className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Trial</Link>
           <Link href="/team"      onClick={() => trackEvent('home_nav_click', { meta: { target: '/team', label: 'Team' } })}            className="px-4 py-2 rounded-full text-ink-800 hover:bg-black/[0.05] transition-colors">Team</Link>
           <span className="flex-1" />
@@ -509,6 +510,9 @@ export default function Home() {
             <p>
               Now I&apos;m building it for everybody from the solo operator to the 50-unit CEO. Same show-our-work rule. Same operator-to-operator language. <span className="text-ink-800 font-semibold">If something on the screen doesn&apos;t make sense, you can email me directly. <a href="mailto:myke@n86.app" className="underline" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.</span>
             </p>
+            <p className="text-ink-800 font-semibold">
+              We partner with restaurant technology when it helps the operator. We are not here to protect a platform&apos;s story. The restaurant and its problems come first.
+            </p>
             <p style={{ color: '#86868b' }}>— Myke Mueller · Fort Dodge, Iowa</p>
           </div>
         </div>
@@ -633,6 +637,7 @@ export default function Home() {
           <div className="flex items-center gap-5">
             <Link href="/for"     onClick={() => trackEvent('home_footer_click', { meta: { target: '/for', label: 'Seats' } })}        className="hover:text-ink-800 transition-colors">Seats</Link>
             <Link href="/people"  onClick={() => trackEvent('home_footer_click', { meta: { target: '/people', label: 'People' } })}    className="hover:text-ink-800 transition-colors">People</Link>
+            <Link href="/answers" onClick={() => trackEvent('home_footer_click', { meta: { target: '/answers', label: 'Answers' } })} className="hover:text-ink-800 transition-colors">Answers</Link>
             <Link href="/onboard" onClick={() => trackEvent('home_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}  className="hover:text-ink-800 transition-colors">Onboard</Link>
             <Link href="/changelog" onClick={() => trackEvent('home_footer_click', { meta: { target: '/changelog', label: 'Changelog' } })} className="hover:text-ink-800 transition-colors">Changelog</Link>
             <Link href="/login" onClick={() => trackEvent('home_footer_click', { meta: { target: '/login', label: 'Sign in' } })} className="hover:text-ink-800 transition-colors">Sign in</Link>

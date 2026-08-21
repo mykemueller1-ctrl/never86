@@ -31,6 +31,7 @@ const TOOLS = [
     name: 'list_answers',
     description: 'List every published Q&A from never86. Returns slug, title, question, audience, URL.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'get_answer',
@@ -41,6 +42,7 @@ const TOOLS = [
       required: ['slug'],
       additionalProperties: false,
     },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'search_answers',
@@ -51,11 +53,13 @@ const TOOLS = [
       required: ['query'],
       additionalProperties: false,
     },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'list_free_agents',
     description: 'List the 8 free quick-win agents (no signup) operators can try right now. Returns name, audience, URL, headline, what-it-catches, sample-signal.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'get_agent',
@@ -66,18 +70,53 @@ const TOOLS = [
       required: ['slug'],
       additionalProperties: false,
     },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'list_seats',
     description: 'List the 8 role-routed landing pages (CEO, CFO, COO, Chef, CTO, Owner, Manager, Crew). Returns role + URL.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
     name: 'list_source_tags',
     description: 'List the three source-tag categories Never 86\'d applies to every figure: Verified, Estimated, Unverified. Returns name + meaning.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
 ];
+
+const STOP_WORDS = new Set(['a', 'an', 'and', 'are', 'for', 'from', 'how', 'i', 'in', 'is', 'it', 'my', 'of', 'on', 'or', 'the', 'to', 'what', 'with']);
+
+function searchTerms(query: string): string[] {
+  return query
+    .toLowerCase()
+    .replace(/[^a-z0-9']+/g, ' ')
+    .split(/\s+/)
+    .filter((term) => term.length > 1 && !STOP_WORDS.has(term));
+}
+
+function answerScore(query: string, answer: Awaited<ReturnType<typeof listPublishedAnswers>>[number]): number {
+  const normalizedQuery = query.trim().toLowerCase();
+  const title = answer.title.toLowerCase();
+  const question = (answer.question ?? '').toLowerCase();
+  const summary = (answer.summary ?? '').toLowerCase();
+  const keywords = (answer.keywords ?? []).join(' ').toLowerCase();
+  const body = answer.answer.toLowerCase();
+  let score = 0;
+  if (title.includes(normalizedQuery)) score += 20;
+  if (question.includes(normalizedQuery)) score += 15;
+  if (keywords.includes(normalizedQuery)) score += 12;
+  if (body.includes(normalizedQuery)) score += 5;
+  for (const term of searchTerms(normalizedQuery)) {
+    if (title.includes(term)) score += 5;
+    if (question.includes(term)) score += 4;
+    if (keywords.includes(term)) score += 4;
+    if (summary.includes(term)) score += 3;
+    if (body.includes(term)) score += 1;
+  }
+  return score;
+}
 
 const FREE_AGENTS = AGENT_SPECS.map((a) => ({
   slug: a.slug,
@@ -137,28 +176,32 @@ async function handle(req: JsonRpcReq): Promise<Response> {
       }
 
       if (name === 'get_answer') {
-        const slug = String(args.slug ?? '');
+        const slug = String(args.slug ?? '').trim();
+        if (!slug || slug.length > 160) return ok(req.id, { content: [{ type: 'text', text: 'A valid answer slug is required.' }], isError: true });
         const a = await getPublishedAnswer(slug);
         if (!a) return ok(req.id, { content: [{ type: 'text', text: 'Not found.' }] });
-        return ok(req.id, { content: [{ type: 'text', text: `${a.title}\n\nQ: ${a.question ?? '—'}\n\n${a.answer}\n\nSource: https://never86.ai/answers/${a.slug}` }] });
+        const sources = (a.sources ?? []).map((source) => `- ${source.title}: ${source.url}`).join('\n');
+        return ok(req.id, { content: [{ type: 'text', text: `${a.title}\n\nQ: ${a.question ?? '—'}\n\n${a.answer}\n\nCanonical: https://never86.ai/answers/${a.slug}${sources ? `\n\nSources:\n${sources}` : ''}` }] });
       }
 
       if (name === 'search_answers') {
-        const q = String(args.query ?? '').toLowerCase();
-        if (!q) return ok(req.id, { content: [{ type: 'text', text: 'Empty query.' }] });
+        const q = String(args.query ?? '').trim();
+        if (!q || q.length > 300) return ok(req.id, { content: [{ type: 'text', text: 'Enter a search query between 1 and 300 characters.' }], isError: true });
         const rows = await listPublishedAnswers();
         const matches = rows
           .map((a) => {
-            const haystack = `${a.title} ${a.question ?? ''} ${a.answer}`.toLowerCase();
-            const score = haystack.includes(q) ? 1 : 0;
+            const score = answerScore(q, a);
             return { a, score };
           })
           .filter((m) => m.score > 0)
+          .sort((left, right) => right.score - left.score)
           .slice(0, 10)
-          .map(({ a }) => ({
+          .map(({ a, score }) => ({
             slug: a.slug,
             title: a.title,
             question: a.question,
+            summary: a.summary,
+            relevance: score,
             url: `https://never86.ai/answers/${a.slug}`,
           }));
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(matches, null, 2) }] });

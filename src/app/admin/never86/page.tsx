@@ -1,5 +1,6 @@
 import { loadAdminSnapshot, type DailyFocus, type AeoDraft, type TeamNote, type PipelineRow, type QuickWin } from '@/lib/adminDb';
 import { addFocus, updateFocusStatus, addAeoDraft, addTeamNote, addPipelineRow, updatePipelineStage, sendFollowupNow, markOutboundSent, markOutboundReplied, markOutboundPassed } from './actions';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -82,7 +83,7 @@ export default async function AdminNever86() {
             <a href="#activity" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Activity</a>
             <a href="#outbound" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Outbound</a>
             <a href="#ops" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Ops</a>
-            <a href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</a>
+            <Link href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</Link>
             <a href="/command-center" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Operator view</a>
           </nav>
         </div>
@@ -554,10 +555,10 @@ export default async function AdminNever86() {
             <p className="text-white font-semibold mb-1">Operator command center</p>
             <p className="text-dark-400 text-xs">What your design partners see when they sign in</p>
           </a>
-          <a href="/" className="bg-dark-700 border border-dark-600 hover:border-gold-500 rounded-2xl p-5 block">
+          <Link href="/" className="bg-dark-700 border border-dark-600 hover:border-gold-500 rounded-2xl p-5 block">
             <p className="text-white font-semibold mb-1">Marketing surface</p>
             <p className="text-dark-400 text-xs">The public homepage — same one your prospects land on</p>
-          </a>
+          </Link>
         </div>
       </section>
 

@@ -9,10 +9,10 @@ function tokenFor(pw: string): string {
   return crypto.createHash('sha256').update(pw).digest('hex');
 }
 
-function isAdmin(): boolean {
+async function isAdmin(): Promise<boolean> {
   const adminPw = process.env.ADMIN_PASSWORD;
   if (!adminPw) return false;
-  const cookie = cookies().get('n86_admin_auth')?.value;
+  const cookie = (await cookies()).get('n86_admin_auth')?.value;
   if (!cookie) return false;
   try {
     return crypto.timingSafeEqual(
@@ -35,14 +35,14 @@ export async function GET() {
   try {
     const sql = opsDb();
     await sql`select 1 as ok`;
-    if (isAdmin()) {
+    if (await isAdmin()) {
       const rows = await sql<{ n: number }[]>`
         select count(*)::int as n from operator_locations where operator_id = 3`;
       return Response.json({ ok: true, locations: rows[0]?.n ?? null, ms: Date.now() - t0 });
     }
     return Response.json({ ok: true, ms: Date.now() - t0 });
   } catch (e) {
-    if (isAdmin()) {
+    if (await isAdmin()) {
       return Response.json({ ok: false, error: e instanceof Error ? e.message : String(e), ms: Date.now() - t0 });
     }
     return Response.json({ ok: false, ms: Date.now() - t0 });

@@ -5,7 +5,7 @@ import { getTrialRunByShareToken } from '@/lib/trialRunsDb';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-type Params = { shareToken: string };
+type Params = Promise<{ shareToken: string }>;
 
 export const metadata: Metadata = {
   title: "Margin Recovery Proposal · Never 86'd",
@@ -17,7 +17,8 @@ const usd = (n: number | null | undefined) => n == null ? '—' : '$' + Math.rou
 const pct = (n: number | null | undefined) => n == null ? '—' : (n * 100).toFixed(2) + '%';
 
 export default async function ProposalPage({ params }: { params: Params }) {
-  const run = await getTrialRunByShareToken(params.shareToken);
+  const { shareToken } = await params;
+  const run = await getTrialRunByShareToken(shareToken);
   if (!run) notFound();
   const r = run.result as any;
   const runAt = new Date(run.createdAt).toLocaleString();
@@ -139,7 +140,7 @@ export default async function ProposalPage({ params }: { params: Params }) {
 
           <div className="footer">
             <div>Never 86&apos;d · Built by operators · myke@n86.app</div>
-            <div className="mono">never86.ai/trial/run/{params.shareToken.slice(0, 8)}…</div>
+            <div className="mono">never86.ai/trial/run/{shareToken.slice(0, 8)}…</div>
           </div>
 
           <div className="no-print" style={{ marginTop: 24, padding: 16, background: '#f5f5f7', borderRadius: 12, fontSize: 13, color: '#515154' }}>

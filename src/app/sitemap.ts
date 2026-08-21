@@ -15,7 +15,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     answers = rows.map((a) => ({ slug: a.slug, updatedAt: a.updatedAt }));
   } catch {}
 
-  const now = new Date();
+  // Fixed content release date: request-time timestamps mislead crawlers into
+  // treating every URL as newly changed on every sitemap fetch.
+  const now = new Date('2026-08-20T14:00:00Z');
 
   const fixed: MetadataRoute.Sitemap = [
     { url: `${BASE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },

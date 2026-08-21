@@ -72,7 +72,7 @@ export default function StoryPage() {
             The tell was a sales total that physically couldn&apos;t be real — the model was counting the same sales twice and building a big number on top of it. I caught it the next day. The honest number, after I removed the double-counting, came out at <span className="font-mono tabular-nums text-ink-800">$1.81M</span> — about 22% of what I&apos;d reported.
           </p>
           <p>
-            Every other vendor in this category would have left the $8.3M number in the deck and never spoken of it again. I walked it back in writing to the design partner who&apos;d already seen the original figure.
+            The easy move would have been to leave the $8.3M number in the deck and never speak of it again. I walked it back in writing to the design partner who&apos;d already seen the original figure.
           </p>
           <p className="text-ink-800 font-semibold text-xl">
             That&apos;s the moment I knew the discipline of correcting your own number down is the product.
@@ -89,7 +89,15 @@ export default function StoryPage() {
             <span style={{ color: '#ff453a' }} className="font-semibold"> Unverified</span> means the source isn&apos;t wired yet; the figure is illustrative.
           </p>
           <p>
-            No competitor in this category does this publicly. None disclose model error. We checked. The closest thing is one vendor quoting &ldquo;15% labor forecast accuracy gains&rdquo; — a brag stat, not a per-figure disclosure.
+            Source-tagging makes the limits visible next to the number. It is our standard because an operator needs to know the difference between evidence, a modeled assumption, and a gap that still needs to be closed.
+          </p>
+
+          <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The restaurant comes first</h2>
+          <p>
+            We work with restaurant technology companies when that helps the operator. We do not exist to sell another platform&apos;s agenda, hide a bad number, or force a restaurant to replace a system that is already doing its job. We stay independent enough to question the evidence and practical enough to integrate when integration creates a better result.
+          </p>
+          <p className="text-ink-800 font-semibold text-xl">
+            The restaurant owner, the people inside the four walls, and the restaurant&apos;s economics come first. Always.
           </p>
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">What I&apos;m building now</h2>

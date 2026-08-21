@@ -12,10 +12,10 @@ const invoiceInput = z.object({
   fileUrl: z.string().optional(),
 });
 
-function isAuthorized(): boolean {
+async function isAuthorized(): Promise<boolean> {
   const adminPw = process.env.ADMIN_PASSWORD;
   const reportsPw = process.env.REPORTS_PASSWORD;
-  const jar = cookies();
+  const jar = await cookies();
   const tryMatch = (pw: string | undefined, cookie: string | undefined) => {
     if (!pw || !cookie) return false;
     try {
@@ -29,7 +29,7 @@ function isAuthorized(): boolean {
 
 // POST /api/invoices — Upload and process an invoice (operator/admin only)
 export async function POST(req: NextRequest) {
-  if (!isAuthorized()) {
+  if (!(await isAuthorized())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
 // GET /api/invoices — List invoices (operator/admin only)
 export async function GET(req: NextRequest) {
-  if (!isAuthorized()) {
+  if (!(await isAuthorized())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {

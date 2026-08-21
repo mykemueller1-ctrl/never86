@@ -20,7 +20,7 @@ async function sha256Hex(input: string): Promise<string> {
     .join('');
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith('/reports/login')) {

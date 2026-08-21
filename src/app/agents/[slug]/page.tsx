@@ -8,8 +8,9 @@ export function generateStaticParams() {
   return AGENT_SPECS.map((a) => ({ slug: a.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const a = getAgentSpec(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const a = getAgentSpec(slug);
   if (!a) return { title: "Agent not found · Never 86'd" };
   return {
     title: `${a.name} · ${a.headline} · Never 86'd`,
@@ -29,8 +30,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function AgentDetail({ params }: { params: { slug: string } }) {
-  const a = getAgentSpec(params.slug);
+export default async function AgentDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const a = getAgentSpec(slug);
   if (!a) notFound();
 
   // JSON-LD Product schema — helps Google AI Overviews + Rich Results

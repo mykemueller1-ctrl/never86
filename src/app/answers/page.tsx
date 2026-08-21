@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
-  title: "Answers · Never 86'd",
-  description: 'Operator-to-operator answers, sourced to the live system.',
+  title: "Restaurant operator answers · Never86'd",
+  description: "Practical, source-aware answers on delivery-marketplace fees, payout reconciliation, restaurant AI, margin leaks, and multi-unit execution from Never86'd.",
+  alternates: { canonical: 'https://never86.ai/answers' },
   openGraph: {
-    title: "Answers · Never 86'd",
-    description: 'Operator-to-operator answers, sourced to the live system.',
+    title: "Restaurant operator answers · Never86'd",
+    description: 'Evidence-first answers for restaurant owners, finance teams, and multi-unit operators.',
     url: 'https://never86.ai/answers',
   },
 };
@@ -22,13 +23,13 @@ export default async function AnswersIndex() {
     <main className="compass min-h-screen">
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
         <div className="flex items-start justify-between gap-6 flex-wrap">
-          <Link href="/" className="flex items-start gap-4 group">
+          <Link href="/" className="flex items-start gap-4 group min-w-0">
             <span className="compass-mark">N</span>
-            <span>
+            <span className="min-w-0">
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86&apos;d <span className="italic text-ink-600">· answers</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · published answers</p>
+              <p className="compass-eyebrow-dim mt-2 break-words">Restaurant margin intelligence · published answers</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -44,13 +45,13 @@ export default async function AnswersIndex() {
           Answers, <em>not opinions.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">
-          Every answer sourced to the live system. No hot takes. No vendor pitches.
+          Practical answers for restaurant owners and multi-unit teams. We show the evidence boundary, name what is unknown, and put the restaurant&apos;s problem first.
         </p>
       </section>
 
       <section className="max-w-3xl mx-auto px-6 pb-20">
         {answers.length === 0 ? (
-          <p className="text-[#6e6e73] text-sm text-center compass-card">No answers published yet.</p>
+          <p className="text-[#6e6e73] text-sm text-center compass-card">Answers are temporarily unavailable. Try the free marketplace statement audit while we reconnect them.</p>
         ) : (
           <div className="space-y-3">
             {answers.map((a) => (
@@ -60,7 +61,7 @@ export default async function AnswersIndex() {
                 ) : null}
                 <h3 className="!mt-2">{a.title}</h3>
                 {a.question ? <p className="compass-body text-sm italic mt-2 mb-2" style={{ color: '#86868b' }}>{a.question}</p> : null}
-                <p className="compass-body text-sm mt-2 leading-relaxed line-clamp-3">{a.answer}</p>
+                <p className="compass-body text-sm mt-2 leading-relaxed line-clamp-3">{a.summary ?? a.answer}</p>
                 <p className="text-[14px] mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>Read it <span aria-hidden>→</span></p>
               </Link>
             ))}

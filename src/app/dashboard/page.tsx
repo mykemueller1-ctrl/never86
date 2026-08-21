@@ -13,7 +13,7 @@ export const metadata = { title: "Your dashboard | Never 86'd" };
 // only their stores. Middleware also gates this route; the redirect here is
 // belt-and-suspenders.
 export default async function DashboardPage() {
-  const token = cookies().get(OPERATOR_COOKIE)?.value;
+  const token = (await cookies()).get(OPERATOR_COOKIE)?.value;
   const session = await verifyOperatorSession(token, Date.now());
   if (!session) redirect('/login?next=/dashboard');
 

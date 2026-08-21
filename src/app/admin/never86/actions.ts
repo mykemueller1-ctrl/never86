@@ -5,16 +5,16 @@ import crypto from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { opsDb } from '@/lib/opsDb';
 
-function adminAuthorized(): boolean {
+async function adminAuthorized(): Promise<boolean> {
   const pw = process.env.ADMIN_PASSWORD;
   if (!pw) return false;
   const expected = crypto.createHash('sha256').update(pw).digest('hex');
-  const got = cookies().get('n86_admin_auth')?.value;
+  const got = (await cookies()).get('n86_admin_auth')?.value;
   return !!got && got === expected;
 }
 
-function requireAdmin() {
-  if (!adminAuthorized()) throw new Error('Not authorized.');
+async function requireAdmin() {
+  if (!(await adminAuthorized())) throw new Error('Not authorized.');
 }
 
 function asString(v: FormDataEntryValue | null): string {
@@ -22,7 +22,7 @@ function asString(v: FormDataEntryValue | null): string {
 }
 
 export async function addFocus(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const author = asString(formData.get('author')) || 'myke';
   const body = asString(formData.get('body'));
   const status = asString(formData.get('status')) || null;
@@ -33,7 +33,7 @@ export async function addFocus(formData: FormData) {
 }
 
 export async function updateFocusStatus(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const id = Number(formData.get('id'));
   const status = asString(formData.get('status'));
   if (!id || !status) return;
@@ -43,7 +43,7 @@ export async function updateFocusStatus(formData: FormData) {
 }
 
 export async function addAeoDraft(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const author = asString(formData.get('author')) || 'myke';
   const title = asString(formData.get('title'));
   const question = asString(formData.get('question')) || null;
@@ -62,7 +62,7 @@ export async function addAeoDraft(formData: FormData) {
 }
 
 export async function addTeamNote(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const author = asString(formData.get('author'));
   const kind = asString(formData.get('kind')) || 'note';
   const title = asString(formData.get('title')) || null;
@@ -75,7 +75,7 @@ export async function addTeamNote(formData: FormData) {
 }
 
 export async function addPipelineRow(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const name = asString(formData.get('operator_name'));
   const contact = asString(formData.get('contact_name')) || null;
   const units = Number(formData.get('units')) || null;
@@ -90,7 +90,7 @@ export async function addPipelineRow(formData: FormData) {
 }
 
 export async function updatePipelineStage(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const id = Number(formData.get('id'));
   const stage = asString(formData.get('stage'));
   if (!id || !stage) return;
@@ -102,7 +102,7 @@ export async function updatePipelineStage(formData: FormData) {
 import { sendFollowupEmail } from '@/lib/email';
 
 export async function sendFollowupNow(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const leadId = Number(formData.get('leadId'));
   const kind = (formData.get('kind') as '24h' | '7d') || '24h';
   if (!leadId) return;
@@ -137,7 +137,7 @@ export async function sendFollowupNow(formData: FormData) {
 }
 
 export async function markOutboundSent(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const id = Number(formData.get('id'));
   const templateUsed = asString(formData.get('template'));
   if (!id) return;
@@ -151,7 +151,7 @@ export async function markOutboundSent(formData: FormData) {
 }
 
 export async function markOutboundReplied(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const id = Number(formData.get('id'));
   if (!id) return;
   const sql = opsDb();
@@ -164,7 +164,7 @@ export async function markOutboundReplied(formData: FormData) {
 }
 
 export async function markOutboundPassed(formData: FormData) {
-  requireAdmin();
+  await requireAdmin();
   const id = Number(formData.get('id'));
   const reason = asString(formData.get('reason'));
   if (!id) return;
