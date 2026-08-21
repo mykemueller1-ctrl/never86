@@ -50,7 +50,7 @@ export default async function OG() {
               N
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: 31, letterSpacing: '-0.02em' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 31, letterSpacing: '-0.02em' }}>
                 Never 86&apos;d <span style={{ color: '#5f574f', fontStyle: 'italic' }}>for operators</span>
               </div>
               <div
