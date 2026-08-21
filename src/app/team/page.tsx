@@ -1,186 +1,119 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { HumanSiteFooter, HumanSiteHeader } from '@/components/HumanSiteShell';
 
 export const metadata: Metadata = {
-  title: "Team — Never 86'd",
-  description:
-    "Built by an operator, for operators. The people behind Never 86'd.",
+  title: "The team — Never 86'd",
+  description: "Meet the operators, product people, hospitality technologists, and field storytellers behind Never 86'd.",
+  alternates: { canonical: 'https://www.never86.ai/team' },
   openGraph: {
-    title: "Team — Never 86'd",
-    description:
-      "Built by an operator, for operators. The people behind Never 86'd.",
+    title: "The team — Never 86'd",
+    description: 'Small team. Real restaurant scars. Built in the work, not around it.',
     url: 'https://www.never86.ai/team',
     siteName: "Never 86'd",
     type: 'website',
   },
 };
 
-type Member = {
-  initials: string;
-  name: string;
-  role: string;
-  where: string;
-  bio: string;
-  monogramTone: 'gold' | 'void' | 'ink';
-  photo?: string;
-};
-
-const TEAM: Member[] = [
+const PEOPLE = [
   {
-    initials: 'MM',
     name: 'Myke Mueller',
-    role: 'Founder / CEO',
-    where: 'Fort Dodge, Iowa',
-    bio: "Founder and CEO. Third-generation restaurant operator and co-owner of Community Tap & Pizza — the restaurant where Never 86'd began, and where it runs every shift.",
-    monogramTone: 'gold',
-    photo: '/team/mm.jpg',
+    role: 'Founder · active restaurant operator',
+    place: 'Fort Dodge, Iowa',
+    image: '/field/myke-kitchen.jpg',
+    imageClass: 'object-cover object-bottom',
+    bio: "Myke built Never 86'd because the operating tools were not good enough. He still lives the restaurant week at Community Tap & Pizza, and brings firsthand experience from independent restaurants and a 28-location, private-equity-backed group.",
+    line: 'The floor on Friday night. The books on Saturday morning.',
   },
   {
-    initials: 'VH',
     name: 'Victor Hatungimana',
-    role: 'Marketing · On the Line',
-    where: 'Iowa',
-    bio: "Builds the operator audience and runs On the Line — Never 86'd's owner-to-owner show. Real conversations, real restaurants. (That is the channel.)",
-    monogramTone: 'void',
-    photo: '/team/vh.jpg',
+    role: 'Field stories · On the Line 515',
+    place: 'Iowa',
+    image: '/field/on-the-line-victor.jpg',
+    imageClass: 'object-cover object-[50%_34%]',
+    bio: 'Victor gets owners, managers, cooks, servers, and builders talking about the parts of hospitality that never make a corporate case study. Those conversations keep the product close to the real work.',
+    line: 'Real talk. Real operators. No polished corporate takes.',
   },
   {
-    initials: 'KA',
     name: 'Kristin Aduna',
-    role: 'Head of Product',
-    where: '',
-    bio: 'Restaurant-technology product leader with early years at Compeat and Restaurant365. Owns product discipline, customer discovery, and the Charter Operator experience.',
-    monogramTone: 'ink',
+    role: 'Product discipline · operator discovery',
+    place: 'Restaurant technology',
+    image: '/team/kristin.jpg',
+    imageClass: 'object-cover',
+    bio: 'Kristin brings years of restaurant-technology and customer work to the table. She turns operator pain, messy requests, and customer discovery into product decisions a restaurant team can live with.',
+    line: 'The product has to make the next move easier, not add another screen.',
+  },
+  {
+    name: 'Rik Reinhardt',
+    role: 'Cofounder · hospitality systems',
+    place: 'Denver, Colorado',
+    image: '/team/rik.jpg',
+    imageClass: 'object-cover',
+    bio: 'Rik started as a dishwasher, moved through operations leadership, and spent years designing, installing, and supporting restaurant systems. He knows who gets blamed when technology fails during service.',
+    line: 'Operators first. Technology second.',
   },
 ];
 
-function monogramClasses(tone: Member['monogramTone']) {
-  switch (tone) {
-    case 'gold':
-      return 'bg-gradient-to-br from-void-500 to-void-800 text-white';
-    case 'void':
-      return 'bg-gradient-to-br from-void-500 to-void-800 text-ink-800';
-    case 'ink':
-    default:
-      return 'bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed] text-ink-600 ring-1 ring-[#d2d2d7]';
-  }
-}
-
 export default function TeamPage() {
   return (
-    <main className="compass min-h-screen text-ink-800">
-      {/* Header — wordmark only. No shared nav; keeps this route self-contained. */}
-      <header className="max-w-6xl mx-auto px-6 pt-8 md:pt-12">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-3 group"
-          aria-label="Back to Never 86'd"
-        >
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-gradient-to-br from-void-500 to-void-800 text-ink-800 font-bold text-sm tracking-tight shadow-btn">
-            N
-          </span>
-          <span className="font-display text-ink-800 text-lg md:text-xl leading-none">
-            Never 86&#39;d{' '}
-            <span className="font-serif italic text-ink-600 text-base md:text-lg">
-              for operators
-            </span>
-          </span>
-        </Link>
-      </header>
+    <main className="human-page min-h-screen">
+      <HumanSiteHeader />
 
-      {/* Lede */}
-      <section className="max-w-6xl mx-auto px-6 pt-16 md:pt-24 pb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#0066ff]">
-          — Team
-        </p>
-        <h1 className="mt-4 font-display font-semibold text-4xl md:text-6xl leading-[1.05] tracking-tighter text-ink-800">
-          Built by an operator.{' '}
-          <span className="font-serif italic text-ink-600">
-            For operators.
-          </span>
-        </h1>
-        <p className="mt-6 max-w-2xl text-base md:text-lg text-ink-600 leading-relaxed">
-          Small team. Every hire has run a shift, sold a plate, or closed out a
-          register the hard way.
-        </p>
+      <section className="relative overflow-hidden px-5 pb-20 pt-14 md:px-8 md:pb-28 md:pt-20">
+        <div className="human-grid-lines" aria-hidden />
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <p className="human-kicker">The people behind Never 86&apos;d</p>
+          <div className="mt-6 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+            <h1 className="font-serif text-[clamp(4rem,9vw,8rem)] font-medium leading-[0.87] tracking-[-0.055em] text-[#171717]">
+              Small team.
+              <span className="block italic text-[#005de8]">Real restaurant scars.</span>
+            </h1>
+            <div className="border-l-4 border-[#005de8] bg-[#fffaf2] p-6 text-lg leading-relaxed text-[#514b43] shadow-[6px_7px_0_rgba(23,48,76,0.12)]">
+              Nobody here gets to hide behind “the algorithm.” We show the source, say what is missing, correct the number when it is wrong, and keep the operator&apos;s economics ahead of the platform&apos;s story.
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Team grid */}
-      <section className="max-w-6xl mx-auto px-6 pt-4 md:pt-8 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TEAM.map((m) => (
-            <article
-              key={m.name}
-              className="rounded-2xl border border-[#e8e8ed] bg-white p-6 md:p-7 flex flex-col"
-            >
-              <div className="flex items-center gap-4">
-                {m.photo ? (
-                  <Image
-                    src={m.photo}
-                    alt={m.name}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover ring-1 ring-[#d2d2d7]"
-                  />
-                ) : (
-                  <div
-                    className={
-                      'w-16 h-16 rounded-full flex items-center justify-center font-display font-semibold text-xl tracking-tight ' +
-                      monogramClasses(m.monogramTone)
-                    }
-                    aria-hidden="true"
-                  >
-                    {m.initials}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <h2 className="font-display font-semibold text-ink-800 text-lg md:text-xl leading-tight">
-                    {m.name}
-                  </h2>
-                  <p className="mt-1 text-sm text-ink-600">
-                    {m.role}
-                    {m.where ? (
-                      <>
-                        <span className="text-ink-400 mx-1.5">·</span>
-                        <span className="font-serif italic text-ink-500">
-                          {m.where}
-                        </span>
-                      </>
-                    ) : null}
-                  </p>
+      <section className="border-t border-[#d8cec0] px-5 pb-20 pt-14 md:px-8 md:pb-28 md:pt-20">
+        <div className="mx-auto max-w-7xl space-y-6">
+          {PEOPLE.map((person, index) => (
+            <article key={person.name} className="grid overflow-hidden border border-[#cfc3b5] bg-[#fffaf2] shadow-[7px_8px_0_rgba(74,62,49,0.10)] md:grid-cols-[0.75fr_1.25fr]">
+              <div className={`relative min-h-[360px] bg-[#d8cec0] ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <Image src={person.image} alt={person.name} fill sizes="(max-width: 768px) 100vw, 42vw" className={person.imageClass} />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-5 pb-5 pt-16">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white">{person.place}</p>
                 </div>
               </div>
-              <p className="mt-5 text-[15px] leading-relaxed text-ink-600">
-                {m.bio}
-              </p>
+              <div className={`flex flex-col justify-center p-7 md:p-12 ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-[#005de8]">{person.role}</p>
+                <h2 className="mt-4 font-serif text-4xl leading-none tracking-[-0.03em] text-[#1b1b1b] md:text-5xl">{person.name}</h2>
+                <p className="mt-6 max-w-2xl text-base leading-relaxed text-[#585149]">{person.bio}</p>
+                <p className="mt-7 border-l-2 border-[#005de8] pl-4 font-serif text-2xl italic leading-snug text-[#25211d]">“{person.line}”</p>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
-      {/* Advisors — deliberately empty this ship. */}
-      <section className="max-w-6xl mx-auto px-6 pb-24 md:pb-32">
-        <div className="rounded-2xl border border-dashed border-[#e8e8ed] bg-white p-8 md:p-10">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#0066ff]">
-            — Advisors
-          </p>
-          <p className="mt-4 font-display text-xl md:text-2xl text-ink-600 leading-snug tracking-tight">
-            Coming soon.{' '}
-            <span className="font-serif italic text-ink-500">
-              (Names go up here once the paperwork is signed, not before.)
-            </span>
-          </p>
+      <section className="human-dark-section px-5 py-20 md:px-8 md:py-24">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_0.7fr] lg:items-center">
+          <div>
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#81aefc]">The wider table</p>
+            <h2 className="mt-5 font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white md:text-7xl">The team is bigger than four headshots.</h2>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#d7dfeb]">
+              Vadim and the build team turn operator questions into shipped work. Sally and the Community Tap crew live with the decisions. On the Line guests keep opening the door to how other operators actually think. The product is better because all of them can tell us when we missed.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <a href="https://www.tiktok.com/@ontheline515" target="_blank" rel="noreferrer" className="human-button human-button-light w-full">Watch On the Line 515 →</a>
+            <Link href="/audit" className="human-button w-full border border-[#7f97b5] text-white hover:bg-white/10">Try the free 3P audit →</Link>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-6 pb-16">
-        <p className="text-xs text-ink-500 font-mono tracking-wider uppercase">
-          Never 86&#39;d · Built by operators
-        </p>
-      </footer>
+      <HumanSiteFooter />
     </main>
   );
 }
-

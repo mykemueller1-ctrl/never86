@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.never86.ai'),
   title: "Never86'd — Restaurant operating intelligence",
   description:
-    "Evidence-first restaurant operating intelligence for delivery-marketplace fees, payout reconciliation, margin leaks, and inside-the-four-walls execution. Built by operator Myke Mueller.",
+    "Evidence-first restaurant operating intelligence for delivery-marketplace fees, payout reconciliation, margin exceptions, and inside-the-four-walls execution. Built by Myke Mueller and a team with real restaurant, product, and hospitality-technology experience.",
   applicationName: "Never86'd",
   keywords: [
     'restaurant operating intelligence',
@@ -68,6 +68,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     alternateName: ["Never 86'd", 'Never86d'],
     url: 'https://www.never86.ai/',
     founder: { '@id': 'https://www.never86.ai/#myke-mueller' },
+    employee: [
+      { '@type': 'Person', name: 'Victor Hatungimana', jobTitle: 'Field storytelling and On the Line 515' },
+      { '@type': 'Person', name: 'Kristin Aduna', jobTitle: 'Product discipline and operator discovery' },
+      { '@type': 'Person', name: 'Rik Reinhardt', jobTitle: 'Cofounder and hospitality systems' },
+    ],
     slogan: 'The restaurant and its problems come first.',
     description: 'Independent, evidence-first restaurant operating intelligence built by active restaurant operator Myke Mueller. Never86d explains what restaurant-held evidence supports, what is missing, who acts next, and whether the result changed.',
     sameAs: ['https://www.linkedin.com/company/never-86-d'],
@@ -89,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     jobTitle: 'Founder and restaurant operator',
     description: 'Active operator of Community Tap & Pizza in Fort Dodge, Iowa, and founder of Never86d. His public standard: I have nothing to hide. I am the operator. That is why I am here.',
     worksFor: { '@id': 'https://www.never86.ai/#organization' },
+    sameAs: ['https://www.linkedin.com/in/myke-mueller-341b1b2a8/'],
     knowsAbout: ['restaurant operations', 'restaurant financial controls', 'restaurant technology'],
   };
   const applicationJsonLd = {

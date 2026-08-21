@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TeamFaces } from '@/components/HumanSiteShell';
 
 export function MarketplaceAuditHeader({
   label = 'Marketplace audit',
@@ -20,8 +21,17 @@ export function MarketplaceAuditHeader({
         <nav className="flex flex-wrap items-center gap-2 text-[13px]">
           <Link href="/delivery-marketplace-reconciliation" className="compass-pill">3P evidence</Link>
           <Link href="/answers" className="compass-pill">Operator answers</Link>
+          <Link href="/team" className="compass-pill">The team</Link>
           <Link href="/audit" className="btn-primary" style={{ background: '#0066ff' }}>Free audit</Link>
         </nav>
+      </div>
+      <div className="border-t border-[#e8e8ed] bg-white/80">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-6 py-3">
+          <TeamFaces compact />
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6e6e73]">
+            Built and reviewed by restaurant operators, field storytellers, product people, and hospitality technologists—not a black box.
+          </p>
+        </div>
       </div>
     </header>
   );
