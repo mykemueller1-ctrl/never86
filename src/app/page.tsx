@@ -7,7 +7,7 @@ import RoiCalculator from '@/components/RoiCalculator';
 
 const FREE_AGENTS = [
   { name: 'Void Hunter',    href: '/demo/void-hunter',    tag: 'Voids',    line: 'The one name voiding more than everyone else — by store, and across all your stores.' },
-  { name: '3P Fee Finder',  href: '/demo/3p-fee-finder',  tag: 'Delivery', line: 'What DoorDash, Uber Eats, and Grubhub actually take vs what your contract says.' },
+  { name: '3P Fee Finder',  href: '/audit',               tag: 'Delivery', line: 'What one redacted DoorDash statement supports, what is missing, and what to do next.' },
   { name: 'Labor Leak',     href: '/demo/labor-leak',     tag: 'Labor',    line: 'OT drift, ghost shifts, schedule-vs-clocked gaps.' },
   { name: 'Tip Variance',   href: '/demo/tip-variance',   tag: 'Tips',     line: 'Week-over-week tip movement, per store + per name.' },
   { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering', line: 'Catering money per store — and where the invoice and the register don\'t match.' },
@@ -485,7 +485,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <p className="compass-eyebrow mb-4">— 02 · Myke&apos;s story</p>
           <h2 className="compass-display text-4xl md:text-6xl mb-10">
-            I built this <em>for myself first.</em>
+            I have nothing <em>to hide.</em>
           </h2>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -495,6 +495,9 @@ export default function Home() {
             loading="lazy"
           />
           <div className="space-y-6 compass-body text-lg leading-relaxed">
+            <p className="font-serif text-2xl md:text-3xl italic text-ink-800">
+              I&apos;m the operator. That&apos;s why I&apos;m here.
+            </p>
             <p>
               I&apos;m Myke. I run <span className="text-ink-800 font-semibold">Community Tap &amp; Pizza in Fort Dodge, Iowa</span>. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning.
             </p>

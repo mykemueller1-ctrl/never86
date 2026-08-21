@@ -3,17 +3,17 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "The story · Never 86'd",
-  description: 'How a single HTML file on an operator\'s laptop became daily margin control for independent restaurants and a 16-unit chef-led group.',
+  description: 'I have nothing to hide. I am the operator. That is why I am here. The first-person story of Myke Mueller and Never 86\'d.',
   openGraph: {
     title: "Never 86'd · the story",
-    description: "I built this for myself first. Then I gave it away. — Myke Mueller",
+    description: "I have nothing to hide. I am the operator. That is why I am here. — Myke Mueller",
     url: 'https://never86.ai/story',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: "Never 86'd · the story",
-    description: "I built this for myself first. Then I gave it away.",
+    description: "I have nothing to hide. I am the operator. That is why I am here.",
   },
   alternates: { canonical: 'https://never86.ai/story' },
 };
@@ -42,15 +42,18 @@ export default function StoryPage() {
       <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-20">
         <p className="compass-eyebrow mb-6">— The story · first person · Myke Mueller</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-8">
-          I built this <em>for myself first.</em>
+          I have nothing <em>to hide.</em>
         </h1>
         <p className="compass-body text-2xl md:text-3xl mb-12 font-serif italic leading-snug" style={{ color: '#515154' }}>
-          Then I gave it away.
+          I&apos;m the operator. That&apos;s why I&apos;m here.
         </p>
 
         <div className="space-y-7 compass-body text-lg leading-relaxed">
           <p>
             I&apos;m <span className="text-ink-800 font-semibold">Myke Mueller</span>. I run Community Tap &amp; Pizza in Fort Dodge, Iowa. I&apos;ve been an operator longer than I&apos;ve been a founder. Still am — the floor on Friday night, the books on Saturday morning, payroll on Sunday afternoon.
+          </p>
+          <p className="text-ink-800 font-semibold text-xl">
+            I am not looking at a restaurant from a software office. I am living the same problems I am asking Never 86&apos;d to explain.
           </p>
           <p>
             I started building Never 86&apos;d because nobody was making the screen I actually wanted. Every restaurant tech vendor either sold me a dashboard I had to interpret myself, or charged me enterprise prices for software built for the office, not the line. The screen I wanted answered one question: <span className="text-ink-800 font-semibold">what costs me money this week, and what&apos;s the name attached to it.</span>

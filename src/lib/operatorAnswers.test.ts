@@ -11,6 +11,8 @@ describe('built-in operator answer corpus', () => {
       'reconcile-doordash-payout-to-bank-deposit',
       'best-restaurant-software-for-delivery-fee-audit',
       'ai-inside-four-walls-restaurant-operations',
+      'why-never86d-is-operator-first',
+      'how-proven-is-never86d-marketplace-audit',
     ]) expect(slugs.has(slug)).toBe(true);
   });
 

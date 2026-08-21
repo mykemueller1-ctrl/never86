@@ -235,9 +235,9 @@ export default function AuditCampaignPage() {
                     className="w-full rounded-xl border border-white/15 bg-black/35 px-4 py-3.5 text-white outline-none transition focus:border-[#d4a017]"
                   >
                     <option>DoorDash</option>
-                    <option>Uber Eats</option>
-                    <option>Grubhub</option>
-                    <option>ezCater</option>
+                    <option value="Uber Eats">Uber Eats (early access)</option>
+                    <option value="Grubhub">Grubhub (early access)</option>
+                    <option value="ezCater">ezCater (early access)</option>
                     <option>Other</option>
                   </select>
                 </label>
@@ -285,6 +285,38 @@ export default function AuditCampaignPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-20">
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-[#d4a017]">What is proven today</p>
+          <div className="mt-6 grid gap-3 md:grid-cols-2">
+            <div className="rounded-3xl border border-[#d4a017]/35 bg-[#141414] p-6 md:p-8">
+              <h2 className="text-3xl font-black tracking-tight">WE CAN ADDRESS THIS WORKFLOW NOW.</h2>
+              <p className="mt-4 text-base leading-relaxed text-white/65">
+                One redacted DoorDash statement can produce a source-stamped explanation of what happened, what the evidence supports, what is missing, and the next action. No integration is required for the first useful answer.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-white/12 bg-[#141414] p-6 md:p-8">
+              <h2 className="text-3xl font-black tracking-tight">WE HAVE NOT PROVEN SCALE YET.</h2>
+              <p className="mt-4 text-base leading-relaxed text-white/65">
+                DoorDash is the strongest current pilot. Uber Eats, Grubhub, and ezCater are early access. Repeat paid use, deterministic cross-platform coverage, and enterprise reliability still have to be earned.
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 rounded-3xl border border-white/12 bg-[#141414] p-6 md:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#d4a017]">Sanitized 12-period method proof</p>
+            <div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-4">
+              <div><strong className="block text-3xl">$103.6K</strong><span className="text-sm text-white/50">eligible food sales</span></div>
+              <div><strong className="block text-3xl">8.7%</strong><span className="text-sm text-white/50">commission</span></div>
+              <div><strong className="block text-3xl">17.0%</strong><span className="text-sm text-white/50">restaurant-funded ads and promotions</span></div>
+              <div><strong className="block text-3xl text-[#d4a017]">27.2%</strong><span className="text-sm text-white/50">observed all-in marketplace cost</span></div>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-white/50">
+              All 12 finalized statements reconciled. This proves the cost-composition method on one anonymized store. It does not prove a contract violation, recoverable cash, guaranteed savings, or a market-wide benchmark.
+            </p>
           </div>
         </div>
       </section>

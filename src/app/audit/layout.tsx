@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: "Free Marketplace Statement Audit | Never 86'd",
   description:
-    'Send one redacted DoorDash, Uber Eats, Grubhub, or ezCater statement. See commission, fees, promotions, error charges, true marketplace cost, and payout math.',
+    'Send one redacted DoorDash statement. See what the evidence supports, what is missing, and what to do next. Uber Eats and Grubhub are early access.',
   alternates: {
     canonical: 'https://never86.ai/audit',
   },

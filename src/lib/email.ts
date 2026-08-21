@@ -81,7 +81,7 @@ export async function sendAuditIntakeEmail(email: string, name?: string) {
     <h1 style="color:#ffffff;font-size:30px;line-height:1.15;margin:0 0 24px;">Bring the statement. We’ll show you where the money went.</h1>
     <p style="color:#ffffff;font-size:17px;line-height:1.65;">Hey ${firstName},</p>
     <p style="color:#ffffff;font-size:17px;line-height:1.65;">
-      Reply to this email with one redacted DoorDash, Uber Eats, or Grubhub statement.
+      Reply to this email with one redacted marketplace statement. DoorDash is our strongest current pilot. Uber Eats, Grubhub, and ezCater are early access while we validate their statement formats.
     </p>
     <div style="background:#1c1c1c;border:1px solid #333333;border-radius:14px;padding:22px;margin:24px 0;">
       <p style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 12px;">We will break out:</p>

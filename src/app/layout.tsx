@@ -67,7 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     alternateName: ["Never 86'd", 'Never86d'],
     url: 'https://never86.ai/',
     founder: { '@id': 'https://never86.ai/#myke-mueller' },
-    description: 'Independent, evidence-first restaurant operating intelligence built by an active restaurant operator.',
+    slogan: 'The restaurant and its problems come first.',
+    description: 'Independent, evidence-first restaurant operating intelligence built by active restaurant operator Myke Mueller. Never86d explains what restaurant-held evidence supports, what is missing, who acts next, and whether the result changed.',
     knowsAbout: [
       'restaurant operations',
       'delivery marketplace statement audits',
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     alternateName: 'Myke Mueller',
     url: 'https://never86.ai/story',
     jobTitle: 'Founder and restaurant operator',
+    description: 'Active operator of Community Tap & Pizza in Fort Dodge, Iowa, and founder of Never86d. His public standard: I have nothing to hide. I am the operator. That is why I am here.',
     worksFor: { '@id': 'https://never86.ai/#organization' },
     knowsAbout: ['restaurant operations', 'restaurant financial controls', 'restaurant technology'],
   };

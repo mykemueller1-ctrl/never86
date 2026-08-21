@@ -4,10 +4,10 @@ import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Press kit · Never 86'd",
-  description: "One-page press kit for Never 86'd. Built by an operator, for operators.",
+  description: "One-page press kit for Never 86'd and operator-founder Myke Mueller.",
   openGraph: {
     title: "Never 86'd · Press kit",
-    description: "Built by an operator, for operators.",
+    description: "I have nothing to hide. I am the operator. That is why I am here.",
     url: 'https://never86.ai/press',
   },
   alternates: { canonical: 'https://never86.ai/press' },
@@ -75,8 +75,11 @@ export default function PressKit() {
           <div className="compass-card">
             <p className="compass-card-label">Myke Mueller</p>
             <h3>Operator first, founder second.</h3>
+            <p className="font-serif text-2xl italic leading-snug mt-4 text-ink-800">
+              “I have nothing to hide. I&apos;m the operator. That&apos;s why I&apos;m here.”
+            </p>
             <p className="compass-body leading-relaxed mt-3">
-              Runs Community Tap &amp; Pizza in Fort Dodge, Iowa. Available for: founder interviews, operator podcasts, restaurant-industry trade press.
+              Myke runs Community Tap &amp; Pizza in Fort Dodge, Iowa. He built Never 86&apos;d from the operating and financial questions he could not get answered inside his own restaurant. Available for founder interviews, operator podcasts, and restaurant-industry trade press.
             </p>
           </div>
         </section>
