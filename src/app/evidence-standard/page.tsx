@@ -5,7 +5,7 @@ import { MarketplaceAuditFooter, MarketplaceAuditHeader } from '@/components/Mar
 export const metadata: Metadata = {
   title: "Evidence, privacy, and corrections standard | Never86'd",
   description: "How Never86'd sources restaurant guidance, protects private data, labels calculations and unknowns, corrects mistakes, and avoids unsupported marketplace claims.",
-  alternates: { canonical: 'https://never86.ai/evidence-standard' },
+  alternates: { canonical: 'https://www.never86.ai/evidence-standard' },
 };
 
 const RULES = [
@@ -40,10 +40,10 @@ export default function EvidenceStandardPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: "Never86'd evidence, privacy, and corrections standard",
-    url: 'https://never86.ai/evidence-standard',
+    url: 'https://www.never86.ai/evidence-standard',
     datePublished: '2026-08-21',
     dateModified: '2026-08-21',
-    publisher: { '@id': 'https://never86.ai/#organization' },
+    publisher: { '@id': 'https://www.never86.ai/#organization' },
     about: ['restaurant evidence', 'delivery marketplace reconciliation', 'data privacy', 'corrections policy'],
   };
 

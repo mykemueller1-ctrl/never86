@@ -3,7 +3,7 @@ import type { OperatorAnswer } from './operatorAnswers';
 const AUTHOR = 'Mychael “Myke” Mueller';
 const PUBLISHED_AT = '2026-08-21T00:30:00-05:00';
 const UPDATED_AT = '2026-08-21T00:30:00-05:00';
-const AUDIT = 'https://never86.ai/audit';
+const AUDIT = 'https://www.never86.ai/audit';
 const DD_STATEMENT = 'https://help.doordash.com/merchants/s/article/MX-Monthly-Statement-and-FAQs?language=en_US';
 const DD_FINANCIALS = 'https://help.doordash.com/en-us/merchants/article/how-can-i-receive-my-weekly-pay-statements';
 const DD_ERRORS = 'https://help.doordash.com/en-ca/merchants/article/what-are-order-error-adjustments';
@@ -201,7 +201,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Marketplace store IDs', 'POS and accounting location IDs', 'Payout-to-bank mapping'],
     evidenceBoundary: 'A group-level tie does not prove every location is complete and unique.',
     relatedSlugs: ['multi-unit-restaurant-exception-management', 'find-duplicate-or-missing-marketplace-settlements'],
-    sources: [{ title: 'DoorDash: Payout-level order detail', url: DD_FINANCIALS }, { title: "Never86'd multi-unit exception model", url: 'https://never86.ai/answers/multi-unit-restaurant-exception-management' }],
+    sources: [{ title: 'DoorDash: Payout-level order detail', url: DD_FINANCIALS }, { title: "Never86'd multi-unit exception model", url: 'https://www.never86.ai/answers/multi-unit-restaurant-exception-management' }],
   }),
   guide({
     id: -26,
@@ -252,7 +252,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Payment Details or payment statement', 'Order Errors report', 'Order-level detail when timing or status matters'],
     evidenceBoundary: 'More files do not create certainty if their store scope or date definitions differ.',
     relatedSlugs: ['understand-uber-eats-payment-details-report', 'review-uber-eats-order-error-adjustments'],
-    sources: [{ title: 'Uber Eats Manager: Reports page', url: UBER_REPORTS }, { title: "Never86'd redaction guide", url: 'https://never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' }],
+    sources: [{ title: 'Uber Eats Manager: Reports page', url: UBER_REPORTS }, { title: "Never86'd redaction guide", url: 'https://www.never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' }],
   }),
   guide({
     id: -29,
@@ -390,7 +390,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Finalized catering statement', 'Order and fulfillment detail', 'Rate card or agreement when testing rates'],
     evidenceBoundary: 'The workflow is available as early-access validation; it is not represented as proven deterministic coverage at scale.',
     relatedSlugs: ['calculate-true-third-party-delivery-cost', 'calculate-delivery-menu-item-contribution'],
-    sources: [{ title: "Never86'd Marketplace Audit", url: AUDIT }, { title: "Never86'd proof boundary", url: 'https://never86.ai/answers/how-proven-is-never86d-marketplace-audit' }],
+    sources: [{ title: "Never86'd Marketplace Audit", url: AUDIT }, { title: "Never86'd proof boundary", url: 'https://www.never86.ai/answers/how-proven-is-never86d-marketplace-audit' }],
   }),
   guide({
     id: -37,
@@ -495,7 +495,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Transaction-level dates', 'Finalized payout composition', 'Month-end bank activity'],
     evidenceBoundary: 'A timing difference should not be relabeled as a fee or shortage.',
     relatedSlugs: ['doordash-monthly-statement-vs-payout-period', 'third-party-delivery-month-end-close-checklist'],
-    sources: [{ title: 'DoorDash: Monthly statements versus payout periods', url: DD_STATEMENT }, { title: "Never86'd payout reconciliation guide", url: 'https://never86.ai/answers/reconcile-doordash-payout-to-bank-deposit' }],
+    sources: [{ title: 'DoorDash: Monthly statements versus payout periods', url: DD_STATEMENT }, { title: "Never86'd payout reconciliation guide", url: 'https://www.never86.ai/answers/reconcile-doordash-payout-to-bank-deposit' }],
   }),
   guide({
     id: -43,
@@ -531,7 +531,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Statement or order rows', 'Contract or policy when relevant', 'Support case and resolution trail'],
     evidenceBoundary: 'Do not claim fraud, theft, or contract violation when the governing evidence is incomplete.',
     relatedSlugs: ['delivery-marketplace-commission-overcharge-proof', 'review-doordash-error-charges'],
-    sources: [{ title: 'DoorDash: Error-charge review process', url: DD_ERRORS }, { title: 'Uber: Weekly pay statement issues', url: UBER_ERRORS }, { title: "Never86'd evidence standard", url: 'https://never86.ai/story' }],
+    sources: [{ title: 'DoorDash: Error-charge review process', url: DD_ERRORS }, { title: 'Uber: Weekly pay statement issues', url: UBER_ERRORS }, { title: "Never86'd evidence standard", url: 'https://www.never86.ai/story' }],
   }),
   guide({
     id: -45,
@@ -548,7 +548,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Raw and redacted files', 'Retention and access policy', 'Exception-resolution index'],
     evidenceBoundary: 'Never86’d does not set the restaurant’s legal record-retention period.',
     relatedSlugs: ['what-to-redact-from-restaurant-statement-before-ai-audit', 'build-restaurant-delivery-dispute-packet'],
-    sources: [{ title: 'Uber: Reports are downloaded from Reports Hub', url: UBER_REPORTS }, { title: "Never86'd statement-redaction guide", url: 'https://never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' }],
+    sources: [{ title: 'Uber: Reports are downloaded from Reports Hub', url: UBER_REPORTS }, { title: "Never86'd statement-redaction guide", url: 'https://www.never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' }],
   }),
   guide({
     id: -46,
@@ -619,7 +619,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Platform cost by category', 'Item cost and order history', 'Applicable agreement and test results'],
     evidenceBoundary: 'Observed fees can inform pricing; they do not prove the demand response or an optimal markup.',
     relatedSlugs: ['calculate-delivery-menu-item-contribution', 'calculate-true-third-party-delivery-cost'],
-    sources: [{ title: 'DoorDash: Commission, marketing, and amendment categories', url: DD_STATEMENT }, { title: "Never86'd true-cost guide", url: 'https://never86.ai/answers/calculate-true-third-party-delivery-cost' }],
+    sources: [{ title: 'DoorDash: Commission, marketing, and amendment categories', url: DD_STATEMENT }, { title: "Never86'd true-cost guide", url: 'https://www.never86.ai/answers/calculate-true-third-party-delivery-cost' }],
   }),
   guide({
     id: -50,
@@ -636,7 +636,7 @@ export const THREE_P_EVIDENCE_ANSWERS: OperatorAnswer[] = [
     evidenceNeeded: ['Finalized statement', 'Item and operating cost data', 'Owner and resolution log'],
     evidenceBoundary: 'Total marketplace cost is not automatically an error, contract violation, or recoverable leakage.',
     relatedSlugs: ['calculate-true-third-party-delivery-cost', 'restaurant-command-center-without-another-dashboard'],
-    sources: [{ title: 'DoorDash: Financial category definitions', url: DD_STATEMENT }, { title: "Never86'd operator action model", url: 'https://never86.ai/answers/restaurant-command-center-without-another-dashboard' }],
+    sources: [{ title: 'DoorDash: Financial category definitions', url: DD_STATEMENT }, { title: "Never86'd operator action model", url: 'https://www.never86.ai/answers/restaurant-command-center-without-another-dashboard' }],
   }),
   guide({
     id: -51,

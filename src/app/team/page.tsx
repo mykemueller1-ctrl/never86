@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "Team — Never 86'd",
     description:
       "Built by an operator, for operators. The people behind Never 86'd.",
-    url: 'https://never86.ai/team',
+    url: 'https://www.never86.ai/team',
     siteName: "Never 86'd",
     type: 'website',
   },

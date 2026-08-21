@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Pick your seat",
     description: 'Eight roles. Each one sees the screen they need.',
-    url: 'https://never86.ai/for',
+    url: 'https://www.never86.ai/for',
   },
-  alternates: { canonical: 'https://never86.ai/for' },
+  alternates: { canonical: 'https://www.never86.ai/for' },
 };
 
 export default function ForIndex() {

@@ -18,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow,
       },
     ],
-    sitemap: 'https://never86.ai/sitemap.xml',
-    host: 'https://never86.ai',
+    sitemap: 'https://www.never86.ai/sitemap.xml',
+    host: 'https://www.never86.ai',
   };
 }

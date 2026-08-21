@@ -3,7 +3,7 @@ import { PUBLIC_SIGNAL_METHOD, THREE_P_PUBLIC_SIGNALS } from '@/lib/threePSocial
 export function GET() {
   return Response.json({
     title: 'Seven-day public restaurant 3P control signal sample',
-    canonical_url: 'https://never86.ai/research/3p-operator-signal-august-2026',
+    canonical_url: 'https://www.never86.ai/research/3p-operator-signal-august-2026',
     published_at: '2026-08-21',
     methodology: PUBLIC_SIGNAL_METHOD,
     count: THREE_P_PUBLIC_SIGNALS.length,

@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     'Send one redacted DoorDash statement. See what the evidence supports, what is missing, and what to do next. Uber Eats and Grubhub are early access.',
   alternates: {
-    canonical: 'https://never86.ai/audit',
+    canonical: 'https://www.never86.ai/audit',
   },
   openGraph: {
     title: 'Your DoorDash commission is not your DoorDash cost.',
     description:
       'One redacted statement. Free audit. No portal password, no integration, and no fake recovery claim.',
-    url: 'https://never86.ai/audit',
+    url: 'https://www.never86.ai/audit',
     siteName: "Never 86'd",
     type: 'website',
   },

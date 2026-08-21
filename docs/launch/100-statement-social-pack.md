@@ -18,12 +18,12 @@
 
 | Account | Link |
 |---|---|
-| Myke Mueller LinkedIn | `https://never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_launch` |
-| Never 86'd Facebook | `https://never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_page` |
-| Community Tap Facebook | `https://never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_page` |
-| 515 On The Line TikTok | `https://never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=515_on_the_line` |
-| Never 86'd TikTok | `https://never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_tiktok` |
-| Community Tap TikTok | `https://never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_tiktok` |
+| Myke Mueller LinkedIn | `https://www.never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_launch` |
+| Never 86'd Facebook | `https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_page` |
+| Community Tap Facebook | `https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_page` |
+| 515 On The Line TikTok | `https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=515_on_the_line` |
+| Never 86'd TikTok | `https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_tiktok` |
+| Community Tap TikTok | `https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_tiktok` |
 
 For TikTok, place the account-specific URL in the bio and say **link in bio** in the video and caption.
 
@@ -68,7 +68,7 @@ No portal password.
 No integration.  
 No fake recovery claim.
 
-**Run yours:** https://never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_launch
+**Run yours:** https://www.never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_launch
 
 Or comment **AUDIT** and I will send the link.
 
@@ -96,7 +96,7 @@ Own a restaurant?
 
 Send one redacted marketplace statement. I will audit it free.
 
-https://never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_cost_gap
+https://www.never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_cost_gap
 
 ---
 
@@ -135,7 +135,7 @@ If the payout math is right, we tell you it is right.
 If something is unexplained, we show the variance and the evidence needed next.
 
 **Claim a free audit:**  
-https://never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_page
+https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_page
 
 Or comment **AUDIT**.
 
@@ -178,7 +178,7 @@ Not a made-up savings number. Not an accusation. The actual math.
 
 If you own a restaurant and want your statement checked, Never 86'd is opening the first **100 audits free**.
 
-https://never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_page
+https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_page
 
 Comment **AUDIT** and we will send the link.
 
@@ -349,7 +349,7 @@ Sending it now. One redacted statement is enough to start. No portal password or
 
 Here is the free audit link:
 
-`https://never86.ai/audit`
+`https://www.never86.ai/audit`
 
 Submit your email and restaurant. We will email you back. Reply with one redacted DoorDash, Uber Eats, Grubhub, or ezCater statement.
 

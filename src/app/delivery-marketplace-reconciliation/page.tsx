@@ -9,11 +9,11 @@ export const runtime = 'nodejs';
 export const metadata: Metadata = {
   title: "Restaurant delivery marketplace reconciliation | Never86'd",
   description: 'Evidence-first help with DoorDash, Uber Eats, and Grubhub statements, fees, promotions, refunds, adjustments, payouts, and bank deposits. Start with one redacted statement.',
-  alternates: { canonical: 'https://never86.ai/delivery-marketplace-reconciliation' },
+  alternates: { canonical: 'https://www.never86.ai/delivery-marketplace-reconciliation' },
   openGraph: {
     title: 'Restaurant delivery fees and payouts, explained from the statement',
     description: 'One evidence center for DoorDash, Uber Eats, and Grubhub reconciliation. No portal password and no unsupported recovery claim.',
-    url: 'https://never86.ai/delivery-marketplace-reconciliation',
+    url: 'https://www.never86.ai/delivery-marketplace-reconciliation',
     type: 'website',
   },
   twitter: {
@@ -65,11 +65,11 @@ export default async function DeliveryMarketplaceReconciliationPage() {
   const collectionJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    '@id': 'https://never86.ai/delivery-marketplace-reconciliation#collection',
+    '@id': 'https://www.never86.ai/delivery-marketplace-reconciliation#collection',
     name: 'Restaurant delivery marketplace reconciliation evidence center',
     description: 'Evidence-first field guides for restaurant DoorDash, Uber Eats, Grubhub, and catering statements, deductions, payouts, and bank reconciliation.',
-    url: 'https://never86.ai/delivery-marketplace-reconciliation',
-    publisher: { '@id': 'https://never86.ai/#organization' },
+    url: 'https://www.never86.ai/delivery-marketplace-reconciliation',
+    publisher: { '@id': 'https://www.never86.ai/#organization' },
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: threePAnswers.length,
@@ -77,7 +77,7 @@ export default async function DeliveryMarketplaceReconciliationPage() {
         '@type': 'ListItem',
         position: index + 1,
         name: answer.title,
-        url: `https://never86.ai/answers/${answer.slug}`,
+        url: `https://www.never86.ai/answers/${answer.slug}`,
       })),
     },
   };

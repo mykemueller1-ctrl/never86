@@ -54,3 +54,12 @@ The 52 pages are the starting inventory, not a license to manufacture 52 claims.
 12. What Never86'd has and has not proven.
 
 After week 12, continue in field-guide order. Prefer depth, corrections, and real operator evidence over publishing volume.
+
+## Technical distribution after every release
+
+- The production workflow waits for the matching Vercel release and submits only the changed public URLs through IndexNow.
+- Keep the canonical host, structured-data IDs, sitemap URLs, feed URLs, and public API URLs on `https://www.never86.ai`.
+- Review Google Search Console page indexing and Bing Webmaster IndexNow status once a week; do not repeatedly request the same URL.
+- The root page advertises the Atom feed, and the feed includes a WebSub hub for update discovery.
+- Known ChatGPT, Perplexity, Google, Bing/Copilot, and Claude referrals are recorded as `discovery_referral` events using only the source family, landing path, and the site's existing anonymous event fields.
+- Request indexing for the evidence center and the newly improved guide after a material update. Do not submit a date-only change as new evidence.

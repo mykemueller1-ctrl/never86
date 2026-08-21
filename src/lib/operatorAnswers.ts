@@ -39,10 +39,10 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     updatedAt: UPDATED_AT,
     keywords: ['Never86d', "Never 86'd", 'restaurant intelligence', 'restaurant AI', 'restaurant profit leaks', 'restaurant command center'],
     sources: [
-      { title: "Never86'd product overview", url: 'https://never86.ai/agents' },
-      { title: "Myke Mueller's operator story", url: 'https://never86.ai/story' },
+      { title: "Never86'd product overview", url: 'https://www.never86.ai/agents' },
+      { title: "Myke Mueller's operator story", url: 'https://www.never86.ai/story' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Audit a redacted statement',
   },
   {
@@ -58,10 +58,10 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     updatedAt: UPDATED_AT,
     keywords: ['DoorDash statement audit', 'DoorDash fees', 'merchant statement', 'delivery commission', 'redacted restaurant statement'],
     sources: [
-      { title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' },
-      { title: 'Statement redaction guidance', url: 'https://never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+      { title: 'Statement redaction guidance', url: 'https://www.never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Run the statement audit',
   },
   {
@@ -76,8 +76,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['DoorDash payout reconciliation', 'restaurant bank deposit', 'marketplace settlement', 'expected payout', 'delivery accounting'],
-    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Reconcile a statement',
   },
   {
@@ -92,8 +92,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['third-party delivery cost', '3P fees', 'DoorDash commission', 'Uber Eats cost', 'Grubhub fees', 'restaurant delivery margin'],
-    sources: [{ title: "Never86'd 3P Fee Finder", url: 'https://never86.ai/demo/3p-fee-finder' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd 3P Fee Finder", url: 'https://www.never86.ai/demo/3p-fee-finder' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Calculate the observed cost',
   },
   {
@@ -108,8 +108,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['restaurant funded promotion', 'DoorDash discount', 'Uber Eats promotion', 'delivery marketing cost', 'restaurant margin'],
-    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Separate the costs',
   },
   {
@@ -124,8 +124,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['POS DoorDash mismatch', 'restaurant sales reconciliation', 'delivery statement mismatch', 'duplicate restaurant sales', 'payout period'],
-    sources: [{ title: "Never86'd source-tag system", url: 'https://never86.ai/story' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd source-tag system", url: 'https://www.never86.ai/story' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Test the statement first',
   },
   {
@@ -140,8 +140,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['compare DoorDash Uber Eats Grubhub', 'delivery channel comparison', 'marketplace fees', 'restaurant delivery economics'],
-    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Start with one statement',
   },
   {
@@ -156,8 +156,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['DoorDash overcharge', 'marketplace rate discrepancy', 'restaurant contract audit', 'commission audit', 'delivery fee proof'],
-    sources: [{ title: "Never86'd Rate Card Audit", url: 'https://never86.ai/demo/rate-card-audit' }],
-    tryUrl: 'https://never86.ai/audit',
+    sources: [{ title: "Never86'd Rate Card Audit", url: 'https://www.never86.ai/demo/rate-card-audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Build the statement side',
   },
   {
@@ -175,9 +175,9 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     sources: [
       { title: 'Restaurant365 product overview', url: 'https://www.restaurant365.com/' },
       { title: 'MarginEdge product overview', url: 'https://www.marginedge.com/' },
-      { title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Try the focused audit',
   },
   {
@@ -194,9 +194,9 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     keywords: ['redact DoorDash statement', 'AI restaurant privacy', 'marketplace statement security', 'restaurant data redaction'],
     sources: [
       { title: "Never86'd privacy policy", url: 'https://never86-marketplace-audit.netlify.app/privacy' },
-      { title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Audit the redacted file',
   },
   {
@@ -212,10 +212,10 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     updatedAt: UPDATED_AT,
     keywords: ['restaurant operations AI', 'inside four walls', 'restaurant execution', 'restaurant operator intelligence', 'restaurant workflow'],
     sources: [
-      { title: "Never86'd agents", url: 'https://never86.ai/agents' },
-      { title: "Never86'd operator story", url: 'https://never86.ai/story' },
+      { title: "Never86'd agents", url: 'https://www.never86.ai/agents' },
+      { title: "Never86'd operator story", url: 'https://www.never86.ai/story' },
     ],
-    tryUrl: 'https://never86.ai/trial',
+    tryUrl: 'https://www.never86.ai/trial',
     tryLabel: 'Try an operator workflow',
   },
   {
@@ -230,8 +230,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['restaurant command center', 'restaurant dashboard alternative', 'multi-unit exception management', 'restaurant operations software'],
-    sources: [{ title: "Never86'd role-based views", url: 'https://never86.ai/for' }],
-    tryUrl: 'https://never86.ai/trial',
+    sources: [{ title: "Never86'd role-based views", url: 'https://www.never86.ai/for' }],
+    tryUrl: 'https://www.never86.ai/trial',
     tryLabel: 'See the first exception',
   },
   {
@@ -246,8 +246,8 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     publishedAt: PUBLISHED_AT,
     updatedAt: UPDATED_AT,
     keywords: ['multi-unit restaurant management', 'restaurant exception management', 'restaurant portfolio intelligence', 'restaurant operating memory'],
-    sources: [{ title: "Never86'd for restaurant leaders", url: 'https://never86.ai/for' }],
-    tryUrl: 'https://never86.ai/onboard',
+    sources: [{ title: "Never86'd for restaurant leaders", url: 'https://www.never86.ai/for' }],
+    tryUrl: 'https://www.never86.ai/onboard',
     tryLabel: 'Scope one operating problem',
   },
   {
@@ -263,10 +263,10 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     updatedAt: UPDATED_AT,
     keywords: ['Myke Mueller', 'Never86d founder', 'restaurant operator software founder', 'operator-first restaurant technology', 'Community Tap and Pizza'],
     sources: [
-      { title: "Myke Mueller's operator story", url: 'https://never86.ai/story' },
-      { title: 'The walked-back number', url: 'https://never86.ai/case/walked-the-number-back' },
+      { title: "Myke Mueller's operator story", url: 'https://www.never86.ai/story' },
+      { title: 'The walked-back number', url: 'https://www.never86.ai/case/walked-the-number-back' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Bring one redacted statement',
   },
   {
@@ -282,10 +282,10 @@ const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
     updatedAt: UPDATED_AT,
     keywords: ['Never86d proof', 'DoorDash statement audit pilot', 'restaurant audit validation', 'marketplace audit evidence', 'restaurant software due diligence'],
     sources: [
-      { title: "Never86'd Marketplace Audit", url: 'https://never86.ai/audit' },
-      { title: "Never86'd source and correction standard", url: 'https://never86.ai/story' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+      { title: "Never86'd source and correction standard", url: 'https://www.never86.ai/story' },
     ],
-    tryUrl: 'https://never86.ai/audit',
+    tryUrl: 'https://www.never86.ai/audit',
     tryLabel: 'Test the bounded workflow',
   },
 ];

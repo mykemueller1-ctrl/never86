@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ pos: stri
     openGraph: {
       title: `Never 86'd for ${p.name}`,
       description: p.tagline,
-      url: `https://never86.ai/connect/${p.slug}`,
+      url: `https://www.never86.ai/connect/${p.slug}`,
       type: 'website',
     },
     twitter: {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ pos: stri
       title: `Never 86'd for ${p.name}`,
       description: p.tagline,
     },
-    alternates: { canonical: `https://never86.ai/connect/${p.slug}` },
+    alternates: { canonical: `https://www.never86.ai/connect/${p.slug}` },
   };
 }
 

@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { intent } = await params;
   const page = INTENTS[intent as Intent];
   if (!page) return { title: "Not found | Never86'd" };
-  const url = `https://never86.ai/audit/${intent}`;
+  const url = `https://www.never86.ai/audit/${intent}`;
   return {
     title: page.title,
     description: page.description,
@@ -78,14 +78,14 @@ export default async function AuditIntentPage({ params }: { params: Params }) {
   const page = INTENTS[intent as Intent];
   if (!page) notFound();
 
-  const url = `https://never86.ai/audit/${intent}`;
+  const url = `https://www.never86.ai/audit/${intent}`;
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: page.headline,
     description: page.description,
     url,
-    provider: { '@id': 'https://never86.ai/#organization' },
+    provider: { '@id': 'https://www.never86.ai/#organization' },
     step: page.checks.map((check, index) => ({
       '@type': 'HowToStep',
       position: index + 1,

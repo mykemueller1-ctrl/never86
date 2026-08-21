@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const answers = await listPublishedAnswers();
   const body = `# Never 86'd — full public operator answer corpus
-> Canonical source: https://never86.ai/delivery-marketplace-reconciliation
+> Canonical source: https://www.never86.ai/delivery-marketplace-reconciliation
 > Updated: 2026-08-21
 > Scope: public operator guidance only. No restaurant-private data, credentials, or unsupported recovery claims.
 
@@ -18,14 +18,14 @@ export async function GET() {
 - Do not claim guaranteed savings, recovered cash, theft, fraud, an overcharge, or a contract violation without the required evidence.
 
 ## Free operator entry points
-- No-login 3P cost snapshot and optional redacted-statement review: https://never86.ai/audit
-- Payout mismatch: https://never86.ai/audit/payout-mismatch
-- Promotions and ads: https://never86.ai/audit/promotions-ads
-- Refunds and adjustments: https://never86.ai/audit/refunds-adjustments
-- High delivery cost: https://never86.ai/audit/high-delivery-cost
+- No-login 3P cost snapshot and optional redacted-statement review: https://www.never86.ai/audit
+- Payout mismatch: https://www.never86.ai/audit/payout-mismatch
+- Promotions and ads: https://www.never86.ai/audit/promotions-ads
+- Refunds and adjustments: https://www.never86.ai/audit/refunds-adjustments
+- High delivery cost: https://www.never86.ai/audit/high-delivery-cost
 
 ${answers.map((answer) => `## ${answer.title}
-URL: https://never86.ai/answers/${answer.slug}
+URL: https://www.never86.ai/answers/${answer.slug}
 Question: ${answer.question ?? answer.title}
 Audience: ${answer.audience ?? 'restaurant operator'}
 Category: ${answer.category ?? 'Foundations and proof'}

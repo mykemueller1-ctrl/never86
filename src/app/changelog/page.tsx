@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Changelog",
     description: 'What shipped, when, and why. Source-tagged.',
-    url: 'https://never86.ai/changelog',
+    url: 'https://www.never86.ai/changelog',
   },
-  alternates: { canonical: 'https://never86.ai/changelog' },
+  alternates: { canonical: 'https://www.never86.ai/changelog' },
   robots: { index: false, follow: true },
 };
 

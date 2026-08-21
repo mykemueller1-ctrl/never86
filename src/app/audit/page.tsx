@@ -1,10 +1,12 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { MarketplaceAuditFooter, MarketplaceAuditHeader } from '@/components/MarketplaceAuditShell';
 import { MarketplaceCostSnapshot } from '@/components/MarketplaceCostSnapshot';
 import { trackEvent } from '@/lib/track';
+import { TOP_THREE_P_GUIDES } from '@/lib/threePDiscovery';
 
 const BREAKDOWN = [
   ['Commission', '$787.55'],
@@ -218,6 +220,26 @@ export default function AuditCampaignPage() {
           <div><p className="compass-eyebrow">— What comes back</p><h2 className="compass-display mt-5 text-4xl md:text-5xl">Not an AI essay. <em>An operator receipt.</em></h2><p className="compass-body mt-5 text-lg">Every material number is sourced, calculated, or marked missing. You leave knowing what happened and what deserves review next.</p></div>
           <div className="grid gap-3 sm:grid-cols-2">
             {OUTPUTS.map((item, index) => <div key={item} className="compass-card flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0066ff] text-sm font-semibold text-white">{index + 1}</span><p className="font-medium leading-relaxed text-[#515154]">{item}</p></div>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[#e8e8ed] bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-3xl">
+              <p className="compass-eyebrow">— Operator evidence desk</p>
+              <h2 className="compass-display mt-5 text-4xl md:text-6xl">Check the method before you send a file.</h2>
+              <p className="compass-body mt-5 text-lg">Use the same statement, payout, contract, and bank rules Never86&apos;d applies. Every guide states what the evidence can prove and where it stops.</p>
+            </div>
+            <Link href="/delivery-marketplace-reconciliation" className="btn-primary" style={{ background: '#0066ff' }}>Open all 52 guides →</Link>
+          </div>
+          <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {TOP_THREE_P_GUIDES.map((guide) => (
+              <Link key={guide.href} href={guide.href} className="compass-card font-semibold leading-snug text-[#515154] transition hover:border-[#0066ff] hover:text-[#1d1d1f]">
+                {guide.title} <span className="text-[#0066ff]">→</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

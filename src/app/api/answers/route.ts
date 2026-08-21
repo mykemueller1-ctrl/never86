@@ -36,7 +36,7 @@ export async function GET(req: Request) {
       field_checks: a.fieldChecks,
       evidence_needed: a.evidenceNeeded,
       evidence_boundary: a.evidenceBoundary,
-      url: `https://never86.ai/answers/${a.slug}`,
+      url: `https://www.never86.ai/answers/${a.slug}`,
       published_at: a.publishedAt,
     }, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } });
   }
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
   const all = await listPublishedAnswers();
   return NextResponse.json({
     count: all.length,
-    source: 'https://never86.ai',
+    source: 'https://www.never86.ai',
     license: 'public-attribution',
     attribution: "Never 86'd · operator-turned-founder native AI for multi-unit restaurants",
     answers: all.map((a) => ({
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
       keywords: a.keywords,
       category: a.category,
       week: a.week,
-      url: `https://never86.ai/answers/${a.slug}`,
+      url: `https://www.never86.ai/answers/${a.slug}`,
       published_at: a.publishedAt,
     })),
   }, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } });

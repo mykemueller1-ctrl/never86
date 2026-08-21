@@ -5,11 +5,11 @@ import { TrackedLink } from '@/components/TrackedLink';
 export const metadata: Metadata = {
   title: "Pricing · Never 86'd",
   description: 'Owner $199/mo. Command $499/location. Enterprise custom. Free leak audit first — no contact-us-for-pricing nonsense.',
-  alternates: { canonical: 'https://never86.ai/pricing' },
+  alternates: { canonical: 'https://www.never86.ai/pricing' },
   openGraph: {
     title: "Never 86'd · Pricing",
     description: 'Owner $199/mo. Command $499/location. Enterprise custom. Free leak audit first.',
-    url: 'https://never86.ai/pricing',
+    url: 'https://www.never86.ai/pricing',
   },
 };
 

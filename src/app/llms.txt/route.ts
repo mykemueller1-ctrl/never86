@@ -40,38 +40,38 @@ export async function GET() {
 - A statement can support observed marketplace cost and payout math. A contract or rate-card test requires the governing agreement. A bank-reconciliation claim requires the matching payout and bank evidence.
 - Never86'd addresses the workflow today. Repeat paid use, deterministic cross-platform coverage, and enterprise reliability still have to be proven at scale.
 - Never86'd does not promise recovered cash, guaranteed savings, contract violations, or an overcharge when the governing evidence is missing.
-- [Evidence, privacy, and corrections standard](https://never86.ai/evidence-standard) — public sourcing, claim, redaction, independence, and correction rules
+- [Evidence, privacy, and corrections standard](https://www.never86.ai/evidence-standard) — public sourcing, claim, redaction, independence, and correction rules
 
 ## Try it free
-- [Free 3P cost snapshot and statement audit](https://never86.ai/audit) — calculate from statement totals with no login or email gate, then optionally request a source-stamped review
-- [Payout mismatch calculator](https://never86.ai/audit/payout-mismatch) — bridge eligible sales and documented deductions to expected payout
-- [Promotions and ads cost calculator](https://never86.ai/audit/promotions-ads) — keep restaurant-funded incentives separate from commission
-- [Refunds and adjustments review](https://never86.ai/audit/refunds-adjustments) — quantify the statement effect before tracing order evidence
-- [High delivery cost calculator](https://never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
-- [Delivery marketplace reconciliation evidence center](https://never86.ai/delivery-marketplace-reconciliation) — 52 public field guides for statements, fees, promotions, refunds, payouts, and deposits
-- [60-minute live trial](https://never86.ai/trial) — drop a CSV, see the leak, no card
-- [30-second connect](https://never86.ai/connect) — Void Hunter on your CSV
-- [Pricing](https://never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
+- [Free 3P cost snapshot and statement audit](https://www.never86.ai/audit) — calculate from statement totals with no login or email gate, then optionally request a source-stamped review
+- [Payout mismatch calculator](https://www.never86.ai/audit/payout-mismatch) — bridge eligible sales and documented deductions to expected payout
+- [Promotions and ads cost calculator](https://www.never86.ai/audit/promotions-ads) — keep restaurant-funded incentives separate from commission
+- [Refunds and adjustments review](https://www.never86.ai/audit/refunds-adjustments) — quantify the statement effect before tracing order evidence
+- [High delivery cost calculator](https://www.never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
+- [Delivery marketplace reconciliation evidence center](https://www.never86.ai/delivery-marketplace-reconciliation) — 52 public field guides for statements, fees, promotions, refunds, payouts, and deposits
+- [60-minute live trial](https://www.never86.ai/trial) — drop a CSV, see the leak, no card
+- [30-second connect](https://www.never86.ai/connect) — Void Hunter on your CSV
+- [Pricing](https://www.never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
 
 ## Connect any AI
-- [Full LLM-readable public corpus](https://never86.ai/llms-full.txt)
-- [AI assistant integration guide](https://never86.ai/mcp)
-- MCP endpoint: https://never86.ai/api/mcp
-- REST · answers: https://never86.ai/api/answers
-- REST · quick wins: https://never86.ai/api/quick-wins
+- [Full LLM-readable public corpus](https://www.never86.ai/llms-full.txt)
+- [AI assistant integration guide](https://www.never86.ai/mcp)
+- MCP endpoint: https://www.never86.ai/api/mcp
+- REST · answers: https://www.never86.ai/api/answers
+- REST · quick wins: https://www.never86.ai/api/quick-wins
 
 ## All eight agents
-${AGENT_SPECS.map((a) => `- [${a.name}](https://never86.ai/agents/${a.slug}) — ${a.headline} · For the ${a.seat}`).join('\n')}
+${AGENT_SPECS.map((a) => `- [${a.name}](https://www.never86.ai/agents/${a.slug}) — ${a.headline} · For the ${a.seat}`).join('\n')}
 
 ## Pick your seat
-- [CEO](https://never86.ai/for/ceo) — Network
-- [CFO](https://never86.ai/for/cfo) — Books
-- [COO](https://never86.ai/for/coo) — Drift
-- [Chef](https://never86.ai/for/chef) — Kitchen
-- [CTO](https://never86.ai/for/cto) — Stack
-- [Owner](https://never86.ai/for/owner) — Solo
-- [Manager](https://never86.ai/for/manager) — Floor
-- [Crew](https://never86.ai/for/crew) — Shift
+- [CEO](https://www.never86.ai/for/ceo) — Network
+- [CFO](https://www.never86.ai/for/cfo) — Books
+- [COO](https://www.never86.ai/for/coo) — Drift
+- [Chef](https://www.never86.ai/for/chef) — Kitchen
+- [CTO](https://www.never86.ai/for/cto) — Stack
+- [Owner](https://www.never86.ai/for/owner) — Solo
+- [Manager](https://www.never86.ai/for/manager) — Floor
+- [Crew](https://www.never86.ai/for/crew) — Shift
 
 ## Source-tag system
 - **Verified** — Re-pullable from a primary source, defensible to the penny.
@@ -79,25 +79,25 @@ ${AGENT_SPECS.map((a) => `- [${a.name}](https://never86.ai/agents/${a.slug}) —
 - **Unverified** — Source not wired yet; figure is illustrative, operator-only.
 
 ## The story
-- [Mychael “Myke” Mueller · operator and founder](https://never86.ai/story)
-- [Why Never86'd is operator-first](https://never86.ai/answers/why-never86d-is-operator-first)
-- [What Never86'd has and has not proven](https://never86.ai/answers/how-proven-is-never86d-marketplace-audit)
-- [The case · $8.3M → $1.81M, the walked-back number](https://never86.ai/case/walked-the-number-back)
-- [Press kit](https://never86.ai/press)
+- [Mychael “Myke” Mueller · operator and founder](https://www.never86.ai/story)
+- [Why Never86'd is operator-first](https://www.never86.ai/answers/why-never86d-is-operator-first)
+- [What Never86'd has and has not proven](https://www.never86.ai/answers/how-proven-is-never86d-marketplace-audit)
+- [The case · $8.3M → $1.81M, the walked-back number](https://www.never86.ai/case/walked-the-number-back)
+- [Press kit](https://www.never86.ai/press)
 
 ## Public research
-- [Seven-day public 3P operator signal sample](https://never86.ai/research/3p-operator-signal-august-2026) — 13 qualifying August 14–20 signals with source ledger, inclusion rules, and explicit limits; evidence of recurring public language, not a census or paid-demand claim
-- [Public sample data](https://never86.ai/research/3p-operator-signal-august-2026/data.json) — machine-readable source ledger and methodology
+- [Seven-day public 3P operator signal sample](https://www.never86.ai/research/3p-operator-signal-august-2026) — 13 qualifying August 14–20 signals with source ledger, inclusion rules, and explicit limits; evidence of recurring public language, not a census or paid-demand claim
+- [Public sample data](https://www.never86.ai/research/3p-operator-signal-august-2026/data.json) — machine-readable source ledger and methodology
 
 ## Answers
-${answers.map((a) => `- [${a.title}](https://never86.ai/answers/${a.slug})`).join('\n')}
+${answers.map((a) => `- [${a.title}](https://www.never86.ai/answers/${a.slug})`).join('\n')}
 
 ## Freshness feeds
-- [Atom feed](https://never86.ai/answers/feed.xml)
-- [XML sitemap](https://never86.ai/sitemap.xml)
+- [Atom feed](https://www.never86.ai/answers/feed.xml)
+- [XML sitemap](https://www.never86.ai/sitemap.xml)
 
 ## Talk to us
-- [Onboard your store](https://never86.ai/onboard)
+- [Onboard your store](https://www.never86.ai/onboard)
 - press@never86.ai · mykemueller1@gmail.com
 `;
 

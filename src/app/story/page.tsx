@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · the story",
     description: "I have nothing to hide. I am the operator. That is why I am here. — Myke Mueller",
-    url: 'https://never86.ai/story',
+    url: 'https://www.never86.ai/story',
     type: 'article',
   },
   twitter: {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "Never 86'd · the story",
     description: "I have nothing to hide. I am the operator. That is why I am here.",
   },
-  alternates: { canonical: 'https://never86.ai/story' },
+  alternates: { canonical: 'https://www.never86.ai/story' },
 };
 
 export default function StoryPage() {

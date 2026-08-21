@@ -6,7 +6,7 @@ import { POS_SPECS } from '@/lib/posSpecs';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const BASE = 'https://never86.ai';
+const BASE = 'https://www.never86.ai';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let answers: { slug: string; updatedAt: string }[] = [];
@@ -20,8 +20,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date('2026-08-21T05:30:00Z');
 
   const fixed: MetadataRoute.Sitemap = [
-    { url: `${BASE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: BASE, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/audit`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/audit/payout-mismatch`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/promotions-ads`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/refunds-adjustments`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/high-delivery-cost`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/for`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/for/ceo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/cfo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },

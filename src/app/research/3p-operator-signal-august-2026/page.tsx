@@ -5,7 +5,7 @@ import { PUBLIC_SIGNAL_METHOD, THREE_P_PUBLIC_SIGNALS } from '@/lib/threePSocial
 export const metadata: Metadata = {
   title: "Seven days of public 3P restaurant signals | Never86'd research",
   description: 'A documented August 14–20, 2026 sample of 13 public restaurant-side signals about delivery economics, disputes, promotions, payouts, and reconciliation—with method and limits.',
-  alternates: { canonical: 'https://never86.ai/research/3p-operator-signal-august-2026' },
+  alternates: { canonical: 'https://www.never86.ai/research/3p-operator-signal-august-2026' },
 };
 
 export default function Public3PSignalReport() {
@@ -20,16 +20,16 @@ export default function Public3PSignalReport() {
     '@type': 'Dataset',
     name: 'Seven-day public restaurant 3P control signal sample',
     description: 'A strict, deduplicated sample of public restaurant-side third-party delivery economics and control signals observed August 14–20, 2026.',
-    url: 'https://never86.ai/research/3p-operator-signal-august-2026',
+    url: 'https://www.never86.ai/research/3p-operator-signal-august-2026',
     datePublished: '2026-08-21',
     temporalCoverage: PUBLIC_SIGNAL_METHOD.window,
-    creator: { '@id': 'https://never86.ai/#organization' },
+    creator: { '@id': 'https://www.never86.ai/#organization' },
     measurementTechnique: 'Manual public-source qualification and deduplication using published inclusion and exclusion rules.',
     variableMeasured: ['platform', 'source classification', 'issue mechanism', 'evidence limitation'],
     distribution: [{
       '@type': 'DataDownload',
       encodingFormat: 'application/json',
-      contentUrl: 'https://never86.ai/research/3p-operator-signal-august-2026/data.json',
+      contentUrl: 'https://www.never86.ai/research/3p-operator-signal-august-2026/data.json',
     }],
   };
 

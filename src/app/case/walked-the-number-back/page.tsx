@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "$8.3M → $1.81M · How we walked our own number back",
     description:
       "Most vendors brag about accuracy gains. We publish the corrections.",
-    url: 'https://never86.ai/case/walked-the-number-back',
+    url: 'https://www.never86.ai/case/walked-the-number-back',
     type: 'article',
   },
   twitter: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "$8.3M → $1.81M · The correction",
     description: "Most vendors brag about accuracy gains. We publish the corrections.",
   },
-  alternates: { canonical: 'https://never86.ai/case/walked-the-number-back' },
+  alternates: { canonical: 'https://www.never86.ai/case/walked-the-number-back' },
 };
 
 export default function CaseWalkedBack() {

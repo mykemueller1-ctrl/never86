@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Drop a CSV, see the leak in 30 seconds",
     description: 'No signup. No POS wiring. Drop your employee-performance export — Void Hunter runs on real data.',
-    url: 'https://never86.ai/connect',
+    url: 'https://www.never86.ai/connect',
     type: 'website',
   },
   twitter: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Never 86'd · 30-second CSV → leak read",
     description: 'No signup. Drop a CSV. See the leak.',
   },
-  alternates: { canonical: 'https://never86.ai/connect' },
+  alternates: { canonical: 'https://www.never86.ai/connect' },
 };
 
 export default function ConnectLayout({ children }: { children: React.ReactNode }) {

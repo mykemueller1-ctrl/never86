@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Install the operator app",
     description: 'From the trial wedge to the full operator OS. White-glove onboarding for the first 10 operators.',
-    url: 'https://never86.ai/install',
+    url: 'https://www.never86.ai/install',
   },
-  alternates: { canonical: 'https://never86.ai/install' },
+  alternates: { canonical: 'https://www.never86.ai/install' },
 };
 
 export default function InstallPage() {

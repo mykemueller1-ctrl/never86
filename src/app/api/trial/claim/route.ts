@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok,
-      shareUrl: `https://never86.ai/trial/run/${data.shareToken}`,
+      shareUrl: `https://www.never86.ai/trial/run/${data.shareToken}`,
     });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Bad request';

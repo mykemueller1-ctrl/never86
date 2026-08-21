@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: "For AI · Never 86'd",
   description: 'Public MCP endpoint for AI assistants.',
-  alternates: { canonical: 'https://never86.ai/mcp' },
+  alternates: { canonical: 'https://www.never86.ai/mcp' },
   robots: { index: true, follow: true },
 };
 
@@ -38,7 +38,7 @@ export default function McpPage() {
         </p>
         <div className="compass-card">
           <p className="compass-card-label">MCP endpoint</p>
-          <p className="font-mono text-ink-800 text-[15px] mt-3 break-all">https://never86.ai/api/mcp</p>
+          <p className="font-mono text-ink-800 text-[15px] mt-3 break-all">https://www.never86.ai/api/mcp</p>
         </div>
       </section>
 

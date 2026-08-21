@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · 60-minute live trial",
     description: 'One hour. Your real numbers. Drop a CSV, see the leak, no human in the loop.',
-    url: 'https://never86.ai/trial',
+    url: 'https://www.never86.ai/trial',
     type: 'website',
   },
   twitter: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Never 86'd · 60-minute live trial",
     description: 'Drop a CSV, see the leak. No card. No human in the loop.',
   },
-  alternates: { canonical: 'https://never86.ai/trial' },
+  alternates: { canonical: 'https://www.never86.ai/trial' },
 };
 
 export default function TrialLayout({ children }: { children: React.ReactNode }) {

@@ -8,17 +8,17 @@ const html = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>What Is a Margin Inspection When Buying a Restaurant? | Never 86'd</title>
 <meta name="description" content="Every restaurant buyer gets a building inspection. Almost nobody gets a margin inspection — a POS-level audit of comps, voids, pour variance, and 3P fees before signing.">
-<link rel="canonical" href="https://never86.ai/blog/restaurant-margin-inspection">
+<link rel="canonical" href="https://www.never86.ai/blog/restaurant-margin-inspection">
 <meta property="og:type" content="article">
 <meta property="og:title" content="What Is a Margin Inspection When Buying a Restaurant?">
 <meta property="og:description" content="The P&L is the seller's story. The building inspection covers the walls. The margin inspection reads the POS — comps, voids, pour variance, 3P fees — before you sign.">
-<meta property="og:url" content="https://never86.ai/blog/restaurant-margin-inspection">
-<meta property="og:image" content="https://never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
+<meta property="og:url" content="https://www.never86.ai/blog/restaurant-margin-inspection">
+<meta property="og:image" content="https://www.never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
 <meta property="og:site_name" content="Never 86'd">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="What Is a Margin Inspection When Buying a Restaurant?">
 <meta name="twitter:description" content="Every buyer gets a building inspection. Almost nobody gets a margin inspection. Here's what one covers and why it matters in the boomer retirement wave.">
-<meta name="twitter:image" content="https://never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
+<meta name="twitter:image" content="https://www.never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -74,11 +74,11 @@ const html = `<!DOCTYPE html>
   "publisher": {
     "@type": "Organization",
     "name": "Never 86'd",
-    "url": "https://never86.ai"
+    "url": "https://www.never86.ai"
   },
   "datePublished": "2026-07-10",
   "dateModified": "2026-07-10",
-  "mainEntityOfPage": "https://never86.ai/blog/restaurant-margin-inspection"
+  "mainEntityOfPage": "https://www.never86.ai/blog/restaurant-margin-inspection"
 }
 </script>
 <style>
@@ -147,7 +147,7 @@ const html = `<!DOCTYPE html>
   </dl>
 
   <div class="cta">
-    <p><strong>Buying a restaurant — or selling one and want the numbers clean first?</strong> Never 86'd runs the margin inspection against your POS data. <a href="https://never86.ai">never86.ai</a> · myke@n86.app</p>
+    <p><strong>Buying a restaurant — or selling one and want the numbers clean first?</strong> Never 86'd runs the margin inspection against your POS data. <a href="https://www.never86.ai">never86.ai</a> · myke@n86.app</p>
   </div>
 </article>
 </body>

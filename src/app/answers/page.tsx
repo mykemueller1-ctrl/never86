@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   title: "Restaurant operator answers · Never86'd",
   description: "Practical, source-aware answers on delivery-marketplace fees, payout reconciliation, restaurant AI, margin leaks, and multi-unit execution from Never86'd.",
   alternates: {
-    canonical: 'https://never86.ai/answers',
-    types: { 'application/atom+xml': 'https://never86.ai/answers/feed.xml' },
+    canonical: 'https://www.never86.ai/answers',
+    types: { 'application/atom+xml': 'https://www.never86.ai/answers/feed.xml' },
   },
   openGraph: {
     title: "Restaurant operator answers · Never86'd",
     description: 'Evidence-first answers for restaurant owners, finance teams, and multi-unit operators.',
-    url: 'https://never86.ai/answers',
+    url: 'https://www.never86.ai/answers',
   },
 };
 

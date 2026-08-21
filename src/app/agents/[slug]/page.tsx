@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${a.name} — ${a.headline}`,
       description: a.intro,
-      url: `https://never86.ai/agents/${a.slug}`,
+      url: `https://www.never86.ai/agents/${a.slug}`,
       type: 'article',
     },
     twitter: {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: `${a.name} — ${a.headline}`,
       description: a.intro,
     },
-    alternates: { canonical: `https://never86.ai/agents/${a.slug}` },
+    alternates: { canonical: `https://www.never86.ai/agents/${a.slug}` },
   };
 }
 
@@ -45,19 +45,19 @@ export default async function AgentDetail({ params }: { params: Promise<{ slug: 
     applicationCategory: 'BusinessApplication',
     applicationSubCategory: 'Restaurant Financial Intelligence',
     operatingSystem: 'Web',
-    url: `https://never86.ai/agents/${a.slug}`,
+    url: `https://www.never86.ai/agents/${a.slug}`,
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
       description: '60-minute free trial · drop a CSV at /trial',
-      url: 'https://never86.ai/trial',
+      url: 'https://www.never86.ai/trial',
     },
     featureList: a.catches.join(' · '),
     publisher: {
       '@type': 'Organization',
       name: "Never 86'd",
-      url: 'https://never86.ai',
+      url: 'https://www.never86.ai',
     },
   };
 

@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     openGraph: {
       title: a.title,
       description: desc,
-      url: `https://never86.ai/answers/${a.slug}`,
+      url: `https://www.never86.ai/answers/${a.slug}`,
       type: 'article',
     },
     twitter: { card: 'summary_large_image', title: a.title, description: desc },
-    alternates: { canonical: `https://never86.ai/answers/${a.slug}` },
+    alternates: { canonical: `https://www.never86.ai/answers/${a.slug}` },
   };
 }
 
@@ -49,14 +49,14 @@ export default async function AnswerPage({ params }: { params: Params }) {
     articleBody: a.answer,
     datePublished: a.publishedAt,
     dateModified: a.updatedAt,
-    mainEntityOfPage: `https://never86.ai/answers/${a.slug}`,
+    mainEntityOfPage: `https://www.never86.ai/answers/${a.slug}`,
     author: {
       '@type': 'Person',
       name: 'Mychael Mueller',
       alternateName: 'Myke Mueller',
-      url: 'https://never86.ai/story',
+      url: 'https://www.never86.ai/story',
     },
-    publisher: { '@type': 'Organization', name: "Never86'd", alternateName: "Never 86'd", url: 'https://never86.ai' },
+    publisher: { '@type': 'Organization', name: "Never86'd", alternateName: "Never 86'd", url: 'https://www.never86.ai' },
     about: ['restaurant operations', 'restaurant financial intelligence', ...(a.keywords ?? [])],
     articleSection: a.category,
     citation: (a.sources ?? []).map((source) => source.url),
@@ -66,9 +66,9 @@ export default async function AnswerPage({ params }: { params: Params }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: "Never86'd", item: 'https://never86.ai/' },
-      { '@type': 'ListItem', position: 2, name: 'Answers', item: 'https://never86.ai/answers' },
-      { '@type': 'ListItem', position: 3, name: a.title, item: `https://never86.ai/answers/${a.slug}` },
+      { '@type': 'ListItem', position: 1, name: "Never86'd", item: 'https://www.never86.ai/' },
+      { '@type': 'ListItem', position: 2, name: 'Answers', item: 'https://www.never86.ai/answers' },
+      { '@type': 'ListItem', position: 3, name: a.title, item: `https://www.never86.ai/answers/${a.slug}` },
     ],
   };
 

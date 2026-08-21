@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Eight ways we find your leak",
     description: 'Find the leak. Name who owns it. Keep the receipt. Eight checks, every number labeled Verified / Estimated / Unverified.',
-    url: 'https://never86.ai/agents',
+    url: 'https://www.never86.ai/agents',
     type: 'website',
   },
   twitter: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Never 86'd · Eight ways we find your leak",
     description: 'Eight checks that read your whole operation. Every number labeled.',
   },
-  alternates: { canonical: 'https://never86.ai/agents' },
+  alternates: { canonical: 'https://www.never86.ai/agents' },
 };
 
 // AGENT_SPECS and SOURCE_TAGS imported from @/lib/agentSpecs

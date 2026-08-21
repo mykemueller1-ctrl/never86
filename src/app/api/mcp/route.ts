@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // Public MCP-protocol server endpoint. JSON-RPC 2.0 over HTTP.
 // Exposes the SAME limited public surface as /api/answers and /api/quick-wins.
 // Connect from Claude Desktop / Gemini / ChatGPT via their respective MCP
-// connector configurations using https://never86.ai/api/mcp as the URL.
+// connector configurations using https://www.never86.ai/api/mcp as the URL.
 //
 // Per governance: NEVER expose operator data, methodology, agent manifests,
 // or admin tables. This is the answer corpus and the public catalog only.
@@ -122,8 +122,8 @@ const FREE_AGENTS = AGENT_SPECS.map((a) => ({
   slug: a.slug,
   name: a.name,
   audience: a.seat,
-  landingUrl: `https://never86.ai/agents/${a.slug}`,
-  demoUrl: `https://never86.ai${a.href}`,
+  landingUrl: `https://www.never86.ai/agents/${a.slug}`,
+  demoUrl: `https://www.never86.ai${a.href}`,
   headline: a.headline,
   catches: a.catches,
   sampleSignal: a.sampleSignal,
@@ -131,14 +131,14 @@ const FREE_AGENTS = AGENT_SPECS.map((a) => ({
 }));
 
 const SEATS = [
-  { role: 'CEO',     url: 'https://never86.ai/for/ceo' },
-  { role: 'CFO',     url: 'https://never86.ai/for/cfo' },
-  { role: 'COO',     url: 'https://never86.ai/for/coo' },
-  { role: 'Chef',    url: 'https://never86.ai/for/chef' },
-  { role: 'CTO',     url: 'https://never86.ai/for/cto' },
-  { role: 'Owner',   url: 'https://never86.ai/for/owner' },
-  { role: 'Manager', url: 'https://never86.ai/for/manager' },
-  { role: 'Crew',    url: 'https://never86.ai/for/crew' },
+  { role: 'CEO',     url: 'https://www.never86.ai/for/ceo' },
+  { role: 'CFO',     url: 'https://www.never86.ai/for/cfo' },
+  { role: 'COO',     url: 'https://www.never86.ai/for/coo' },
+  { role: 'Chef',    url: 'https://www.never86.ai/for/chef' },
+  { role: 'CTO',     url: 'https://www.never86.ai/for/cto' },
+  { role: 'Owner',   url: 'https://www.never86.ai/for/owner' },
+  { role: 'Manager', url: 'https://www.never86.ai/for/manager' },
+  { role: 'Crew',    url: 'https://www.never86.ai/for/crew' },
 ];
 
 function ok(id: string | number | null | undefined, result: unknown) {
@@ -170,7 +170,7 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           title: a.title,
           question: a.question,
           audience: a.audience,
-          url: `https://never86.ai/answers/${a.slug}`,
+          url: `https://www.never86.ai/answers/${a.slug}`,
         }));
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       }
@@ -181,7 +181,7 @@ async function handle(req: JsonRpcReq): Promise<Response> {
         const a = await getPublishedAnswer(slug);
         if (!a) return ok(req.id, { content: [{ type: 'text', text: 'Not found.' }] });
         const sources = (a.sources ?? []).map((source) => `- ${source.title}: ${source.url}`).join('\n');
-        return ok(req.id, { content: [{ type: 'text', text: `${a.title}\n\nQ: ${a.question ?? '—'}\n\n${a.answer}\n\nCanonical: https://never86.ai/answers/${a.slug}${sources ? `\n\nSources:\n${sources}` : ''}` }] });
+        return ok(req.id, { content: [{ type: 'text', text: `${a.title}\n\nQ: ${a.question ?? '—'}\n\n${a.answer}\n\nCanonical: https://www.never86.ai/answers/${a.slug}${sources ? `\n\nSources:\n${sources}` : ''}` }] });
       }
 
       if (name === 'search_answers') {
@@ -202,7 +202,7 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             question: a.question,
             summary: a.summary,
             relevance: score,
-            url: `https://never86.ai/answers/${a.slug}`,
+            url: `https://www.never86.ai/answers/${a.slug}`,
           }));
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(matches, null, 2) }] });
       }
@@ -227,8 +227,8 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           output: a.output,
           sampleSignal: a.sampleSignal,
           posSupport: a.posSupport,
-          landingUrl: `https://never86.ai/agents/${a.slug}`,
-          demoUrl: `https://never86.ai${a.href}`,
+          landingUrl: `https://www.never86.ai/agents/${a.slug}`,
+          demoUrl: `https://www.never86.ai${a.href}`,
         };
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       }
@@ -274,9 +274,9 @@ export async function GET() {
   return NextResponse.json({
     protocol: 'mcp',
     transport: 'http+json-rpc-2.0',
-    endpoint: 'https://never86.ai/api/mcp',
+    endpoint: 'https://www.never86.ai/api/mcp',
     server: SERVER_INFO,
     tools: TOOLS.map((t) => ({ name: t.name, description: t.description })),
-    docs: 'https://never86.ai/mcp',
+    docs: 'https://www.never86.ai/mcp',
   });
 }

@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Never 86'd · ${spec.audience}`,
     description: spec.intro,
-    url: `https://never86.ai/for/${spec.slug}`,
+    url: `https://www.never86.ai/for/${spec.slug}`,
   },
-  alternates: { canonical: `https://never86.ai/for/${spec.slug}` },
+  alternates: { canonical: `https://www.never86.ai/for/${spec.slug}` },
 };
 
 export default function Page() {

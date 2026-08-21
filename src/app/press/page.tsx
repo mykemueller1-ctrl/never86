@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Never 86'd · Press kit",
     description: "I have nothing to hide. I am the operator. That is why I am here.",
-    url: 'https://never86.ai/press',
+    url: 'https://www.never86.ai/press',
   },
-  alternates: { canonical: 'https://never86.ai/press' },
+  alternates: { canonical: 'https://www.never86.ai/press' },
 };
 
 const RECEIPTS = [
@@ -22,7 +22,7 @@ const RECEIPTS = [
 const FACTS = [
   ['Company',          "Never 86'd · Inc."],
   ['Founder',          'Myke Mueller'],
-  ['Site',             'https://never86.ai'],
+  ['Site',             'https://www.never86.ai'],
   ['Press',            'press@never86.ai'],
   ['Sales / operator', 'myke@n86.app'],
   ['Headquarters',     'Fort Dodge, Iowa'],
