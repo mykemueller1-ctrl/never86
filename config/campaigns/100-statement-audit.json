@@ -1,0 +1,121 @@
+{
+  "campaign_id": "100_statement_audit",
+  "name": "100 Statement Audit",
+  "status": "prelaunch",
+  "landing_path": "/audit",
+  "primary_conversion": "audit_intake_submitted",
+  "secondary_conversion": "comment_or_dm_audit",
+  "offer": "One free audit from one redacted DoorDash, Uber Eats, Grubhub, or ezCater statement.",
+  "trust_rules": [
+    "Never label a variance theft or fraud without direct evidence.",
+    "Keep identified, disputed, reimbursed, recovered, and protected dollars separate.",
+    "A clean reconciliation is a successful result.",
+    "Never publish customer data or audit results without permission."
+  ],
+  "accounts": [
+    {
+      "account_id": "myke_linkedin",
+      "platform": "linkedin",
+      "display_name": "Myke Mueller",
+      "voice": "founder_operator",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=linkedin&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=myke_launch"
+    },
+    {
+      "account_id": "never86d_facebook",
+      "platform": "facebook",
+      "display_name": "Never 86'd",
+      "voice": "product_proof",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_page"
+    },
+    {
+      "account_id": "community_tap_facebook",
+      "platform": "facebook",
+      "display_name": "Community Tap & Pizza",
+      "voice": "firsthand_restaurant_proof",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=facebook&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_page"
+    },
+    {
+      "account_id": "515_on_the_line_tiktok",
+      "platform": "tiktok",
+      "display_name": "515 On The Line",
+      "voice": "operator_attention",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=515_on_the_line"
+    },
+    {
+      "account_id": "never86d_tiktok",
+      "platform": "tiktok",
+      "display_name": "Never 86'd",
+      "voice": "product_proof",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=never86d_tiktok"
+    },
+    {
+      "account_id": "community_tap_tiktok",
+      "platform": "tiktok",
+      "display_name": "Community Tap & Pizza",
+      "voice": "firsthand_restaurant_proof",
+      "tracked_url": "https://www.never86.ai/audit?utm_source=tiktok&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=community_tap_tiktok"
+    }
+  ],
+  "proof_example": {
+    "restaurant": "Community Tap & Pizza",
+    "platform": "DoorDash",
+    "period": "2026-01-01/2026-01-31",
+    "eligible_food_sales": 8207.63,
+    "commission": 787.55,
+    "merchant_fees": 39.92,
+    "promotions_and_marketing": 887.8,
+    "error_charges": 49.02,
+    "true_marketplace_cost": 1764.29,
+    "effective_cost_rate": 0.215,
+    "reported_payout": 7646.86,
+    "calculated_payout": 7646.86,
+    "unexplained_variance": 0,
+    "permission_scope": "founder-owned restaurant proof"
+  },
+  "content_sequence": [
+    {
+      "day": 1,
+      "account_id": "myke_linkedin",
+      "content_key": "commission_is_not_cost",
+      "objective": "qualified_audit_requests"
+    },
+    {
+      "day": 1,
+      "account_id": "never86d_facebook",
+      "content_key": "true_cost_1764",
+      "objective": "qualified_audit_requests"
+    },
+    {
+      "day": 1,
+      "account_id": "515_on_the_line_tiktok",
+      "content_key": "wrong_number_hook",
+      "objective": "comments_and_profile_clicks"
+    },
+    {
+      "day": 2,
+      "account_id": "never86d_tiktok",
+      "content_key": "zero_missing_is_good",
+      "objective": "trust_and_profile_clicks"
+    },
+    {
+      "day": 2,
+      "account_id": "community_tap_facebook",
+      "content_key": "tested_on_ourselves",
+      "objective": "operator_trust"
+    },
+    {
+      "day": 2,
+      "account_id": "community_tap_tiktok",
+      "content_key": "tested_on_ourselves_vertical",
+      "objective": "comments_and_profile_clicks"
+    }
+  ],
+  "measurement": [
+    "audit_campaign_view",
+    "audit_campaign_submit",
+    "audit_campaign_success",
+    "audit_campaign_error",
+    "audit_campaign_mailto_click",
+    "audit_campaign_bottom_cta"
+  ]
+}

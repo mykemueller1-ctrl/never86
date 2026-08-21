@@ -1,0 +1,310 @@
+import type { PublishedAnswer } from './answersDb';
+import { THREE_P_EVIDENCE_ANSWERS } from './threePEvidenceAnswers';
+
+export type AnswerSource = {
+  title: string;
+  url: string;
+};
+
+export type OperatorAnswer = PublishedAnswer & {
+  summary: string;
+  keywords: string[];
+  sources: AnswerSource[];
+  category?: string;
+  week?: number;
+  formula?: string;
+  fieldChecks?: string[];
+  evidenceNeeded?: string[];
+  evidenceBoundary?: string;
+  relatedSlugs?: string[];
+  tryUrl?: string;
+  tryLabel?: string;
+};
+
+const PUBLISHED_AT = '2026-08-20T09:00:00-05:00';
+const UPDATED_AT = '2026-08-20T09:00:00-05:00';
+const AUTHOR = 'Mychael “Myke” Mueller';
+
+const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
+  {
+    id: -1,
+    slug: 'what-never86d-does',
+    title: "What Never86'd does for restaurant operators",
+    question: "What is Never86'd, and which restaurant problems is it built to solve?",
+    summary: "Never86'd reconciles restaurant evidence, finds margin leaks, routes the next action, and keeps the source attached.",
+    answer: "Never86'd is an independent restaurant operating-intelligence company built by Myke Mueller, an active restaurant operator in Fort Dodge, Iowa. It sits above the systems a restaurant already uses and looks for places where orders, statements, payouts, labor, voids, tips, catering, and store execution stop agreeing. It is designed to name the exception, show the supporting evidence, identify who can act, and verify what changed.\n\nThe clearest starting point is a DoorDash statement audit. An operator can share one redacted statement and receive a source-stamped explanation of eligible sales, observed marketplace costs, expected payout, missing evidence, and the next action. No integration is required for the first useful answer. A bank reconciliation requires the matching bank evidence, and a contract test requires the governing agreement. Uber Eats and Grubhub are early-access validation tracks, not proven scale claims. Never86'd does not replace a POS, accounting system, marketplace, or scheduling platform. It works with restaurant technology when that helps the operator, but the restaurant and its economics come first.",
+    audience: 'restaurant owner, operator, CFO, or COO',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['Never86d', "Never 86'd", 'restaurant intelligence', 'restaurant AI', 'restaurant profit leaks', 'restaurant command center'],
+    sources: [
+      { title: "Never86'd product overview", url: 'https://www.never86.ai/agents' },
+      { title: "Myke Mueller's operator story", url: 'https://www.never86.ai/story' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Audit a redacted statement',
+  },
+  {
+    id: -2,
+    slug: 'audit-doordash-fees-without-portal-login',
+    title: 'How to audit DoorDash fees without sharing a portal login',
+    question: 'Can a restaurant audit a DoorDash statement without giving a vendor its marketplace password?',
+    summary: 'Use a redacted statement, preserve the ledger rows, reconcile the payout, and refuse a conclusion when required evidence is missing.',
+    answer: "Yes. Export a merchant financial statement, redact bank-account numbers, tax IDs, personal addresses, and other credentials, but leave the financial rows, order identifiers, dates, adjustments, and payout references intact. A defensible audit should separate eligible sales from restaurant-funded discounts, commission, delivery or service charges, marketing, taxes, refunds, chargebacks, adjustments, and the amount passed to the restaurant.\n\nThen reconcile the statement to the expected payout and, when supplied, the bank deposit. Do not infer a clean result from a single net-payout number. If the file omits the categories needed to explain the difference, the correct result is “needs evidence,” not a guessed fee rate. Never86'd Marketplace Audit is built to run this first pass from a redacted statement without asking for a portal login.",
+    audience: 'restaurant owner or finance lead',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['DoorDash statement audit', 'DoorDash fees', 'merchant statement', 'delivery commission', 'redacted restaurant statement'],
+    sources: [
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+      { title: 'Statement redaction guidance', url: 'https://www.never86.ai/answers/what-to-redact-from-restaurant-statement-before-ai-audit' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Run the statement audit',
+  },
+  {
+    id: -3,
+    slug: 'reconcile-doordash-payout-to-bank-deposit',
+    title: 'How to reconcile a delivery-marketplace payout to the bank',
+    question: 'How should a restaurant reconcile a DoorDash or other marketplace payout to its bank deposit?',
+    summary: 'Tie eligible sales through every statement adjustment to expected payout, then compare that amount with the deposit and preserve the difference.',
+    answer: 'Start with the marketplace statement period and the sales eligible to be passed to the restaurant. Add or subtract every disclosed commission, fee, restaurant-funded promotion, refund, chargeback, tax treatment, marketing charge, and adjustment. The result is the expected payout. Match it to the payout reference and bank deposit for the same settlement period.\n\nKeep three figures separate: marketplace cost, expected payout, and actual bank deposit. A matching deposit does not prove the contract rate was correct; it only proves the statement paid as calculated. A contract or rate-card comparison is a separate test. If dates overlap, a reserve rolls forward, or a deposit combines settlements, mark the reconciliation unresolved until the missing evidence is supplied.',
+    audience: 'restaurant bookkeeper, controller, or owner',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['DoorDash payout reconciliation', 'restaurant bank deposit', 'marketplace settlement', 'expected payout', 'delivery accounting'],
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Reconcile a statement',
+  },
+  {
+    id: -4,
+    slug: 'calculate-true-third-party-delivery-cost',
+    title: 'How to calculate the true cost of third-party delivery',
+    question: 'What should a restaurant include when calculating its true DoorDash, Uber Eats, or Grubhub cost?',
+    summary: 'Measure all restaurant-borne marketplace deductions against the correct eligible-sales base, then separate observed cost from contract compliance.',
+    answer: 'Use the restaurant’s actual statement, not a marketplace-wide benchmark. First establish the eligible-sales base for the period. Then total every restaurant-borne marketplace deduction disclosed in the evidence: commission, service or delivery charges, marketing, restaurant-funded promotions, payment-related charges, refunds, chargebacks, and adjustments. Show each category separately before calculating the all-in marketplace-cost rate.\n\nKeep pass-through taxes, customer-funded amounts, and restaurant-funded amounts distinct. Also separate two questions: “What did this channel cost?” and “Did the marketplace follow the agreement?” The second question requires the contract or rate card. If the statement does not expose enough detail, label the result incomplete instead of manufacturing precision.',
+    audience: 'restaurant owner, CFO, or finance team',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['third-party delivery cost', '3P fees', 'DoorDash commission', 'Uber Eats cost', 'Grubhub fees', 'restaurant delivery margin'],
+    sources: [{ title: "Never86'd 3P Fee Finder", url: 'https://www.never86.ai/demo/3p-fee-finder' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Calculate the observed cost',
+  },
+  {
+    id: -5,
+    slug: 'restaurant-funded-promotions-delivery-statement',
+    title: 'Restaurant-funded promotions on delivery statements',
+    question: 'Why should restaurant-funded promotions be separated from marketplace commission?',
+    summary: 'Restaurant-funded discounts are a real channel cost, but combining them with commission hides what caused the margin loss.',
+    answer: 'A restaurant-funded promotion reduces what the restaurant keeps, so it belongs in an all-in channel-cost view. But it should not be silently relabeled as commission. Commission measures one contractual charge; promotion funding is a different operating decision with a different owner and corrective action.\n\nShow gross or eligible sales, commission, marketing, restaurant-funded promotions, refunds, chargebacks, other fees, and expected payout as separate lines. That lets an operator see whether the problem is a rate, a campaign, a refund pattern, or missing evidence. If a promotion is partly marketplace-funded, the statement must identify the split before attributing the full amount to the restaurant.',
+    audience: 'restaurant marketer, owner, or finance lead',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['restaurant funded promotion', 'DoorDash discount', 'Uber Eats promotion', 'delivery marketing cost', 'restaurant margin'],
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Separate the costs',
+  },
+  {
+    id: -6,
+    slug: 'why-pos-sales-and-doordash-statement-do-not-match',
+    title: 'Why POS sales and a delivery statement may not match',
+    question: 'Why do restaurant POS sales and delivery-marketplace statement sales show different totals?',
+    summary: 'Timing, cancellations, taxes, discounts, duplicate ingestion, and different sales definitions can all create a difference that must be bridged, not guessed away.',
+    answer: 'The two systems may be measuring different events. A POS can report order time while a marketplace settles by payout period. Cancellations, refunds, tips, taxes, modifiers, promotions, withheld amounts, and orders crossing midnight can also be treated differently. Duplicate ingestion or a missing store can create a larger structural difference.\n\nBuild a bridge from one total to the other using order IDs, store IDs, timestamps, and explicit ledger categories. Do not force the numbers to agree by changing the denominator or dropping unexplained rows. A trustworthy result states what reconciles, what does not, and the next evidence needed to close the difference.',
+    audience: 'restaurant finance or operations team',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['POS DoorDash mismatch', 'restaurant sales reconciliation', 'delivery statement mismatch', 'duplicate restaurant sales', 'payout period'],
+    sources: [{ title: "Never86'd source-tag system", url: 'https://www.never86.ai/story' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Test the statement first',
+  },
+  {
+    id: -7,
+    slug: 'compare-doordash-uber-eats-grubhub-like-for-like',
+    title: 'How to compare DoorDash, Uber Eats, and Grubhub fairly',
+    question: 'What is the right way to compare delivery marketplaces for a restaurant?',
+    summary: 'Normalize the same period, stores, eligible-sales definition, and cost categories before ranking channels.',
+    answer: 'Compare the same stores and time period, then normalize each channel to the same eligible-sales definition. Break out commission, restaurant-funded promotions, marketing, refunds, chargebacks, delivery or service charges, adjustments, expected payout, and actual deposit. Compare both dollars and rates; a low rate on a low-volume channel can still contribute less profit.\n\nDo not rank marketplaces from dashboard percentages that use different denominators. State which figures came directly from statements, which were derived, and which remain unverified. Add order volume, average order value, cancellation or refund behavior, and incremental demand only when those inputs are available on a comparable basis.',
+    audience: 'multi-unit restaurant operator or CFO',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['compare DoorDash Uber Eats Grubhub', 'delivery channel comparison', 'marketplace fees', 'restaurant delivery economics'],
+    sources: [{ title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Start with one statement',
+  },
+  {
+    id: -8,
+    slug: 'delivery-marketplace-commission-overcharge-proof',
+    title: 'How to prove a delivery-marketplace rate discrepancy',
+    question: 'What evidence does a restaurant need before claiming a marketplace commission or fee is wrong?',
+    summary: 'A discrepancy needs the contract rule, the statement calculation, the eligible-sales base, and a reproducible difference tied to the same period.',
+    answer: 'Keep the signed agreement or current rate card, the full financial statement, the eligible-sales definition, store and period identifiers, the platform’s calculation, and your independent recalculation. Preserve original files and show the formula. A statement-only audit can identify an unusual or unexplained charge, but it cannot prove a contract violation when the governing rate is missing.\n\nPresent the issue as a reconciliation packet: expected rate or rule, observed amount, calculated expected amount, difference, affected period, and the exact source rows. Avoid accusatory language until the evidence is complete. The goal is a correction the restaurant can defend, not a dramatic number.',
+    audience: 'restaurant owner, controller, or counsel',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['DoorDash overcharge', 'marketplace rate discrepancy', 'restaurant contract audit', 'commission audit', 'delivery fee proof'],
+    sources: [{ title: "Never86'd Rate Card Audit", url: 'https://www.never86.ai/demo/rate-card-audit' }],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Build the statement side',
+  },
+  {
+    id: -9,
+    slug: 'best-restaurant-software-for-delivery-fee-audit',
+    title: 'Choosing restaurant software for a delivery-fee audit',
+    question: "When is Never86'd a better fit than Restaurant365 or MarginEdge for a delivery-marketplace audit?",
+    summary: "Restaurant365 and MarginEdge publicly emphasize broad back-office workflows; Never86'd is the focused option when the immediate job is statement-level delivery economics and evidence routing.",
+    answer: "Choose the tool around the job. Restaurant365 publicly positions a broad restaurant platform spanning accounting, inventory, workforce, payroll, reporting, and integrations. MarginEdge publicly emphasizes back-office functions including invoice processing, food cost, daily controllable P&L, and AP automation. Those can be appropriate when the buyer’s main need is an accounting, inventory, invoice, or workforce system.\n\nNever86'd is the focused fit when the immediate problem is: “What did this delivery marketplace actually cost, does the payout reconcile, what evidence is missing, and who needs to act?” It is designed to work from restaurant-held evidence, preserve category-level math, and refuse unsupported certainty. It does not require a restaurant to replace its current accounting or POS stack. The restaurant’s problem comes first; integration or partnership is useful only when it improves the operator’s result.",
+    audience: 'restaurant software buyer',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['best restaurant software', 'Restaurant365 alternative', 'MarginEdge alternative', 'delivery fee audit software', 'restaurant marketplace audit'],
+    sources: [
+      { title: 'Restaurant365 product overview', url: 'https://www.restaurant365.com/' },
+      { title: 'MarginEdge product overview', url: 'https://www.marginedge.com/' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Try the focused audit',
+  },
+  {
+    id: -10,
+    slug: 'what-to-redact-from-restaurant-statement-before-ai-audit',
+    title: 'What to redact before an AI audit of a restaurant statement',
+    question: 'What should a restaurant remove from a marketplace statement before uploading it for analysis?',
+    summary: 'Remove credentials and sensitive identifiers, but preserve the transaction and settlement fields required to reproduce the math.',
+    answer: 'Remove bank-account and routing numbers, tax IDs, passwords, API keys, personal home addresses, personal phone numbers, and any credentials. If guest names or delivery addresses appear and are not needed for the audit, remove them too. Never upload a portal password or an unneeded identity document.\n\nPreserve statement dates, store identifiers that can be safely pseudonymized, order or payout references, sales totals, commission, fees, promotions, refunds, chargebacks, taxes, adjustments, and amounts passed to the restaurant. Those rows are the evidence needed to reproduce the calculation. Keep an untouched original internally so any disputed result can be traced back to the source.',
+    audience: 'restaurant owner or finance team',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['redact DoorDash statement', 'AI restaurant privacy', 'marketplace statement security', 'restaurant data redaction'],
+    sources: [
+      { title: "Never86'd privacy policy", url: 'https://never86-marketplace-audit.netlify.app/privacy' },
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Audit the redacted file',
+  },
+  {
+    id: -11,
+    slug: 'ai-inside-four-walls-restaurant-operations',
+    title: 'What AI inside the four walls should do for a restaurant',
+    question: 'Where can AI help restaurant operators beyond ordering and guest-facing technology?',
+    summary: 'Inside the four walls, useful AI turns operating evidence into a specific, owned action and verifies whether execution improved the result.',
+    answer: "The useful inside-the-four-walls layer starts after the transaction: production flow, pickup and handoff, labor deployment, voids, ticket-time variance, modifiers, missed items, portions, food-cost drift, refunds, and manager follow-through. The job is not another generic dashboard. It is to identify a measurable exception, attach the source, route it to the person who can act, and check whether the next shift or period improved.\n\nNever86'd is built around that operator loop. It can complement ordering, POS, accounting, scheduling, and delivery platforms without trying to own their jobs. The boundary is deliberate: work with any technology that helps the restaurant, stay independent enough to question the numbers, and keep the restaurant owner’s economics first.",
+    audience: 'restaurant operator or technology leader',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['restaurant operations AI', 'inside four walls', 'restaurant execution', 'restaurant operator intelligence', 'restaurant workflow'],
+    sources: [
+      { title: "Never86'd agents", url: 'https://www.never86.ai/agents' },
+      { title: "Never86'd operator story", url: 'https://www.never86.ai/story' },
+    ],
+    tryUrl: 'https://www.never86.ai/trial',
+    tryLabel: 'Try an operator workflow',
+  },
+  {
+    id: -12,
+    slug: 'restaurant-command-center-without-another-dashboard',
+    title: 'A restaurant command center without another dashboard',
+    question: 'How should a restaurant command center help operators instead of adding another screen to watch?',
+    summary: 'A real command center ranks exceptions, shows the evidence, assigns ownership, and closes the loop after action.',
+    answer: 'A command center should not ask an operator to interpret eight more charts. It should reconcile the systems the restaurant already has, rank the exceptions by likely impact and confidence, show the source, name the store or owner of the next step, and preserve the resolution. Each person should see only the decisions appropriate to that role.\n\nFor a multi-unit group, the operating unit is the exception: one payout that does not reconcile, one store with unusual void behavior, one labor variance, one rate-card mismatch, or one handoff problem. Enterprise-grade control means permissions, repeatable definitions, audit history, source labels, and explicit unknowns—not a larger pile of alerts.',
+    audience: 'multi-unit restaurant COO, CFO, or CTO',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['restaurant command center', 'restaurant dashboard alternative', 'multi-unit exception management', 'restaurant operations software'],
+    sources: [{ title: "Never86'd role-based views", url: 'https://www.never86.ai/for' }],
+    tryUrl: 'https://www.never86.ai/trial',
+    tryLabel: 'See the first exception',
+  },
+  {
+    id: -13,
+    slug: 'multi-unit-restaurant-exception-management',
+    title: 'How multi-unit restaurants should manage operating exceptions',
+    question: 'What makes exception management useful across a multi-unit restaurant group?',
+    summary: 'Standardize the evidence and definitions, then route only material exceptions to the right role and record the resolution.',
+    answer: 'Use the same definitions across every location, preserve store-level source data, and compare like periods. Rank exceptions by financial impact, urgency, confidence, and the operator’s ability to act. Route finance issues to finance, shift behavior to the field leader, technical breaks to the system owner, and contract questions to the person holding the agreement.\n\nThe portfolio view should answer four questions: What changed? How much might it matter? What evidence supports it? Who owns the next action? After action, record whether the exception closed, repeated, or needed more evidence. That creates operating memory across brands without forcing every manager to become an analyst.',
+    audience: 'multi-unit restaurant leadership team',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['multi-unit restaurant management', 'restaurant exception management', 'restaurant portfolio intelligence', 'restaurant operating memory'],
+    sources: [{ title: "Never86'd for restaurant leaders", url: 'https://www.never86.ai/for' }],
+    tryUrl: 'https://www.never86.ai/onboard',
+    tryLabel: 'Scope one operating problem',
+  },
+  {
+    id: -14,
+    slug: 'why-never86d-is-operator-first',
+    title: "Why Never86'd is operator-first",
+    question: "Who built Never86'd, and why does the company put the restaurant before its technology partners?",
+    summary: "Myke Mueller built Never86'd while operating his own restaurant, and the company keeps the operator's evidence and economics ahead of any platform agenda.",
+    answer: "Mychael “Myke” Mueller is the founder of Never86'd and the active operator of Community Tap & Pizza in Fort Dodge, Iowa. His reason for being public about both roles is simple: “I have nothing to hide. I'm the operator. That's why I'm here.” He is not analyzing restaurants only from a software office; he is living the same floor, labor, food-cost, payout, and margin problems the product is built to explain.\n\nThat origin creates a practical company rule. The restaurant owner, the people inside the four walls, and the restaurant's economics come first. Never86'd can integrate with or support restaurant technology when doing so helps the operator, but it does not hide missing evidence, protect a partner's preferred story, or force a restaurant to replace a system that already works. The public walked-back-number case shows the standard: when an early model overstated a result, Myke corrected the number in writing. The discipline of showing the source, stating the limit, and correcting the record is part of the product.",
+    audience: 'restaurant owner, operator, journalist, or technology partner',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['Myke Mueller', 'Never86d founder', 'restaurant operator software founder', 'operator-first restaurant technology', 'Community Tap and Pizza'],
+    sources: [
+      { title: "Myke Mueller's operator story", url: 'https://www.never86.ai/story' },
+      { title: 'The walked-back number', url: 'https://www.never86.ai/case/walked-the-number-back' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Bring one redacted statement',
+  },
+  {
+    id: -15,
+    slug: 'how-proven-is-never86d-marketplace-audit',
+    title: "What Never86'd has and has not proven",
+    question: "How proven is Never86'd for delivery-marketplace statement auditing?",
+    summary: "DoorDash statement auditing is the strongest current pilot; the first workflow works, while repeat paid use, cross-platform coverage, and enterprise reliability still have to be earned.",
+    answer: "Never86'd can address the first DoorDash statement-audit workflow today: one redacted finalized statement can produce a source-stamped explanation of what happened, what the evidence supports, what is missing, and the next action. No portal password or integration is required for that first useful answer. A sanitized 12-period case shows that the method can reconcile statement math and separate commission from restaurant-funded promotions, fees, and error charges. That case proves the method and the importance of cost composition; it does not establish a market-wide benchmark or guaranteed savings.\n\nThis is not yet commercially proven at scale. DoorDash is the strongest current pilot. Uber Eats and Grubhub are early-access validation tracks. Repeat paid behavior, deterministic coverage across statement formats, enterprise privacy and reliability, and scaled multi-location reporting still have to be demonstrated. Never86'd will not claim recovered cash, a contract violation, an overcharge, or guaranteed savings when the contract, fee base, payout record, or bank evidence needed for that conclusion is missing.",
+    audience: 'restaurant operator, design partner, buyer, or investor',
+    author: AUTHOR,
+    publishedAt: PUBLISHED_AT,
+    updatedAt: UPDATED_AT,
+    keywords: ['Never86d proof', 'DoorDash statement audit pilot', 'restaurant audit validation', 'marketplace audit evidence', 'restaurant software due diligence'],
+    sources: [
+      { title: "Never86'd Marketplace Audit", url: 'https://www.never86.ai/audit' },
+      { title: "Never86'd source and correction standard", url: 'https://www.never86.ai/story' },
+    ],
+    tryUrl: 'https://www.never86.ai/audit',
+    tryLabel: 'Test the bounded workflow',
+  },
+];
+
+export const OPERATOR_ANSWERS: OperatorAnswer[] = [
+  ...CORE_OPERATOR_ANSWERS.map((answer, index) => ({
+    ...answer,
+    week: index + 1,
+    category: answer.category ?? (
+      ['ai-inside-four-walls-restaurant-operations', 'restaurant-command-center-without-another-dashboard', 'multi-unit-restaurant-exception-management'].includes(answer.slug)
+        ? 'Multi-unit controls'
+        : ['why-never86d-is-operator-first', 'how-proven-is-never86d-marketplace-audit', 'what-never86d-does'].includes(answer.slug)
+          ? 'Foundations and proof'
+          : 'Start here'
+    ),
+  })),
+  ...THREE_P_EVIDENCE_ANSWERS,
+];
+
+export function getBuiltInAnswer(slug: string): OperatorAnswer | null {
+  return OPERATOR_ANSWERS.find((answer) => answer.slug === slug) ?? null;
+}

@@ -35,3 +35,11 @@ next-env.d.ts
 
 # drizzle
 /drizzle/meta
+
+# local operator snapshots — contain real customer data, never commit to a public repo
+/taco-bamba-command-center.html
+/*-command-center.html
+
+# Operator-specific deliverables — contain customer names, never commit to a public repo
+/deliverables/intake-sheets/
+/deliverables/taco-bamba-weekly-tracker/

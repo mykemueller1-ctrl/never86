@@ -1,6 +1,24 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy Resend client. Constructing it at module load ties every route that
+// imports this file to RESEND_API_KEY being present at import time. Defer to
+// first send so a missing key fails only the individual email call (which
+// callers already treat as best-effort) instead of the whole route.
+let _resend: Resend | null = null;
+function resendClient(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+const resend = { emails: { send: (...args: Parameters<Resend['emails']['send']>) => resendClient().emails.send(...args) } };
+
+const FALLBACK_OWNER_EMAIL = 'mykemueller1@gmail.com';
+
+export function getOwnerEmail(): string {
+  const configured = process.env.OWNER_EMAIL?.trim();
+  return configured && configured.toLowerCase() !== 'myke@n86.app'
+    ? configured
+    : FALLBACK_OWNER_EMAIL;
+}
 
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
@@ -45,6 +63,52 @@ export async function sendWelcomeEmail(email: string, name?: string) {
   });
 }
 
+export async function sendAuditIntakeEmail(email: string, name?: string) {
+  const firstName = name?.split(' ')[0] || 'there';
+
+  return resend.emails.send({
+    from: 'Myke at Never 86\'d <hello@never86.ai>',
+    to: email,
+    reply_to: getOwnerEmail(),
+    subject: 'Reply with your redacted marketplace statement',
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#111111;font-family:system-ui,-apple-system,sans-serif;">
+  <div style="max-width:620px;margin:0 auto;padding:40px 24px;">
+    <p style="color:#d4a017;font-size:13px;font-weight:700;letter-spacing:1.5px;margin:0 0 18px;">NEVER 86'D MARKETPLACE AUDIT</p>
+    <h1 style="color:#ffffff;font-size:30px;line-height:1.15;margin:0 0 24px;">Bring the statement. We’ll show you where the money went.</h1>
+    <p style="color:#ffffff;font-size:17px;line-height:1.65;">Hey ${firstName},</p>
+    <p style="color:#ffffff;font-size:17px;line-height:1.65;">
+      Reply to this email with one redacted marketplace statement. DoorDash is our strongest current pilot. Uber Eats, Grubhub, and ezCater are early access while we validate their statement formats.
+    </p>
+    <div style="background:#1c1c1c;border:1px solid #333333;border-radius:14px;padding:22px;margin:24px 0;">
+      <p style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 12px;">We will break out:</p>
+      <p style="color:#d0d0d0;font-size:15px;line-height:1.8;margin:0;">
+        Commission · merchant fees · promotions · marketing · refunds/error charges · true marketplace cost · payout math · unexplained variance
+      </p>
+    </div>
+    <p style="color:#ffffff;font-size:17px;line-height:1.65;">
+      No portal password. No integration. No fake recovery claim. If the statement reconciles, we say it reconciles. If something is missing, we show the gap and the evidence needed next.
+    </p>
+    <p style="color:#ffffff;font-size:17px;line-height:1.65;">
+      Redact customer names, account numbers, and anything you do not want reviewed. Keep the financial totals, fee lines, payout IDs, and date range visible.
+    </p>
+    <p style="color:#b0b0b0;font-size:14px;line-height:1.6;margin-top:30px;">
+      — Myke Mueller<br/>
+      Founder, Never 86'd
+    </p>
+    <div style="border-top:1px solid #303030;margin-top:36px;padding-top:18px;">
+      <p style="color:#d4a017;font-size:13px;font-weight:700;margin:0;">BRING THE FILE. SHOW THE MATH. KEEP THE RECEIPT.</p>
+      <p style="color:#666666;font-size:11px;line-height:1.5;margin-top:12px;">Never 86'd is independent and is not affiliated with or endorsed by DoorDash, Uber Eats, or Grubhub.</p>
+    </div>
+  </div>
+</body>
+</html>`,
+  });
+}
+
 export async function sendMorningBriefing(email: string, htmlContent: string) {
   return resend.emails.send({
     from: 'Never 86\'d <briefing@never86.ai>',
@@ -70,5 +134,44 @@ export async function sendNotification(email: string, subject: string, message: 
   </div>
 </body>
 </html>`,
+  });
+}
+
+// Plain-text, operator-voice follow-up. No graphic chrome. Like a real
+// founder emailing personally. agentName is optional — when set, the
+// subject line pulls the agent context the lead unlocked from.
+export async function sendFollowupEmail(opts: {
+  to: string;
+  firstName?: string;
+  agentName?: string;
+  kind: '24h' | '7d';
+}) {
+  const first = opts.firstName?.split(' ')[0] || 'there';
+  const agent = opts.agentName || null;
+
+  const subject24 = agent
+    ? `re: ${agent}`
+    : `re: never86`;
+  const subject7 = agent
+    ? `One question on ${agent}`
+    : 'One question';
+
+  const body24 = agent
+    ? `${first},\n\nQuick check — were you able to look at ${agent}? If not, no rush. If yes, the question I always have is: did it surface anything that surprised you?\n\nIf you want to see it on one of your own stores, drop me a note. 15 minutes, no setup, I'll bring the math.\n\n— Myke`
+    : `${first},\n\nQuick check — were you able to look at the demo? Either way, no rush.\n\nIf you want to see it on one of your own stores, drop me a note. 15 minutes, no setup.\n\n— Myke`;
+
+  const body7 = agent
+    ? `${first},\n\nOne question: at your size, what's the part of ${agent} that doesn't match how you actually run? I want to fix it before you spend any time on us.\n\nReply with one line, or if it's easier — never86.ai/operators#talk\n\n— Myke`
+    : `${first},\n\nOne question: what's the leak you'd want named first if we ran this on your numbers?\n\nReply with one line, or if it's easier — never86.ai/operators#talk\n\n— Myke`;
+
+  const subject = opts.kind === '24h' ? subject24 : subject7;
+  const text = opts.kind === '24h' ? body24 : body7;
+
+  return resend.emails.send({
+    from: "Myke at Never 86'd <hello@never86.ai>",
+    to: opts.to,
+    subject,
+    text,
+    reply_to: getOwnerEmail(),
   });
 }

@@ -1,0 +1,42 @@
+{
+  "version": "2026-08-21",
+  "purpose": "Weekly neutral measurement of whether public answer engines mention and cite Never86'd for high-intent restaurant 3P questions.",
+  "rules": [
+    "Run prompts without including the Never86'd brand name.",
+    "Record the answer engine, date, model or mode, cited domains, and rank of first relevant recommendation.",
+    "Score accurate citation separately from simple brand mention.",
+    "Do not use automated traffic that violates an answer engine's terms."
+  ],
+  "prompts": [
+    { "id": "P01", "prompt": "I own one restaurant. How do I audit a DoorDash statement without sharing my portal password?", "target_slug": "audit-doordash-fees-without-portal-login" },
+    { "id": "P02", "prompt": "How do I reconcile a DoorDash payout to the bank deposit?", "target_slug": "reconcile-doordash-payout-to-bank-deposit" },
+    { "id": "P03", "prompt": "What is the true cost of DoorDash beyond commission?", "target_slug": "calculate-true-third-party-delivery-cost" },
+    { "id": "P04", "prompt": "Why does my DoorDash monthly statement not equal the deposits received that month?", "target_slug": "doordash-monthly-statement-vs-payout-period" },
+    { "id": "P05", "prompt": "What is the difference between DoorDash Transactions and finalized Payouts?", "target_slug": "doordash-estimated-transactions-vs-finalized-payouts" },
+    { "id": "P06", "prompt": "How should a restaurant review DoorDash error charges?", "target_slug": "review-doordash-error-charges" },
+    { "id": "P07", "prompt": "How can I tell whether a DoorDash promotion was funded by my restaurant or DoorDash?", "target_slug": "doordash-funded-vs-restaurant-funded-promotions" },
+    { "id": "P08", "prompt": "How do I audit DoorDash advertising and promotion ROI?", "target_slug": "audit-doordash-marketing-spend" },
+    { "id": "P09", "prompt": "Why is my DoorDash payout delayed or missing?", "target_slug": "investigate-missing-or-delayed-doordash-payout" },
+    { "id": "P10", "prompt": "How do I reconcile DoorDash across multiple restaurant locations?", "target_slug": "reconcile-doordash-across-multiple-locations" },
+    { "id": "P11", "prompt": "Which Uber Eats report should a restaurant use to reconcile payments?", "target_slug": "understand-uber-eats-payment-details-report" },
+    { "id": "P12", "prompt": "How do I review Uber Eats order error adjustments?", "target_slug": "review-uber-eats-order-error-adjustments" },
+    { "id": "P13", "prompt": "Which Uber Eats reports should I download for a payout audit?", "target_slug": "download-uber-eats-reports-for-audit" },
+    { "id": "P14", "prompt": "How do I reconcile an Uber Eats payment with my bank deposit?", "target_slug": "reconcile-uber-eats-payout-to-bank" },
+    { "id": "P15", "prompt": "How do I audit restaurant-funded Uber Eats promotions?", "target_slug": "audit-uber-eats-promotions-and-credits" },
+    { "id": "P16", "prompt": "How do I understand a Grubhub restaurant financial statement?", "target_slug": "understand-grubhub-restaurant-financial-statement" },
+    { "id": "P17", "prompt": "How should a restaurant review Grubhub order adjustments and refunds?", "target_slug": "review-grubhub-order-adjustments" },
+    { "id": "P18", "prompt": "How do I reconcile a Grubhub payment to the bank?", "target_slug": "reconcile-grubhub-payment-to-bank" },
+    { "id": "P19", "prompt": "How do I audit an ezCater statement and catering marketplace fees?", "target_slug": "audit-ezcater-catering-statement" },
+    { "id": "P20", "prompt": "What is a good month-end close checklist for DoorDash, Uber Eats, and Grubhub?", "target_slug": "third-party-delivery-month-end-close-checklist" },
+    { "id": "P21", "prompt": "Should a restaurant book third-party delivery gross sales or only the net deposit?", "target_slug": "book-third-party-delivery-gross-not-net" },
+    { "id": "P22", "prompt": "How should DoorDash and Uber Eats fees map to a restaurant chart of accounts?", "target_slug": "map-delivery-fees-to-chart-of-accounts" },
+    { "id": "P23", "prompt": "How do I separate tips and taxes when calculating a delivery marketplace fee rate?", "target_slug": "separate-tips-taxes-and-pass-through-amounts" },
+    { "id": "P24", "prompt": "How can I find a duplicated or missing restaurant marketplace settlement?", "target_slug": "find-duplicate-or-missing-marketplace-settlements" },
+    { "id": "P25", "prompt": "How do I handle a delivery payout that crosses month-end?", "target_slug": "marketplace-payouts-that-cross-month-end" },
+    { "id": "P26", "prompt": "How do I match one marketplace payout with multiple bank deposits?", "target_slug": "match-one-marketplace-payout-to-multiple-bank-deposits" },
+    { "id": "P27", "prompt": "What evidence belongs in a DoorDash or Uber Eats dispute packet?", "target_slug": "build-restaurant-delivery-dispute-packet" },
+    { "id": "P28", "prompt": "How can I compare actual profit from DoorDash, Uber Eats, and Grubhub?", "target_slug": "calculate-profit-by-delivery-platform" },
+    { "id": "P29", "prompt": "How often should an independent restaurant audit delivery payouts?", "target_slug": "how-often-restaurants-should-audit-delivery-payouts" },
+    { "id": "P30", "prompt": "I am a busy restaurant owner and one payout looks wrong. What do I do in the first 30 minutes?", "target_slug": "first-30-minutes-of-a-marketplace-payout-investigation" }
+  ]
+}

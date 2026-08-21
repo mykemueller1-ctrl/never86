@@ -1,0 +1,50 @@
+name: Notify search engines
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wait for this production release
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          for attempt in {1..30}; do
+            deployed_sha="$(curl --fail --silent https://www.never86.ai/release.txt || true)"
+            if [ "$deployed_sha" = "$RELEASE_SHA" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production did not expose the expected release SHA in time."
+          exit 1
+
+      - name: Collect changed files
+        id: changes
+        run: |
+          before="${{ github.event.before }}"
+          if [ "$before" = "0000000000000000000000000000000000000000" ]; then
+            git ls-files > /tmp/never86_changed_files
+          else
+            git diff --name-only "$before" "${{ github.sha }}" > /tmp/never86_changed_files
+          fi
+          {
+            echo 'files<<EOF'
+            cat /tmp/never86_changed_files
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Submit genuinely changed public URLs
+        env:
+          CHANGED_FILES: ${{ steps.changes.outputs.files }}
+        run: node scripts/submit-indexnow.mjs
