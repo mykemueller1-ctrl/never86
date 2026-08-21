@@ -22,10 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const fixed: MetadataRoute.Sitemap = [
     { url: `${BASE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/audit`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${BASE}/audit/payout-mismatch`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${BASE}/audit/promotions-ads`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${BASE}/audit/refunds-adjustments`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${BASE}/audit/high-delivery-cost`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/for`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/for/ceo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/cfo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
