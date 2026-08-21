@@ -1,20 +1,22 @@
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
+  const disallow = ['/admin/', '/reports/', '/command-center/', '/tools/', '/api/'];
+  const allow = ['/', '/api/answers', '/api/mcp', '/api/quick-wins'];
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/admin/', '/reports/', '/command-center/', '/tools/', '/api/'],
+        allow,
+        disallow,
       },
-      // Allow named AI crawlers explicitly.
-      { userAgent: 'GPTBot', allow: '/' },
-      { userAgent: 'ClaudeBot', allow: '/' },
-      { userAgent: 'Google-Extended', allow: '/' },
-      { userAgent: 'PerplexityBot', allow: '/' },
-      { userAgent: 'OAI-SearchBot', allow: '/' },
-      { userAgent: 'Applebot-Extended', allow: '/' },
+      // Named AI crawlers can read the public evidence surface but not private
+      // operator, admin, command-center, or upload routes.
+      {
+        userAgent: ['GPTBot', 'ClaudeBot', 'Google-Extended', 'PerplexityBot', 'OAI-SearchBot', 'Applebot-Extended'],
+        allow,
+        disallow,
+      },
     ],
     sitemap: 'https://never86.ai/sitemap.xml',
     host: 'https://never86.ai',

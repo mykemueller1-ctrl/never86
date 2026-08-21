@@ -17,11 +17,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fixed content release date: request-time timestamps mislead crawlers into
   // treating every URL as newly changed on every sitemap fetch.
-  const now = new Date('2026-08-20T14:00:00Z');
+  const now = new Date('2026-08-21T05:30:00Z');
 
   const fixed: MetadataRoute.Sitemap = [
     { url: `${BASE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/audit`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/audit/payout-mismatch`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/promotions-ads`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/refunds-adjustments`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/audit/high-delivery-cost`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/for`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/for/ceo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/cfo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
@@ -46,6 +50,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/onboard`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/operators`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/answers`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE}/delivery-marketplace-reconciliation`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/evidence-standard`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE}/research/3p-operator-signal-august-2026`, lastModified: now, changeFrequency: 'monthly', priority: 0.92 },
     { url: `${BASE}/press`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/mcp`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/people`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },

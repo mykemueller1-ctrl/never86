@@ -31,7 +31,15 @@ export default async function AnswerPage({ params }: { params: Params }) {
   const { slug } = await params;
   const a = await getPublishedAnswer(slug);
   if (!a) notFound();
-  const others = (await listPublishedAnswers()).filter((x) => x.slug !== a.slug).slice(0, 4);
+  const allAnswers = await listPublishedAnswers();
+  const relatedBySlug = new Map(allAnswers.map((answer) => [answer.slug, answer]));
+  const explicitRelated = (a.relatedSlugs ?? [])
+    .map((relatedSlug) => relatedBySlug.get(relatedSlug))
+    .filter((answer): answer is NonNullable<typeof answer> => Boolean(answer));
+  const categoryRelated = allAnswers.filter((answer) => answer.slug !== a.slug && answer.category === a.category);
+  const others = [...explicitRelated, ...categoryRelated, ...allAnswers]
+    .filter((answer, index, list) => answer.slug !== a.slug && list.findIndex((item) => item.slug === answer.slug) === index)
+    .slice(0, 5);
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -50,6 +58,8 @@ export default async function AnswerPage({ params }: { params: Params }) {
     },
     publisher: { '@type': 'Organization', name: "Never86'd", alternateName: "Never 86'd", url: 'https://never86.ai' },
     about: ['restaurant operations', 'restaurant financial intelligence', ...(a.keywords ?? [])],
+    articleSection: a.category,
+    citation: (a.sources ?? []).map((source) => source.url),
   };
 
   const breadcrumbJsonLd = {
@@ -93,11 +103,55 @@ export default async function AnswerPage({ params }: { params: Params }) {
           <p className="compass-body text-lg italic mb-10 border-l-2 pl-4" style={{ borderColor: '#0066ff' }}>{a.question}</p>
         ) : null}
 
+        {(a.category || a.week) ? (
+          <div className="mb-8 flex flex-wrap gap-2 text-[12px] font-semibold" style={{ color: '#6e6e73' }}>
+            {a.category ? <span className="compass-pill">{a.category}</span> : null}
+            {a.week ? <span className="compass-pill">Field guide {a.week} of 52</span> : null}
+          </div>
+        ) : null}
+
         <div className="max-w-none">
           {a.answer.split(/\n\n+/).map((para, i) => (
             <p key={i} className="compass-body text-lg leading-relaxed mb-5">{para}</p>
           ))}
         </div>
+
+        {a.formula ? (
+          <section className="mt-10 rounded-2xl border p-6" style={{ borderColor: '#b8d2ff', background: '#f2f7ff' }} aria-labelledby="formula-heading">
+            <p id="formula-heading" className="compass-eyebrow mb-3">— Working formula</p>
+            <p className="font-mono text-sm md:text-base leading-relaxed text-ink-800">{a.formula}</p>
+          </section>
+        ) : null}
+
+        {a.fieldChecks && a.fieldChecks.length > 0 ? (
+          <section className="mt-10" aria-labelledby="field-checks-heading">
+            <p id="field-checks-heading" className="compass-eyebrow mb-4">— Field checks</p>
+            <ol className="space-y-3">
+              {a.fieldChecks.map((check, index) => (
+                <li key={check} className="compass-card flex gap-4 items-start">
+                  <span className="font-mono text-[12px] font-bold" style={{ color: '#0066ff' }}>{String(index + 1).padStart(2, '0')}</span>
+                  <span className="compass-body text-base">{check}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
+
+        {a.evidenceNeeded && a.evidenceNeeded.length > 0 ? (
+          <section className="mt-10 compass-card" aria-labelledby="evidence-heading">
+            <p id="evidence-heading" className="compass-eyebrow mb-4">— Evidence to keep</p>
+            <ul className="space-y-2 compass-body text-base">
+              {a.evidenceNeeded.map((item) => <li key={item}>• {item}</li>)}
+            </ul>
+          </section>
+        ) : null}
+
+        {a.evidenceBoundary ? (
+          <aside className="mt-8 border-l-4 pl-5 py-2" style={{ borderColor: '#d4a017' }} aria-label="Evidence boundary">
+            <p className="compass-eyebrow mb-2">— Evidence boundary</p>
+            <p className="compass-body text-base leading-relaxed">{a.evidenceBoundary}</p>
+          </aside>
+        ) : null}
 
         {a.sources && a.sources.length > 0 ? (
           <aside className="mt-10 compass-card" aria-label="Sources and supporting pages">
@@ -120,6 +174,10 @@ export default async function AnswerPage({ params }: { params: Params }) {
             <span className="text-[12px]" style={{ color: '#86868b' }}>Use redacted data. A missing-evidence result is a valid result.</span>
           </div>
         ) : null}
+
+        <p className="mt-8 text-[12px] leading-relaxed" style={{ color: '#86868b' }}>
+          Sources checked August 21, 2026. Independent operational guidance—not marketplace-endorsed legal, tax, or accounting advice. <Link href="/evidence-standard" className="underline">Read the evidence and corrections standard.</Link>
+        </p>
 
         {others.length > 0 ? (
           <div className="mt-16 pt-8 border-t border-[#e8e8ed]">

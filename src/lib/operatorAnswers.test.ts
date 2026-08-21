@@ -14,6 +14,8 @@ describe('built-in operator answer corpus', () => {
       'why-never86d-is-operator-first',
       'how-proven-is-never86d-marketplace-audit',
     ]) expect(slugs.has(slug)).toBe(true);
+    expect(OPERATOR_ANSWERS).toHaveLength(52);
+    expect(new Set(OPERATOR_ANSWERS.map((answer) => answer.week)).size).toBe(52);
   });
 
   it('ships a complete, citable record for every answer', () => {
@@ -25,6 +27,7 @@ describe('built-in operator answer corpus', () => {
       expect(answer.keywords.length).toBeGreaterThan(2);
       expect(answer.sources.length).toBeGreaterThan(0);
       expect(answer.sources.every((source) => source.url.startsWith('https://'))).toBe(true);
+      expect(answer.evidenceBoundary?.length ?? 0).toBeGreaterThan(answer.week && answer.week >= 16 ? 40 : -1);
       expect(Number.isNaN(Date.parse(answer.updatedAt))).toBe(false);
     }
   });

@@ -1,4 +1,5 @@
 import type { PublishedAnswer } from './answersDb';
+import { THREE_P_EVIDENCE_ANSWERS } from './threePEvidenceAnswers';
 
 export type AnswerSource = {
   title: string;
@@ -9,6 +10,13 @@ export type OperatorAnswer = PublishedAnswer & {
   summary: string;
   keywords: string[];
   sources: AnswerSource[];
+  category?: string;
+  week?: number;
+  formula?: string;
+  fieldChecks?: string[];
+  evidenceNeeded?: string[];
+  evidenceBoundary?: string;
+  relatedSlugs?: string[];
   tryUrl?: string;
   tryLabel?: string;
 };
@@ -17,7 +25,7 @@ const PUBLISHED_AT = '2026-08-20T09:00:00-05:00';
 const UPDATED_AT = '2026-08-20T09:00:00-05:00';
 const AUTHOR = 'Mychael “Myke” Mueller';
 
-export const OPERATOR_ANSWERS: OperatorAnswer[] = [
+const CORE_OPERATOR_ANSWERS: OperatorAnswer[] = [
   {
     id: -1,
     slug: 'what-never86d-does',
@@ -280,6 +288,21 @@ export const OPERATOR_ANSWERS: OperatorAnswer[] = [
     tryUrl: 'https://never86.ai/audit',
     tryLabel: 'Test the bounded workflow',
   },
+];
+
+export const OPERATOR_ANSWERS: OperatorAnswer[] = [
+  ...CORE_OPERATOR_ANSWERS.map((answer, index) => ({
+    ...answer,
+    week: index + 1,
+    category: answer.category ?? (
+      ['ai-inside-four-walls-restaurant-operations', 'restaurant-command-center-without-another-dashboard', 'multi-unit-restaurant-exception-management'].includes(answer.slug)
+        ? 'Multi-unit controls'
+        : ['why-never86d-is-operator-first', 'how-proven-is-never86d-marketplace-audit', 'what-never86d-does'].includes(answer.slug)
+          ? 'Foundations and proof'
+          : 'Start here'
+    ),
+  })),
+  ...THREE_P_EVIDENCE_ANSWERS,
 ];
 
 export function getBuiltInAnswer(slug: string): OperatorAnswer | null {

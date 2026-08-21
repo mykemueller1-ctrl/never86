@@ -14,6 +14,13 @@ export type PublishedAnswer = {
   summary?: string;
   keywords?: string[];
   sources?: AnswerSource[];
+  category?: string;
+  week?: number;
+  formula?: string;
+  fieldChecks?: string[];
+  evidenceNeeded?: string[];
+  evidenceBoundary?: string;
+  relatedSlugs?: string[];
   tryUrl?: string;
   tryLabel?: string;
 };

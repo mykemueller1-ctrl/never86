@@ -40,14 +40,21 @@ export async function GET() {
 - A statement can support observed marketplace cost and payout math. A contract or rate-card test requires the governing agreement. A bank-reconciliation claim requires the matching payout and bank evidence.
 - Never86'd addresses the workflow today. Repeat paid use, deterministic cross-platform coverage, and enterprise reliability still have to be proven at scale.
 - Never86'd does not promise recovered cash, guaranteed savings, contract violations, or an overcharge when the governing evidence is missing.
+- [Evidence, privacy, and corrections standard](https://never86.ai/evidence-standard) — public sourcing, claim, redaction, independence, and correction rules
 
 ## Try it free
-- [Free marketplace statement audit](https://never86.ai/audit) — start with one redacted DoorDash statement; Uber Eats, Grubhub, and ezCater are early access
+- [Free 3P cost snapshot and statement audit](https://never86.ai/audit) — calculate from statement totals with no login or email gate, then optionally request a source-stamped review
+- [Payout mismatch calculator](https://never86.ai/audit/payout-mismatch) — bridge eligible sales and documented deductions to expected payout
+- [Promotions and ads cost calculator](https://never86.ai/audit/promotions-ads) — keep restaurant-funded incentives separate from commission
+- [Refunds and adjustments review](https://never86.ai/audit/refunds-adjustments) — quantify the statement effect before tracing order evidence
+- [High delivery cost calculator](https://never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
+- [Delivery marketplace reconciliation evidence center](https://never86.ai/delivery-marketplace-reconciliation) — 52 public field guides for statements, fees, promotions, refunds, payouts, and deposits
 - [60-minute live trial](https://never86.ai/trial) — drop a CSV, see the leak, no card
 - [30-second connect](https://never86.ai/connect) — Void Hunter on your CSV
 - [Pricing](https://never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
 
 ## Connect any AI
+- [Full LLM-readable public corpus](https://never86.ai/llms-full.txt)
 - [AI assistant integration guide](https://never86.ai/mcp)
 - MCP endpoint: https://never86.ai/api/mcp
 - REST · answers: https://never86.ai/api/answers
@@ -78,8 +85,16 @@ ${AGENT_SPECS.map((a) => `- [${a.name}](https://never86.ai/agents/${a.slug}) —
 - [The case · $8.3M → $1.81M, the walked-back number](https://never86.ai/case/walked-the-number-back)
 - [Press kit](https://never86.ai/press)
 
+## Public research
+- [Seven-day public 3P operator signal sample](https://never86.ai/research/3p-operator-signal-august-2026) — 13 qualifying August 14–20 signals with source ledger, inclusion rules, and explicit limits; evidence of recurring public language, not a census or paid-demand claim
+- [Public sample data](https://never86.ai/research/3p-operator-signal-august-2026/data.json) — machine-readable source ledger and methodology
+
 ## Answers
 ${answers.map((a) => `- [${a.title}](https://never86.ai/answers/${a.slug})`).join('\n')}
+
+## Freshness feeds
+- [Atom feed](https://never86.ai/answers/feed.xml)
+- [XML sitemap](https://never86.ai/sitemap.xml)
 
 ## Talk to us
 - [Onboard your store](https://never86.ai/onboard)
