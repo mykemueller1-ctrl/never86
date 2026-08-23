@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { listPublishedAnswers, getPublishedAnswer } from '@/lib/answersDb';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 import { buildActionShift, type ActionShiftInput } from '@/lib/actionShift';
+import { getOperatorSystem } from '@/lib/operatorSystem';
+import { buildVendorSilenceTicket, type VendorSilenceInput } from '@/lib/vendorSilence';
 import {
   PUBLIC_LOGIC_DOMAINS,
   calculateMarketplaceQuickWin,
@@ -18,8 +20,9 @@ export const dynamic = 'force-dynamic';
 // Connect from Grok / Claude / Gemini / ChatGPT via their respective MCP
 // connector configurations using https://www.never86.ai/api/mcp as the URL.
 //
-// Per governance: NEVER expose operator data, methodology, agent manifests,
-// or admin tables. This is the answer corpus and the public catalog only.
+// Per governance: NEVER expose operator data, credentials, private store memory,
+// private prompts, or admin tables. This endpoint exposes only the versioned,
+// public operator system, deterministic tools, answer corpus, and agent catalog.
 
 type JsonRpcReq = {
   jsonrpc: '2.0';
@@ -30,8 +33,8 @@ type JsonRpcReq = {
 
 const SERVER_INFO = {
   name: 'never86',
-  version: '2.1.0',
-  description: "Never 86'd — evidence-first restaurant operator intelligence. Action Shift + deterministic 3P Quick Win + public POS, invoice, and leak-agent logic. Read-only.",
+  version: '3.0.0',
+  description: "Never 86'd — one evidence-first restaurant operating system for Grok, ChatGPT, Claude, Gemini, and other MCP clients. Action Shift, deterministic 3P Quick Win, vendor silence, proof/memory, routines, and public operator logic. Read-only.",
 };
 
 const TOOLS = [
@@ -121,6 +124,30 @@ const TOOLS = [
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
+    name: 'build_vendor_silence_ticket',
+    description: 'Evaluate one vendor/location silence clock from operator-approved cadence. Pauses configured dates, keeps the first 14 days advisory, suppresses duplicate tickets, and returns the proof needed to reset last-seen. Typed inputs remain Unverified.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vendor: { type: 'string' },
+        store: { type: 'string' },
+        owner: { type: 'string' },
+        last_seen_date: { type: 'string', description: 'YYYY-MM-DD date of the last human-supported receipt, invoice, confirmation, or exception.' },
+        as_of_date: { type: 'string', description: 'YYYY-MM-DD date to evaluate.' },
+        expected_cadence_days: { type: 'integer', minimum: 1, description: 'Operator-approved cadence only; never import another store\'s threshold.' },
+        grace_days: { type: 'integer', minimum: 0 },
+        pause_weekends: { type: 'boolean', description: 'Use only when the store approves weekend pauses.' },
+        paused_dates: { type: 'array', items: { type: 'string' }, description: 'Store-approved closure, holiday, or exception dates in YYYY-MM-DD.' },
+        program_started_date: { type: 'string', description: 'Optional YYYY-MM-DD baseline start; first 14 calendar days remain advisory.' },
+        existing_open_ticket_id: { type: 'string', description: 'Keeps one existing vendor/location ticket open rather than creating a duplicate.' },
+        last_seen_evidence: { type: 'string', description: 'Short description of the proof supporting last-seen; never include credentials or PII.' },
+      },
+      required: ['vendor', 'last_seen_date', 'as_of_date', 'expected_cadence_days'],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
     name: 'calculate_3p_marketplace_cost',
     description: 'Run the deterministic Never86 3P Quick Win. Separates commission, fees, restaurant-funded promos/ads, refunds/adjustments, other deductions, and credits; returns observed marketplace cost, expected payout, optional payout variance, formula, evidence limits, and next records needed. Use only clearly supplied non-negative dollar inputs.',
     inputSchema: {
@@ -150,7 +177,7 @@ const TOOLS = [
   },
   {
     name: 'get_operator_logic',
-    description: 'Fetch the public Never86 rulebook for evidence, Action Shift, POS routing, invoices/Daily Prime, marketplace 3P, void/refund peer bands, ticket leak signals, labor drift, tips, catering reconciliation, vendor drift, beverage shrink, product-mix pars, or all domains.',
+    description: 'Fetch one public Never86 rulebook domain or the full set: evidence, Action Shift, load-day, vendor silence, proof/memory, service drafts, agent orchestration, safety, POS, invoices/Daily Prime, marketplace 3P, voids/refunds, ticket leaks, labor, tips, catering, vendor drift, beverage, and product-mix pars.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -163,6 +190,12 @@ const TOOLS = [
       required: ['domain'],
       additionalProperties: false,
     },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
+    name: 'get_operator_system',
+    description: 'Return the canonical, versioned Never86 operating-system pack consolidated from the four product threads: entry and load-day, capture-to-proof loop, morning/night/weekly routines, specialist agents, versioned store memory, truth gates, prompt-injection defenses, operator UI rules, rollout gates, and the private-store boundary. Use this first when building or coaching a Never86 workflow.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
 ];
@@ -349,6 +382,28 @@ async function handle(req: JsonRpcReq): Promise<Response> {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(shift.result, null, 2) }] });
       }
 
+      if (name === 'build_vendor_silence_ticket') {
+        const input: VendorSilenceInput = {
+          vendor: String(args.vendor ?? ''),
+          store: typeof args.store === 'string' ? args.store : undefined,
+          owner: typeof args.owner === 'string' ? args.owner : undefined,
+          lastSeenDate: String(args.last_seen_date ?? ''),
+          asOfDate: String(args.as_of_date ?? ''),
+          expectedCadenceDays: Number(args.expected_cadence_days),
+          graceDays: args.grace_days === undefined ? undefined : Number(args.grace_days),
+          pauseWeekends: args.pause_weekends === undefined ? undefined : Boolean(args.pause_weekends),
+          pausedDates: Array.isArray(args.paused_dates) ? args.paused_dates.map(String) : undefined,
+          programStartedDate: typeof args.program_started_date === 'string' ? args.program_started_date : undefined,
+          existingOpenTicketId: typeof args.existing_open_ticket_id === 'string' ? args.existing_open_ticket_id : undefined,
+          lastSeenEvidence: typeof args.last_seen_evidence === 'string' ? args.last_seen_evidence : undefined,
+        };
+        const ticket = buildVendorSilenceTicket(input);
+        if (!ticket.ok) {
+          return ok(req.id, { content: [{ type: 'text', text: ticket.error }], isError: true });
+        }
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(ticket.result, null, 2) }] });
+      }
+
       if (name === 'calculate_3p_marketplace_cost') {
         const input: MarketplaceQuickWinInput = {
           platform: typeof args.platform === 'string' ? args.platform.trim() : undefined,
@@ -382,6 +437,10 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           });
         }
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getPublicOperatorLogic(domain), null, 2) }] });
+      }
+
+      if (name === 'get_operator_system') {
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getOperatorSystem(), null, 2) }] });
       }
 
       return err(req.id, -32601, `Unknown tool: ${name}`);
