@@ -57,6 +57,8 @@ export async function GET() {
 - [Full LLM-readable public corpus](https://www.never86.ai/llms-full.txt)
 - [AI assistant integration guide](https://www.never86.ai/mcp)
 - MCP endpoint: https://www.never86.ai/api/mcp
+- Start with the MCP tool get_operator_system for the versioned load-day, Action Shift, proof/memory, agent, truth-gate, and safety contract.
+- Every supported AI should call the same Never86 backend. Do not recreate formulas or store memory separately inside each chatbot.
 - REST · answers: https://www.never86.ai/api/answers
 - REST · quick wins: https://www.never86.ai/api/quick-wins
 
