@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listPublishedAnswers, getPublishedAnswer } from '@/lib/answersDb';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
+import {
+  PUBLIC_LOGIC_DOMAINS,
+  calculateMarketplaceQuickWin,
+  getPublicOperatorLogic,
+  type MarketplaceQuickWinInput,
+  type PublicLogicDomain,
+} from '@/lib/publicOperatorLogic';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Public MCP-protocol server endpoint. JSON-RPC 2.0 over HTTP.
 // Exposes the SAME limited public surface as /api/answers and /api/quick-wins.
-// Connect from Claude Desktop / Gemini / ChatGPT via their respective MCP
+// Connect from Grok / Claude / Gemini / ChatGPT via their respective MCP
 // connector configurations using https://www.never86.ai/api/mcp as the URL.
 //
 // Per governance: NEVER expose operator data, methodology, agent manifests,
@@ -22,8 +29,8 @@ type JsonRpcReq = {
 
 const SERVER_INFO = {
   name: 'never86',
-  version: '1.0.0',
-  description: "Never 86'd — operator-turned-founder native AI for multi-unit restaurants. Answer corpus + free-agent catalog. Read-only.",
+  version: '2.0.0',
+  description: "Never 86'd — evidence-first restaurant operator intelligence. Deterministic 3P Quick Win + public POS, invoice, and leak-agent logic. Read-only.",
 };
 
 const TOOLS = [
@@ -82,6 +89,51 @@ const TOOLS = [
     name: 'list_source_tags',
     description: 'List the three source-tag categories Never 86\'d applies to every figure: Verified, Estimated, Unverified. Returns name + meaning.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
+    name: 'calculate_3p_marketplace_cost',
+    description: 'Run the deterministic Never86 3P Quick Win. Separates commission, fees, restaurant-funded promos/ads, refunds/adjustments, other deductions, and credits; returns observed marketplace cost, expected payout, optional payout variance, formula, evidence limits, and next records needed. Use only clearly supplied non-negative dollar inputs.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        platform: { type: 'string', description: 'Marketplace name, e.g. DoorDash, Uber Eats, Grubhub, or ezCater.' },
+        period: { type: 'string', description: 'Optional statement period label.' },
+        eligible_sales: { type: 'number', exclusiveMinimum: 0, description: 'Eligible food sales or the disclosed fee base. Exclude tips, taxes, and customer pass-through fees unless governing evidence says otherwise.' },
+        commission: { type: 'number', minimum: 0 },
+        merchant_fees: { type: 'number', minimum: 0, description: 'Restaurant-borne processing, delivery, service, or other merchant fees.' },
+        restaurant_funded_promotions_ads: { type: 'number', minimum: 0, description: 'Only the restaurant-funded portion of promotions and advertising.' },
+        refunds_adjustments: { type: 'number', minimum: 0, description: 'Refunds, error charges, chargebacks, and other adjustments shown as deductions.' },
+        other_deductions: { type: 'number', minimum: 0 },
+        credits: { type: 'number', minimum: 0, description: 'Supported credits that increase what the restaurant keeps.' },
+        reported_payout: { type: 'number', minimum: 0, description: 'Optional marketplace-reported payout for variance comparison.' },
+      },
+      required: ['eligible_sales', 'commission', 'merchant_fees', 'restaurant_funded_promotions_ads', 'refunds_adjustments', 'other_deductions', 'credits'],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
+    name: 'get_3p_audit_logic',
+    description: 'Return the complete public Never86 3P evidence ladder, deterministic formulas, DoorDash statement mappings, cross-marketplace boundaries, claim rules, and reconciliation tolerance. Use before interpreting a marketplace statement or payout variance.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
+    name: 'get_operator_logic',
+    description: 'Fetch the public Never86 rulebook for evidence, POS routing, invoices/Daily Prime, marketplace 3P, void/refund peer bands, ticket leak signals, labor drift, tips, catering reconciliation, vendor drift, beverage shrink, product-mix pars, or all domains.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        domain: {
+          type: 'string',
+          enum: PUBLIC_LOGIC_DOMAINS,
+          description: 'Rulebook domain. Use "all" only when the user explicitly needs the whole public logic bundle.',
+        },
+      },
+      required: ['domain'],
+      additionalProperties: false,
+    },
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
 ];
@@ -239,6 +291,41 @@ async function handle(req: JsonRpcReq): Promise<Response> {
 
       if (name === 'list_source_tags') {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(SOURCE_TAGS, null, 2) }] });
+      }
+
+      if (name === 'calculate_3p_marketplace_cost') {
+        const input: MarketplaceQuickWinInput = {
+          platform: typeof args.platform === 'string' ? args.platform.trim() : undefined,
+          period: typeof args.period === 'string' ? args.period.trim() : undefined,
+          eligibleSales: Number(args.eligible_sales),
+          commission: Number(args.commission),
+          merchantFees: Number(args.merchant_fees),
+          promotions: Number(args.restaurant_funded_promotions_ads),
+          refundsAdjustments: Number(args.refunds_adjustments),
+          otherFees: Number(args.other_deductions),
+          credits: Number(args.credits),
+          reportedPayout: args.reported_payout === undefined ? undefined : Number(args.reported_payout),
+        };
+        const receipt = calculateMarketplaceQuickWin(input);
+        if (!receipt.ok) {
+          return ok(req.id, { content: [{ type: 'text', text: receipt.error }], isError: true });
+        }
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(receipt.result, null, 2) }] });
+      }
+
+      if (name === 'get_3p_audit_logic') {
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getPublicOperatorLogic('marketplace-3p'), null, 2) }] });
+      }
+
+      if (name === 'get_operator_logic') {
+        const domain = String(args.domain ?? '') as PublicLogicDomain;
+        if (!PUBLIC_LOGIC_DOMAINS.includes(domain)) {
+          return ok(req.id, {
+            content: [{ type: 'text', text: `Unknown domain "${domain}". Available: ${PUBLIC_LOGIC_DOMAINS.join(', ')}` }],
+            isError: true,
+          });
+        }
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getPublicOperatorLogic(domain), null, 2) }] });
       }
 
       return err(req.id, -32601, `Unknown tool: ${name}`);
