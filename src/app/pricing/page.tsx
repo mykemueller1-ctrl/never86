@@ -4,28 +4,28 @@ import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Pricing · Never 86'd",
-  description: 'Owner $199/mo. Command $499/location. Enterprise custom. Free leak audit first — no contact-us-for-pricing nonsense.',
+  description: 'One-store Action Shift is free. Owner $199/mo. Command $499/location. Enterprise custom.',
   alternates: { canonical: 'https://www.never86.ai/pricing' },
   openGraph: {
     title: "Never 86'd · Pricing",
-    description: 'Owner $199/mo. Command $499/location. Enterprise custom. Free leak audit first.',
+    description: 'One-store Action Shift is free. Owner $199/mo. Command $499/location. Enterprise custom.',
     url: 'https://www.never86.ai/pricing',
   },
 };
 
 const TIERS = [
   {
-    name: 'Free Leak Audit',
-    tag: '60 minutes',
+    name: 'Action Shift · Beta',
+    tag: '1 store · 1 login',
     price: 'Free',
-    blurb: 'Send one sales report. See your real leak. No card.',
+    blurb: 'Forward or upload yesterday\'s close. Get one morning move and one night proof check.',
     features: [
-      'Void Hunter on your own sales report',
-      'Broken down by store and by name',
-      'Every number labeled — confirmed, estimated, or a guess',
-      'No signup required',
+      'One store and one operator login',
+      'Up to 3 ranked, evidence-backed actions',
+      'Missing proof named — no invented certainty',
+      'Email or file onboarding — no POS API key required',
     ],
-    cta: { label: 'Start the free leak audit →', href: '/trial' },
+    cta: { label: 'Start my free store →', href: '/onboard' },
     accent: false,
   },
   {
@@ -87,7 +87,7 @@ const FAQS = [
   },
   {
     q: 'How does the free trial work?',
-    a: 'Go to the trial page and click Start. You get 60 minutes to run as many reports as you want. After the hour, your read is saved if you entered an email — no credit card needed to keep it.',
+    a: 'The founding beta includes one store and one operator login. Forward or upload the prior-day close and Never 86\'d returns up to three morning actions plus a night proof check. Additional stores, seats, and role controls come with paid expansion.',
   },
   {
     q: 'What about data security?',
@@ -122,7 +122,7 @@ export default function PricingPage() {
           Owner $199. <em>A Morning Brief from your own numbers.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">
-          Built by an operator. Priced like one. Start with the free leak audit — see your real leak before you decide. Owner is for 1–2 location independents; Command for 3–9 location groups; Enterprise for 10+ multi-brand.
+          Built by an operator. Priced like one. Start with one store and one operator login free: one morning decision, one night proof check. Owner is for 1–2 location independents; Command for 3–9 location groups; Enterprise for 10+ multi-brand.
         </p>
         <p className="compass-body text-lg md:text-xl max-w-2xl mt-4">
           The proof behind the price: in a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-ink-800 font-semibold">545,677 orders</span> — $15.72M checked to the cent — and surfaced an estimated $1.81M of annual leak, every figure labeled. <span className="font-serif italic text-ink-600">(If we don&apos;t find you money, don&apos;t buy.)</span>

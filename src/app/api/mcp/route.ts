@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listPublishedAnswers, getPublishedAnswer } from '@/lib/answersDb';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
+import { buildActionShift, type ActionShiftInput } from '@/lib/actionShift';
 import {
   PUBLIC_LOGIC_DOMAINS,
   calculateMarketplaceQuickWin,
@@ -29,8 +30,8 @@ type JsonRpcReq = {
 
 const SERVER_INFO = {
   name: 'never86',
-  version: '2.0.0',
-  description: "Never 86'd — evidence-first restaurant operator intelligence. Deterministic 3P Quick Win + public POS, invoice, and leak-agent logic. Read-only.",
+  version: '2.1.0',
+  description: "Never 86'd — evidence-first restaurant operator intelligence. Action Shift + deterministic 3P Quick Win + public POS, invoice, and leak-agent logic. Read-only.",
 };
 
 const TOOLS = [
@@ -92,6 +93,34 @@ const TOOLS = [
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
   },
   {
+    name: 'build_action_shift',
+    description: 'Turn one store\'s typed prior-day close into no more than three morning actions plus a night proof checklist. Uses only operator-supplied targets, labels every result Unverified, and never converts a variance into a theft, discipline, contract, bank, or guaranteed-savings claim.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store: { type: 'string' },
+        business_date: { type: 'string', description: 'Prior complete restaurant business date, preferably YYYY-MM-DD.' },
+        gross_sales: { type: 'number', exclusiveMinimum: 0 },
+        order_count: { type: 'number', minimum: 0 },
+        labor_dollars: { type: 'number', minimum: 0 },
+        labor_target_pct: { type: 'number', minimum: 0, maximum: 100, description: 'Operator-approved target only; omit when unknown.' },
+        expected_cash: { type: 'number', minimum: 0 },
+        entered_deposit: { type: 'number', minimum: 0 },
+        payouts: { type: 'number', minimum: 0 },
+        discounts: { type: 'number', minimum: 0 },
+        promotions: { type: 'number', minimum: 0 },
+        voids: { type: 'number', minimum: 0 },
+        late_delivery_count: { type: 'number', minimum: 0 },
+        late_delivery_sales: { type: 'number', minimum: 0 },
+        average_delivery_minutes: { type: 'number', minimum: 0 },
+        target_delivery_minutes: { type: 'number', minimum: 0, description: 'Operator-approved target only; omit when unknown.' },
+      },
+      required: ['gross_sales'],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+  },
+  {
     name: 'calculate_3p_marketplace_cost',
     description: 'Run the deterministic Never86 3P Quick Win. Separates commission, fees, restaurant-funded promos/ads, refunds/adjustments, other deductions, and credits; returns observed marketplace cost, expected payout, optional payout variance, formula, evidence limits, and next records needed. Use only clearly supplied non-negative dollar inputs.',
     inputSchema: {
@@ -121,7 +150,7 @@ const TOOLS = [
   },
   {
     name: 'get_operator_logic',
-    description: 'Fetch the public Never86 rulebook for evidence, POS routing, invoices/Daily Prime, marketplace 3P, void/refund peer bands, ticket leak signals, labor drift, tips, catering reconciliation, vendor drift, beverage shrink, product-mix pars, or all domains.',
+    description: 'Fetch the public Never86 rulebook for evidence, Action Shift, POS routing, invoices/Daily Prime, marketplace 3P, void/refund peer bands, ticket leak signals, labor drift, tips, catering reconciliation, vendor drift, beverage shrink, product-mix pars, or all domains.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -291,6 +320,33 @@ async function handle(req: JsonRpcReq): Promise<Response> {
 
       if (name === 'list_source_tags') {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(SOURCE_TAGS, null, 2) }] });
+      }
+
+      if (name === 'build_action_shift') {
+        const optionalNumber = (key: string) => args[key] === undefined ? undefined : Number(args[key]);
+        const input: ActionShiftInput = {
+          store: typeof args.store === 'string' ? args.store : undefined,
+          businessDate: typeof args.business_date === 'string' ? args.business_date : undefined,
+          grossSales: Number(args.gross_sales),
+          orderCount: optionalNumber('order_count'),
+          laborDollars: optionalNumber('labor_dollars'),
+          laborTargetPct: optionalNumber('labor_target_pct'),
+          expectedCash: optionalNumber('expected_cash'),
+          enteredDeposit: optionalNumber('entered_deposit'),
+          payouts: optionalNumber('payouts'),
+          discounts: optionalNumber('discounts'),
+          promotions: optionalNumber('promotions'),
+          voids: optionalNumber('voids'),
+          lateDeliveryCount: optionalNumber('late_delivery_count'),
+          lateDeliverySales: optionalNumber('late_delivery_sales'),
+          averageDeliveryMinutes: optionalNumber('average_delivery_minutes'),
+          targetDeliveryMinutes: optionalNumber('target_delivery_minutes'),
+        };
+        const shift = buildActionShift(input);
+        if (!shift.ok) {
+          return ok(req.id, { content: [{ type: 'text', text: shift.error }], isError: true });
+        }
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(shift.result, null, 2) }] });
       }
 
       if (name === 'calculate_3p_marketplace_cost') {

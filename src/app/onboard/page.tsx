@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { trackEvent } from '@/lib/track';
 
-const POS_OPTIONS = ['Toast', 'Square', 'Clover', 'Aloha', 'Lightspeed', 'Other / not sure'];
+const POS_OPTIONS = ['PDQ', 'Toast', 'Square', 'Clover', 'Aloha', 'PAR / Brink', 'Simphony', 'Lightspeed', 'Other / not sure'];
 
 // 7 CSV-runnable first (match agentSpecs.ts names exactly), then 3
 // not-yet-CSV agents we still wire on the full operator app, then
@@ -13,6 +13,8 @@ const POS_OPTIONS = ['Toast', 'Square', 'Clover', 'Aloha', 'Lightspeed', 'Other 
 // this picker — operators couldn't even raise their hand for 3 of
 // the agents we publicly market on /trial and /agents.
 const AGENT_OPTIONS = [
+  { v: 'Action Shift',           d: 'Yesterday\'s evidence → one morning move + one night proof check.' },
+  { v: 'Daily Prime',            d: 'Sales + labor + invoices for a same-scope daily prime-cost read.' },
   { v: 'Void Hunter',            d: 'Catch the void pattern before it eats the night.' },
   { v: 'Leak Detector',          d: '7 theft signals, ticket by ticket. Scored by name.' },
   { v: 'Labor Leak',             d: 'Find the labor that ran without permission.' },
@@ -27,9 +29,9 @@ const AGENT_OPTIONS = [
 ];
 
 const DATA_OPTIONS = [
-  { v: 'Connect Toast',            d: 'Give us read-only access to Toast — we pull what we need, you see every figure.' },
-  { v: 'Send a file',              d: 'Send a sales + labor export. We run the check and send back what we find.' },
-  { v: 'Forward your daily email', d: 'Forward the daily numbers you already get. We label every figure we use.' },
+  { v: 'Forward the daily close email', d: 'Use the report already arriving after close. No POS API key needed to start.' },
+  { v: 'Upload yesterday\'s reports',   d: 'Send the POS close, labor, invoice, or marketplace file you already have.' },
+  { v: 'Connect a read-only inbox',     d: 'Let Never 86\'d collect only the approved report and invoice messages.' },
   { v: 'Talk to us first',         d: '15 minutes. We figure out together what makes sense for your setup.' },
 ];
 
@@ -131,7 +133,8 @@ export default function OnboardPage() {
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
                 Who <em>are you?</em>
               </h1>
-              <p className="compass-body text-lg mb-10">Three things. Takes ten seconds.</p>
+              <p className="compass-body text-lg mb-4">Three things. Takes ten seconds.</p>
+              <p className="compass-eyebrow mb-10" style={{ color: '#0066ff' }}>One store · one login · free founding beta</p>
               <form
                 onSubmit={(e) => { e.preventDefault(); if (step1Valid) { trackEvent('onboard_step_1_complete', { meta: { hasUnits: !!units } }); setStep(2); } }}
                 className="compass-card text-left space-y-3"
@@ -139,7 +142,7 @@ export default function OnboardPage() {
                 <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
                 <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} />
                 <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} required className={inputClass} />
-                <input type="number" inputMode="numeric" placeholder="Units (optional)" value={units} onChange={(e) => setUnits(e.target.value)} className={inputClass} />
+                <input type="number" inputMode="numeric" min="1" placeholder="Locations (free includes 1)" value={units} onChange={(e) => setUnits(e.target.value)} className={inputClass} />
                 <button
                   type="submit"
                   disabled={!step1Valid}
@@ -177,7 +180,7 @@ export default function OnboardPage() {
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
                 What should we <em>check first?</em>
               </h1>
-              <p className="compass-body text-lg mb-10">Pick one. You can have the rest later.</p>
+              <p className="compass-body text-lg mb-10">Start with Action Shift: one decision in the morning, proof at night. Add the specialist checks when they matter.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {AGENT_OPTIONS.map((a) => (
                   <button key={a.v} type="button" onClick={() => { if (a.v !== interestedAgent) trackEvent('onboard_agent_selected', { meta: { interestedAgent: a.v } }); setInterestedAgent(a.v); }} className={pickClass(interestedAgent === a.v)}>
@@ -210,7 +213,7 @@ export default function OnboardPage() {
               <div className="flex justify-between mt-8 gap-3">
                 <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 4 } }); setStep(3); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
                 <button type="button" onClick={handleSubmit} disabled={!step4Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
-                  {status === 'loading' ? 'Sending…' : 'Finish →'}
+                  {status === 'loading' ? 'Sending…' : 'Start my free store →'}
                 </button>
               </div>
               {status === 'error' && <p className="text-[#ff453a] text-sm text-center mt-4">{message}</p>}
@@ -224,9 +227,9 @@ export default function OnboardPage() {
                 <em>Welcome.</em>
               </h1>
               <p className="compass-body text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-                <span className="text-ink-800 font-semibold">{interestedAgent}</span> is queued for{' '}
+                Your free one-store <span className="text-ink-800 font-semibold">{interestedAgent}</span> setup is queued for{' '}
                 <span className="text-ink-800 font-semibold">{restaurantName}</span>.
-                Myke will reach out from <span className="font-mono text-ink-800">myke@n86.app</span> within 24 hours.
+                Start with one operator login. Myke will reach out from <span className="font-mono text-ink-800">myke@n86.app</span> within 24 hours.
               </p>
 
               <div className="compass-card text-left mb-8">
