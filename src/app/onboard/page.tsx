@@ -5,28 +5,7 @@ import { useEffect, useState } from 'react';
 import { trackEvent } from '@/lib/track';
 
 const POS_OPTIONS = ['PDQ', 'Toast', 'Square', 'Clover', 'Aloha', 'PAR / Brink', 'Simphony', 'Lightspeed', 'Other / not sure'];
-
-// 7 CSV-runnable first (match agentSpecs.ts names exactly), then 3
-// not-yet-CSV agents we still wire on the full operator app, then
-// the catch-all. Drift caught in the button-walk audit: the 7-agent
-// expansion (Leak Detector / BCS / Vendor Drift) had never reached
-// this picker — operators couldn't even raise their hand for 3 of
-// the agents we publicly market on /trial and /agents.
-const AGENT_OPTIONS = [
-  { v: 'Action Shift',           d: 'Yesterday\'s evidence → one morning move + one night proof check.' },
-  { v: 'Daily Prime',            d: 'Sales + labor + invoices for a same-scope daily prime-cost read.' },
-  { v: 'Void Hunter',            d: 'Catch the void pattern before it eats the night.' },
-  { v: 'Leak Detector',          d: '7 theft signals, ticket by ticket. Scored by name.' },
-  { v: 'Labor Leak',             d: 'Find the labor that ran without permission.' },
-  { v: 'Tip Variance',           d: 'Spot the tip drift that nobody talks about.' },
-  { v: 'Catering Leak',          d: 'Off-menu catering with no margin left on it.' },
-  { v: 'Beverage Cost Score',    d: 'A 0–100 beverage score per store · bar/wine shrink by category.' },
-  { v: 'Vendor Drift Detector',  d: 'Price creep on each item across vendors, week to week.' },
-  { v: '3P Fee Finder',          d: 'See what DoorDash, UberEats, GrubHub are actually keeping.' },
-  { v: 'Rate Card Audit',        d: 'Where your delivery rate sits vs similar restaurants.' },
-  { v: 'Shift Pulse',            d: 'Crew + manager read on how each shift closed.' },
-  { v: 'All of the above',       d: 'Set up everything — the full system on your data.' },
-];
+const FREE_PRODUCT = 'Action Shift';
 
 const DATA_OPTIONS = [
   { v: 'Forward the daily close email', d: 'Use the report already arriving after close. No POS API key needed to start.' },
@@ -46,7 +25,6 @@ export default function OnboardPage() {
   const [restaurantName, setRestaurantName] = useState('');
   const [units, setUnits] = useState('');
   const [posType, setPosType] = useState('');
-  const [interestedAgent, setInterestedAgent] = useState('');
   const [dataPreference, setDataPreference] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
@@ -55,8 +33,8 @@ export default function OnboardPage() {
 
   const step1Valid = name.trim() && email.trim() && restaurantName.trim();
   const step2Valid = !!posType;
-  const step3Valid = !!interestedAgent;
-  const step4Valid = !!dataPreference;
+  const step3Valid = !!dataPreference;
+  const interestedAgent = FREE_PRODUCT;
 
   async function handleSubmit() {
     trackEvent('onboard_submit', { meta: { posType, interestedAgent, dataPreference, units: units || null } });
@@ -80,7 +58,7 @@ export default function OnboardPage() {
       if (data.success) {
         setStatus('success');
         setMessage(data.message || "You're in.");
-        setStep(5);
+        setStep(4);
         trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference } });
       } else {
         throw new Error(data.error || 'Something went wrong');
@@ -106,7 +84,7 @@ export default function OnboardPage() {
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86&apos;d <span className="italic text-ink-600">· onboard</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Set yourself up · 4 quick steps</p>
+              <p className="compass-eyebrow-dim mt-2">Set yourself up · 3 quick steps</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -117,9 +95,9 @@ export default function OnboardPage() {
 
       <section className="pt-16 md:pt-20 pb-10 px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <p className="compass-eyebrow mb-5">— Step {Math.min(step, 4)} of 4</p>
+          <p className="compass-eyebrow mb-5">— Step {Math.min(step, 3)} of 3</p>
           <div className="flex justify-center gap-1.5 mb-12" aria-hidden>
-            {[1, 2, 3, 4].map((n) => (
+            {[1, 2, 3].map((n) => (
               <div
                 key={n}
                 className="h-1 w-12 rounded-full transition-colors"
@@ -178,30 +156,10 @@ export default function OnboardPage() {
           {step === 3 && (
             <div>
               <h1 className="compass-display text-4xl md:text-6xl mb-4">
-                What should we <em>check first?</em>
+                How does yesterday&apos;s close <em>arrive?</em>
               </h1>
-              <p className="compass-body text-lg mb-10">Start with Action Shift: one decision in the morning, proof at night. Add the specialist checks when they matter.</p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {AGENT_OPTIONS.map((a) => (
-                  <button key={a.v} type="button" onClick={() => { if (a.v !== interestedAgent) trackEvent('onboard_agent_selected', { meta: { interestedAgent: a.v } }); setInterestedAgent(a.v); }} className={pickClass(interestedAgent === a.v)}>
-                    <p className="font-serif text-xl text-ink-800 tracking-tight mb-1">{a.v}</p>
-                    <p className="compass-body text-sm leading-snug">{a.d}</p>
-                  </button>
-                ))}
-              </div>
-              <div className="flex justify-between mt-8 gap-3">
-                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 3 } }); setStep(2); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
-                <button type="button" onClick={() => { if (step3Valid) { trackEvent('onboard_step_3_complete', { meta: { interestedAgent } }); setStep(4); } }} disabled={!step3Valid} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>Next →</button>
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div>
-              <h1 className="compass-display text-4xl md:text-6xl mb-4">
-                How do you want to <em>share data?</em>
-              </h1>
-              <p className="compass-body text-lg mb-10">Pick the path that fits where you are today.</p>
+              <p className="compass-body text-lg mb-3">Action Shift is already selected. Pick the data path that fits today.</p>
+              <p className="compass-eyebrow mb-10" style={{ color: '#0066ff' }}>Morning action · night proof</p>
               <div className="grid gap-3">
                 {DATA_OPTIONS.map((d) => (
                   <button key={d.v} type="button" onClick={() => { if (d.v !== dataPreference) trackEvent('onboard_data_pref_selected', { meta: { dataPreference: d.v } }); setDataPreference(d.v); }} className={pickClass(dataPreference === d.v)}>
@@ -211,8 +169,8 @@ export default function OnboardPage() {
                 ))}
               </div>
               <div className="flex justify-between mt-8 gap-3">
-                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 4 } }); setStep(3); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
-                <button type="button" onClick={handleSubmit} disabled={!step4Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
+                <button type="button" onClick={() => { trackEvent('onboard_back', { meta: { fromStep: 3 } }); setStep(2); }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>← Back</button>
+                <button type="button" onClick={handleSubmit} disabled={!step3Valid || status === 'loading'} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: '#0066ff' }}>
                   {status === 'loading' ? 'Sending…' : 'Start my free store →'}
                 </button>
               </div>
@@ -220,7 +178,7 @@ export default function OnboardPage() {
             </div>
           )}
 
-          {step === 5 && (
+          {step === 4 && (
             <div>
               <p className="compass-eyebrow mb-5" style={{ color: '#34c759' }}>— You&apos;re in</p>
               <h1 className="compass-display text-4xl md:text-6xl mb-5">
