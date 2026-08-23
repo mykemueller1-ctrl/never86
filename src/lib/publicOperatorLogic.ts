@@ -6,6 +6,7 @@ import {
 export const PUBLIC_LOGIC_DOMAINS = [
   'all',
   'evidence',
+  'action-shift',
   'pos-routing',
   'invoices-daily-prime',
   'marketplace-3p',
@@ -37,6 +38,24 @@ const evidence = {
     'Show parsed source, scope, row count, totals, fields found, and missing fields before computing.',
     'Never silently drop failed rows, repair a source, invent a field meaning, or upgrade one evidence silo into another.',
     'Every finding ends with why it matters, an owner, one next action, dollars at stake, and evidence status.',
+  ],
+};
+
+const actionShift = {
+  promise: 'One store gets one morning decision and one night proof loop, not another dashboard.',
+  morning: [
+    'Use only the prior complete business day and preserve store, timezone, cutoff, filters, and source status.',
+    'Rank no more than three moves by supported dollars, urgency, controllability, and evidence quality.',
+    'Every move names one owner, one concrete action, the observed dollars at stake, and the claim boundary.',
+  ],
+  night: [
+    'Ask whether the move happened and require the proof created by the shift: deposit record, receipt, schedule/time clock, ticket detail, or exception log.',
+    'Carry an unresolved move forward with the missing evidence; never mark it complete from a verbal yes alone.',
+  ],
+  limits: [
+    'Typed values remain Unverified until reconciled to the source.',
+    'Use only the operator\'s own targets and comparable history; never silently import an industry benchmark.',
+    'A variance ranks review work. It does not prove theft, wrongdoing, contract breach, loss, or guaranteed savings.',
   ],
 };
 
@@ -212,6 +231,7 @@ const productMixPars = {
 
 export const PUBLIC_OPERATOR_LOGIC = {
   evidence,
+  'action-shift': actionShift,
   'pos-routing': posRouting,
   'invoices-daily-prime': invoicesDailyPrime,
   'marketplace-3p': marketplace3p,
