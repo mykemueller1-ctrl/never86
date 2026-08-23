@@ -2,11 +2,18 @@ import {
   calculateMarketplaceCost,
   type MarketplaceCostInputs,
 } from './marketplaceCost';
+import { NEVER86_OPERATOR_SYSTEM } from './operatorSystem';
 
 export const PUBLIC_LOGIC_DOMAINS = [
   'all',
   'evidence',
   'action-shift',
+  'load-day',
+  'vendor-silence',
+  'proof-memory',
+  'service-drafts',
+  'agent-orchestration',
+  'safety',
   'pos-routing',
   'invoices-daily-prime',
   'marketplace-3p',
@@ -57,6 +64,65 @@ const actionShift = {
     'Use only the operator\'s own targets and comparable history; never silently import an industry benchmark.',
     'A variance ranks review work. It does not prove theft, wrongdoing, contract breach, loss, or guaranteed savings.',
   ],
+};
+
+const loadDay = {
+  purpose: 'Turn the operator\'s existing files and tribal knowledge into a source map and first Action Shift without requiring APIs.',
+  conversation: NEVER86_OPERATOR_SYSTEM.entry.loadDay.conversation,
+  preferredBaseline: NEVER86_OPERATOR_SYSTEM.entry.loadDay.preferredBaseline,
+  fallback: NEVER86_OPERATOR_SYSTEM.entry.loadDay.fallback,
+  output: NEVER86_OPERATOR_SYSTEM.entry.loadDay.output,
+};
+
+const vendorSilence = {
+  purpose: 'Notice when an expected recurring vendor or source goes quiet and create one proof-seeking follow-up.',
+  rules: [
+    'Use only operator-approved cadence, delivery/order days, closure dates, and ownership. Never copy one store\'s thresholds into another.',
+    'The first 14 calendar days of a new store baseline are advisory.',
+    'Pause dates the operator marks closed or exceptional; weekend handling is store-configured.',
+    'One open vendor/location event at a time. A duplicate signal keeps the existing ticket open instead of creating another.',
+    'Only reviewed proof of receipt, invoice, confirmation, or approved exception resets last-seen.',
+  ],
+  boundary: NEVER86_OPERATOR_SYSTEM.routines.vendorSilence.boundary,
+};
+
+const proofMemory = {
+  purpose: 'Close actions with proof and turn only approved tribal knowledge into versioned store memory.',
+  actionStates: ['open', 'acknowledged', 'done-awaiting-proof', 'verified', 'not-done', 'data-missing', 'fix-failed'],
+  memoryRecord: NEVER86_OPERATOR_SYSTEM.memory.record,
+  allowedMemory: NEVER86_OPERATOR_SYSTEM.memory.allowed,
+  operatorControls: NEVER86_OPERATOR_SYSTEM.memory.controls,
+  rules: [
+    'A verbal yes can acknowledge an action but cannot verify it.',
+    'Financial truth changes only from relevant same-scope evidence.',
+    'Every learned rule carries store scope, provenance, approver, effective date, and version.',
+    'Operators can inspect, correct, supersede, delete, and export learned rules.',
+    NEVER86_OPERATOR_SYSTEM.memory.boundary,
+  ],
+};
+
+const serviceDrafts = {
+  categories: NEVER86_OPERATOR_SYSTEM.routines.serviceDraft.categories,
+  requiredFields: ['store/location context', 'source fact', 'date/time or invoice/order reference', 'requested resolution', 'owner', 'requested proof'],
+  rule: NEVER86_OPERATOR_SYSTEM.routines.serviceDraft.rule,
+  boundary: 'A draft is not a sent message, accepted claim, vendor commitment, or completed repair. A human reviews and sends it.',
+};
+
+const agentOrchestration = {
+  storeTeam: NEVER86_OPERATOR_SYSTEM.agents.storeTeam,
+  companyTeam: NEVER86_OPERATOR_SYSTEM.agents.companyTeam,
+  canonicalLoop: NEVER86_OPERATOR_SYSTEM.loop,
+  routines: NEVER86_OPERATOR_SYSTEM.routines,
+  rule: NEVER86_OPERATOR_SYSTEM.agents.orchestration,
+  network: NEVER86_OPERATOR_SYSTEM.rollout.networkRule,
+};
+
+const safety = {
+  untrustedContent: NEVER86_OPERATOR_SYSTEM.safety.untrustedContent,
+  injectionResponse: NEVER86_OPERATOR_SYSTEM.safety.injectionResponse,
+  toolPolicy: NEVER86_OPERATOR_SYSTEM.safety.toolPolicy,
+  privacy: NEVER86_OPERATOR_SYSTEM.safety.privacy,
+  truthGates: NEVER86_OPERATOR_SYSTEM.truthGates,
 };
 
 const posRouting = {
@@ -232,6 +298,12 @@ const productMixPars = {
 export const PUBLIC_OPERATOR_LOGIC = {
   evidence,
   'action-shift': actionShift,
+  'load-day': loadDay,
+  'vendor-silence': vendorSilence,
+  'proof-memory': proofMemory,
+  'service-drafts': serviceDrafts,
+  'agent-orchestration': agentOrchestration,
+  safety,
   'pos-routing': posRouting,
   'invoices-daily-prime': invoicesDailyPrime,
   'marketplace-3p': marketplace3p,

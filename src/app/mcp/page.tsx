@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Install in Grok + AI · Never 86'd",
-  description: "Add Never 86'd's Action Shift, evidence-first restaurant operator logic, and deterministic 3P Quick Win to Grok or another MCP client.",
+  description: "Give Grok or another MCP client the same versioned Never 86'd operator system: Action Shift, 3P math, load-day, vendor silence, proof, memory, agents, and safety rules.",
   alternates: { canonical: 'https://www.never86.ai/mcp' },
   robots: { index: true, follow: true },
 };
@@ -34,7 +34,7 @@ export default function McpPage() {
           Put the operator logic <em>next to you.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl mb-10 max-w-3xl">
-          One public, read-only Model Context Protocol endpoint gives your AI the Action Shift, deterministic 3P cost calculator, restaurant evidence rulebook, POS and invoice routing logic, every Quick Win spec, and the public answer desk.
+          One public, read-only Model Context Protocol endpoint gives every supported AI the same versioned operator brain: Action Shift, deterministic 3P math, load-day onboarding, vendor silence, proof and memory rules, specialist-agent routines, POS and invoice routing, and the public answer desk.
         </p>
 
         <div className="grid gap-4 md:grid-cols-[1.15fr_0.85fr]">
@@ -53,9 +53,9 @@ export default function McpPage() {
           </div>
 
           <div className="compass-card p-6 md:p-8">
-            <p className="compass-card-label">Try Action Shift first</p>
+            <p className="compass-card-label">Load the whole system first</p>
             <p className="compass-body mt-4 text-base">Ask Grok:</p>
-            <p className="mt-3 rounded-2xl bg-[#fbfbfd] p-4 font-mono text-sm leading-relaxed text-[#1d1d1f]">Build my Never86&apos;d Action Shift for yesterday. Ask only for the close figures I have. Give me no more than three morning actions and the proof each manager must save tonight. Use only my targets.</p>
+            <p className="mt-3 rounded-2xl bg-[#fbfbfd] p-4 font-mono text-sm leading-relaxed text-[#1d1d1f]">Use Never86&apos;d get_operator_system first. Then build my Action Shift for the prior complete business day. Give me one next action, its owner, the proof required tonight, and the exact missing evidence. Use only my store&apos;s approved targets and rules.</p>
             <p className="compass-body mt-5 text-sm">Typed totals stay unverified until matched to a finalized source. A variance ranks review work—it is not proof of theft, loss, or guaranteed savings.</p>
           </div>
         </div>
@@ -63,10 +63,14 @@ export default function McpPage() {
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
             ['Action Shift', 'One store · up to three morning actions · one night proof loop, using only operator-supplied targets.'],
+            ['Load-day + memory', 'Conversational onboarding, four-week source map, versioned tribal rules, and operator controls to show, correct, delete, or export them.'],
+            ['Vendor silence', 'Operator-approved cadence, closure pauses, 14-day advisory period, duplicate suppression, and proof-based reset.'],
             ['3P Quick Win', 'Commission, fees, promos, refunds, expected payout, and variance—deterministic to the cent.'],
             ['POS routing', 'Toast, PDQ, Square, Aloha, Simphony, PAR/Brink, Lightspeed, and safe marketplace attribution.'],
             ['Invoices + product mix', 'Daily Prime reconciliation, vendor drift, product-mix pars, catering invoice-to-POS gaps, and evidence status.'],
             ['Inside-the-four-walls', 'Voids, refunds, ticket signals, labor drift, tips, and beverage shrink with calibrated thresholds.'],
+            ['Agent team + routines', 'Source Collector, Margin Analyst, Operator Coach, Proof Verifier, Memory Curator, and Store Chief of Staff on one shared backend.'],
+            ['Truth + safety gates', 'Untrusted-file defenses, human approval before external side effects, tenant isolation, and explicit Missing Evidence.'],
             ['Public answer desk', 'Restaurant evidence guides, agent specs, source tags, and exact next records needed.'],
             ['Read-only by design', 'No operator database, credentials, marketplace login, or private admin tables are exposed.'],
           ].map(([title, body]) => (
@@ -75,6 +79,12 @@ export default function McpPage() {
               <p className="compass-body mt-3 text-sm">{body}</p>
             </div>
           ))}
+        </div>
+
+        <div className="compass-card mt-5 p-6 md:p-8">
+          <p className="compass-card-label">One brain · many interfaces</p>
+          <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Do not rebuild the logic inside each chatbot.</h2>
+          <p className="compass-body mt-4 max-w-3xl">Grok, ChatGPT, Claude, Gemini, and any other client with compatible remote MCP support should call this same endpoint. Their wording can differ. The formulas, evidence states, store-memory contract, action limits, and human-approval gates stay the same.</p>
         </div>
 
         <div className="compass-card mt-5 p-6 md:p-8">
