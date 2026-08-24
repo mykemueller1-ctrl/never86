@@ -1,0 +1,18 @@
+{
+  "name": "never86",
+  "install": "npm ci",
+  "start": "echo 'never86 ready'",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev",
+      "description": "Next.js dev server on port 3000"
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 3000
+    }
+  ]
+}

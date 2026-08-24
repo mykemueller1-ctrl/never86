@@ -1,12 +1,21 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+let anthropicClient: Anthropic | undefined;
+
+function getAnthropic() {
+  if (!anthropicClient) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY is not set');
+    }
+    anthropicClient = new Anthropic({ apiKey });
+  }
+  return anthropicClient;
+}
 
 // ── Invoice OCR ──
 export async function parseInvoice(text: string) {
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
     messages: [
@@ -48,7 +57,7 @@ ${text}`,
 
 // ── Z-Report Processing ──
 export async function parseZReport(text: string) {
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
     messages: [
@@ -97,7 +106,7 @@ export async function generateBriefing(data: {
   recentInvoices: any[];
   alerts: string[];
 }) {
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
     messages: [
