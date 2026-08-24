@@ -1,11 +1,22 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | undefined;
+
+function getResend() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not set');
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: 'Never 86\'d <hello@never86.ai>',
     to: email,
     subject: 'You\'re on the list — Never 86\'d is coming',
@@ -46,7 +57,7 @@ export async function sendWelcomeEmail(email: string, name?: string) {
 }
 
 export async function sendMorningBriefing(email: string, htmlContent: string) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: 'Never 86\'d <briefing@never86.ai>',
     to: email,
     subject: `Your Morning Briefing — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
@@ -55,7 +66,7 @@ export async function sendMorningBriefing(email: string, htmlContent: string) {
 }
 
 export async function sendNotification(email: string, subject: string, message: string) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: 'Never 86\'d <alerts@never86.ai>',
     to: email,
     subject,
