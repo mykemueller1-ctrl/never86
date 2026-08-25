@@ -1,0 +1,26 @@
+{
+  "name": "@never86/operator-mcp",
+  "version": "3.0.0",
+  "description": "Never86'd Operator System v3 MCP server. Deterministic restaurant math. No portal logins.",
+  "type": "module",
+  "bin": {
+    "never86-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
