@@ -92,20 +92,20 @@ export default function Home() {
         <div className="human-grid-lines" aria-hidden />
         <div className="relative z-10 mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div>
-            <p className="human-kicker">Restaurant work first · software second</p>
+            <p className="human-kicker">One location · one seat free · software second</p>
             <h1 className="mt-6 max-w-4xl font-serif text-[clamp(3.8rem,8.5vw,7.8rem)] font-medium leading-[0.88] tracking-[-0.055em] text-[#161616]">
               Month-end is
               <span className="block italic text-[#005de8]">too late.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#514b43] md:text-xl">
-              We built the tool we wanted behind the bar: yesterday&apos;s numbers, today&apos;s move, and the source attached. No shame. No mystery. No software-company theater.
+              We built the tool we wanted behind the bar: yesterday&apos;s numbers, today&apos;s move, and the source attached. One seat is free. Agents across voids, labor, vendors, and 3P. No shame. No mystery. No software-company theater.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/audit" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/audit', label: 'Audit one DoorDash statement' } })}>
-                Audit one DoorDash statement →
+              <Link href="/trial" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/trial', label: 'Claim one free seat' } })}>
+                Claim one free seat →
               </Link>
-              <Link href="/case/walked-the-number-back" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/case/walked-the-number-back', label: 'See the correction story' } })}>
-                See the number we corrected
+              <Link href="/audit" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/audit', label: 'Audit one DoorDash statement' } })}>
+                Audit one DoorDash statement
               </Link>
             </div>
             <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[#d8cec0] pt-5">

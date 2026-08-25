@@ -4,6 +4,10 @@ import { Track } from '@/components/Track';
 import { TrackedLink } from '@/components/TrackedLink';
 
 export function RolePage({ spec }: { spec: RoleSpec }) {
+  // #122 / CURSOR-GTM: /for/owner (and seats) land on free /trial, not full onboard.
+  const seatHref = '/trial';
+  const seatLabel = spec.slug === 'owner' ? 'Claim one free seat' : 'Start free seat';
+
   return (
     <main className="compass min-h-screen">
       <Track eventType="role_view" audience={spec.badge} />
@@ -21,7 +25,7 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
             <TrackedLink href="/for" event="role_nav_click" meta={{ role: spec.badge, target: '/for', label: 'All seats' }} className="compass-pill"><span className="avatar">A</span><span>All seats</span></TrackedLink>
-            <TrackedLink href="/onboard" event="role_nav_click" meta={{ role: spec.badge, target: '/onboard', label: 'Onboard your store' }} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</TrackedLink>
+            <TrackedLink href={seatHref} event="role_nav_click" meta={{ role: spec.badge, target: seatHref, label: seatLabel }} className="btn-primary" style={{ background: '#0066ff' }}>{seatLabel}</TrackedLink>
           </nav>
         </div>
       </div>
@@ -34,11 +38,11 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl mb-10">{spec.subhead}</p>
         <div className="flex flex-wrap gap-3">
-          <TrackedLink href={spec.freeAgents[0].href} event="role_hero_cta_click" meta={{ role: spec.badge, target: spec.freeAgents[0].href, agentName: spec.freeAgents[0].name, label: `Try ${spec.freeAgents[0].name}`, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
-            Try {spec.freeAgents[0].name} →
+          <TrackedLink href={seatHref} event="role_hero_cta_click" meta={{ role: spec.badge, target: seatHref, label: seatLabel, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
+            {seatLabel} →
           </TrackedLink>
-          <TrackedLink href="/onboard" event="role_hero_cta_click" meta={{ role: spec.badge, target: '/onboard', label: 'Onboard your store', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
-            Onboard your store
+          <TrackedLink href={spec.freeAgents[0].href} event="role_hero_cta_click" meta={{ role: spec.badge, target: spec.freeAgents[0].href, agentName: spec.freeAgents[0].name, label: `Try ${spec.freeAgents[0].name}`, variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
+            Try {spec.freeAgents[0].name}
           </TrackedLink>
         </div>
       </section>
