@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Free-seat tables not on Neon yet. Apply drizzle/0002_free_seat_neon.sql (or drizzle-kit push).',
+          error: 'Free-seat schema is still warming up. Retry once — tables auto-create on Neon.',
         },
         { status: 503 },
       );
