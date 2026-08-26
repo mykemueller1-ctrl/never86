@@ -7,6 +7,7 @@ import {
   seatLocations,
   seatOperators,
 } from '../db/schema';
+import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
 
 // Monday gate (#118) — free seat on Neon (DATABASE_URL).
@@ -84,6 +85,8 @@ export async function requestOperatorActivation(
     return { ok: false, error: 'Enter your restaurant name.', status: 400 };
   }
 
+  await ensureFreeSeatSchema();
+
   const recent = await db
     .select({ n: dsql<number>`count(*)::int` })
     .from(seatActivationTokens)
@@ -154,6 +157,8 @@ export async function activateOperatorSeat(
   if (typeof password !== 'string' || password.length < 10) {
     return { ok: false, error: 'Password must be at least 10 characters.', status: 400 };
   }
+
+  await ensureFreeSeatSchema();
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
   const rows = await db
