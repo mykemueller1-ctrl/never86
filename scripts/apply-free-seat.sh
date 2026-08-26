@@ -13,10 +13,11 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FILES=(
   "$ROOT/drizzle/0002_free_seat_neon.sql"
   "$ROOT/drizzle/0003_free_seat_intake.sql"
+  "$ROOT/drizzle/0004_seat_auth_attempts.sql"
 )
 
 if ! command -v psql >/dev/null 2>&1; then
-  echo "psql is required to apply free-seat tables. Or paste drizzle/0002 + 0003 in Neon SQL Editor." >&2
+  echo "psql is required to apply free-seat tables. Or paste drizzle/0002 + 0003 + 0004 in Neon SQL Editor." >&2
   exit 1
 fi
 

@@ -1,4 +1,7 @@
-/** In-process sliding-window throttle keyed by normalized email and trusted IP. */
+import { and, eq, gt, sql as dsql } from 'drizzle-orm';
+import { db } from '../db';
+import { seatAuthAttempts } from '../db/schema';
+import { neonConfigured } from './operatorActivation';
 
 export const AUTH_THROTTLE_WINDOW_MS = 1000 * 60 * 60;
 
@@ -19,6 +22,11 @@ function prune(key: string, nowMs: number): number[] {
 
 export function resetAuthThrottleForTests(): void {
   buckets.clear();
+}
+
+function authAttemptsTableMissing(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /seat_auth_attempts|relation .* does not exist/i.test(msg);
 }
 
 /**
@@ -50,4 +58,60 @@ export function allowAuthAttempt(input: {
     buckets.set(key, times);
   }
   return true;
+}
+
+/**
+ * Durable login throttle on Neon so concurrent Vercel instances share the
+ * window. Falls back to the in-process map if 0004 is not applied yet.
+ */
+export async function allowDurableLoginAttempt(input: {
+  email: string;
+  ip?: string;
+  nowMs?: number;
+}): Promise<boolean> {
+  const email = input.email.trim().toLowerCase();
+  const ip = input.ip?.trim();
+  const nowMs = input.nowMs ?? Date.now();
+  if (!neonConfigured()) {
+    return allowAuthAttempt({ kind: 'login', email, ip, nowMs });
+  }
+  try {
+    await db.insert(seatAuthAttempts).values({
+      kind: 'login',
+      email,
+      requestIp: ip ?? null,
+      createdAt: new Date(nowMs),
+    });
+    const windowStart = new Date(nowMs - AUTH_THROTTLE_WINDOW_MS);
+    const emailRows = await db
+      .select({ n: dsql<number>`count(*)::int` })
+      .from(seatAuthAttempts)
+      .where(
+        and(
+          eq(seatAuthAttempts.kind, 'login'),
+          eq(seatAuthAttempts.email, email),
+          gt(seatAuthAttempts.createdAt, windowStart),
+        ),
+      );
+    if ((emailRows[0]?.n ?? 0) > AUTH_THROTTLE_LIMITS.login.email) return false;
+    if (ip) {
+      const ipRows = await db
+        .select({ n: dsql<number>`count(*)::int` })
+        .from(seatAuthAttempts)
+        .where(
+          and(
+            eq(seatAuthAttempts.kind, 'login'),
+            eq(seatAuthAttempts.requestIp, ip),
+            gt(seatAuthAttempts.createdAt, windowStart),
+          ),
+        );
+      if ((ipRows[0]?.n ?? 0) > AUTH_THROTTLE_LIMITS.login.ip) return false;
+    }
+    return true;
+  } catch (err) {
+    if (authAttemptsTableMissing(err)) {
+      return allowAuthAttempt({ kind: 'login', email, ip, nowMs });
+    }
+    throw err;
+  }
 }

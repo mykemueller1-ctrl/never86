@@ -28,5 +28,6 @@ describe('scripts/apply-free-seat.sh', () => {
     expect(src).toMatch(/Canonical path/);
     expect(src).toMatch(/do not add a second apply-free-seat-neon\.sh/);
     expect(src).not.toMatch(/postgresql:\/\//);
+    expect(src).toMatch(/0004_seat_auth_attempts\.sql/);
   });
 });

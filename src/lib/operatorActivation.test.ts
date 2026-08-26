@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FREE_SEAT_ID_FLOOR,
+  SeatActivationAbort,
   activationEmailConfigured,
   activationTokenIsConsumable,
   chooseLoginPlane,
@@ -110,5 +111,20 @@ describe('operatorActivation pure helpers', () => {
     expect(chooseLoginPlane({ passwordHash: 'x' }, false)).toBe('deny-neon');
     expect(chooseLoginPlane({ passwordHash: 'x' }, true)).toBe('neon');
     expect(chooseLoginPlane(null, false)).toBe('ops');
+  });
+
+  it('aborts activation so second-store and id-namespace failures can roll back', () => {
+    const second = refuseSecondFreeStore(1);
+    if (!second.ok) {
+      const abort = new SeatActivationAbort({ ok: false, error: second.error, status: 409 });
+      expect(abort.result.ok).toBe(false);
+      expect(abort.result.status).toBe(409);
+    }
+    const idAbort = new SeatActivationAbort({
+      ok: false,
+      error: 'Free-seat id namespace misconfigured. Contact support.',
+      status: 500,
+    });
+    expect(idAbort.result.status).toBe(500);
   });
 });

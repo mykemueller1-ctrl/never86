@@ -17,7 +17,7 @@ import {
   OPERATOR_COOKIE_OPTS,
 } from '@/lib/operatorSession';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
-import { allowAuthAttempt } from '@/lib/authThrottle';
+import { allowDurableLoginAttempt } from '@/lib/authThrottle';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   const ip = pickTrustedClientIp(req.headers);
-  if (!allowAuthAttempt({ kind: 'login', email: normalizeEmail(email), ip })) {
+  if (!(await allowDurableLoginAttempt({ email: normalizeEmail(email), ip }))) {
     return NextResponse.json(
       { success: false, error: 'Too many sign-in attempts. Try again in an hour.' },
       { status: 429 },

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { and, eq, gt, isNull, sql as dsql } from 'drizzle-orm';
 import { db } from '../db';
+import { withSeatTransaction } from '../db/tx';
 import {
   seatActivationTokens,
   seatCredentials,
@@ -228,6 +229,16 @@ export type ActivateResult =
     }
   | { ok: false; error: string; status: number };
 
+export class SeatActivationAbort extends Error {
+  readonly result: ActivateResult & { ok: false };
+
+  constructor(result: ActivateResult & { ok: false }) {
+    super(result.error);
+    this.name = 'SeatActivationAbort';
+    this.result = result;
+  }
+}
+
 export async function activateOperatorSeat(
   input: ActivateInput,
   nowMs = Date.now(),
@@ -242,163 +253,180 @@ export async function activateOperatorSeat(
   }
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
-  const consumed = await db
-    .update(seatActivationTokens)
-    .set({ consumedAt: new Date(nowMs) })
-    .where(
-      and(
-        eq(seatActivationTokens.tokenHash, tokenHash),
-        isNull(seatActivationTokens.consumedAt),
-        gt(seatActivationTokens.expiresAt, new Date(nowMs)),
-      ),
-    )
-    .returning();
-
-  const row = consumed[0];
-  if (!row) {
-    const existing = await db
-      .select()
-      .from(seatActivationTokens)
-      .where(eq(seatActivationTokens.tokenHash, tokenHash))
-      .limit(1);
-    const found = existing[0];
-    if (!found) {
-      return { ok: false, error: 'This activation link is invalid.', status: 400 };
-    }
-    if (found.consumedAt) {
-      return { ok: false, error: 'This activation link was already used. Sign in.', status: 409 };
-    }
-    if (new Date(found.expiresAt).getTime() < nowMs) {
-      return { ok: false, error: 'This activation link expired. Request a new one.', status: 410 };
-    }
-    return { ok: false, error: 'This activation link is invalid.', status: 400 };
-  }
-
-  const email = normalizeEmail(row.email);
-  const restaurantName = normalizeRestaurant(row.restaurantName);
-  const operatorName = (row.operatorName?.trim() || restaurantName).slice(0, 200);
-
-  const priorCred = await db
-    .select({ operatorId: seatCredentials.operatorId })
-    .from(seatCredentials)
-    .where(eq(seatCredentials.email, email))
-    .limit(1);
-  if (priorCred[0]) {
-    await db
-      .update(seatActivationTokens)
-      .set({ consumedOperatorId: priorCred[0].operatorId })
-      .where(eq(seatActivationTokens.id, row.id));
-    return {
-      ok: false,
-      error: 'This email already has a seat. Sign in instead.',
-      status: 409,
-    };
-  }
-
   const passwordHash = hashPassword(password);
 
-  // Ensure free-seat serial stays above OPS collision floor.
-  await db.execute(dsql`
-    SELECT setval(
-      pg_get_serial_sequence('seat_operators', 'id'),
-      GREATEST(
-        (SELECT COALESCE(MAX(id), 0) FROM seat_operators),
-        ${FREE_SEAT_ID_FLOOR - 1}
-      )
-    )
-  `);
+  try {
+    return await withSeatTransaction(async (tx) => {
+      const consumed = await tx
+        .update(seatActivationTokens)
+        .set({ consumedAt: new Date(nowMs) })
+        .where(
+          and(
+            eq(seatActivationTokens.tokenHash, tokenHash),
+            isNull(seatActivationTokens.consumedAt),
+            gt(seatActivationTokens.expiresAt, new Date(nowMs)),
+          ),
+        )
+        .returning();
 
-  let operatorId: number;
-  const existingOp = await db
-    .select({ id: seatOperators.id })
-    .from(seatOperators)
-    .where(eq(seatOperators.email, email))
-    .limit(1);
-
-  if (existingOp[0]) {
-    operatorId = existingOp[0].id;
-    await db
-      .update(seatOperators)
-      .set({
-        name: operatorName,
-        restaurantName,
-        activatedAt: new Date(nowMs),
-      })
-      .where(eq(seatOperators.id, operatorId));
-  } else {
-    const inserted = await db
-      .insert(seatOperators)
-      .values({
-        email,
-        name: operatorName,
-        restaurantName,
-        sourcePage: row.sourcePage,
-        consentAt: row.consentAt,
-        activatedAt: new Date(nowMs),
-        createdAt: new Date(nowMs),
-      })
-      .returning({ id: seatOperators.id });
-    operatorId = inserted[0].id;
-  }
-
-  if (operatorId < FREE_SEAT_ID_FLOOR) {
-    // Should not happen after setval; refuse rather than collide with OPS.
-    return {
-      ok: false,
-      error: 'Free-seat id namespace misconfigured. Contact support.',
-      status: 500,
-    };
-  }
-
-  const existingLoc = await db
-    .select({ id: seatLocations.id })
-    .from(seatLocations)
-    .where(eq(seatLocations.operatorId, operatorId))
-    .limit(1);
-
-  let locationId: number;
-  if (existingLoc[0]) {
-    const locRows = await db
-      .select({ name: seatLocations.name })
-      .from(seatLocations)
-      .where(eq(seatLocations.id, existingLoc[0].id))
-      .limit(1);
-    const existingName = locRows[0]?.name;
-    if (existingName && existingName !== restaurantName) {
-      const second = refuseSecondFreeStore(1);
-      if (!second.ok) {
-        return { ok: false, error: second.error, status: 409 };
+      const row = consumed[0];
+      if (!row) {
+        const existing = await tx
+          .select()
+          .from(seatActivationTokens)
+          .where(eq(seatActivationTokens.tokenHash, tokenHash))
+          .limit(1);
+        const found = existing[0];
+        if (!found) {
+          throw new SeatActivationAbort({
+            ok: false,
+            error: 'This activation link is invalid.',
+            status: 400,
+          });
+        }
+        if (found.consumedAt) {
+          throw new SeatActivationAbort({
+            ok: false,
+            error: 'This activation link was already used. Sign in.',
+            status: 409,
+          });
+        }
+        if (new Date(found.expiresAt).getTime() < nowMs) {
+          throw new SeatActivationAbort({
+            ok: false,
+            error: 'This activation link expired. Request a new one.',
+            status: 410,
+          });
+        }
+        throw new SeatActivationAbort({
+          ok: false,
+          error: 'This activation link is invalid.',
+          status: 400,
+        });
       }
-    }
-    locationId = existingLoc[0].id;
-  } else {
-    const loc = await db
-      .insert(seatLocations)
-      .values({ operatorId, name: restaurantName, createdAt: new Date(nowMs) })
-      .returning({ id: seatLocations.id });
-    locationId = loc[0].id;
+
+      const email = normalizeEmail(row.email);
+      const restaurantName = normalizeRestaurant(row.restaurantName);
+      const operatorName = (row.operatorName?.trim() || restaurantName).slice(0, 200);
+
+      const priorCred = await tx
+        .select({ operatorId: seatCredentials.operatorId })
+        .from(seatCredentials)
+        .where(eq(seatCredentials.email, email))
+        .limit(1);
+      if (priorCred[0]) {
+        await tx
+          .update(seatActivationTokens)
+          .set({ consumedOperatorId: priorCred[0].operatorId })
+          .where(eq(seatActivationTokens.id, row.id));
+        // Commit consume: this email already has a seat; retrying the link
+        // must not mint a second one.
+        return {
+          ok: false,
+          error: 'This email already has a seat. Sign in instead.',
+          status: 409,
+        } as const;
+      }
+
+      await tx.execute(dsql`
+        SELECT setval(
+          pg_get_serial_sequence('seat_operators', 'id'),
+          GREATEST(
+            (SELECT COALESCE(MAX(id), 0) FROM seat_operators),
+            ${FREE_SEAT_ID_FLOOR - 1}
+          )
+        )
+      `);
+
+      let operatorId: number;
+      const existingOp = await tx
+        .select({ id: seatOperators.id })
+        .from(seatOperators)
+        .where(eq(seatOperators.email, email))
+        .limit(1);
+
+      if (existingOp[0]) {
+        operatorId = existingOp[0].id;
+        await tx
+          .update(seatOperators)
+          .set({
+            name: operatorName,
+            restaurantName,
+            activatedAt: new Date(nowMs),
+          })
+          .where(eq(seatOperators.id, operatorId));
+      } else {
+        const inserted = await tx
+          .insert(seatOperators)
+          .values({
+            email,
+            name: operatorName,
+            restaurantName,
+            sourcePage: row.sourcePage,
+            consentAt: row.consentAt,
+            activatedAt: new Date(nowMs),
+            createdAt: new Date(nowMs),
+          })
+          .returning({ id: seatOperators.id });
+        operatorId = inserted[0].id;
+      }
+
+      if (operatorId < FREE_SEAT_ID_FLOOR) {
+        throw new SeatActivationAbort({
+          ok: false,
+          error: 'Free-seat id namespace misconfigured. Contact support.',
+          status: 500,
+        });
+      }
+
+      const existingLoc = await tx
+        .select({ id: seatLocations.id, name: seatLocations.name })
+        .from(seatLocations)
+        .where(eq(seatLocations.operatorId, operatorId))
+        .limit(1);
+
+      let locationId: number;
+      if (existingLoc[0]) {
+        if (existingLoc[0].name && existingLoc[0].name !== restaurantName) {
+          const second = refuseSecondFreeStore(1);
+          if (!second.ok) {
+            throw new SeatActivationAbort({ ok: false, error: second.error, status: 409 });
+          }
+        }
+        locationId = existingLoc[0].id;
+      } else {
+        const loc = await tx
+          .insert(seatLocations)
+          .values({ operatorId, name: restaurantName, createdAt: new Date(nowMs) })
+          .returning({ id: seatLocations.id });
+        locationId = loc[0].id;
+      }
+
+      await tx.delete(seatCredentials).where(eq(seatCredentials.email, email));
+      await tx.insert(seatCredentials).values({
+        operatorId,
+        email,
+        passwordHash,
+        createdAt: new Date(nowMs),
+      });
+
+      await tx
+        .update(seatActivationTokens)
+        .set({ consumedOperatorId: operatorId })
+        .where(eq(seatActivationTokens.id, row.id));
+
+      return {
+        ok: true,
+        operatorId,
+        locationId,
+        email,
+        restaurantName,
+      };
+    });
+  } catch (err) {
+    if (err instanceof SeatActivationAbort) return err.result;
+    throw err;
   }
-
-  await db.delete(seatCredentials).where(eq(seatCredentials.email, email));
-  await db.insert(seatCredentials).values({
-    operatorId,
-    email,
-    passwordHash,
-    createdAt: new Date(nowMs),
-  });
-
-  await db
-    .update(seatActivationTokens)
-    .set({ consumedOperatorId: operatorId })
-    .where(eq(seatActivationTokens.id, row.id));
-
-  return {
-    ok: true,
-    operatorId,
-    locationId,
-    email,
-    restaurantName,
-  };
 }
 
 export type FreeSeatCredential = {
