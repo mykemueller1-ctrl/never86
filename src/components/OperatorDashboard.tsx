@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCommandCenterData, type CommandCenterData } from '@/lib/commandCenter';
 import { buildCoachCards, type CoachCard } from '@/lib/coachCards';
 import { opsDbConfigured } from '@/lib/opsDb';
+import { isFreeSeatOperatorId } from '@/lib/operatorActivation';
 import SignOutButton from './SignOutButton';
 
 // The operator's home in the COMPASS brief design — the exact language of the
@@ -125,7 +126,8 @@ function EmptyState({ name }: { name: string }) {
 }
 
 export default async function OperatorDashboard({ operatorId, displayName }: { operatorId: number; displayName?: string }) {
-  if (!opsDbConfigured()) {
+  // Neon free-seat operators (Monday gate) do not read Supabase OPS yet.
+  if (isFreeSeatOperatorId(operatorId) || !opsDbConfigured()) {
     return <Shell name="DASHBOARD"><EmptyState name="YOUR RESTAURANT" /></Shell>;
   }
   let d: CommandCenterData;

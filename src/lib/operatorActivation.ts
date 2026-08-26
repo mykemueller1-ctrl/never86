@@ -1,15 +1,33 @@
 import crypto from 'crypto';
-import { opsDb, opsDbConfigured } from './opsDb';
-import { hashPassword } from './operatorAuth';
+import { and, eq, gt, sql as dsql } from 'drizzle-orm';
+import { db } from '../db';
+import {
+  seatActivationTokens,
+  seatCredentials,
+  seatLocations,
+  seatOperators,
+} from '../db/schema';
+import { hashPassword, verifyPassword } from './operatorAuth';
 
-// Monday gate (#118) — self-serve one-store activation.
-// Columns used here are proven by applied sql/0003 + sql/0004 only.
+// Monday gate (#118) — free seat on Neon (DATABASE_URL).
+// Supabase OPS is deferred; Toast/CTAP data comes back later.
 // Never email, log, or return a plaintext starter password.
 
 const TOKEN_BYTES = 32;
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24; // 24h
 const RATE_LIMIT_WINDOW_MS = 1000 * 60 * 60; // 1h
 const RATE_LIMIT_MAX = 5;
+
+/** Neon free-seat ids stay above this floor to avoid OPS operator_users id collisions. */
+export const FREE_SEAT_ID_FLOOR = 1_000_000;
+
+export function isFreeSeatOperatorId(operatorId: number): boolean {
+  return operatorId >= FREE_SEAT_ID_FLOOR;
+}
+
+export function neonConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL);
+}
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -53,8 +71,8 @@ export async function requestOperatorActivation(
   input: ActivationRequestInput,
   nowMs = Date.now(),
 ): Promise<ActivationRequestResult> {
-  if (!opsDbConfigured()) {
-    return { ok: false, error: 'Activation database is offline.', status: 503 };
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
   }
 
   const email = normalizeEmail(input.email);
@@ -66,22 +84,24 @@ export async function requestOperatorActivation(
     return { ok: false, error: 'Enter your restaurant name.', status: 400 };
   }
 
-  const sql = opsDb();
-
-  const recent = await sql<{ n: number }[]>`
-    select count(*)::int as n
-    from operator_activation_tokens
-    where lower(email) = ${email}
-      and created_at > ${new Date(nowMs - RATE_LIMIT_WINDOW_MS)}`;
+  const recent = await db
+    .select({ n: dsql<number>`count(*)::int` })
+    .from(seatActivationTokens)
+    .where(
+      and(
+        eq(seatActivationTokens.email, email),
+        gt(seatActivationTokens.createdAt, new Date(nowMs - RATE_LIMIT_WINDOW_MS)),
+      ),
+    );
   if ((recent[0]?.n ?? 0) >= RATE_LIMIT_MAX) {
     return { ok: false, error: 'Too many activation emails. Try again in an hour.', status: 429 };
   }
 
-  // If this email already has a login, do not mint a second free store path.
-  const existingCred = await sql<{ operator_id: number }[]>`
-    select operator_id from operator_credentials
-    where lower(email) = ${email}
-    limit 1`;
+  const existingCred = await db
+    .select({ operatorId: seatCredentials.operatorId })
+    .from(seatCredentials)
+    .where(eq(seatCredentials.email, email))
+    .limit(1);
   if (existingCred[0]) {
     return {
       ok: false,
@@ -91,22 +111,18 @@ export async function requestOperatorActivation(
   }
 
   const { rawToken, tokenHash, expiresAt } = mintActivationToken(nowMs);
-  await sql`
-    insert into operator_activation_tokens (
-      email, restaurant_name, operator_name, token_hash,
-      source_page, consent_at, created_at, expires_at, request_ip, user_agent
-    ) values (
-      ${email},
-      ${restaurantName},
-      ${input.name?.trim() || null},
-      ${tokenHash},
-      ${input.sourcePage ?? null},
-      ${new Date(nowMs)},
-      ${new Date(nowMs)},
-      ${expiresAt},
-      ${input.requestIp ?? null},
-      ${input.userAgent ?? null}
-    )`;
+  await db.insert(seatActivationTokens).values({
+    email,
+    restaurantName,
+    operatorName: input.name?.trim() || null,
+    tokenHash,
+    sourcePage: input.sourcePage ?? null,
+    consentAt: new Date(nowMs),
+    createdAt: new Date(nowMs),
+    expiresAt,
+    requestIp: input.requestIp ?? null,
+    userAgent: input.userAgent ?? null,
+  });
 
   return { ok: true, rawToken, expiresAt, alreadyPending: false };
 }
@@ -130,8 +146,8 @@ export async function activateOperatorSeat(
   input: ActivateInput,
   nowMs = Date.now(),
 ): Promise<ActivateResult> {
-  if (!opsDbConfigured()) {
-    return { ok: false, error: 'Activation database is offline.', status: 503 };
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
   }
 
   const password = input.password;
@@ -140,49 +156,37 @@ export async function activateOperatorSeat(
   }
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
-  const sql = opsDb();
-
-  const rows = await sql<
-    {
-      id: number;
-      email: string;
-      restaurant_name: string;
-      operator_name: string | null;
-      expires_at: Date;
-      consumed_at: Date | null;
-    }[]
-  >`
-    select id, email, restaurant_name, operator_name, expires_at, consumed_at
-    from operator_activation_tokens
-    where token_hash = ${tokenHash}
-    limit 1`;
+  const rows = await db
+    .select()
+    .from(seatActivationTokens)
+    .where(eq(seatActivationTokens.tokenHash, tokenHash))
+    .limit(1);
 
   const row = rows[0];
   if (!row) {
     return { ok: false, error: 'This activation link is invalid.', status: 400 };
   }
-  if (row.consumed_at) {
+  if (row.consumedAt) {
     return { ok: false, error: 'This activation link was already used. Sign in.', status: 409 };
   }
-  if (new Date(row.expires_at).getTime() < nowMs) {
+  if (new Date(row.expiresAt).getTime() < nowMs) {
     return { ok: false, error: 'This activation link expired. Request a new one.', status: 410 };
   }
 
   const email = normalizeEmail(row.email);
-  const restaurantName = normalizeRestaurant(row.restaurant_name);
-  const operatorName = (row.operator_name?.trim() || restaurantName).slice(0, 200);
+  const restaurantName = normalizeRestaurant(row.restaurantName);
+  const operatorName = (row.operatorName?.trim() || restaurantName).slice(0, 200);
 
-  // Idempotent by normalized email: reuse operator if credential already exists.
-  const priorCred = await sql<{ operator_id: number }[]>`
-    select operator_id from operator_credentials
-    where lower(email) = ${email}
-    limit 1`;
+  const priorCred = await db
+    .select({ operatorId: seatCredentials.operatorId })
+    .from(seatCredentials)
+    .where(eq(seatCredentials.email, email))
+    .limit(1);
   if (priorCred[0]) {
-    await sql`
-      update operator_activation_tokens
-      set consumed_at = ${new Date(nowMs)},
-          consumed_operator_id = ${priorCred[0].operator_id}
-      where id = ${row.id} and consumed_at is null`;
+    await db
+      .update(seatActivationTokens)
+      .set({ consumedAt: new Date(nowMs), consumedOperatorId: priorCred[0].operatorId })
+      .where(eq(seatActivationTokens.id, row.id));
     return {
       ok: false,
       error: 'This email already has a seat. Sign in instead.',
@@ -190,76 +194,144 @@ export async function activateOperatorSeat(
     };
   }
 
-  // Idempotent by restaurant+email: reuse an uncredentialed operator row if present.
-  let operatorId: number | null = null;
-  const priorOps = await sql<{ id: number }[]>`
-    select id from operator_users
-    where lower(email) = ${email}
-       or (lower(coalesce(restaurant_name, '')) = lower(${restaurantName})
-           and lower(coalesce(email, '')) = ${email})
-    order by id asc
-    limit 1`;
-  if (priorOps[0]) {
-    operatorId = priorOps[0].id;
-  }
-
   const passwordHash = hashPassword(password);
 
-  // One server-side transaction: operator + exactly one free location + one credential.
-  const result = await sql.begin(async (tx) => {
-    if (operatorId == null) {
-      const inserted = await tx<{ id: number }[]>`
-        insert into operator_users (name, restaurant_name, email)
-        values (${operatorName}, ${restaurantName}, ${email})
-        returning id`;
-      operatorId = inserted[0].id;
-    } else {
-      await tx`
-        update operator_users
-        set name = coalesce(nullif(name, ''), ${operatorName}),
-            restaurant_name = coalesce(nullif(restaurant_name, ''), ${restaurantName}),
-            email = coalesce(nullif(email, ''), ${email})
-        where id = ${operatorId}`;
-    }
+  // Ensure free-seat serial stays above OPS collision floor.
+  await db.execute(dsql`
+    SELECT setval(
+      pg_get_serial_sequence('seat_operators', 'id'),
+      GREATEST(
+        (SELECT COALESCE(MAX(id), 0) FROM seat_operators),
+        ${FREE_SEAT_ID_FLOOR - 1}
+      )
+    )
+  `);
 
-    const existingLoc = await tx<{ id: number }[]>`
-      select id from operator_locations
-      where operator_id = ${operatorId}
-      order by id asc
-      limit 1`;
+  let operatorId: number;
+  const existingOp = await db
+    .select({ id: seatOperators.id })
+    .from(seatOperators)
+    .where(eq(seatOperators.email, email))
+    .limit(1);
 
-    let locationId: number;
-    if (existingLoc[0]) {
-      // Free plan: one store only. Never create a second location.
-      locationId = existingLoc[0].id;
-    } else {
-      const loc = await tx<{ id: number }[]>`
-        insert into operator_locations (operator_id, name, city, state)
-        values (${operatorId}, ${restaurantName}, ${''}, ${''})
-        returning id`;
-      locationId = loc[0].id;
-    }
+  if (existingOp[0]) {
+    operatorId = existingOp[0].id;
+    await db
+      .update(seatOperators)
+      .set({
+        name: operatorName,
+        restaurantName,
+        activatedAt: new Date(nowMs),
+      })
+      .where(eq(seatOperators.id, operatorId));
+  } else {
+    const inserted = await db
+      .insert(seatOperators)
+      .values({
+        email,
+        name: operatorName,
+        restaurantName,
+        sourcePage: row.sourcePage,
+        consentAt: row.consentAt,
+        activatedAt: new Date(nowMs),
+        createdAt: new Date(nowMs),
+      })
+      .returning({ id: seatOperators.id });
+    operatorId = inserted[0].id;
+  }
 
-    // Delete-then-insert matches upsertOperatorCredential (unique on lower(email)).
-    await tx`delete from operator_credentials where lower(email) = ${email}`;
-    await tx`
-      insert into operator_credentials (operator_id, email, password_hash)
-      values (${operatorId}, ${email}, ${passwordHash})`;
+  if (operatorId < FREE_SEAT_ID_FLOOR) {
+    // Should not happen after setval; refuse rather than collide with OPS.
+    return {
+      ok: false,
+      error: 'Free-seat id namespace misconfigured. Contact support.',
+      status: 500,
+    };
+  }
 
-    await tx`
-      update operator_activation_tokens
-      set consumed_at = ${new Date(nowMs)},
-          consumed_operator_id = ${operatorId}
-      where id = ${row.id} and consumed_at is null`;
+  const existingLoc = await db
+    .select({ id: seatLocations.id })
+    .from(seatLocations)
+    .where(eq(seatLocations.operatorId, operatorId))
+    .limit(1);
 
-    return { operatorId: operatorId!, locationId };
+  let locationId: number;
+  if (existingLoc[0]) {
+    locationId = existingLoc[0].id;
+  } else {
+    const loc = await db
+      .insert(seatLocations)
+      .values({ operatorId, name: restaurantName, createdAt: new Date(nowMs) })
+      .returning({ id: seatLocations.id });
+    locationId = loc[0].id;
+  }
+
+  await db.delete(seatCredentials).where(eq(seatCredentials.email, email));
+  await db.insert(seatCredentials).values({
+    operatorId,
+    email,
+    passwordHash,
+    createdAt: new Date(nowMs),
   });
+
+  await db
+    .update(seatActivationTokens)
+    .set({ consumedAt: new Date(nowMs), consumedOperatorId: operatorId })
+    .where(eq(seatActivationTokens.id, row.id));
 
   return {
     ok: true,
-    operatorId: result.operatorId,
-    locationId: result.locationId,
+    operatorId,
+    locationId,
     email,
     restaurantName,
   };
 }
+
+export type FreeSeatCredential = {
+  operatorId: number;
+  email: string;
+  passwordHash: string;
+  name: string | null;
+};
+
+export async function findFreeSeatCredential(email: string): Promise<FreeSeatCredential | null> {
+  if (!neonConfigured()) return null;
+  const normalized = normalizeEmail(email);
+  const rows = await db
+    .select({
+      operatorId: seatCredentials.operatorId,
+      email: seatCredentials.email,
+      passwordHash: seatCredentials.passwordHash,
+      name: seatOperators.restaurantName,
+    })
+    .from(seatCredentials)
+    .leftJoin(seatOperators, eq(seatOperators.id, seatCredentials.operatorId))
+    .where(eq(seatCredentials.email, normalized))
+    .limit(1);
+  const r = rows[0];
+  return r
+    ? {
+        operatorId: r.operatorId,
+        email: r.email,
+        passwordHash: r.passwordHash,
+        name: r.name,
+      }
+    : null;
+}
+
+export async function touchFreeSeatLogin(operatorId: number, email: string): Promise<void> {
+  if (!neonConfigured()) return;
+  try {
+    await db
+      .update(seatCredentials)
+      .set({ lastLoginAt: new Date() })
+      .where(
+        and(eq(seatCredentials.operatorId, operatorId), eq(seatCredentials.email, normalizeEmail(email))),
+      );
+  } catch {
+    /* non-fatal */
+  }
+}
+
+export { verifyPassword };

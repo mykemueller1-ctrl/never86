@@ -85,7 +85,7 @@ export default function OnboardPage() {
         if (waitData.success) {
           setStatus('success');
           setMessage(
-            "You're on the list. Activation DB is offline right now — Myke will turn the seat on when Supabase never86 is restored.",
+            "You're on the list. Free-seat tables still need a Neon push (drizzle/0002_free_seat_neon.sql). Supabase can wait until morning.",
           );
           setStep(4);
           trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference, path: 'waitlist_fallback' } });

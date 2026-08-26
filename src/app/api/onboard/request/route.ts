@@ -50,7 +50,7 @@ async function sendActivationEmail(email: string, name: string | undefined, link
   });
 }
 
-// POST /api/onboard/request — mint a one-time activation token (hashed at rest).
+// POST /api/onboard/request — mint a one-time activation token on Neon (hashed at rest).
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
@@ -81,17 +81,14 @@ export async function POST(req: NextRequest) {
       await sendNotification(
         process.env.OWNER_EMAIL || 'myke@n86.app',
         `Activation requested · ${data.name || data.email}`,
-        `<p><strong>${data.name || 'Someone'}</strong> requested the free seat.</p>
+        `<p><strong>${data.name || 'Someone'}</strong> requested the free seat (Neon path).</p>
          <p>Email: ${data.email}<br/>Restaurant: ${data.restaurantName}</p>
-         <p>Token minted. Password is never emailed.</p>`,
+         <p>Token minted. Password is never emailed. Supabase deferred.</p>`,
       );
     } catch {
       /* best-effort */
     }
 
-    // Never return the raw token to the browser in production responses that
-    // also email — but for local/dev without Resend, include it so the
-    // stranger path can be tested.
     const includeToken = !process.env.RESEND_API_KEY || process.env.NODE_ENV !== 'production';
     return NextResponse.json({
       success: true,
@@ -104,12 +101,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Check email and restaurant name.' }, { status: 400 });
     }
     const msg = err instanceof Error ? err.message : 'Activation request failed';
-    // Missing activation table → clear blocker, not a vague 500.
-    if (/operator_activation_tokens/i.test(msg)) {
+    if (/seat_activation_tokens|relation .* does not exist/i.test(msg)) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Activation table not applied yet. Apply sql/0005_operator_activation.sql after Supabase never86 is restored.',
+          error: 'Free-seat tables not on Neon yet. Apply drizzle/0002_free_seat_neon.sql (or drizzle-kit push).',
         },
         { status: 503 },
       );

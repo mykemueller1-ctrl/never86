@@ -1,43 +1,33 @@
 # Monday gate status — 2026-08-26
 
 ## Operating model (locked)
-Grok (phone front door) → Cursor (runs agents/bots/code/PRs) → Codex (outside review / safe branch rails).
-One Cursor factory job at a time. Kill stuck Grok sales organization before the next dispatch.
+Grok (phone) → Cursor (agents/bots/code/PRs) → Codex (outside review).
+One Cursor factory job at a time.
 
-## Live deploy proof
-GitHub Deployments API for `mykemueller1-ctrl/never86`:
-- Production SHA `84e543a` (2026-08-26) = `origin/main` tip (Grok OAuth connector merge).
-- Older note `b86eef9` is stale — that SHA is not in this repo; current production is.
-- This repo deploys www.never86.ai (Vercel). Default git branch `recovery-apr12` is NOT production.
+## Live deploy
+Production SHA `84e543a` = `main`. This repo deploys www.never86.ai.
 
-## Branch for this work
-`cursor/monday-gate-onboard-6e56` from founder-authorized `codex/action-shift-122-safe`.
+## Branch
+`cursor/monday-gate-onboard-6e56` from `codex/action-shift-122-safe` → PR #127.
 
-## What shipped in this PR
-- Activation token migration `sql/0005_operator_activation.sql` (hashed token, expiry, consent).
-- `requestOperatorActivation` + `activateOperatorSeat` using only proven columns from applied sql/0003+0004:
-  - `operator_users(id, name, restaurant_name, email)`
-  - `operator_locations(id, operator_id, name, city, state)`
-  - `operator_credentials(...)`
-- `/api/onboard/request`, `/api/onboard/activate`, `/activate` password UI (password never emailed).
-- `/onboard` calls activation first; waitlist fallback if ops DB is 503.
-- Dashboard empty state asks for prior complete business-day close only.
-- AGENTS.md: Grok → Cursor → Codex + active job #118.
+## Free seat without Supabase (tonight)
+Activation + login use **Neon** (`DATABASE_URL`):
+- `seat_activation_tokens`, `seat_operators`, `seat_locations`, `seat_credentials`
+- SQL: `drizzle/0002_free_seat_neon.sql`
+- Free-seat operator ids ≥ `1_000_000` (no OPS id collision)
+- Dashboard empty state asks for prior business-day close
+- Password never emailed
 
-## Hard blocker (exact)
-Supabase project `never86` (`zjtbhsouhwyyfwoyjgow`) is **INACTIVE** with **unpaid invoices**.
-`restore_project` → `PaymentRequiredException`.
-Without OPS DB up + `sql/0005` applied + `OPS_DATABASE_URL` in Vercel:
-- stranger activation cannot complete live
-- live schema re-check cannot run
+## Supabase
+**Deferred to tomorrow morning** per Myke. Project `never86` unpaid/INACTIVE.
+Toast/CTAP OPS evidence waits. Do not block factory on it tonight.
 
-## Phone taps for Myke (only these)
-1. Stop/Archive stuck **Grok sales organization** Cursor chat if still ACTIVE.
-2. Pay / unpause Supabase org invoices → restore project `never86`.
-3. Paste `OPS_DATABASE_URL` (and `RESEND_API_KEY` if missing) into Cursor secrets / Vercel.
-4. Confirm Cursor GitHub App has **write** on this repo.
+## Apply Neon tables
+On Neon console or CI with `DATABASE_URL`:
+```bash
+psql "$DATABASE_URL" -f drizzle/0002_free_seat_neon.sql
+# or: npx drizzle-kit push
+```
 
-## Do not
-- Merge grok-sales-org dump (#121).
-- Invent columns beyond the proven set above.
-- Ask Myke to merge from a laptop.
+## Grok
+See `docs/GROK-KEEP-BUILDING.md` — keep dispatching Cursor; Supabase is morning work.

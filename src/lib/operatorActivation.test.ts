@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FREE_SEAT_ID_FLOOR,
   hashActivationToken,
+  isFreeSeatOperatorId,
   mintActivationToken,
   normalizeEmail,
   normalizeRestaurant,
@@ -29,5 +31,11 @@ describe('operatorActivation pure helpers', () => {
     const b = mintActivationToken();
     expect(a.rawToken).not.toBe(b.rawToken);
     expect(a.tokenHash).not.toBe(b.tokenHash);
+  });
+
+  it('keeps free-seat ids above OPS collision floor', () => {
+    expect(isFreeSeatOperatorId(FREE_SEAT_ID_FLOOR)).toBe(true);
+    expect(isFreeSeatOperatorId(FREE_SEAT_ID_FLOOR - 1)).toBe(false);
+    expect(isFreeSeatOperatorId(3)).toBe(false);
   });
 });

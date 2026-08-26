@@ -577,3 +577,57 @@ export type ActionShiftStepReceipt = typeof actionShiftStepReceipts.$inferSelect
 export type InsertActionShiftStepReceipt = typeof actionShiftStepReceipts.$inferInsert;
 export type ActionShiftFeedback = typeof actionShiftFeedback.$inferSelect;
 export type InsertActionShiftFeedback = typeof actionShiftFeedback.$inferInsert;
+
+// ── Free seat (Neon) — Monday gate without Supabase ──
+// Lives on primary DATABASE_URL. Supabase OPS stays for Toast/CTAP data later.
+// IDs start at 1_000_000 so they never collide with legacy OPS operator_users ids.
+
+export const seatActivationTokens = pgTable('seat_activation_tokens', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull(),
+  restaurantName: text('restaurant_name').notNull(),
+  operatorName: text('operator_name'),
+  tokenHash: text('token_hash').notNull().unique(),
+  sourcePage: text('source_page'),
+  consentAt: timestamp('consent_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  consumedAt: timestamp('consumed_at'),
+  consumedOperatorId: integer('consumed_operator_id'),
+  requestIp: text('request_ip'),
+  userAgent: text('user_agent'),
+});
+
+export const seatOperators = pgTable('seat_operators', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  restaurantName: text('restaurant_name').notNull(),
+  sourcePage: text('source_page'),
+  consentAt: timestamp('consent_at').defaultNow().notNull(),
+  activatedAt: timestamp('activated_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const seatLocations = pgTable('seat_locations', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('seat_locations_one_free_store_idx').on(table.operatorId),
+]);
+
+export const seatCredentials = pgTable('seat_credentials', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  lastLoginAt: timestamp('last_login_at'),
+});
+
+export type SeatActivationToken = typeof seatActivationTokens.$inferSelect;
+export type SeatOperator = typeof seatOperators.$inferSelect;
+export type SeatLocation = typeof seatLocations.$inferSelect;
+export type SeatCredential = typeof seatCredentials.$inferSelect;

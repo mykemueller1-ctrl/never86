@@ -34,6 +34,8 @@ capture → parse → truth-gate → normalize → decide (formulas first) → a
 ## Active job
 **#118 Monday gate** — stranger can join → verify email → activate one store → submit yesterday's close → ≤3 source-labeled actions → night proof. Without Myke touching the database.
 
+**Supabase deferred** (Myke: morning). Free seat runs on **Neon** tonight (`drizzle/0002_free_seat_neon.sql`).
+
 Branch from `codex/action-shift-122-safe` → `cursor/monday-gate-onboard-*`. See #121. SEO/GTM (#122) waits until the stranger door ships.
 
-Handoff: `docs/CURSOR-GTM.md`, `docs/STACK-MAP.md`, `docs/MONDAY-GATE-STATUS.md`.
+Grok keep-building brief: `docs/GROK-KEEP-BUILDING.md`. Status: `docs/MONDAY-GATE-STATUS.md`.
