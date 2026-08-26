@@ -649,7 +649,13 @@ export const seatCloses = pgTable('seat_closes', {
   businessDate: date('business_date').notNull(),
   desk: jsonb('desk').default({}).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  uniqueIndex('seat_closes_operator_location_date_idx').on(
+    table.operatorId,
+    table.locationId,
+    table.businessDate,
+  ),
+]);
 
 export const seatProofs = pgTable('seat_proofs', {
   id: serial('id').primaryKey(),

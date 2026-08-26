@@ -8,10 +8,11 @@ One Cursor factory job at a time.
 Production SHA `84e543a` = `main`. This repo deploys www.never86.ai.
 
 ## Branch
-`cursor/never86-monday-gate-118-a951` from `codex/action-shift-122-safe`, extending PR #127.
+`cursor/never86-pr-130-merge-ready-0699` from `codex/action-shift-122-safe` @ `9258b86`.
+Clean rebase of PR #130 PDQ + yesterday-close intake (dropped overlapping #127 activation commits already on base). Dirty #130 head `cursor/never86-monday-gate-118-a951` @ `b075114` is superseded by this branch.
 
 ## What landed (drafted + tested in this slice)
-- Join → email activation token → one Neon free store + one login (PR #127).
+- Join → email activation token → one Neon free store + one login (PR #127, already on base).
 - Yesterday close via **paste / file upload / forwarded email** (`close+{operatorId}@inbound.never86.ai`). No POS password.
 - PDQ native-text contract: ZReport_Summary + Hourly_Sales + Void_Promo. Filename `M-D-YYYY` is the business date.
 - Desk shows sales, mix (food/beer/liquor/pop), labor, cash. Missing category = Missing Evidence, not $0.
