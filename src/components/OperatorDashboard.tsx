@@ -91,7 +91,10 @@ function Shell({ name, children }: { name: string; children: React.ReactNode }) 
           <Link href="/" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: INK }}>
             / NEVER 86&apos;D — COMMAND CENTER — {name}
           </Link>
-          <SignOutButton />
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Workforce setup</Link>
+            <SignOutButton />
+          </div>
         </div>
       </header>
       <div className="max-w-5xl mx-auto px-6 pt-10 pb-16">{children}</div>
@@ -114,6 +117,9 @@ function EmptyState({ name }: { name: string }) {
         No POS API key. Morning = ≤3 ranked actions. Night = proof on those only.
       </p>
       <div className="flex gap-3 flex-wrap">
+        <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${BLUE}`, color: BLUE, padding: '10px 16px' }}>
+          Set up roster + schedule
+        </Link>
         <Link href="/action-shift" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>
           Open Action Shift desk →
         </Link>
