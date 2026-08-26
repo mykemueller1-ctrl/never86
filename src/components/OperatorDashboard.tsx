@@ -4,6 +4,7 @@ import { buildCoachCards, type CoachCard } from '@/lib/coachCards';
 import { opsDbConfigured } from '@/lib/opsDb';
 import { isFreeSeatOperatorId } from '@/lib/operatorActivation';
 import SignOutButton from './SignOutButton';
+import FreeSeatDesk from './FreeSeatDesk';
 
 // The operator's home in the COMPASS brief design — the exact language of the
 // demo docs (Weekly Brief / coaching cards): cream paper, serif display, mono
@@ -126,8 +127,15 @@ function EmptyState({ name }: { name: string }) {
 }
 
 export default async function OperatorDashboard({ operatorId, displayName }: { operatorId: number; displayName?: string }) {
-  // Neon free-seat operators (Monday gate) do not read Supabase OPS yet.
-  if (isFreeSeatOperatorId(operatorId) || !opsDbConfigured()) {
+  // Neon free-seat operators (Monday gate) stay on the prior-day desk — no OPS command center.
+  if (isFreeSeatOperatorId(operatorId)) {
+    return (
+      <Shell name="DESK">
+        <FreeSeatDesk operatorId={operatorId} />
+      </Shell>
+    );
+  }
+  if (!opsDbConfigured()) {
     return <Shell name="DASHBOARD"><EmptyState name="YOUR RESTAURANT" /></Shell>;
   }
   let d: CommandCenterData;

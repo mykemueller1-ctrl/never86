@@ -216,9 +216,9 @@ export default function OnboardPage() {
                 <em>Welcome.</em>
               </h1>
               <p className="compass-body text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-                Your free one-store <span className="text-ink-800 font-semibold">{interestedAgent}</span> setup is queued for{' '}
-                <span className="text-ink-800 font-semibold">{restaurantName}</span>.
-                Start with one operator login. Myke will reach out from <span className="font-mono text-ink-800">myke@n86.app</span> within 24 hours.
+                Check <span className="text-ink-800 font-semibold">{email}</span> for the activation link.
+                You choose the password — we never email one. Then the desk asks only for yesterday&apos;s close.
+                {message ? <span className="block mt-4 font-mono text-sm">{message}</span> : null}
               </p>
 
               <div className="compass-card text-left mb-8">
