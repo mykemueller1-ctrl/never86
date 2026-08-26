@@ -29,11 +29,12 @@ export function HumanSiteHeader() {
           <Link href="/answers" className="human-nav-link">Operator answers</Link>
           <Link href="/team" className="human-nav-link">The team</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
-          <Link href="/audit" className="human-button human-button-primary text-sm">Free 3P audit →</Link>
+          <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
+          <Link href="/trial" className="human-button human-button-primary text-sm">One seat free →</Link>
         </nav>
 
-        <Link href="/audit" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          Free audit →
+        <Link href="/trial" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
+          One seat free →
         </Link>
       </div>
     </header>
@@ -73,6 +74,7 @@ export function HumanSiteFooter() {
           </p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
+          <Link href="/trial" className="human-nav-link">One seat free</Link>
           <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
           <Link href="/team" className="human-nav-link">Team</Link>
           <Link href="/story" className="human-nav-link">Story</Link>

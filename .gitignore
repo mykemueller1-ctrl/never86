@@ -36,6 +36,9 @@ next-env.d.ts
 # drizzle
 /drizzle/meta
 
+# Supabase CLI local state
+/supabase/.temp/
+
 # local operator snapshots — contain real customer data, never commit to a public repo
 /taco-bamba-command-center.html
 /*-command-center.html

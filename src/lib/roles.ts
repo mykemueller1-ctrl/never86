@@ -293,3 +293,13 @@ export const ROLES: Record<string, RoleSpec> = {
 };
 
 export const ROLE_ORDER = ['ceo', 'cfo', 'coo', 'chef', 'cto', 'owner', 'manager', 'crew'] as const;
+
+/** Unique SEO title per /for/[role] — issue #122 */
+export function roleSeoTitle(spec: RoleSpec): string {
+  const sub = spec.subhead.replace(/\.$/, '');
+  return `${spec.badge}: ${sub} · Never 86'd`;
+}
+
+export function roleSeoDescription(spec: RoleSpec): string {
+  return `${spec.intro} One seat free at /trial.`;
+}

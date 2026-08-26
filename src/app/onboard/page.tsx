@@ -40,29 +40,60 @@ export default function OnboardPage() {
     trackEvent('onboard_submit', { meta: { posType, interestedAgent, dataPreference, units: units || null } });
     setStatus('loading');
     try {
-      const res = await fetch('/api/waitlist', {
+      // Monday gate: mint activation token (password never emailed). Keep waitlist
+      // mirror as a soft backup so Myke still sees the lead if ops DB is down.
+      const res = await fetch('/api/onboard/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           name,
           restaurantName,
-          units: units || undefined,
-          posType,
-          interestedAgent,
-          dataPreference,
           sourcePage: '/onboard',
         }),
       });
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setMessage(data.message || "You're in.");
+        setMessage(
+          data.debugActivatePath
+            ? `${data.message} Dev link: ${data.debugActivatePath}`
+            : data.message || 'Check your email for the activation link.',
+        );
         setStep(4);
-        trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference } });
-      } else {
-        throw new Error(data.error || 'Something went wrong');
+        trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference, path: 'activation' } });
+        return;
       }
+
+      // If activation DB is offline, fall back to waitlist so the form never dead-ends.
+      if (res.status === 503) {
+        const wait = await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            name,
+            restaurantName,
+            units: units || undefined,
+            posType,
+            interestedAgent,
+            dataPreference,
+            sourcePage: '/onboard',
+          }),
+        });
+        const waitData = await wait.json();
+        if (waitData.success) {
+          setStatus('success');
+          setMessage(
+            "You're on the list. Free-seat tables still need a Neon push (drizzle/0002_free_seat_neon.sql). Supabase can wait until morning.",
+          );
+          setStep(4);
+          trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference, path: 'waitlist_fallback' } });
+          return;
+        }
+      }
+
+      throw new Error(data.error || 'Something went wrong');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Something went wrong';
       setStatus('error');

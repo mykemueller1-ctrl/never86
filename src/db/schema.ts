@@ -1,4 +1,20 @@
-import { pgTable, text, timestamp, numeric, integer, jsonb, boolean, uuid, serial } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  boolean,
+  date,
+  foreignKey,
+  index,
+  integer,
+  jsonb,
+  numeric,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 // ── Waitlist ──
 export const waitlist = pgTable('waitlist', {
@@ -237,6 +253,292 @@ export const mmOsRuns = pgTable('mm_os_runs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// ── Action Shift workforce and role-specific checklist foundation ──
+// Employee values are private runtime data. Source control contains schema only.
+export const operatorStaffSeats = pgTable('operator_staff_seats', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  defaultLocationId: integer('default_location_id'),
+  authSubject: uuid('auth_subject').unique(),
+  displayName: text('display_name').notNull(),
+  email: text('email'),
+  jobTitle: text('job_title'),
+  status: text('status').default('invited').notNull(),
+  hiredOn: date('hired_on'),
+  terminatedOn: date('terminated_on'),
+  metadata: jsonb('metadata').default({}).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('operator_staff_seats_operator_id_id_unique').on(table.operatorId, table.id),
+  index('operator_staff_seats_operator_status_idx').on(table.operatorId, table.status),
+  index('operator_staff_seats_operator_location_idx').on(table.operatorId, table.defaultLocationId),
+]);
+
+export const actionShiftRoleAssignments = pgTable('action_shift_role_assignments', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  seatId: uuid('seat_id').notNull(),
+  locationId: integer('location_id'),
+  roleKey: text('role_key').notNull(),
+  isPrimary: boolean('is_primary').default(false).notNull(),
+  activeFrom: date('active_from').defaultNow().notNull(),
+  activeUntil: date('active_until'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_roles_global_scope_unique').on(
+    table.operatorId,
+    table.seatId,
+    table.roleKey,
+    table.activeFrom,
+  ).where(sql`${table.locationId} is null`),
+  uniqueIndex('action_shift_roles_location_scope_unique').on(
+    table.operatorId,
+    table.seatId,
+    table.locationId,
+    table.roleKey,
+    table.activeFrom,
+  ).where(sql`${table.locationId} is not null`),
+  foreignKey({
+    name: 'action_shift_roles_operator_seat_fkey',
+    columns: [table.operatorId, table.seatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('cascade'),
+  index('action_shift_roles_operator_seat_idx').on(table.operatorId, table.seatId, table.activeUntil),
+  index('action_shift_roles_operator_location_role_idx').on(table.operatorId, table.locationId, table.roleKey),
+]);
+
+export const actionShiftIdentityLinks = pgTable('action_shift_identity_links', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  seatId: uuid('seat_id').notNull(),
+  systemKind: text('system_kind').notNull(),
+  providerKey: text('provider_key').notNull(),
+  externalWorkerId: text('external_worker_id').notNull(),
+  externalLocationId: text('external_location_id'),
+  active: boolean('active').default(true).notNull(),
+  lastVerifiedAt: timestamp('last_verified_at', { withTimezone: true }),
+  metadata: jsonb('metadata').default({}).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_identity_external_unique').on(
+    table.operatorId,
+    table.providerKey,
+    table.externalWorkerId,
+  ),
+  foreignKey({
+    name: 'action_shift_identity_operator_seat_fkey',
+    columns: [table.operatorId, table.seatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('cascade'),
+  index('action_shift_identity_seat_idx').on(table.operatorId, table.seatId, table.active),
+]);
+
+export const actionShiftScheduleShifts = pgTable('action_shift_schedule_shifts', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id').notNull(),
+  seatId: uuid('seat_id'),
+  providerKey: text('provider_key').notNull(),
+  externalShiftId: text('external_shift_id').notNull(),
+  externalWorkerId: text('external_worker_id'),
+  positionName: text('position_name'),
+  startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  status: text('status').default('scheduled').notNull(),
+  sourceUpdatedAt: timestamp('source_updated_at', { withTimezone: true }),
+  importedAt: timestamp('imported_at', { withTimezone: true }).defaultNow().notNull(),
+  metadata: jsonb('metadata').default({}).notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_schedule_external_unique').on(
+    table.operatorId,
+    table.providerKey,
+    table.externalShiftId,
+  ),
+  uniqueIndex('action_shift_schedule_operator_id_id_unique').on(table.operatorId, table.id),
+  foreignKey({
+    name: 'action_shift_schedule_operator_seat_fkey',
+    columns: [table.operatorId, table.seatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  index('action_shift_schedule_location_start_idx').on(table.operatorId, table.locationId, table.startsAt),
+  index('action_shift_schedule_seat_start_idx').on(table.operatorId, table.seatId, table.startsAt),
+]);
+
+export const actionShiftChecklistTemplates = pgTable('action_shift_checklist_templates', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id'),
+  roleKey: text('role_key'),
+  name: text('name').notNull(),
+  shiftPhase: text('shift_phase').notNull(),
+  version: integer('version').default(1).notNull(),
+  status: text('status').default('draft').notNull(),
+  effectiveFrom: date('effective_from'),
+  effectiveUntil: date('effective_until'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_templates_operator_id_id_unique').on(table.operatorId, table.id),
+  index('action_shift_templates_scope_idx').on(
+    table.operatorId,
+    table.locationId,
+    table.roleKey,
+    table.status,
+  ),
+]);
+
+export const actionShiftChecklistSteps = pgTable('action_shift_checklist_steps', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  templateId: uuid('template_id').notNull(),
+  stepOrder: integer('step_order').notNull(),
+  instruction: text('instruction').notNull(),
+  evidenceType: text('evidence_type').default('attestation').notNull(),
+  isRequired: boolean('is_required').default(true).notNull(),
+  escalationMinutes: integer('escalation_minutes'),
+  metadata: jsonb('metadata').default({}).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_steps_order_unique').on(table.templateId, table.stepOrder),
+  uniqueIndex('action_shift_steps_operator_id_id_unique').on(table.operatorId, table.id),
+  foreignKey({
+    name: 'action_shift_steps_operator_template_fkey',
+    columns: [table.operatorId, table.templateId],
+    foreignColumns: [actionShiftChecklistTemplates.operatorId, actionShiftChecklistTemplates.id],
+  }).onDelete('cascade'),
+  index('action_shift_steps_operator_template_idx').on(table.operatorId, table.templateId, table.stepOrder),
+]);
+
+export const actionShiftChecklistRuns = pgTable('action_shift_checklist_runs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id').notNull(),
+  templateId: uuid('template_id').notNull(),
+  assignedSeatId: uuid('assigned_seat_id'),
+  scheduleShiftId: bigint('schedule_shift_id', { mode: 'number' }),
+  runKey: text('run_key').notNull(),
+  businessDate: date('business_date').notNull(),
+  status: text('status').default('assigned').notNull(),
+  dueAt: timestamp('due_at', { withTimezone: true }),
+  startedAt: timestamp('started_at', { withTimezone: true }),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  verifiedAt: timestamp('verified_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_runs_key_unique').on(table.operatorId, table.runKey),
+  uniqueIndex('action_shift_runs_operator_id_id_unique').on(table.operatorId, table.id),
+  foreignKey({
+    name: 'action_shift_runs_operator_template_fkey',
+    columns: [table.operatorId, table.templateId],
+    foreignColumns: [actionShiftChecklistTemplates.operatorId, actionShiftChecklistTemplates.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_runs_operator_seat_fkey',
+    columns: [table.operatorId, table.assignedSeatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_runs_operator_schedule_fkey',
+    columns: [table.operatorId, table.scheduleShiftId],
+    foreignColumns: [actionShiftScheduleShifts.operatorId, actionShiftScheduleShifts.id],
+  }).onDelete('restrict'),
+  index('action_shift_runs_location_date_idx').on(
+    table.operatorId,
+    table.locationId,
+    table.businessDate,
+    table.status,
+  ),
+  index('action_shift_runs_seat_due_idx').on(table.operatorId, table.assignedSeatId, table.dueAt),
+  index('action_shift_runs_template_idx').on(table.templateId),
+  index('action_shift_runs_schedule_idx').on(table.scheduleShiftId),
+]);
+
+export const actionShiftStepReceipts = pgTable('action_shift_step_receipts', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  runId: uuid('run_id').notNull(),
+  stepId: bigint('step_id', { mode: 'number' }).notNull(),
+  actorSeatId: uuid('actor_seat_id'),
+  status: text('status').default('complete').notNull(),
+  evidenceUri: text('evidence_uri'),
+  valueText: text('value_text'),
+  notes: text('notes'),
+  observedAt: timestamp('observed_at', { withTimezone: true }).defaultNow().notNull(),
+  verifiedBySeatId: uuid('verified_by_seat_id'),
+  verifiedAt: timestamp('verified_at', { withTimezone: true }),
+  metadata: jsonb('metadata').default({}).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('action_shift_receipts_run_step_unique').on(table.runId, table.stepId),
+  foreignKey({
+    name: 'action_shift_receipts_operator_run_fkey',
+    columns: [table.operatorId, table.runId],
+    foreignColumns: [actionShiftChecklistRuns.operatorId, actionShiftChecklistRuns.id],
+  }).onDelete('cascade'),
+  foreignKey({
+    name: 'action_shift_receipts_operator_step_fkey',
+    columns: [table.operatorId, table.stepId],
+    foreignColumns: [actionShiftChecklistSteps.operatorId, actionShiftChecklistSteps.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_receipts_operator_actor_fkey',
+    columns: [table.operatorId, table.actorSeatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_receipts_operator_verifier_fkey',
+    columns: [table.operatorId, table.verifiedBySeatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  index('action_shift_receipts_run_idx').on(table.operatorId, table.runId),
+  index('action_shift_receipts_step_idx').on(table.stepId),
+  index('action_shift_receipts_actor_idx').on(table.actorSeatId),
+  index('action_shift_receipts_verifier_idx').on(table.verifiedBySeatId),
+]);
+
+export const actionShiftFeedback = pgTable('action_shift_feedback', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id'),
+  runId: uuid('run_id'),
+  actorSeatId: uuid('actor_seat_id'),
+  sourceKind: text('source_kind').notNull(),
+  sourceRef: text('source_ref'),
+  verdict: text('verdict').notNull(),
+  correction: text('correction'),
+  outcome: jsonb('outcome').default({}).notNull(),
+  learningStatus: text('learning_status').default('candidate').notNull(),
+  reviewedBySeatId: uuid('reviewed_by_seat_id'),
+  reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  foreignKey({
+    name: 'action_shift_feedback_operator_run_fkey',
+    columns: [table.operatorId, table.runId],
+    foreignColumns: [actionShiftChecklistRuns.operatorId, actionShiftChecklistRuns.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_feedback_operator_actor_fkey',
+    columns: [table.operatorId, table.actorSeatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  foreignKey({
+    name: 'action_shift_feedback_operator_reviewer_fkey',
+    columns: [table.operatorId, table.reviewedBySeatId],
+    foreignColumns: [operatorStaffSeats.operatorId, operatorStaffSeats.id],
+  }).onDelete('restrict'),
+  index('action_shift_feedback_review_idx').on(table.operatorId, table.learningStatus, table.createdAt),
+  index('action_shift_feedback_run_idx').on(table.runId),
+  index('action_shift_feedback_actor_idx').on(table.actorSeatId),
+  index('action_shift_feedback_reviewer_idx').on(table.reviewedBySeatId),
+]);
+
 export type OperatorBrand = typeof operatorBrands.$inferSelect;
 export type InsertOperatorBrand = typeof operatorBrands.$inferInsert;
 export type OperatorConcept = typeof operatorConcepts.$inferSelect;
@@ -257,3 +559,75 @@ export type MmTrainingExample = typeof mmTrainingExamples.$inferSelect;
 export type InsertMmTrainingExample = typeof mmTrainingExamples.$inferInsert;
 export type MmOsRun = typeof mmOsRuns.$inferSelect;
 export type InsertMmOsRun = typeof mmOsRuns.$inferInsert;
+export type OperatorStaffSeat = typeof operatorStaffSeats.$inferSelect;
+export type InsertOperatorStaffSeat = typeof operatorStaffSeats.$inferInsert;
+export type ActionShiftRoleAssignment = typeof actionShiftRoleAssignments.$inferSelect;
+export type InsertActionShiftRoleAssignment = typeof actionShiftRoleAssignments.$inferInsert;
+export type ActionShiftIdentityLink = typeof actionShiftIdentityLinks.$inferSelect;
+export type InsertActionShiftIdentityLink = typeof actionShiftIdentityLinks.$inferInsert;
+export type ActionShiftScheduleShift = typeof actionShiftScheduleShifts.$inferSelect;
+export type InsertActionShiftScheduleShift = typeof actionShiftScheduleShifts.$inferInsert;
+export type ActionShiftChecklistTemplate = typeof actionShiftChecklistTemplates.$inferSelect;
+export type InsertActionShiftChecklistTemplate = typeof actionShiftChecklistTemplates.$inferInsert;
+export type ActionShiftChecklistStep = typeof actionShiftChecklistSteps.$inferSelect;
+export type InsertActionShiftChecklistStep = typeof actionShiftChecklistSteps.$inferInsert;
+export type ActionShiftChecklistRun = typeof actionShiftChecklistRuns.$inferSelect;
+export type InsertActionShiftChecklistRun = typeof actionShiftChecklistRuns.$inferInsert;
+export type ActionShiftStepReceipt = typeof actionShiftStepReceipts.$inferSelect;
+export type InsertActionShiftStepReceipt = typeof actionShiftStepReceipts.$inferInsert;
+export type ActionShiftFeedback = typeof actionShiftFeedback.$inferSelect;
+export type InsertActionShiftFeedback = typeof actionShiftFeedback.$inferInsert;
+
+// ── Free seat (Neon) — Monday gate without Supabase ──
+// Lives on primary DATABASE_URL. Supabase OPS stays for Toast/CTAP data later.
+// IDs start at 1_000_000 so they never collide with legacy OPS operator_users ids.
+
+export const seatActivationTokens = pgTable('seat_activation_tokens', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull(),
+  restaurantName: text('restaurant_name').notNull(),
+  operatorName: text('operator_name'),
+  tokenHash: text('token_hash').notNull().unique(),
+  sourcePage: text('source_page'),
+  consentAt: timestamp('consent_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  consumedAt: timestamp('consumed_at'),
+  consumedOperatorId: integer('consumed_operator_id'),
+  requestIp: text('request_ip'),
+  userAgent: text('user_agent'),
+});
+
+export const seatOperators = pgTable('seat_operators', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  restaurantName: text('restaurant_name').notNull(),
+  sourcePage: text('source_page'),
+  consentAt: timestamp('consent_at').defaultNow().notNull(),
+  activatedAt: timestamp('activated_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const seatLocations = pgTable('seat_locations', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('seat_locations_one_free_store_idx').on(table.operatorId),
+]);
+
+export const seatCredentials = pgTable('seat_credentials', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  lastLoginAt: timestamp('last_login_at'),
+});
+
+export type SeatActivationToken = typeof seatActivationTokens.$inferSelect;
+export type SeatOperator = typeof seatOperators.$inferSelect;
+export type SeatLocation = typeof seatLocations.$inferSelect;
+export type SeatCredential = typeof seatCredentials.$inferSelect;
