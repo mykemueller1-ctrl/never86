@@ -1,0 +1,6 @@
+-- 0005_operator_activation.sql
+--
+-- SUPERSEDED for Monday gate free-seat path.
+-- Free seats now live on Neon: drizzle/0002_free_seat_neon.sql
+-- Keep this file only if/when we later mint tokens against Supabase OPS.
+-- Supabase never86 restore is deferred (Myke: morning of 2026-08-27).
