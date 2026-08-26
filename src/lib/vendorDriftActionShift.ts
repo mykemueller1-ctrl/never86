@@ -292,6 +292,7 @@ const POS_SCORE: Record<ActionShiftAction['id'], number> = {
   'approval-proof': 60,
   'close-packet': 1,
   'vendor-drift': 90,
+  'po-receive-usage': 85,
 };
 
 function actionScore(action: ActionShiftAction): number {

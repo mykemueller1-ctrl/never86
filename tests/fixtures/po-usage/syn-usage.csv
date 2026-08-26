@@ -1,0 +1,4 @@
+SKU,Description,Period,Units Sold,Recipe Qty Per Sold,Yield,Theoretical Qty,Unit Cost
+SYN-OIL-01,Sample Olive Oil 4/1 GAL,2026-05-12,50,0.05,1,2.50,68.40
+SYN-PASTA-02,Sample Penne 2/10 LB,2026-05-12,10,1,1,10.00,18.10
+SYN-SPICE-05,Sample Seasonal Spice 6/1 LB,2026-05-12,8,0.125,1,1.00,10.00
