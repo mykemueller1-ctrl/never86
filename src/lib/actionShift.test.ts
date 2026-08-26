@@ -34,9 +34,25 @@ describe('Action Shift', () => {
     }));
     expect(shift.result.policy.maxMorningActions).toBe(3);
     expect(shift.result.nightCloseCheck).toHaveLength(3);
+    expect(shift.result.morningActions[0].proof.verbalYesCloses).toBe(false);
+    expect(shift.result.morningActions[0].proof.object).toMatch(/deposit/i);
     expect(shift.result.missingEvidence).not.toContain(
       'Ticket-level exception detail with employee, approver, reason, tender, and timestamp.',
     );
+  });
+
+  it('does not ticket a shortage when cash was never entered', () => {
+    const shift = buildActionShift({
+      grossSales: 1000,
+      expectedCash: 0,
+      enteredDeposit: 0,
+      cashEntered: false,
+      voids: 12,
+    });
+    expect(shift.ok).toBe(true);
+    if (!shift.ok) return;
+    expect(shift.result.morningActions.map((action) => action.id)).not.toContain('cash-proof');
+    expect(shift.result.morningActions[0].id).toBe('approval-proof');
   });
 
   it('uses only an operator-supplied labor target', () => {

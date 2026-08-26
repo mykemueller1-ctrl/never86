@@ -1,0 +1,17 @@
+Hourly Sales Report
+Sample Kitchen Lab
+Business Date: 8/24/2026
+
+Hour Sales Guests
+11:00 AM $40.00 3
+12:00 PM $90.00 8
+1:00 PM $110.00 9
+2:00 PM $70.00 5
+3:00 PM $55.00 4
+4:00 PM $80.00 6
+5:00 PM $160.00 12
+6:00 PM $220.00 16
+7:00 PM $175.00 14
+Total $1,000.00 77
+
+Report Generated At: 8/25/2026 6:57:00 AM
