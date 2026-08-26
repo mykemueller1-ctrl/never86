@@ -126,7 +126,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
         {desk ? `Yesterday, ${desk.businessDate || 'date missing'}.` : 'Drop yesterday’s close.'}
       </h1>
       <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>
-        Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. No POS password.
+        Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. Vendor invoices (CSV / native-text PDF) feed the same Action Shift. No POS or vendor-portal password.
       </p>
 
       <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 16, marginBottom: 22 }}>
@@ -142,7 +142,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste the native-text Z, Hourly, or Void report…"
+          placeholder="Paste the native-text Z, Hourly, Void report, or vendor invoice…"
           rows={8}
           className="w-full"
           style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 12, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
@@ -186,7 +186,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
           {desk.actionShift ? (
             <ul className="space-y-4" style={{ marginBottom: 28 }}>
               {desk.actionShift.morningActions.map((a, i) => (
-                <li key={a.id} style={{ borderLeft: `3px solid ${BLUE}`, padding: '8px 0 8px 14px' }}>
+                <li key={a.instanceKey || `${a.id}-${i}`} style={{ borderLeft: `3px solid ${BLUE}`, padding: '8px 0 8px 14px' }}>
                   <p className="font-mono uppercase" style={{ fontSize: 10, color: MUTED }}>
                     {String(i + 1).padStart(2, '0')} · {a.owner}
                     {a.dollarsObserved != null ? ` · $${a.dollarsObserved.toFixed(2)}` : ''}
@@ -197,15 +197,15 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
                     Proof object: {a.proof.object} · {a.claimBoundary}
                   </p>
                   <div className="flex flex-wrap gap-2" style={{ marginTop: 10 }}>
-                    <button type="button" disabled={busy} onClick={() => prove(a.id, 'acknowledged')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Ack</button>
-                    <button type="button" disabled={busy} onClick={() => prove(a.id, 'verified')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${INK}`, background: INK, color: '#f7f4ec', padding: '6px 10px' }}>Close with proof</button>
-                    <button type="button" disabled={busy} onClick={() => prove(a.id, 'data-missing')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Missing data</button>
+                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'acknowledged')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Ack</button>
+                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'verified')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${INK}`, background: INK, color: '#f7f4ec', padding: '6px 10px' }}>Close with proof</button>
+                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'data-missing')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Missing data</button>
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p style={{ fontSize: 14, color: MUTED, marginBottom: 24 }}>{desk.actionShiftError || 'Need a Z with net sales before Action Shift can rank a move.'}</p>
+            <p style={{ fontSize: 14, color: MUTED, marginBottom: 24 }}>{desk.actionShiftError || 'Need a Z with net sales, or a current + prior vendor invoice, before Action Shift can rank a move.'}</p>
           )}
 
           <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', marginBottom: 8 }}>Night proof object</p>
@@ -217,6 +217,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
               <option value="schedule">Schedule</option>
               <option value="ticket-detail">Ticket detail</option>
               <option value="exception-log">Exception log</option>
+              <option value="invoice-packet">Invoice packet</option>
               <option value="photo">Photo</option>
             </select>
             <input

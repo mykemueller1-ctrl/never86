@@ -83,5 +83,9 @@ describe('night proof', () => {
       ok: true,
       state: 'verified',
     });
+    expect(applyNightProof({ action, outcome: 'verified', proofKind: 'invoice-packet' })).toEqual({
+      ok: true,
+      state: 'verified',
+    });
   });
 });

@@ -38,5 +38,5 @@ Pay invoices → restore project `never86` → paste `OPS_DATABASE_URL` → wire
 - Follow-on PR: https://github.com/mykemueller1-ctrl/never86/pull/131
 - Dirty predecessor: PR #130 @ `b075114` (DIRTY; superseded)
 - Tests: `npx vitest run` — 157/157 passed
-- Next after this PR is green: vendor-drift intake (SKU >5%) as a separate slice
+- Next after this PR is green: vendor-drift intake shipped as `cursor/never86-vendor-drift-action-shift-6c5c` stacked on this #131 head. Codex reviews; no merge from desk.
 - Blocker cleared for code review: rebase is clean vs allowlisted base

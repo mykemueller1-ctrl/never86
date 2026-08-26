@@ -27,11 +27,16 @@ psql "$DATABASE_URL" -f drizzle/0002_free_seat_neon.sql
 psql "$DATABASE_URL" -f drizzle/0003_free_seat_intake.sql
 ```
 
+## Next slice (this factory job)
+Vendor Drift intake on `cursor/never86-vendor-drift-action-shift-6c5c`, stacked on #131 @ `c206ecc`.
+Invoice CSV / native-text PDF → SKU + vendor + unit price + period → >5% up vs prior period → Action Shift ≤3. Missing prior = Missing Evidence, not $0. Synthetic fixtures only.
+
 ## Residual gaps
 - Live Gmail polling of pdqreports@ is not wired (connector auth is outside this repo). Forward/paste/upload is the launch path.
 - Native-text PDF extraction is best-effort; scanned/image PDFs still need OCR later.
 - Two-real-input unattended-routine gate still requires a human review on two different dates.
 - Neon tables must be applied once; this agent does not run live migrations.
+- `docs/company/intake/CHATGPT_HANDOFF.md` and `INBOX.md` were not in this checkout.
 
 ## Do not
 Merge grok-sales-org (#121). Auto-send. Invent dollars. Print private store totals in public comments.

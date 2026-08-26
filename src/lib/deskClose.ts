@@ -8,6 +8,11 @@ import {
   type PdqVoidPromo,
   type PdqZSummary,
 } from './pdqEodParse';
+import {
+  buildVendorDriftActionShift,
+  feedVendorDriftIntoActionShift,
+} from './vendorDriftActionShift';
+import { looksLikeVendorInvoice } from './vendorInvoiceParse';
 
 export type DeskNumber = {
   label: string;
@@ -20,7 +25,7 @@ export type DeskClose = {
   store: string;
   businessDate: string | null;
   channel: IntakeChannel;
-  families: Array<'z-summary' | 'hourly' | 'void-promo'>;
+  families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice'>;
   injectionSuspected: boolean;
   sales: DeskNumber;
   mix: {
@@ -160,6 +165,43 @@ export function buildDeskFromPdqParts(input: {
   };
 }
 
+function missingMoneyField(label: string): MoneyEvidence {
+  return { value: null, state: 'missing-evidence', sourceLabel: label };
+}
+
+export function buildVendorInvoiceDesk(input: {
+  store?: string;
+  channel: IntakeChannel;
+  vendorShift: ActionShiftResult;
+  injectionSuspected?: boolean;
+}): DeskClose {
+  const missing = missingMoneyField('Vendor invoice desk — POS close not in this packet');
+  return {
+    store: input.store || input.vendorShift.store,
+    businessDate: input.vendorShift.businessDate === 'Unspecified business date'
+      ? null
+      : input.vendorShift.businessDate,
+    channel: input.channel,
+    families: ['vendor-invoice'],
+    injectionSuspected: Boolean(input.injectionSuspected),
+    sales: deskMoney('Net sales', missing),
+    mix: {
+      food: deskMoney('Food', missingMoneyField('Food')),
+      beer: deskMoney('Beer', missingMoneyField('Beer')),
+      liquor: deskMoney('Liquor', missingMoneyField('Liquor')),
+      pop: deskMoney('Pop', missingMoneyField('Pop')),
+      wine: deskMoney('Wine', missingMoneyField('Wine')),
+    },
+    labor: deskMoney('Labor', missingMoneyField('Labor')),
+    cash: { ...deskMoney('Cash', missingMoneyField('Cash')), status: 'missing-evidence' },
+    hourlyPeak: null,
+    voids: deskMoney('Voids', missingMoneyField('Voids')),
+    missingEvidence: input.vendorShift.missingEvidence,
+    actionShift: input.vendorShift,
+    actionShiftError: null,
+  };
+}
+
 export function ingestCloseDocuments(
   docs: IntakeDocument[],
   store?: string,
@@ -170,6 +212,7 @@ export function ingestCloseDocuments(
   let z: PdqZSummary | undefined;
   let hourly: PdqHourly | undefined;
   let voids: PdqVoidPromo | undefined;
+  const invoiceDocs: IntakeDocument[] = [];
   let injectionSuspected = false;
   let channel: IntakeChannel = docs[0].channel;
 
@@ -178,25 +221,48 @@ export function ingestCloseDocuments(
     if (secret) return { ok: false, error: secret.error, status: 400 };
     if (scanInjection(doc.text)) injectionSuspected = true;
     const parsed = parsePdqNativeText(doc.text, doc.filename || '');
-    if (parsed.family === 'unknown') continue;
     if (parsed.family === 'z-summary') z = parsed;
-    if (parsed.family === 'hourly') hourly = parsed;
-    if (parsed.family === 'void-promo') voids = parsed;
+    else if (parsed.family === 'hourly') hourly = parsed;
+    else if (parsed.family === 'void-promo') voids = parsed;
+    else if (looksLikeVendorInvoice(doc.text, doc.filename || '')) invoiceDocs.push(doc);
     if (doc.channel === 'email') channel = 'email';
   }
 
+  const vendorBuilt = invoiceDocs.length
+    ? buildVendorDriftActionShift({
+      store,
+      documents: invoiceDocs.map((doc) => ({ text: doc.text, filename: doc.filename })),
+    })
+    : null;
+  const vendorShift = vendorBuilt?.ok ? vendorBuilt.result : null;
+
   if (!z && !hourly && !voids) {
+    if (vendorShift) {
+      return {
+        ok: true,
+        desk: buildVendorInvoiceDesk({ store, channel, vendorShift, injectionSuspected }),
+      };
+    }
     return {
       ok: false,
-      error: 'Could not read a PDQ Z, Hourly, or Void/Promo report from that text. Paste native text — no POS password.',
+      error: vendorBuilt && !vendorBuilt.ok
+        ? vendorBuilt.error
+        : 'Could not read a PDQ Z, Hourly, Void/Promo, or vendor invoice from that text. Paste native text — no POS password.',
       status: 422,
     };
   }
 
-  return {
-    ok: true,
-    desk: buildDeskFromPdqParts({ store, channel, z, hourly, voids, injectionSuspected }),
-  };
+  const desk = buildDeskFromPdqParts({ store, channel, z, hourly, voids, injectionSuspected });
+  if (vendorShift) {
+    desk.families = [...desk.families, 'vendor-invoice'];
+    desk.actionShift = feedVendorDriftIntoActionShift(desk.actionShift, vendorShift);
+    desk.missingEvidence = [...new Set([
+      ...desk.missingEvidence,
+      ...vendorShift.missingEvidence,
+    ])];
+    if (desk.actionShift) desk.actionShiftError = null;
+  }
+  return { ok: true, desk };
 }
 
 export const PROOF_KINDS = [
@@ -206,6 +272,7 @@ export const PROOF_KINDS = [
   'schedule',
   'ticket-detail',
   'exception-log',
+  'invoice-packet',
   'photo',
   'other-source',
 ] as const;
@@ -229,8 +296,8 @@ export function applyNightProof(input: {
     if (!input.proofKind || input.proofKind === 'verbal') {
       return { ok: false, error: 'A verbal yes does not close the action. Attach the proof object from the shift.' };
     }
-    if (!PROOF_KINDS.includes(input.proofKind as ProofKind)) {
-      return { ok: false, error: 'Choose a source proof object (deposit slip, close, clock, ticket, or exception log).' };
+    if (!input.proofKind || !PROOF_KINDS.includes(input.proofKind as ProofKind)) {
+      return { ok: false, error: 'Choose a source proof object (deposit slip, close, clock, ticket, invoice packet, or exception log).' };
     }
   }
   if (input.outcome === 'acknowledged') {
