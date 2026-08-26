@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { and, eq, gt, sql as dsql } from 'drizzle-orm';
+import { and, eq, gt, isNull, sql as dsql } from 'drizzle-orm';
 import { db } from '../db';
 import {
   seatActivationTokens,
@@ -15,8 +15,9 @@ import { hashPassword, verifyPassword } from './operatorAuth';
 
 const TOKEN_BYTES = 32;
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24; // 24h
-const RATE_LIMIT_WINDOW_MS = 1000 * 60 * 60; // 1h
-const RATE_LIMIT_MAX = 5;
+export const RATE_LIMIT_WINDOW_MS = 1000 * 60 * 60; // 1h
+export const RATE_LIMIT_EMAIL_MAX = 5;
+export const RATE_LIMIT_IP_MAX = 12;
 
 /** Neon free-seat ids stay above this floor to avoid OPS operator_users id collisions. */
 export const FREE_SEAT_ID_FLOOR = 1_000_000;
@@ -27,6 +28,44 @@ export function isFreeSeatOperatorId(operatorId: number): boolean {
 
 export function neonConfigured(): boolean {
   return Boolean(process.env.DATABASE_URL);
+}
+
+export function activationEmailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
+/** Same predicate as the atomic UPDATE ... WHERE consumed_at IS NULL AND expires_at > now. */
+export function activationTokenIsConsumable(
+  row: { consumedAt: Date | null; expiresAt: Date },
+  nowMs: number,
+): boolean {
+  return row.consumedAt == null && new Date(row.expiresAt).getTime() > nowMs;
+}
+
+export type LoginPlaneDecision = 'neon' | 'deny-neon' | 'ops';
+
+/**
+ * If Neon already has this email, never fall through to OPS on a bad password.
+ * OPS is only tried when Neon has no credential for the normalized email.
+ */
+export function chooseLoginPlane(
+  neonCredential: { passwordHash: string } | null,
+  neonPasswordOk: boolean,
+): LoginPlaneDecision {
+  if (neonCredential) return neonPasswordOk ? 'neon' : 'deny-neon';
+  return 'ops';
+}
+
+export function publicActivationAccepted(expiresAt: Date): {
+  success: true;
+  message: string;
+  expiresAt: string;
+} {
+  return {
+    success: true,
+    message: 'Check your email for the activation link.',
+    expiresAt: expiresAt.toISOString(),
+  };
 }
 
 export function normalizeEmail(email: string): string {
@@ -63,16 +102,26 @@ export type ActivationRequestInput = {
   userAgent?: string;
 };
 
+export type ActivationRequestCode =
+  | 'activation_email_unavailable'
+  | 'neon_unavailable'
+  | 'rate_limited';
+
 export type ActivationRequestResult =
   | { ok: true; rawToken: string; expiresAt: Date; alreadyPending: boolean }
-  | { ok: false; error: string; status: number };
+  | { ok: false; error: string; status: number; code?: ActivationRequestCode };
 
 export async function requestOperatorActivation(
   input: ActivationRequestInput,
   nowMs = Date.now(),
 ): Promise<ActivationRequestResult> {
   if (!neonConfigured()) {
-    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
+    return {
+      ok: false,
+      error: 'Primary database (Neon) is not configured.',
+      status: 503,
+      code: 'neon_unavailable',
+    };
   }
 
   const email = normalizeEmail(input.email);
@@ -84,17 +133,54 @@ export async function requestOperatorActivation(
     return { ok: false, error: 'Enter your restaurant name.', status: 400 };
   }
 
+  const windowStart = new Date(nowMs - RATE_LIMIT_WINDOW_MS);
   const recent = await db
     .select({ n: dsql<number>`count(*)::int` })
     .from(seatActivationTokens)
     .where(
       and(
         eq(seatActivationTokens.email, email),
-        gt(seatActivationTokens.createdAt, new Date(nowMs - RATE_LIMIT_WINDOW_MS)),
+        gt(seatActivationTokens.createdAt, windowStart),
       ),
     );
-  if ((recent[0]?.n ?? 0) >= RATE_LIMIT_MAX) {
-    return { ok: false, error: 'Too many activation emails. Try again in an hour.', status: 429 };
+  if ((recent[0]?.n ?? 0) >= RATE_LIMIT_EMAIL_MAX) {
+    return {
+      ok: false,
+      error: 'Too many activation emails. Try again in an hour.',
+      status: 429,
+      code: 'rate_limited',
+    };
+  }
+
+  if (input.requestIp) {
+    const recentIp = await db
+      .select({ n: dsql<number>`count(*)::int` })
+      .from(seatActivationTokens)
+      .where(
+        and(
+          eq(seatActivationTokens.requestIp, input.requestIp),
+          gt(seatActivationTokens.createdAt, windowStart),
+        ),
+      );
+    if ((recentIp[0]?.n ?? 0) >= RATE_LIMIT_IP_MAX) {
+      return {
+        ok: false,
+        error: 'Too many activation emails. Try again in an hour.',
+        status: 429,
+        code: 'rate_limited',
+      };
+    }
+  }
+
+  // After the first table hit so missing Neon tables still surface as 503 tables,
+  // fail closed before minting a token that cannot be delivered.
+  if (!activationEmailConfigured()) {
+    return {
+      ok: false,
+      error: 'Activation email is unavailable. Try again later.',
+      status: 503,
+      code: 'activation_email_unavailable',
+    };
   }
 
   const existingCred = await db
@@ -156,21 +242,36 @@ export async function activateOperatorSeat(
   }
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
-  const rows = await db
-    .select()
-    .from(seatActivationTokens)
-    .where(eq(seatActivationTokens.tokenHash, tokenHash))
-    .limit(1);
+  const consumed = await db
+    .update(seatActivationTokens)
+    .set({ consumedAt: new Date(nowMs) })
+    .where(
+      and(
+        eq(seatActivationTokens.tokenHash, tokenHash),
+        isNull(seatActivationTokens.consumedAt),
+        gt(seatActivationTokens.expiresAt, new Date(nowMs)),
+      ),
+    )
+    .returning();
 
-  const row = rows[0];
+  const row = consumed[0];
   if (!row) {
+    const existing = await db
+      .select()
+      .from(seatActivationTokens)
+      .where(eq(seatActivationTokens.tokenHash, tokenHash))
+      .limit(1);
+    const found = existing[0];
+    if (!found) {
+      return { ok: false, error: 'This activation link is invalid.', status: 400 };
+    }
+    if (found.consumedAt) {
+      return { ok: false, error: 'This activation link was already used. Sign in.', status: 409 };
+    }
+    if (new Date(found.expiresAt).getTime() < nowMs) {
+      return { ok: false, error: 'This activation link expired. Request a new one.', status: 410 };
+    }
     return { ok: false, error: 'This activation link is invalid.', status: 400 };
-  }
-  if (row.consumedAt) {
-    return { ok: false, error: 'This activation link was already used. Sign in.', status: 409 };
-  }
-  if (new Date(row.expiresAt).getTime() < nowMs) {
-    return { ok: false, error: 'This activation link expired. Request a new one.', status: 410 };
   }
 
   const email = normalizeEmail(row.email);
@@ -185,7 +286,7 @@ export async function activateOperatorSeat(
   if (priorCred[0]) {
     await db
       .update(seatActivationTokens)
-      .set({ consumedAt: new Date(nowMs), consumedOperatorId: priorCred[0].operatorId })
+      .set({ consumedOperatorId: priorCred[0].operatorId })
       .where(eq(seatActivationTokens.id, row.id));
     return {
       ok: false,
@@ -257,6 +358,18 @@ export async function activateOperatorSeat(
 
   let locationId: number;
   if (existingLoc[0]) {
+    const locRows = await db
+      .select({ name: seatLocations.name })
+      .from(seatLocations)
+      .where(eq(seatLocations.id, existingLoc[0].id))
+      .limit(1);
+    const existingName = locRows[0]?.name;
+    if (existingName && existingName !== restaurantName) {
+      const second = refuseSecondFreeStore(1);
+      if (!second.ok) {
+        return { ok: false, error: second.error, status: 409 };
+      }
+    }
     locationId = existingLoc[0].id;
   } else {
     const loc = await db
@@ -276,7 +389,7 @@ export async function activateOperatorSeat(
 
   await db
     .update(seatActivationTokens)
-    .set({ consumedAt: new Date(nowMs), consumedOperatorId: operatorId })
+    .set({ consumedOperatorId: operatorId })
     .where(eq(seatActivationTokens.id, row.id));
 
   return {
