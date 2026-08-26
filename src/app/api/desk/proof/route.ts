@@ -70,5 +70,6 @@ export async function POST(req: Request) {
     state: applied.state,
     persisted,
     proof: action.proof,
+    lastSeenReset: applied.lastSeenReset === true,
   });
 }
