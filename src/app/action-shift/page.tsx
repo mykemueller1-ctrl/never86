@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { buildActionShift, type ActionShiftResult } from '@/lib/actionShift';
+import type { DeskClose } from '@/lib/deskClose';
 
 type Seat = {
   n: number;
@@ -17,25 +18,28 @@ const SEATS: Seat[] = [
 ];
 
 export default function ActionShiftDeskPage() {
-  const [grossSales, setGrossSales] = useState('13727.18');
+  const [grossSales, setGrossSales] = useState('');
   const [laborDollars, setLaborDollars] = useState('');
   const [voids, setVoids] = useState('');
   const [expectedCash, setExpectedCash] = useState('');
   const [enteredDeposit, setEnteredDeposit] = useState('');
-  const [businessDate, setBusinessDate] = useState('2026-08-22');
+  const [businessDate, setBusinessDate] = useState('');
+  const [paste, setPaste] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ActionShiftResult | null>(null);
+  const [desk, setDesk] = useState<DeskClose | null>(null);
 
   function onRun(e: FormEvent) {
     e.preventDefault();
     const parsed = buildActionShift({
-      store: 'Community Tap & Pizza',
+      store: 'Your store',
       businessDate: businessDate || undefined,
       grossSales: Number(grossSales),
       laborDollars: laborDollars ? Number(laborDollars) : undefined,
       voids: voids ? Number(voids) : undefined,
       expectedCash: expectedCash ? Number(expectedCash) : undefined,
       enteredDeposit: enteredDeposit ? Number(enteredDeposit) : undefined,
+      cashEntered: enteredDeposit !== '' && Number(enteredDeposit) > 0,
     });
     if (!parsed.ok) {
       setResult(null);
@@ -44,6 +48,30 @@ export default function ActionShiftDeskPage() {
     }
     setError(null);
     setResult(parsed.result);
+  }
+
+  async function onPaste(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    try {
+      const res = await fetch('/api/intake/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: paste, filename: 'paste.txt' }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setDesk(null);
+        setResult(null);
+        setError(data.error || 'Could not read that close.');
+        return;
+      }
+      setDesk(data.desk);
+      setResult(data.desk.actionShift);
+      if (data.desk.actionShiftError && !data.desk.actionShift) setError(data.desk.actionShiftError);
+    } catch {
+      setError('Could not reach parse.');
+    }
   }
 
   return (
@@ -106,8 +134,23 @@ export default function ActionShiftDeskPage() {
         </section>
 
         <section id="drop" className="mt-12 border-t border-white/10 pt-8">
-          <h2 className="text-sm tracking-wide text-[#8fa898]">Drop · prior business day</h2>
-          <form onSubmit={onRun} className="mt-4 grid gap-3 sm:grid-cols-2">
+          <h2 className="text-sm tracking-wide text-[#8fa898]">Drop · prior business day · no POS password</h2>
+          <form onSubmit={onPaste} className="mt-4">
+            <textarea
+              className="w-full rounded-md border border-white/10 bg-black/30 px-3 py-2 text-sm text-[#f3f5f0]"
+              rows={7}
+              placeholder="Paste native-text ZReport_Summary, Hourly_Sales, or Void_Promo. Or type numbers below."
+              value={paste}
+              onChange={(e) => setPaste(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="mt-3 rounded-md bg-[#c4a35a] px-4 py-2.5 text-sm font-medium text-[#0c1210] hover:bg-[#d4b56a]"
+            >
+              Read close →
+            </button>
+          </form>
+          <form onSubmit={onRun} className="mt-6 grid gap-3 sm:grid-cols-2">
             <label className="block text-xs text-[#8fa898] sm:col-span-2">
               Business date
               <input
@@ -175,6 +218,13 @@ export default function ActionShiftDeskPage() {
 
         <section id="desk" className="mt-12 border-t border-white/10 pt-8">
           <h2 className="text-sm tracking-wide text-[#8fa898]">Desk · one next move</h2>
+          {desk ? (
+            <p className="mt-4 text-sm text-[#a8b5ac]">
+              Sales {desk.sales.display} · Food {desk.mix.food.display} · Beer {desk.mix.beer.display} · Liquor {desk.mix.liquor.display} · Pop {desk.mix.pop.display}
+              {' · '}Labor {desk.labor.display} · Cash {desk.cash.status === 'unentered' ? 'unentered (not a shortage)' : desk.cash.display}
+              {desk.hourlyPeak ? ` · Peak ${desk.hourlyPeak.hour}` : ''}
+            </p>
+          ) : null}
           {!result ? (
             <p className="mt-4 text-sm text-[#a8b5ac]">
               Drop yesterday&apos;s numbers above. Engine labels everything Unverified until
@@ -196,7 +246,7 @@ export default function ActionShiftDeskPage() {
                     <p className="mt-1 text-lg text-[#f3f5f0]">{a.title}</p>
                     <p className="mt-1 text-sm text-[#a8b5ac]">{a.move}</p>
                     <p className="mt-2 text-xs text-[#7a8a80]">
-                      Proof: {a.evidence} · {a.claimBoundary}
+                      Proof object: {a.proof.object} · {a.claimBoundary}
                     </p>
                   </li>
                 ))}

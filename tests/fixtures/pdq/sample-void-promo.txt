@@ -1,0 +1,8 @@
+Void Promo Report
+Sample Kitchen Lab
+Business Date: 8/24/2026
+
+# Voids 2 $12.00
+Promo 1 $8.00
+
+Report Generated At: 8/25/2026 6:57:00 AM

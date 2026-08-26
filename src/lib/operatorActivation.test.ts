@@ -6,6 +6,8 @@ import {
   mintActivationToken,
   normalizeEmail,
   normalizeRestaurant,
+  refuseSecondFreeSeat,
+  refuseSecondFreeStore,
 } from './operatorActivation';
 
 describe('operatorActivation pure helpers', () => {
@@ -37,5 +39,17 @@ describe('operatorActivation pure helpers', () => {
     expect(isFreeSeatOperatorId(FREE_SEAT_ID_FLOOR)).toBe(true);
     expect(isFreeSeatOperatorId(FREE_SEAT_ID_FLOOR - 1)).toBe(false);
     expect(isFreeSeatOperatorId(3)).toBe(false);
+  });
+
+  it('blocks a second free store or seat', () => {
+    expect(refuseSecondFreeStore(1)).toEqual({
+      ok: false,
+      error: 'The free plan is one store. Extra locations are paid expansion.',
+    });
+    expect(refuseSecondFreeSeat(1)).toEqual({
+      ok: false,
+      error: 'The free plan is one login. Extra seats are paid expansion.',
+    });
+    expect(refuseSecondFreeStore(0).ok).toBe(true);
   });
 });

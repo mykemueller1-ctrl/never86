@@ -334,4 +334,52 @@ export async function touchFreeSeatLogin(operatorId: number, email: string): Pro
   }
 }
 
+export function refuseSecondFreeStore(existingLocationCount: number): {
+  ok: true;
+} | { ok: false; error: string } {
+  if (existingLocationCount >= 1) {
+    return { ok: false, error: 'The free plan is one store. Extra locations are paid expansion.' };
+  }
+  return { ok: true };
+}
+
+export function refuseSecondFreeSeat(existingCredentialCount: number): {
+  ok: true;
+} | { ok: false; error: string } {
+  if (existingCredentialCount >= 1) {
+    return { ok: false, error: 'The free plan is one login. Extra seats are paid expansion.' };
+  }
+  return { ok: true };
+}
+
 export { verifyPassword };
+
+export async function findFreeSeatOperator(operatorId: number): Promise<{
+  operatorId: number;
+  email: string;
+  restaurantName: string;
+  locationId: number | null;
+} | null> {
+  if (!neonConfigured() || !isFreeSeatOperatorId(operatorId)) return null;
+  const op = await db
+    .select({
+      operatorId: seatOperators.id,
+      email: seatOperators.email,
+      restaurantName: seatOperators.restaurantName,
+    })
+    .from(seatOperators)
+    .where(eq(seatOperators.id, operatorId))
+    .limit(1);
+  if (!op[0]) return null;
+  const loc = await db
+    .select({ id: seatLocations.id })
+    .from(seatLocations)
+    .where(eq(seatLocations.operatorId, operatorId))
+    .limit(1);
+  return {
+    operatorId: op[0].operatorId,
+    email: op[0].email,
+    restaurantName: op[0].restaurantName,
+    locationId: loc[0]?.id ?? null,
+  };
+}

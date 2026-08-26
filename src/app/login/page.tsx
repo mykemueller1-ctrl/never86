@@ -102,10 +102,10 @@ export default function OperatorLoginPage() {
 
         <p className="compass-body text-[13px] mt-6" style={{ color: '#6e6e73' }}>
           Don&apos;t have a login yet?{' '}
-          <a href="mailto:myke@n86.app?subject=Operator%20login" className="underline" style={{ textDecorationColor: '#0066ff' }}>
-            Email Myke
-          </a>{' '}
-          and we&apos;ll set you up.
+          <Link href="/onboard" className="underline" style={{ textDecorationColor: '#0066ff' }}>
+            Claim the free seat
+          </Link>
+          . One store, one login.
         </p>
       </section>
     </main>
