@@ -17,7 +17,9 @@ Production SHA on `main` still serves www.never86.ai. This slice does **not** de
 | **#135** | `cursor/monday-gate-apply-neon-6e56` | Open; Monday gate + two-date unattended. Claimed red (TS at operatorActivation). |
 | **#137** | `cursor/neon-free-seat-apply-9d74` | Draft; ops apply + door probe. Claimed green. |
 
-Allowlisted tip: `codex/action-shift-122-safe` @ `f92f89d`. Reconcile job: `cursor/never86-pr-135-137-reconcile-c42a`.
+Allowlisted tip: `codex/action-shift-122-safe` @ `f92f89d`. Reconcile PR: **#138** `cursor/never86-pr-135-137-reconcile-c42a`.
+
+Local evidence (this agent, not CI yet): `npx vitest run` **221/221** (30 files). `npm run lint` green. `npm run build` TypeScript + Next production green. Does not merge/deploy/apply Neon.
 
 ## What this reconcile keeps
 - Join → email activation token → one Neon free store + one login.

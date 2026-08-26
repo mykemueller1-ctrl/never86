@@ -44,7 +44,9 @@ Pay invoices → restore project `never86` → paste `OPS_DATABASE_URL` → wire
 
 ## Cursor status packet
 - Branch: `cursor/never86-pr-135-137-reconcile-c42a`
+- PR: https://github.com/mykemueller1-ctrl/never86/pull/138
 - Tip ancestor: `codex/action-shift-122-safe` @ `f92f89d` (#131–#134 landed)
 - Dirty predecessor: PR #130 closed
+- Local tests: vitest **221/221**, lint green, Next production build green
 - Live probe: `POST /api/onboard/request` on www still 503 until 0002+0003 hit Neon
-- Next: Codex reviews; ops applies Neon from the secret box; no merge from desk.
+- Next: Codex reviews CI/preview; ops applies Neon from the secret box; no merge from desk.
