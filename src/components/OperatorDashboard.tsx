@@ -101,15 +101,24 @@ function Shell({ name, children }: { name: string; children: React.ReactNode }) 
 function EmptyState({ name }: { name: string }) {
   return (
     <div className="max-w-xl mx-auto pt-10">
-      <MonoLabel>/ {name} — NO DATA ON FILE YET</MonoLabel>
-      <h1 className="font-serif" style={{ fontSize: 44, letterSpacing: '-0.015em', margin: '10px 0 6px' }}>Your numbers aren&apos;t in yet.</h1>
-      <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>Send one report - we&apos;ll show you the first leak, with receipts.</p>
+      <MonoLabel>/ {name} — EMPTY DESK · PRIOR BUSINESS DAY</MonoLabel>
+      <h1 className="font-serif" style={{ fontSize: 44, letterSpacing: '-0.015em', margin: '10px 0 6px' }}>
+        Drop yesterday&apos;s close.
+      </h1>
+      <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>
+        One complete business day. Typed values stay Unverified until reconciled.
+      </p>
       <p style={{ fontSize: 14, color: '#3d3d38', lineHeight: 1.6, marginBottom: 22 }}>
-        Which store, which shift, whose name, and what to do about it — in 30 seconds.
+        Forward the daily-close email or upload the POS Z / void / hourly file you already have.
+        No POS API key. Morning = ≤3 ranked actions. Night = proof on those only.
       </p>
       <div className="flex gap-3 flex-wrap">
-        <Link href="/trial" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>Drop your first report →</Link>
-        <a href="mailto:myke@n86.app?subject=Connect%20my%20store" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px' }}>Connect my POS</a>
+        <Link href="/action-shift" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>
+          Open Action Shift desk →
+        </Link>
+        <Link href="/trial" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px' }}>
+          Upload a file
+        </Link>
       </div>
     </div>
   );

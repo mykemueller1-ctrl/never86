@@ -11,10 +11,9 @@ type Seat = {
   name: string;
 };
 
+// Free plan = one operator seat. Extra seats / role controls are paid later (#118).
 const SEATS: Seat[] = [
-  { n: 1, role: 'Owner', status: 'free', name: 'You' },
-  { n: 2, role: 'Manager / GM', status: 'invite', name: 'Invite' },
-  { n: 3, role: 'Kitchen or Bar', status: 'invite', name: 'Invite' },
+  { n: 1, role: 'Owner-operator', status: 'free', name: 'You · this store' },
 ];
 
 export default function ActionShiftDeskPage() {
@@ -64,8 +63,7 @@ export default function ActionShiftDeskPage() {
           Never 86&apos;d
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#a8b5ac]">
-          LLM → DoorDash first win → free seat → 3 seats → full in-store. Same path every
-          operator will take. Command Center later.
+          Yesterday&apos;s numbers → one next action → night proof. One free seat. Extra seats paid later.
         </p>
 
         <nav className="mt-8 flex flex-wrap gap-4 text-sm text-[#c5d0c8]">
@@ -76,7 +74,7 @@ export default function ActionShiftDeskPage() {
             Drop close
           </a>
           <a href="#seats" className="underline-offset-4 hover:underline">
-            Seats
+            Free seat
           </a>
           <Link href="/tools/3p-fee-finder" className="underline-offset-4 hover:underline">
             DoorDash path
@@ -87,7 +85,7 @@ export default function ActionShiftDeskPage() {
         </nav>
 
         <section id="seats" className="mt-12 border-t border-white/10 pt-8">
-          <h2 className="text-sm tracking-wide text-[#8fa898]">Seats · path to 3</h2>
+          <h2 className="text-sm tracking-wide text-[#8fa898]">Free seat · one store · one login</h2>
           <ul className="mt-4 space-y-3">
             {SEATS.map((s) => (
               <li
@@ -98,14 +96,13 @@ export default function ActionShiftDeskPage() {
                   <span className="text-[#f3f5f0]">
                     {s.n}. {s.role}
                   </span>
-                  <span className="ml-2 text-xs text-[#7a8a80]">
-                    {s.status === 'free' ? 'Free forever' : 'Invite · paid later'}
-                  </span>
+                  <span className="ml-2 text-xs text-[#7a8a80]">Free forever</span>
                 </div>
                 <span className="text-sm text-[#a8b5ac]">{s.name}</span>
               </li>
             ))}
           </ul>
+          <p className="mt-3 text-xs text-[#7a8a80]">Manager / station seats are paid expansion — not on this free path.</p>
         </section>
 
         <section id="drop" className="mt-12 border-t border-white/10 pt-8">
