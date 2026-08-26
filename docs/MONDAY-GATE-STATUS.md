@@ -28,9 +28,16 @@ Tests on this vendor-silence branch: `npx vitest run` — **197/197** (26 files)
 
 ## Apply Neon (ops, not this agent)
 ```bash
+npm run db:apply-free-seat
+# exits 2 if DATABASE_URL is missing (do not paste the URL in chat)
+```
+Equivalent:
+```bash
 psql "$DATABASE_URL" -f drizzle/0002_free_seat_neon.sql
 psql "$DATABASE_URL" -f drizzle/0003_free_seat_intake.sql
 ```
+
+Unattended morning/night routines stay **off** until Z, Hourly, and Void each parse successfully on two different business dates. Desk returns `unattendedRoutines.enabled: false` until then.
 
 ## Residuals
 - Neon 0002+0003 apply is ops.

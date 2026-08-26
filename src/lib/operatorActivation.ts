@@ -257,6 +257,16 @@ export async function activateOperatorSeat(
 
   let locationId: number;
   if (existingLoc[0]) {
+    const locRows = await db
+      .select({ name: seatLocations.name })
+      .from(seatLocations)
+      .where(eq(seatLocations.id, existingLoc[0].id))
+      .limit(1);
+    const existingName = locRows[0]?.name;
+    if (existingName && existingName !== restaurantName) {
+      const second = refuseSecondFreeStore(1);
+      return { ok: false, error: second.error, status: 409 };
+    }
     locationId = existingLoc[0].id;
   } else {
     const loc = await db
