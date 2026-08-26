@@ -2,6 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getPublishedAnswer, listPublishedAnswers } from '@/lib/answersDb';
+import {
+  WWW,
+  answerCanonicalUrl,
+  answerSeoDescription,
+  answerSeoTitle,
+  buildAnswerFaqJsonLd,
+} from '@/lib/seoAeo';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -12,18 +19,20 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params;
   const a = await getPublishedAnswer(slug);
   if (!a) return { title: "Not found · Never 86'd" };
-  const desc = a.summary ?? (a.answer.slice(0, 200) + (a.answer.length > 200 ? '…' : ''));
+  const desc = answerSeoDescription(a);
+  const title = answerSeoTitle(a);
+  const url = answerCanonicalUrl(a.slug);
   return {
-    title: `${a.title} · Never 86'd`,
+    title,
     description: desc,
     openGraph: {
-      title: a.title,
+      title,
       description: desc,
-      url: `https://www.never86.ai/answers/${a.slug}`,
+      url,
       type: 'article',
     },
-    twitter: { card: 'summary_large_image', title: a.title, description: desc },
-    alternates: { canonical: `https://www.never86.ai/answers/${a.slug}` },
+    twitter: { card: 'summary_large_image', title, description: desc },
+    alternates: { canonical: url },
   };
 }
 
@@ -49,14 +58,14 @@ export default async function AnswerPage({ params }: { params: Params }) {
     articleBody: a.answer,
     datePublished: a.publishedAt,
     dateModified: a.updatedAt,
-    mainEntityOfPage: `https://www.never86.ai/answers/${a.slug}`,
+    mainEntityOfPage: answerCanonicalUrl(a.slug),
     author: {
       '@type': 'Person',
       name: 'Mychael Mueller',
       alternateName: 'Myke Mueller',
-      url: 'https://www.never86.ai/story',
+      url: `${WWW}/story`,
     },
-    publisher: { '@type': 'Organization', name: "Never86'd", alternateName: "Never 86'd", url: 'https://www.never86.ai' },
+    publisher: { '@type': 'Organization', name: "Never86'd", alternateName: "Never 86'd", url: `${WWW}/` },
     about: ['restaurant operations', 'restaurant financial intelligence', ...(a.keywords ?? [])],
     articleSection: a.category,
     citation: (a.sources ?? []).map((source) => source.url),
@@ -66,9 +75,9 @@ export default async function AnswerPage({ params }: { params: Params }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: "Never86'd", item: 'https://www.never86.ai/' },
-      { '@type': 'ListItem', position: 2, name: 'Answers', item: 'https://www.never86.ai/answers' },
-      { '@type': 'ListItem', position: 3, name: a.title, item: `https://www.never86.ai/answers/${a.slug}` },
+      { '@type': 'ListItem', position: 1, name: "Never86'd", item: `${WWW}/` },
+      { '@type': 'ListItem', position: 2, name: 'Answers', item: `${WWW}/answers` },
+      { '@type': 'ListItem', position: 3, name: a.question ?? a.title, item: answerCanonicalUrl(a.slug) },
     ],
   };
 
@@ -76,6 +85,7 @@ export default async function AnswerPage({ params }: { params: Params }) {
     <main className="compass min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildAnswerFaqJsonLd(a)) }} />
 
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
         <div className="flex items-start justify-between gap-6 flex-wrap">
@@ -98,10 +108,12 @@ export default async function AnswerPage({ params }: { params: Params }) {
       <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-20">
         <Link href="/answers" className="text-[#6e6e73] hover:text-ink-800 text-[12px] font-medium inline-flex items-center gap-1 mb-6 transition-colors">← All answers</Link>
         {a.audience ? <p className="compass-eyebrow mb-4">— For the {a.audience}</p> : null}
-        <h1 className="compass-display text-3xl md:text-5xl mb-6 break-words">{a.title}</h1>
-        {a.question ? (
-          <p className="compass-body text-lg italic mb-10 border-l-2 pl-4" style={{ borderColor: '#0066ff' }}>{a.question}</p>
-        ) : null}
+        <h1 className="compass-display text-3xl md:text-5xl mb-6 break-words">{a.question ?? a.title}</h1>
+        {a.question && a.question.trim() !== a.title.trim() ? (
+          <p className="compass-body text-lg italic mb-10 border-l-2 pl-4" style={{ borderColor: '#0066ff' }}>{a.title}</p>
+        ) : (
+          <div className="mb-10" />
+        )}
 
         {(a.category || a.week) ? (
           <div className="mb-8 flex flex-wrap gap-2 text-[12px] font-semibold" style={{ color: '#6e6e73' }}>
@@ -118,7 +130,7 @@ export default async function AnswerPage({ params }: { params: Params }) {
 
         {a.formula ? (
           <section className="mt-10 rounded-2xl border p-6" style={{ borderColor: '#b8d2ff', background: '#f2f7ff' }} aria-labelledby="formula-heading">
-            <p id="formula-heading" className="compass-eyebrow mb-3">— Working formula</p>
+            <p id="formula-heading" className="compass-eyebrow mb-3">— What working formula does this answer use?</p>
             <p className="font-mono text-sm md:text-base leading-relaxed text-ink-800">{a.formula}</p>
           </section>
         ) : null}
@@ -148,7 +160,7 @@ export default async function AnswerPage({ params }: { params: Params }) {
 
         {a.evidenceBoundary ? (
           <aside className="mt-8 border-l-4 pl-5 py-2" style={{ borderColor: '#d4a017' }} aria-label="Evidence boundary">
-            <p className="compass-eyebrow mb-2">— Evidence boundary</p>
+            <p className="compass-eyebrow mb-2">— What can this evidence not prove?</p>
             <p className="compass-body text-base leading-relaxed">{a.evidenceBoundary}</p>
           </aside>
         ) : null}

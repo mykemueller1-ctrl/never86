@@ -6,6 +6,7 @@ import { FormEvent, useState } from 'react';
 import { HumanSiteFooter, HumanSiteHeader, TeamFaces } from '@/components/HumanSiteShell';
 import { MarketplaceCostSnapshot } from '@/components/MarketplaceCostSnapshot';
 import { trackEvent } from '@/lib/track';
+import { HOME_OPERATOR_AGENTS, HOME_OPERATOR_ANSWERS } from '@/lib/seoAeo';
 
 const FIELD_NOTES = [
   {
@@ -135,6 +136,44 @@ export default function Home() {
       </section>
 
       <MarketplaceCostSnapshot pagePath="/" humanAuditHref="/audit#claim" />
+
+      <section className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28" aria-labelledby="home-discovery-heading">
+        <div className="mx-auto max-w-7xl">
+          <p className="human-kicker">2 a.m. Google · then the operator OS</p>
+          <h2 id="home-discovery-heading" className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
+            Three questions owners type.
+            <span className="block italic text-[#005de8]">Three checks to run next.</span>
+          </h2>
+          <div className="mt-12 grid gap-3 md:grid-cols-3">
+            {HOME_OPERATOR_ANSWERS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="human-receipt-card block hover:border-[#005de8]"
+                onClick={() => trackEvent('home_answer_click', { meta: { target: item.href, label: item.title } })}
+              >
+                <p className="font-mono text-xs font-bold text-[#005de8]">Answer</p>
+                <h3 className="mt-8 font-serif text-3xl leading-tight text-[#1b1b1b]">{item.title}</h3>
+                <p className="mt-4 text-sm font-semibold text-[#005de8]">Read it →</p>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {HOME_OPERATOR_AGENTS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="human-receipt-card block hover:border-[#005de8]"
+                onClick={() => trackEvent('home_agent_click', { meta: { target: item.href, label: item.title } })}
+              >
+                <p className="font-mono text-xs font-bold text-[#005de8]">{item.title}</p>
+                <h3 className="mt-8 font-serif text-3xl leading-tight text-[#1b1b1b]">{item.line}</h3>
+                <p className="mt-4 text-sm font-semibold text-[#005de8]">Open the agent →</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-7xl">
