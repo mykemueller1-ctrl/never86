@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { captureLead } from '@/lib/leadCapture';
 import { getOwnerEmail, sendAuditIntakeEmail, sendNotification } from '@/lib/email';
+import { escapeHtml } from '@/lib/escapeHtml';
 
 const auditIntakeInput = z.object({
   email: z.string().trim().email(),
@@ -15,15 +16,6 @@ const auditIntakeInput = z.object({
   utmCampaign: z.string().trim().max(160).optional(),
   utmContent: z.string().trim().max(160).optional(),
 });
-
-function escapeHtml(value: unknown): string {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
 
 function safeSubjectLabel(value: string): string {
   return value.replace(/[\r\n]+/g, ' ').trim().slice(0, 160);

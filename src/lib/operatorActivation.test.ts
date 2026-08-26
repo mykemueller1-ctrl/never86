@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   FREE_SEAT_ID_FLOOR,
+  SeatActivationAbort,
+  activationEmailConfigured,
+  activationTokenIsConsumable,
+  chooseLoginPlane,
   hashActivationToken,
   isFreeSeatOperatorId,
   mintActivationToken,
   normalizeEmail,
   normalizeRestaurant,
+  publicActivationAccepted,
   refuseSecondFreeSeat,
   refuseSecondFreeStore,
 } from './operatorActivation';
@@ -51,5 +56,75 @@ describe('operatorActivation pure helpers', () => {
       error: 'The free plan is one login. Extra seats are paid expansion.',
     });
     expect(refuseSecondFreeStore(0).ok).toBe(true);
+  });
+
+  it('narrows refuseSecondFreeStore.error for production TypeScript', () => {
+    const second = refuseSecondFreeStore(1);
+    if (!second.ok) {
+      const payload: { ok: false; error: string; status: number } = {
+        ok: false,
+        error: second.error,
+        status: 409,
+      };
+      expect(payload.error).toMatch(/one store/);
+    } else {
+      throw new Error('expected refusal');
+    }
+  });
+
+  it('fails closed when activation email is not configured', () => {
+    const prev = process.env.RESEND_API_KEY;
+    delete process.env.RESEND_API_KEY;
+    expect(activationEmailConfigured()).toBe(false);
+    process.env.RESEND_API_KEY = '  ';
+    expect(activationEmailConfigured()).toBe(false);
+    process.env.RESEND_API_KEY = 're_test';
+    expect(activationEmailConfigured()).toBe(true);
+    if (prev === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = prev;
+  });
+
+  it('never puts a raw token on the public activation body', () => {
+    const minted = mintActivationToken(1_700_000_000_000);
+    const body = publicActivationAccepted(minted.expiresAt);
+    const json = JSON.stringify(body);
+    expect(json).not.toContain(minted.rawToken);
+    expect(body).not.toHaveProperty('rawToken');
+    expect(body).not.toHaveProperty('debugActivatePath');
+    expect(body.success).toBe(true);
+  });
+
+  it('consumes a token only when unused and unexpired', () => {
+    const now = 1_700_000_000_000;
+    expect(
+      activationTokenIsConsumable({ consumedAt: null, expiresAt: new Date(now + 1) }, now),
+    ).toBe(true);
+    expect(
+      activationTokenIsConsumable({ consumedAt: new Date(now), expiresAt: new Date(now + 1) }, now),
+    ).toBe(false);
+    expect(
+      activationTokenIsConsumable({ consumedAt: null, expiresAt: new Date(now) }, now),
+    ).toBe(false);
+  });
+
+  it('blocks Neon→OPS same-email bad-password fallback', () => {
+    expect(chooseLoginPlane({ passwordHash: 'x' }, false)).toBe('deny-neon');
+    expect(chooseLoginPlane({ passwordHash: 'x' }, true)).toBe('neon');
+    expect(chooseLoginPlane(null, false)).toBe('ops');
+  });
+
+  it('aborts activation so second-store and id-namespace failures can roll back', () => {
+    const second = refuseSecondFreeStore(1);
+    if (!second.ok) {
+      const abort = new SeatActivationAbort({ ok: false, error: second.error, status: 409 });
+      expect(abort.result.ok).toBe(false);
+      expect(abort.result.status).toBe(409);
+    }
+    const idAbort = new SeatActivationAbort({
+      ok: false,
+      error: 'Free-seat id namespace misconfigured. Contact support.',
+      status: 500,
+    });
+    expect(idAbort.result.status).toBe(500);
   });
 });

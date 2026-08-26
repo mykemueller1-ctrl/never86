@@ -630,6 +630,14 @@ export const seatCredentials = pgTable('seat_credentials', {
   lastLoginAt: timestamp('last_login_at'),
 });
 
+export const seatAuthAttempts = pgTable('seat_auth_attempts', {
+  id: serial('id').primaryKey(),
+  kind: text('kind').notNull(),
+  email: text('email'),
+  requestIp: text('request_ip'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export const seatIntakeEvents = pgTable('seat_intake_events', {
   id: serial('id').primaryKey(),
   operatorId: integer('operator_id').notNull(),

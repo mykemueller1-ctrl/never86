@@ -3,8 +3,10 @@ import { db } from '../db';
 import { seatCloses, seatIntakeEvents, seatProofs } from '../db/schema';
 import { neonConfigured } from './operatorActivation';
 import type { DeskClose } from './deskClose';
-import { detectPdqFamily } from './pdqEodParse';
+import type { PdqReportFamily } from './pdqEodParse';
 import type { IntakeDocument } from './closeIntake';
+import { unattendedRoutineGate, type SuccessfulParse } from './unattendedRoutineGate';
+import { describeDocumentParse } from './intakeParseRecord';
 
 function tableMissing(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
@@ -20,19 +22,23 @@ export async function recordIntakeAndClose(input: {
   if (!neonConfigured()) return { closeId: null, persisted: false };
   try {
     for (const doc of input.docs) {
+      const parsed = describeDocumentParse(doc);
       await db.insert(seatIntakeEvents).values({
         operatorId: input.operatorId,
         locationId: input.locationId,
         channel: doc.channel,
         sourceFilename: doc.filename ?? null,
         sourceFrom: doc.from ?? null,
-        reportFamily: detectPdqFamily(doc.filename || '', doc.text),
-        businessDate: input.desk.businessDate,
+        reportFamily: parsed.family,
+        businessDate: parsed.businessDate || null,
         payload: {
           textBytes: Buffer.byteLength(doc.text, 'utf8'),
           injectionSuspected: input.desk.injectionSuspected,
+          parsedBusinessDate: parsed.businessDate || null,
+          rejectedReason: parsed.rejectedReason,
         },
-        injectionSuspected: input.desk.injectionSuspected,
+        injectionSuspected: parsed.rejectedReason === 'injection' || input.desk.injectionSuspected,
+        rejectedReason: parsed.rejectedReason,
       });
     }
 
@@ -116,4 +122,33 @@ export async function recordProof(input: {
     if (tableMissing(err)) return false;
     throw err;
   }
+}
+
+export async function loadSuccessfulParses(operatorId: number, locationId: number): Promise<SuccessfulParse[]> {
+  if (!neonConfigured()) return [];
+  try {
+    const rows = await db
+      .select({
+        family: seatIntakeEvents.reportFamily,
+        businessDate: seatIntakeEvents.businessDate,
+        rejectedReason: seatIntakeEvents.rejectedReason,
+        injectionSuspected: seatIntakeEvents.injectionSuspected,
+      })
+      .from(seatIntakeEvents)
+      .where(and(eq(seatIntakeEvents.operatorId, operatorId), eq(seatIntakeEvents.locationId, locationId)));
+
+    return rows.map((row) => ({
+      family: (row.family || 'unknown') as PdqReportFamily,
+      businessDate: row.businessDate || '',
+      rejected: Boolean(row.rejectedReason) || Boolean(row.injectionSuspected),
+    }));
+  } catch (err) {
+    if (tableMissing(err)) return [];
+    throw err;
+  }
+}
+
+export async function loadUnattendedGate(operatorId: number, locationId: number) {
+  const parses = await loadSuccessfulParses(operatorId, locationId);
+  return unattendedRoutineGate(parses);
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readOperatorSession } from '@/lib/readOperatorSession';
 import { findFreeSeatOperator, isFreeSeatOperatorId } from '@/lib/operatorActivation';
-import { loadLatestClose } from '@/lib/seatCloseStore';
+import { loadLatestClose, loadUnattendedGate } from '@/lib/seatCloseStore';
 import { intakeMailboxAddress } from '@/lib/closeIntake';
 
 export const runtime = 'nodejs';
@@ -17,6 +17,9 @@ export async function GET() {
   const saved = operator?.locationId
     ? await loadLatestClose(operator.operatorId, operator.locationId).catch(() => null)
     : null;
+  const unattended = operator?.locationId
+    ? await loadUnattendedGate(operator.operatorId, operator.locationId).catch(() => null)
+    : null;
 
   return NextResponse.json({
     success: true,
@@ -27,5 +30,8 @@ export async function GET() {
     forwardTo: intakeMailboxAddress(session.operatorId),
     desk: saved?.desk ?? null,
     closeId: saved?.closeId ?? null,
+    unattendedRoutines: unattended
+      ? { enabled: false, ready: unattended.ok, reason: unattended.reason, missing: unattended.missing }
+      : { enabled: false, ready: false, reason: 'No store yet.' },
   });
 }

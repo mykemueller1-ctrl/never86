@@ -55,18 +55,18 @@ export default function OnboardPage() {
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setMessage(
-          data.debugActivatePath
-            ? `${data.message} Dev link: ${data.debugActivatePath}`
-            : data.message || 'Check your email for the activation link.',
-        );
+        setMessage(data.message || 'Check your email for the activation link.');
         setStep(4);
         trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference, path: 'activation' } });
         return;
       }
 
-      // If activation DB is offline, fall back to waitlist so the form never dead-ends.
-      if (res.status === 503) {
+      if (data.code === 'activation_email_unavailable') {
+        throw new Error(data.error || 'Activation email is unavailable. Try again later.');
+      }
+
+      // If free-seat tables are missing, fall back to waitlist so the form never dead-ends.
+      if (res.status === 503 && data.code === 'neon_tables_missing') {
         const wait = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
