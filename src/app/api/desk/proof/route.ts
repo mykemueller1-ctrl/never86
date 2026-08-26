@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { applyNightProof, PROOF_KINDS } from '@/lib/deskClose';
 import { readOperatorSession } from '@/lib/readOperatorSession';
-import { isFreeSeatOperatorId } from '@/lib/operatorActivation';
+import { findFreeSeatOperator, isFreeSeatOperatorId } from '@/lib/operatorActivation';
 import { loadLatestClose, recordProof } from '@/lib/seatCloseStore';
-import { findFreeSeatOperator } from '@/lib/operatorActivation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,17 +49,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: applied.error }, { status: 400 });
   }
 
-  const closeId = data.closeId ?? saved.closeId;
-  const persisted = await recordProof({
-    operatorId: session.operatorId,
-    closeId,
-    actionId: data.actionId,
-    outcome: applied.state,
-    proofKind: data.proofKind && PROOF_KINDS.includes(data.proofKind as typeof PROOF_KINDS[number])
-      ? data.proofKind
-      : 'other-source',
-    proofNote: data.proofNote,
-  }).catch(() => false);
+  const closeId = data.closeId ?? saved?.closeId;
+  const persisted = closeId
+    ? await recordProof({
+      operatorId: session.operatorId,
+      closeId,
+      actionId: data.actionId,
+      outcome: applied.state,
+      proofKind: data.proofKind && PROOF_KINDS.includes(data.proofKind as typeof PROOF_KINDS[number])
+        ? data.proofKind
+        : 'other-source',
+      proofNote: data.proofNote,
+    }).catch(() => false)
+    : false;
 
   return NextResponse.json({
     success: true,
