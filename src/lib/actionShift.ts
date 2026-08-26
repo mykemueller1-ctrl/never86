@@ -26,7 +26,7 @@ export type ActionShiftProof = {
 };
 
 export type ActionShiftAction = {
-  id: 'cash-proof' | 'labor-window' | 'payout-proof' | 'delivery-clock' | 'approval-proof' | 'close-packet' | 'vendor-drift';
+  id: 'cash-proof' | 'labor-window' | 'payout-proof' | 'delivery-clock' | 'approval-proof' | 'close-packet' | 'vendor-drift' | 'po-receive-usage';
   instanceKey?: string;
   title: string;
   owner: string;
