@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import type { DeskClose } from '@/lib/deskClose';
+import { serializeVendorSilencePacket } from '@/lib/vendorSilenceParse';
 
 const INK = '#141414';
 const BLUE = '#2424cf';
@@ -44,6 +45,14 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
   const [busy, setBusy] = useState(false);
   const [proofKind, setProofKind] = useState('pos-close');
   const [proofNote, setProofNote] = useState('');
+  const [silenceVendor, setSilenceVendor] = useState('');
+  const [silenceLastSeen, setSilenceLastSeen] = useState('');
+  const [silenceAsOf, setSilenceAsOf] = useState('');
+  const [silenceCadence, setSilenceCadence] = useState('');
+  const [silenceGrace, setSilenceGrace] = useState('');
+  const [silencePausedDates, setSilencePausedDates] = useState('');
+  const [silenceProgramStart, setSilenceProgramStart] = useState('');
+  const [silencePauseWeekends, setSilencePauseWeekends] = useState(false);
 
   useEffect(() => {
     fetch('/api/desk')
@@ -92,6 +101,25 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
     void submitDocs(form);
   }
 
+  function onSilence(e: FormEvent) {
+    e.preventDefault();
+    const packet = serializeVendorSilencePacket({
+      vendor: silenceVendor,
+      store: payload?.restaurantName || undefined,
+      lastSeenDate: silenceLastSeen,
+      asOfDate: silenceAsOf,
+      expectedCadenceDays: silenceCadence,
+      graceDays: silenceGrace,
+      pauseWeekends: silencePauseWeekends,
+      pausedDates: silencePausedDates,
+      programStartedDate: silenceProgramStart,
+    });
+    const form = new FormData();
+    form.set('text', packet);
+    form.set('filename', 'vendor-silence.txt');
+    void submitDocs(form);
+  }
+
   async function prove(actionId: string, outcome: 'verified' | 'acknowledged' | 'not-done' | 'data-missing') {
     setBusy(true);
     try {
@@ -126,7 +154,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
         {desk ? `Yesterday, ${desk.businessDate || 'date missing'}.` : 'Drop yesterday’s close.'}
       </h1>
       <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>
-        Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. Vendor invoices, purchase orders, and theoretical-usage files (CSV / native-text PDF) feed the same Action Shift. No POS or vendor-portal password.
+        Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. Vendor invoices, purchase orders, theoretical-usage, and vendor-silence packets feed the same Action Shift. No POS or vendor-portal password.
       </p>
 
       <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 16, marginBottom: 22 }}>
@@ -142,7 +170,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste the native-text Z, Hourly, Void report, vendor invoice, purchase order, or theoretical usage…"
+          placeholder="Paste the native-text Z, Hourly, Void report, vendor invoice, purchase order, theoretical usage, or vendor silence packet…"
           rows={8}
           className="w-full"
           style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 12, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
@@ -156,6 +184,31 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
             <input type="file" multiple className="hidden" accept=".txt,.pdf,.csv" onChange={(e) => onFiles(e.target.files)} />
           </label>
         </div>
+      </form>
+
+      <form onSubmit={onSilence} className="space-y-3" style={{ marginBottom: 22, border: `1px solid ${RULE}`, padding: 16 }}>
+        <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>
+          Vendor silence · typed cadence (Unverified)
+        </p>
+        <p style={{ fontSize: 13, color: MUTED }}>
+          First 14 days after program start stay advisory. Missing cadence or last-seen is Missing Evidence, not a ticket and not $0. Quiet is a follow-up, not a missed truck.
+        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <input value={silenceVendor} onChange={(e) => setSilenceVendor(e.target.value)} placeholder="Vendor" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silenceLastSeen} onChange={(e) => setSilenceLastSeen(e.target.value)} placeholder="Last seen YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silenceAsOf} onChange={(e) => setSilenceAsOf(e.target.value)} placeholder="As of YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silenceCadence} onChange={(e) => setSilenceCadence(e.target.value)} placeholder="Cadence days" inputMode="numeric" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silenceGrace} onChange={(e) => setSilenceGrace(e.target.value)} placeholder="Grace days (optional)" inputMode="numeric" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silencePausedDates} onChange={(e) => setSilencePausedDates(e.target.value)} placeholder="Paused dates YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <input value={silenceProgramStart} onChange={(e) => setSilenceProgramStart(e.target.value)} placeholder="Program start YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
+          <label style={{ fontSize: 13, color: INK, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input type="checkbox" checked={silencePauseWeekends} onChange={(e) => setSilencePauseWeekends(e.target.checked)} />
+            Pause weekends
+          </label>
+        </div>
+        <button type="submit" disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px', background: '#fff' }}>
+          {busy ? 'Reading…' : 'Read silence clock →'}
+        </button>
       </form>
       {status ? <p style={{ fontSize: 13, color: MUTED, marginBottom: 18 }}>{status}</p> : null}
 
@@ -205,7 +258,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
               ))}
             </ul>
           ) : (
-            <p style={{ fontSize: 14, color: MUTED, marginBottom: 24 }}>{desk.actionShiftError || 'Need a Z with net sales, a current + prior vendor invoice, or a PO / invoice / usage packet before Action Shift can rank a move.'}</p>
+            <p style={{ fontSize: 14, color: MUTED, marginBottom: 24 }}>{desk.actionShiftError || 'Need a Z with net sales, a current + prior vendor invoice, a PO / invoice / usage packet, or a vendor-silence clock before Action Shift can rank a move.'}</p>
           )}
 
           <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', marginBottom: 8 }}>Night proof object</p>
@@ -219,6 +272,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
               <option value="exception-log">Exception log</option>
               <option value="invoice-packet">Invoice packet</option>
               <option value="po-packet">PO / receiving packet</option>
+              <option value="receiving-log">Receiving log (resets last-seen)</option>
               <option value="photo">Photo</option>
             </select>
             <input

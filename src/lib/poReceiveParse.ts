@@ -15,6 +15,7 @@ import {
   periodFromDate,
   type EvidenceState,
 } from './vendorInvoiceParse';
+import { looksLikeVendorSilence } from './vendorSilenceParse';
 
 export type LineStatus = 'readable' | 'unreadable';
 
@@ -95,6 +96,7 @@ function looksLikePdq(text: string, filename: string): boolean {
 
 export function looksLikeTheoreticalUsage(text: string, filename = ''): boolean {
   if (looksLikePdq(text, filename)) return false;
+  if (looksLikeVendorSilence(text, filename)) return false;
   const hay = `${filename}\n${text}`.toLowerCase();
   if (/\btheoretical\s*usage\b|\brecipe\s*qty\b|\byield\b/.test(hay) && !/\bpurchase\s*order\b/.test(hay)) {
     if (/\btheoretical\b|\brecipe\b|\busage\b/.test(hay)) return true;
@@ -111,6 +113,7 @@ export function looksLikeTheoreticalUsage(text: string, filename = ''): boolean 
 
 export function looksLikePurchaseOrder(text: string, filename = ''): boolean {
   if (looksLikePdq(text, filename)) return false;
+  if (looksLikeVendorSilence(text, filename)) return false;
   if (looksLikeTheoreticalUsage(text, filename)) return false;
   const hay = `${filename}\n${text}`.toLowerCase();
   const invoiceTyped = /\binvoice\s*(number|#|no\.?|date)\b/.test(hay) || /\binvoice\b/.test(filename.toLowerCase());

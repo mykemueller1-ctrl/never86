@@ -14,6 +14,7 @@
 
 import { findColumn, num, parseCsv } from './csv/core';
 import { extractNativePdfText } from './pdqEodParse';
+import { looksLikeVendorSilence } from './vendorSilenceParse';
 
 export type EvidenceState =
   | 'verified'
@@ -62,6 +63,7 @@ export function decodeInvoiceSource(bytes: Uint8Array, filename = ''): string {
 }
 
 export function looksLikeVendorInvoice(text: string, filename = ''): boolean {
+  if (looksLikeVendorSilence(text, filename)) return false;
   const hay = `${filename}\n${text}`.toLowerCase();
   if (/zreport_summary|hourly_sales|void_promo|end of day/.test(hay)) return false;
   if (/\binvoice\b/.test(hay)) return true;

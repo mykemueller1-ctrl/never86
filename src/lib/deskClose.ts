@@ -21,6 +21,11 @@ import {
   feedVendorDriftIntoActionShift,
 } from './vendorDriftActionShift';
 import { looksLikeVendorInvoice } from './vendorInvoiceParse';
+import {
+  buildVendorSilenceActionShift,
+  feedVendorSilenceIntoActionShift,
+} from './vendorSilenceActionShift';
+import { looksLikeVendorSilence } from './vendorSilenceParse';
 
 export type DeskNumber = {
   label: string;
@@ -33,7 +38,7 @@ export type DeskClose = {
   store: string;
   businessDate: string | null;
   channel: IntakeChannel;
-  families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice' | 'purchase-order' | 'theoretical-usage'>;
+  families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice' | 'purchase-order' | 'theoretical-usage' | 'vendor-silence'>;
   injectionSuspected: boolean;
   sales: DeskNumber;
   mix: {
@@ -215,11 +220,13 @@ function intakeFamilies(input: {
   poDocs: IntakeDocument[];
   invoiceDocs: IntakeDocument[];
   usageDocs: IntakeDocument[];
+  silenceDocs: IntakeDocument[];
 }): DeskClose['families'] {
   const families: DeskClose['families'] = [];
   if (input.poDocs.length) families.push('purchase-order');
   if (input.invoiceDocs.length) families.push('vendor-invoice');
   if (input.usageDocs.length) families.push('theoretical-usage');
+  if (input.silenceDocs.length) families.push('vendor-silence');
   return families;
 }
 
@@ -236,6 +243,7 @@ export function ingestCloseDocuments(
   const invoiceDocs: IntakeDocument[] = [];
   const poDocs: IntakeDocument[] = [];
   const usageDocs: IntakeDocument[] = [];
+  const silenceDocs: IntakeDocument[] = [];
   let injectionSuspected = false;
   let channel: IntakeChannel = docs[0].channel;
 
@@ -247,6 +255,7 @@ export function ingestCloseDocuments(
     if (parsed.family === 'z-summary') z = parsed;
     else if (parsed.family === 'hourly') hourly = parsed;
     else if (parsed.family === 'void-promo') voids = parsed;
+    else if (looksLikeVendorSilence(doc.text, doc.filename || '')) silenceDocs.push(doc);
     else if (looksLikeTheoreticalUsage(doc.text, doc.filename || '')) usageDocs.push(doc);
     else if (looksLikePurchaseOrder(doc.text, doc.filename || '')) poDocs.push(doc);
     else if (looksLikeVendorInvoice(doc.text, doc.filename || '')) invoiceDocs.push(doc);
@@ -271,8 +280,19 @@ export function ingestCloseDocuments(
     : null;
   const poShift = poBuilt?.ok ? poBuilt.result : null;
 
+  const silenceBuilt = silenceDocs.length
+    ? buildVendorSilenceActionShift({
+      store,
+      documents: silenceDocs.map((doc) => ({ text: doc.text, filename: doc.filename })),
+    })
+    : null;
+  const silenceShift = silenceBuilt?.ok ? silenceBuilt.result : null;
+
   if (!z && !hourly && !voids) {
-    const merged = feedPoReceiveUsageIntoActionShift(vendorShift, poShift);
+    const merged = feedVendorSilenceIntoActionShift(
+      feedPoReceiveUsageIntoActionShift(vendorShift, poShift),
+      silenceShift,
+    );
     if (merged) {
       return {
         ok: true,
@@ -281,17 +301,19 @@ export function ingestCloseDocuments(
           channel,
           vendorShift: merged,
           injectionSuspected,
-          families: intakeFamilies({ poDocs, invoiceDocs, usageDocs }),
+          families: intakeFamilies({ poDocs, invoiceDocs, usageDocs, silenceDocs }),
         }),
       };
     }
     return {
       ok: false,
-      error: poBuilt && !poBuilt.ok
-        ? poBuilt.error
-        : vendorBuilt && !vendorBuilt.ok
-          ? vendorBuilt.error
-          : 'Could not read a PDQ Z, Hourly, Void/Promo, vendor invoice, purchase order, or theoretical-usage file from that text. Paste native text — no POS or vendor-portal password.',
+      error: silenceBuilt && !silenceBuilt.ok
+        ? silenceBuilt.error
+        : poBuilt && !poBuilt.ok
+          ? poBuilt.error
+          : vendorBuilt && !vendorBuilt.ok
+            ? vendorBuilt.error
+            : 'Could not read a PDQ Z, Hourly, Void/Promo, vendor invoice, purchase order, theoretical-usage, or vendor-silence packet from that text. Paste native text — no POS or vendor-portal password.',
       status: 422,
     };
   }
@@ -309,12 +331,21 @@ export function ingestCloseDocuments(
   if (poShift) {
     desk.families = [...new Set([
       ...desk.families,
-      ...intakeFamilies({ poDocs, invoiceDocs, usageDocs }),
+      ...intakeFamilies({ poDocs, invoiceDocs, usageDocs, silenceDocs: [] }),
     ])] as DeskClose['families'];
     desk.actionShift = feedPoReceiveUsageIntoActionShift(desk.actionShift, poShift);
     desk.missingEvidence = [...new Set([
       ...desk.missingEvidence,
       ...poShift.missingEvidence,
+    ])];
+    if (desk.actionShift) desk.actionShiftError = null;
+  }
+  if (silenceShift) {
+    desk.families = [...new Set([...desk.families, 'vendor-silence'])] as DeskClose['families'];
+    desk.actionShift = feedVendorSilenceIntoActionShift(desk.actionShift, silenceShift);
+    desk.missingEvidence = [...new Set([
+      ...desk.missingEvidence,
+      ...silenceShift.missingEvidence,
     ])];
     if (desk.actionShift) desk.actionShiftError = null;
   }
@@ -330,11 +361,20 @@ export const PROOF_KINDS = [
   'exception-log',
   'invoice-packet',
   'po-packet',
+  'receiving-log',
   'photo',
   'other-source',
 ] as const;
 
+export const LAST_SEEN_RESET_PROOF_KINDS = [
+  'receiving-log',
+  'invoice-packet',
+  'po-packet',
+  'exception-log',
+] as const;
+
 export type ProofKind = typeof PROOF_KINDS[number];
+export type LastSeenResetProofKind = typeof LAST_SEEN_RESET_PROOF_KINDS[number];
 export type ProofOutcome =
   | 'acknowledged'
   | 'done-awaiting-proof'
@@ -348,12 +388,21 @@ export function applyNightProof(input: {
   outcome: ProofOutcome;
   proofKind?: string;
   proofNote?: string;
-}): { ok: true; state: ProofOutcome } | { ok: false; error: string } {
+}): { ok: true; state: ProofOutcome; lastSeenReset?: boolean } | { ok: false; error: string } {
   if (input.outcome === 'verified') {
     if (!input.proofKind || input.proofKind === 'verbal') {
       return { ok: false, error: 'A verbal yes does not close the action. Attach the proof object from the shift.' };
     }
-    if (!input.proofKind || !PROOF_KINDS.includes(input.proofKind as ProofKind)) {
+    if (input.action.id === 'vendor-silence') {
+      if (!LAST_SEEN_RESET_PROOF_KINDS.includes(input.proofKind as LastSeenResetProofKind)) {
+        return {
+          ok: false,
+          error: 'Closing vendor silence requires proof that resets last-seen: receiving log, invoice, confirmation, or operator-approved exception.',
+        };
+      }
+      return { ok: true, state: 'verified', lastSeenReset: true };
+    }
+    if (!PROOF_KINDS.includes(input.proofKind as ProofKind)) {
       return { ok: false, error: 'Choose a source proof object (deposit slip, close, clock, ticket, invoice packet, or exception log).' };
     }
   }
