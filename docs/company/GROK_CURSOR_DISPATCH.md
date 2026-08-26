@@ -6,11 +6,13 @@ This bridge is separate from the public read-only Never86 MCP.
 
 `https://www.never86.ai/api/orchestrator/mcp`
 
-The endpoint fails closed when `NEVER86_ORCHESTRATOR_TOKEN` is missing and requires `Authorization: Bearer <private token>` on every request. Never put the token or Cursor API key in Git, a prompt, a handoff, or a public connector.
+The endpoint fails closed unless either the private OAuth connector or the legacy bearer token is configured. Grok Web uses OAuth 2.1 authorization-code flow with PKCE and a confidential client secret; direct maintenance checks may use `NEVER86_ORCHESTRATOR_TOKEN`. Never put an OAuth secret, access token, legacy token, or Cursor API key in Git, a prompt, a handoff, or a public connector.
 
 ## Required secret configuration
 
 - `NEVER86_ORCHESTRATOR_TOKEN` — private bearer token used only by Myke's Grok connector
+- `NEVER86_OAUTH_CLIENT_ID` — fixed private Grok client ID; defaults to `grok-never86-cursor`
+- `NEVER86_OAUTH_CLIENT_SECRET` — high-entropy secret used to authenticate Grok and sign short-lived OAuth artifacts
 - `CURSOR_API_KEY` — Cursor user/service-account API key with access to the Never86 repository
 - `CURSOR_AUTONOMOUS_DISPATCH_ENABLED` — leave unset/false until Myke reviews spend and repository access; set exactly `true` to enable launch
 - `CURSOR_ALLOWED_STARTING_REFS` — comma-separated branch allowlist; defaults to `codex/action-shift-122-safe`
@@ -29,7 +31,7 @@ Every launch is tied to a stable `task_id`. Repeating the same task produces the
 ## Rollout gate
 
 1. Deploy with launch disabled.
-2. Add the private endpoint to Grok with bearer authentication.
+2. Add the private endpoint to Grok using the private OAuth client, authorization endpoint `/api/orchestrator/oauth/authorize`, and token endpoint `/api/orchestrator/oauth/token`.
 3. Verify `initialize`, `tools/list`, `cursor_list_agents`, and `cursor_prepare_dispatch`.
 4. Set Cursor's account/team spend cap and confirm GitHub repository permissions.
 5. Enable autonomous dispatch with a maximum of one active agent for the first live test.

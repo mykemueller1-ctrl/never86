@@ -9,6 +9,7 @@ import {
   prepareCursorDispatch,
   safeSecretEqual,
 } from '../../../../lib/cursorDispatch';
+import { validOAuthAccessToken } from '../../../../lib/orchestratorOAuth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -108,10 +109,19 @@ function toolResult(id: JsonRpcRequest['id'], value: unknown, isError = false) {
 
 function authorize(req: NextRequest): { ok: true } | { ok: false; status: number; message: string } {
   const expected = process.env.NEVER86_ORCHESTRATOR_TOKEN?.trim();
-  if (!expected) return { ok: false, status: 503, message: 'Private orchestrator is not configured.' };
+  const oauthConfigured = Boolean(process.env.NEVER86_OAUTH_CLIENT_SECRET?.trim());
+  if (!expected && !oauthConfigured) return { ok: false, status: 503, message: 'Private orchestrator is not configured.' };
   const provided = bearerToken(req.headers.get('authorization'));
-  if (!provided || !safeSecretEqual(provided, expected)) return { ok: false, status: 401, message: 'Unauthorized.' };
+  const legacyAuthorized = Boolean(provided && expected && safeSecretEqual(provided, expected));
+  if (!legacyAuthorized && !validOAuthAccessToken(provided)) return { ok: false, status: 401, message: 'Unauthorized.' };
   return { ok: true };
+}
+
+function authFailure(auth: { status: number; message: string }) {
+  return NextResponse.json({ error: auth.message }, {
+    status: auth.status,
+    ...(auth.status === 401 ? { headers: { 'WWW-Authenticate': 'Bearer resource_metadata="https://www.never86.ai/.well-known/oauth-protected-resource"' } } : {}),
+  });
 }
 
 function dispatchPlan(raw: unknown) {
@@ -217,7 +227,7 @@ async function handle(request: JsonRpcRequest): Promise<Response> {
 
 export async function POST(req: NextRequest) {
   const auth = authorize(req);
-  if (!auth.ok) return NextResponse.json({ error: auth.message }, { status: auth.status });
+  if (!auth.ok) return authFailure(auth);
 
   let body: JsonRpcRequest | JsonRpcRequest[];
   try {
@@ -242,6 +252,6 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const auth = authorize(req);
-  if (!auth.ok) return NextResponse.json({ error: auth.message }, { status: auth.status });
+  if (!auth.ok) return authFailure(auth);
   return NextResponse.json({ protocol: 'mcp', transport: 'http+json-rpc-2.0', server: SERVER_INFO, tools: TOOLS.map(({ name, description }) => ({ name, description })) });
 }
