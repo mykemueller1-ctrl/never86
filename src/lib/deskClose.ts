@@ -9,6 +9,14 @@ import {
   type PdqZSummary,
 } from './pdqEodParse';
 import {
+  looksLikePurchaseOrder,
+  looksLikeTheoreticalUsage,
+} from './poReceiveParse';
+import {
+  buildPoReceiveUsageActionShift,
+  feedPoReceiveUsageIntoActionShift,
+} from './poReceiveUsageActionShift';
+import {
   buildVendorDriftActionShift,
   feedVendorDriftIntoActionShift,
 } from './vendorDriftActionShift';
@@ -25,7 +33,7 @@ export type DeskClose = {
   store: string;
   businessDate: string | null;
   channel: IntakeChannel;
-  families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice'>;
+  families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice' | 'purchase-order' | 'theoretical-usage'>;
   injectionSuspected: boolean;
   sales: DeskNumber;
   mix: {
@@ -174,6 +182,7 @@ export function buildVendorInvoiceDesk(input: {
   channel: IntakeChannel;
   vendorShift: ActionShiftResult;
   injectionSuspected?: boolean;
+  families?: DeskClose['families'];
 }): DeskClose {
   const missing = missingMoneyField('Vendor invoice desk — POS close not in this packet');
   return {
@@ -182,7 +191,7 @@ export function buildVendorInvoiceDesk(input: {
       ? null
       : input.vendorShift.businessDate,
     channel: input.channel,
-    families: ['vendor-invoice'],
+    families: input.families?.length ? input.families : ['vendor-invoice'],
     injectionSuspected: Boolean(input.injectionSuspected),
     sales: deskMoney('Net sales', missing),
     mix: {
@@ -202,6 +211,18 @@ export function buildVendorInvoiceDesk(input: {
   };
 }
 
+function intakeFamilies(input: {
+  poDocs: IntakeDocument[];
+  invoiceDocs: IntakeDocument[];
+  usageDocs: IntakeDocument[];
+}): DeskClose['families'] {
+  const families: DeskClose['families'] = [];
+  if (input.poDocs.length) families.push('purchase-order');
+  if (input.invoiceDocs.length) families.push('vendor-invoice');
+  if (input.usageDocs.length) families.push('theoretical-usage');
+  return families;
+}
+
 export function ingestCloseDocuments(
   docs: IntakeDocument[],
   store?: string,
@@ -213,6 +234,8 @@ export function ingestCloseDocuments(
   let hourly: PdqHourly | undefined;
   let voids: PdqVoidPromo | undefined;
   const invoiceDocs: IntakeDocument[] = [];
+  const poDocs: IntakeDocument[] = [];
+  const usageDocs: IntakeDocument[] = [];
   let injectionSuspected = false;
   let channel: IntakeChannel = docs[0].channel;
 
@@ -224,6 +247,8 @@ export function ingestCloseDocuments(
     if (parsed.family === 'z-summary') z = parsed;
     else if (parsed.family === 'hourly') hourly = parsed;
     else if (parsed.family === 'void-promo') voids = parsed;
+    else if (looksLikeTheoreticalUsage(doc.text, doc.filename || '')) usageDocs.push(doc);
+    else if (looksLikePurchaseOrder(doc.text, doc.filename || '')) poDocs.push(doc);
     else if (looksLikeVendorInvoice(doc.text, doc.filename || '')) invoiceDocs.push(doc);
     if (doc.channel === 'email') channel = 'email';
   }
@@ -236,18 +261,37 @@ export function ingestCloseDocuments(
     : null;
   const vendorShift = vendorBuilt?.ok ? vendorBuilt.result : null;
 
+  const poBuilt = (poDocs.length || invoiceDocs.length || usageDocs.length) && (poDocs.length || usageDocs.length)
+    ? buildPoReceiveUsageActionShift({
+      store,
+      purchaseOrders: poDocs.map((doc) => ({ text: doc.text, filename: doc.filename })),
+      invoices: invoiceDocs.map((doc) => ({ text: doc.text, filename: doc.filename })),
+      usage: usageDocs.map((doc) => ({ text: doc.text, filename: doc.filename })),
+    })
+    : null;
+  const poShift = poBuilt?.ok ? poBuilt.result : null;
+
   if (!z && !hourly && !voids) {
-    if (vendorShift) {
+    const merged = feedPoReceiveUsageIntoActionShift(vendorShift, poShift);
+    if (merged) {
       return {
         ok: true,
-        desk: buildVendorInvoiceDesk({ store, channel, vendorShift, injectionSuspected }),
+        desk: buildVendorInvoiceDesk({
+          store,
+          channel,
+          vendorShift: merged,
+          injectionSuspected,
+          families: intakeFamilies({ poDocs, invoiceDocs, usageDocs }),
+        }),
       };
     }
     return {
       ok: false,
-      error: vendorBuilt && !vendorBuilt.ok
-        ? vendorBuilt.error
-        : 'Could not read a PDQ Z, Hourly, Void/Promo, or vendor invoice from that text. Paste native text — no POS password.',
+      error: poBuilt && !poBuilt.ok
+        ? poBuilt.error
+        : vendorBuilt && !vendorBuilt.ok
+          ? vendorBuilt.error
+          : 'Could not read a PDQ Z, Hourly, Void/Promo, vendor invoice, purchase order, or theoretical-usage file from that text. Paste native text — no POS or vendor-portal password.',
       status: 422,
     };
   }
@@ -262,6 +306,18 @@ export function ingestCloseDocuments(
     ])];
     if (desk.actionShift) desk.actionShiftError = null;
   }
+  if (poShift) {
+    desk.families = [...new Set([
+      ...desk.families,
+      ...intakeFamilies({ poDocs, invoiceDocs, usageDocs }),
+    ])] as DeskClose['families'];
+    desk.actionShift = feedPoReceiveUsageIntoActionShift(desk.actionShift, poShift);
+    desk.missingEvidence = [...new Set([
+      ...desk.missingEvidence,
+      ...poShift.missingEvidence,
+    ])];
+    if (desk.actionShift) desk.actionShiftError = null;
+  }
   return { ok: true, desk };
 }
 
@@ -273,6 +329,7 @@ export const PROOF_KINDS = [
   'ticket-detail',
   'exception-log',
   'invoice-packet',
+  'po-packet',
   'photo',
   'other-source',
 ] as const;
