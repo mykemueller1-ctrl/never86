@@ -35,6 +35,8 @@ Pay invoices → restore project `never86` → paste `OPS_DATABASE_URL` → wire
 ## Cursor status packet
 - Branch: `cursor/never86-pr-130-merge-ready-0699`
 - Base: `codex/action-shift-122-safe` @ `9258b86`
+- Follow-on PR: https://github.com/mykemueller1-ctrl/never86/pull/131
 - Dirty predecessor: PR #130 @ `b075114` (DIRTY; superseded)
+- Tests: `npx vitest run` — 157/157 passed
 - Next after this PR is green: vendor-drift intake (SKU >5%) as a separate slice
 - Blocker cleared for code review: rebase is clean vs allowlisted base
