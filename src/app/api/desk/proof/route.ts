@@ -34,7 +34,9 @@ export async function POST(req: Request) {
   const saved = operator?.locationId
     ? await loadLatestClose(operator.operatorId, operator.locationId).catch(() => null)
     : null;
-  const action = saved?.desk.actionShift?.morningActions.find((a) => a.id === data.actionId);
+  const action = saved?.desk.actionShift?.morningActions.find(
+    (a) => a.id === data.actionId || a.instanceKey === data.actionId,
+  );
   if (!action) {
     return NextResponse.json({ success: false, error: 'That action is not on tonight\'s desk.' }, { status: 404 });
   }
