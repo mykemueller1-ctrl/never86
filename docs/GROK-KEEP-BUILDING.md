@@ -7,23 +7,23 @@ Myke: keep going. Supabase is **tomorrow morning**. Do not block the factory on 
 
 One active Cursor job at a time. Stop stuck sales-org dumps. Do not merge `cursor/grok-sales-org`.
 
-## Live stack (do not rebuild)
-1. **#131** green Monday gate — `cursor/never86-pr-130-merge-ready-0699`. Dirty **#130** is superseded. Leave it.
-2. **#132** vendor drift green — `cursor/never86-vendor-drift-action-shift-6c5c` stacked on #131.
-3. **#133** PO / receive / usage gap **181/181 green** — `cursor/never86-po-receive-usage-gap-b6b2` @ `c8e1e4e` stacked on #132.
-4. **This slice = vendor-silence #134** stacked on the #133 head. Do not merge any of these PRs.
+## Live stack (landed — do not rebuild)
+1. **#131** Monday gate — on `codex/action-shift-122-safe`. Dirty **#130** closed.
+2. **#132** vendor drift — landed on the same tip.
+3. **#133** PO / receive / usage gap — landed.
+4. **#134** vendor silence — landed @ `f92f89d`.
 
-Allowlisted ancestor: `codex/action-shift-122-safe`. Do **not** replay dirty #130.
+Allowlisted tip: `codex/action-shift-122-safe`. Do **not** replay dirty #130.
 
 ## Right now
-1. Vendor Silence intake on the free-seat Action Shift desk: typed `last_seen_date`, `as_of_date`, `expected_cadence_days`, optional `grace_days` / `paused_dates` / `pause_weekends` / `program_started_date`.
-2. First 14 calendar days after program start stay **advisory**. Duplicate vendor+store+day keeps the existing ticket. Closing requires proof that resets last-seen.
-3. Missing cadence or last-seen = **Missing Evidence**, not a ticket and not $0. Quiet vendor is a follow-up signal, not a missed truck or short inventory. Typed inputs stay Unverified.
-4. Free seat still runs on **Neon** (`DATABASE_URL`), not Supabase.
-5. Apply on Neon when ready (**ops, not this agent**):
-   - `drizzle/0002_free_seat_neon.sql`
-   - `drizzle/0003_free_seat_intake.sql`
-6. Use public MCP `https://www.never86.ai/api/mcp` for operator logic.
+1. **Apply Neon free-seat SQL** (live blocker — www returns 503 until this lands):
+   - `DATABASE_URL=... ./scripts/apply-free-seat-neon.sh`
+   - or paste `drizzle/0002_free_seat_neon.sql` + `drizzle/0003_free_seat_intake.sql` in Neon SQL Editor
+2. Probe: `node scripts/probe-free-seat-door.mjs https://www.never86.ai`
+3. Walk stranger door once: `/onboard` → activate → desk → PDQ close → ≤3 Action Shift → night proof.
+4. Free seat stays on **Neon**. Supabase OPS is morning work.
+5. Public MCP: `https://www.never86.ai/api/mcp`.
+6. Code stack #131–#134 is on `codex/action-shift-122-safe`; do not rebuild it.
 
 ## Do not
 - Wait on Supabase tonight
@@ -32,23 +32,22 @@ Allowlisted ancestor: `codex/action-shift-122-safe`. Do **not** replay dirty #13
 - Put CTap private numbers in public Git
 - Start a fourth Never86 repo
 - Merge grok-sales-org (#121)
-- Merge #131 / #132 / #133 / #134
-- Deploy production or apply Neon from the factory
+- Re-open dirty #130
+- Deploy production from a dirty head
 
 ## When Myke returns to Supabase (morning)
 Pay invoices → restore project `never86` → paste `OPS_DATABASE_URL` → wire Toast/CTAP evidence onto the free seat. Neon free seats stay; OPS is the evidence plane.
 
 ## Residuals (ops / later)
-- Neon 0002+0003 apply is ops
+- Neon 0002+0003 apply (tonight’s blocker)
 - Inbound DNS
 - Gmail poll later
 - OCR later
 
 ## Cursor status packet
-- Branch: `cursor/never86-vendor-silence-action-shift-69a5`
-- Stacked on: #133 @ `c8e1e4e` (`cursor/never86-po-receive-usage-gap-b6b2`)
-- Prior green: #131 Monday gate, #132 vendor drift, #133 PO gap 181/181
-- Dirty predecessor: PR #130 superseded
-- Follow-on PR: https://github.com/mykemueller1-ctrl/never86/pull/134
-- Tests: `npx vitest run` — **197/197 passed** (26 files) on this branch after stacking on #133's 181/181
-- Next: Codex reviews; no merge from desk.
+- Branch: `cursor/neon-free-seat-apply-9d74`
+- Tip ancestor: `codex/action-shift-122-safe` @ `f92f89d` (#131–#134 landed)
+- Dirty predecessor: PR #130 closed
+- Live probe: `POST /api/onboard/request` → **503** free-seat tables missing on Neon
+- Tests: `npx vitest run` — **204/204 passed** (27 files)
+- Next: paste `DATABASE_URL` → apply script → door probe → stranger walk.
