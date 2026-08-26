@@ -48,12 +48,13 @@ describe('issue #122 3P AEO', () => {
     }
   });
 
-  it('emits FAQ JSON-LD that repeats the visible operator question', () => {
+  it('emits FAQ JSON-LD that repeats the visible operator question and body', () => {
     for (const answer of EIGHT) {
       const faq = buildAnswerFaqJsonLd(answer);
       expect(faq['@type']).toBe('FAQPage');
       expect(faq.mainEntity[0]?.name).toBe(answer.question);
-      expect(faq.mainEntity[0]?.acceptedAnswer.text).toContain(answer.summary);
+      expect(faq.mainEntity[0]?.acceptedAnswer.text).toBe(answer.answer.replace(/\s+/g, ' ').trim());
+      expect(faq.mainEntity[0]?.acceptedAnswer.text.startsWith(answer.summary ?? '___')).toBe(false);
       expect(faq.mainEntity.some((item) => item.name.includes('working formula'))).toBe(Boolean(answer.formula));
     }
   });

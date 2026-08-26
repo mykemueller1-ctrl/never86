@@ -86,12 +86,12 @@ function visibleFaqItems(answer: {
   title: string;
   question?: string | null;
   answer: string;
-  summary?: string | null;
   formula?: string | null;
   evidenceBoundary?: string | null;
 }): FaqJsonLd['mainEntity'] {
   const name = (answer.question ?? answer.title).trim();
-  const body = [answer.summary, answer.answer].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+  // FAQ answers must match on-page copy. Summary is metadata-only.
+  const body = answer.answer.replace(/\s+/g, ' ').trim();
   const items: FaqJsonLd['mainEntity'] = [
     {
       '@type': 'Question',
