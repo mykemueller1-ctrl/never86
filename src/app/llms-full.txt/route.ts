@@ -14,6 +14,7 @@ export async function GET() {
 - Connect at https://www.never86.ai/api/mcp and call get_operator_system first.
 - The versioned system defines load-day onboarding, the capture-to-proof loop, Action Shift, vendor silence, morning/night/weekly routines, proof-backed store memory, specialist agents, truth gates, prompt-injection defenses, operator UI rules, and rollout gates.
 - Grok, ChatGPT, Claude, Gemini, and other compatible MCP clients should call the same backend. Prompts may differ; calculations, evidence states, memory rules, and human-approval gates do not.
+- Thin ChatGPT, Claude, Gemini, and Grok install shells: https://www.never86.ai/llm-shells — drafted in git, not marketplace listings, live provider install unverified.
 - Store-specific targets, vendor cadence, mappings, recipes, staff data, statements, invoices, and financial results remain private and are not in the public MCP pack.
 
 ## How to use this corpus
