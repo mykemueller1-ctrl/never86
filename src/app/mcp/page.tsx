@@ -85,6 +85,7 @@ export default function McpPage() {
           <p className="compass-card-label">One brain · many interfaces</p>
           <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Do not rebuild the logic inside each chatbot.</h2>
           <p className="compass-body mt-4 max-w-3xl">Grok, ChatGPT, Claude, Gemini, and any other client with compatible remote MCP support should call this same endpoint. Their wording can differ. The formulas, evidence states, store-memory contract, action limits, and human-approval gates stay the same.</p>
+          <p className="compass-body mt-4 max-w-3xl">Thin install shells and the honest status matrix live at <Link href="/llm-shells" className="font-semibold text-[#0066ff] hover:underline">/llm-shells</Link>. Those files are drafted in git. They are not GPT Store, Claude directory, Gemini gallery, or Grok featured-connector listings. Live install inside each provider UI stays unverified until a human adds the connector.</p>
         </div>
 
         <div className="compass-card mt-5 p-6 md:p-8">

@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "never86-operator-system": {
+      "url": "https://www.never86.ai/api/mcp"
+    }
+  }
+}
