@@ -99,7 +99,8 @@ describe('sitemap lastmod for sharpened AEO URLs', () => {
       const lastModified = byUrl.get(`${WWW}${path}`)?.lastModified;
       expect(new Date(lastModified as Date).getTime()).toBe(AEO_PAGE_LASTMOD.getTime());
     }
-    expect(byUrl.get(`${WWW}/llm-shells`)).toBeTruthy();
+    // /llm-shells lives on the factory branch (#141). Do not sitemap a 404 on main.
+    expect(byUrl.has(`${WWW}/llm-shells`)).toBe(false);
   });
 });
 
