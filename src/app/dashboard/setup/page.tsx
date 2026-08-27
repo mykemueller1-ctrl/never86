@@ -18,6 +18,7 @@ export default async function OperatorActionShiftSetupPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
           <Link href="/dashboard" className="hover:text-white">← Dashboard</Link>
+          <Link href="/dashboard/manager" className="hover:text-white">Manager board</Link>
           <Link href="/action-shift" className="hover:text-white">Action Shift desk</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">Manager setup · operator {session.operatorId}</p>

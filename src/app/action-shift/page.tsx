@@ -15,6 +15,8 @@ type Seat = {
 // Free plan = one operator seat. Extra seats / role controls are paid later (#118).
 const SEATS: Seat[] = [
   { n: 1, role: 'Owner-operator', status: 'free', name: 'You · this store' },
+  { n: 2, role: 'Manager / GM', status: 'invite', name: 'One manager login · no staff-wide PINs' },
+  { n: 3, role: 'Kitchen / FOH / driver stations', status: 'invite', name: 'Templates owned by the manager seat' },
 ];
 
 export default function ActionShiftDeskPage() {
@@ -104,6 +106,9 @@ export default function ActionShiftDeskPage() {
           <a href="#seats" className="underline-offset-4 hover:underline">
             Free seat
           </a>
+          <Link href="/action-shift/manager" className="underline-offset-4 hover:underline">
+            Manager seat
+          </Link>
           <Link href="/tools/3p-fee-finder" className="underline-offset-4 hover:underline">
             DoorDash path
           </Link>
@@ -124,13 +129,18 @@ export default function ActionShiftDeskPage() {
                   <span className="text-[#f3f5f0]">
                     {s.n}. {s.role}
                   </span>
-                  <span className="ml-2 text-xs text-[#7a8a80]">Free forever</span>
+                  <span className="ml-2 text-xs text-[#7a8a80]">{s.status === 'free' ? 'Free forever' : 'Paid expansion'}</span>
                 </div>
                 <span className="text-sm text-[#a8b5ac]">{s.name}</span>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-[#7a8a80]">Manager / station seats are paid expansion — not on this free path.</p>
+          <p className="mt-3 text-xs text-[#7a8a80]">
+            Manager operating UI is visible as a synthetic proof.{' '}
+            <Link href="/action-shift/manager" className="text-[#c4a35a] underline-offset-4 hover:underline">
+              Open manager seat →
+            </Link>
+          </p>
         </section>
 
         <section id="drop" className="mt-12 border-t border-white/10 pt-8">
