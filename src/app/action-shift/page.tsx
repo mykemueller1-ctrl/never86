@@ -109,6 +109,9 @@ export default function ActionShiftDeskPage() {
           <Link href="/action-shift/manager" className="underline-offset-4 hover:underline">
             Manager seat
           </Link>
+          <Link href="/action-shift/setup" className="underline-offset-4 hover:underline">
+            Payroll join
+          </Link>
           <Link href="/tools/3p-fee-finder" className="underline-offset-4 hover:underline">
             DoorDash path
           </Link>

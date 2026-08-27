@@ -1,5 +1,7 @@
 import { checklistItemsForCtapLabShift } from './ctapLabPack';
 import { findColumn, parseCsv } from './csv/core';
+import { normalizePayrollRosterCsv } from './actionShiftPayrollRoster';
+import { buildWeeklyDepartmentPlan, isWeeklyDepartmentSheet } from './actionShiftWeeklySheet';
 
 export const ACTION_SHIFT_ROLE_PACKS = {
   owner: [
@@ -28,13 +30,13 @@ export const ACTION_SHIFT_ROLE_PACKS = {
     'Close: cooling, labels, equipment, waste, and sanitation proof',
   ],
   prep_cook: [
-    'Start: review prep list, pars, labels, and thaw plan',
-    'Shift: record completed batches, waste, and shortages',
-    'Finish: label, rotate, clean station, and hand off unfinished prep',
+    'Start: review prep list, pars, labels, thaw plan, and sanitize the prep table before product hits it',
+    'Shift: record completed batches, waste, and shortages; re-sanitize after raw protein or a spill',
+    'Finish: label, rotate, sanitize table and tools, log the cleaning checklist, and hand off unfinished prep',
   ],
   line_cook: [
     'Open: station setup, temperatures, tools, and pars',
-    'Shift: record 86 items, waste, and food-safety exceptions',
+    'Shift: record 86s, waste, and food-safety exceptions; remakes are re-rung and promoed — voids only if food never started',
     'Close: cool, label, clean, restock, and sign station handoff',
   ],
   cook: [
@@ -43,24 +45,24 @@ export const ACTION_SHIFT_ROLE_PACKS = {
     'Close: cool, label, clean, restock, and sign the kitchen handoff',
   ],
   dishwasher: [
-    'Start: machine temperatures, chemicals, sinks, and clean storage',
-    'Shift: maintain clean flow, trash, floors, and chemical levels',
-    'Close: machine, drains, floors, trash, and final sanitation check',
+    'Start: fill and heat the machine; verify wash 150-160F, rinse 180F minimum, detergent, sanitizer, and clear drain screens',
+    'Shift: scrape before load, do not overload, check rinse arms, replace dirty water',
+    'Close: drain, clean arms/screens/trays/curtains, sanitize interior, wipe exterior, leave door open, and log completion',
   ],
   bartender: [
-    'Open: drawer, wells, fruit, beer, wine, and bar cleanliness',
-    'Shift: comps, spills, tabs, stock exceptions, and guest recovery',
-    'Close: drawer handoff, bottles, coolers, taps, waste, and sanitation',
+    'Open: drawer, wells, fruit, beer, wine; discard leftover ice; store the scoop outside the bin',
+    'Shift: comps, spills, tabs, stock exceptions, and guest recovery; pours follow the posted house standard; voids need manager approval',
+    'Close: drawer handoff, bottles, coolers, taps, waste, ice-bin wipe, and sanitation',
   ],
   server: [
-    'Open: section, tables, side work, specials, and 86 list',
-    'Shift: guest recovery, payment exceptions, and section handoff',
-    'Close: side work, checkout, cash owed, and manager sign-off',
+    'Open: section, tables, dining-room checklist, specials, and 86 list',
+    'Shift: guest recovery, payment exceptions, and section handoff; remakes are re-rung and promoed — voids only with manager approval',
+    'Close: dining-room checklist, side work, checkout, cash owed, and manager sign-off',
   ],
   host: [
-    'Open: reservations, waitlist, menus, phones, and entry area',
+    'Open: reservations, waitlist, menus, phones, entry area, and dining-room open checklist',
     'Shift: quote accuracy, seating notes, and guest recovery handoff',
-    'Close: reservations handoff, menus, entry area, and lost-and-found',
+    'Close: reservations handoff, menus, entry area, lost-and-found, and dining-room close checklist',
   ],
   driver: [
     'Start: vehicle, hot bags, route tools, and assigned orders',
@@ -100,7 +102,11 @@ export type ActionShiftSetupIssue = {
     | 'inactive_worker'
     | 'worker_not_found'
     | 'invalid_business_date'
-    | 'invalid_time_window';
+    | 'invalid_time_window'
+    | 'missing_immutable_id'
+    | 'unresolved_open_close'
+    | 'unresolved_first_cut'
+    | 'unsupported_station';
 };
 
 export type ActionShiftSetupPlan = {
@@ -131,6 +137,10 @@ type BuildSetupInput = {
   providerKey: string;
   generatedAt?: string;
   templatePack?: 'generic' | 'ctap-lab';
+  storeOpen?: string;
+  storeClose?: string;
+  storeFirstCut?: string;
+  timezoneOffset?: string;
 };
 
 type ColumnSpec = { key: string; aliases: string[] };
@@ -150,12 +160,12 @@ const SCHEDULE_COLUMNS: ColumnSpec[] = [
   { key: 'endsAt', aliases: ['ends_at', 'end_time', 'end'] },
 ];
 
-function normalize(value: string | undefined): string {
-  return (value ?? '').trim();
+export function normalizeKey(value: string | undefined): string {
+  return (value ?? '').trim().toLowerCase().replace(/[\s-]+/g, '_');
 }
 
-function normalizeKey(value: string | undefined): string {
-  return normalize(value).toLowerCase().replace(/[\s-]+/g, '_');
+function normalize(value: string | undefined): string {
+  return (value ?? '').trim();
 }
 
 const ROLE_ALIASES: Record<string, ActionShiftRoleKey> = {
@@ -185,6 +195,17 @@ const ROLE_ALIASES: Record<string, ActionShiftRoleKey> = {
   host: 'host',
   foh: 'server',
   front_of_house: 'server',
+  waitress: 'server',
+  waitstaff: 'server',
+  pizza_side: 'server',
+  bar_side: 'bartender',
+  bar: 'bartender',
+  fry: 'line_cook',
+  fry_line: 'line_cook',
+  dish: 'dishwasher',
+  dish_pit: 'dishwasher',
+  expo: 'cook',
+  delivery: 'driver',
   driver: 'driver',
   dishwasher: 'dishwasher',
   crew: 'staff',
@@ -208,7 +229,7 @@ function isRoleKey(value: string): value is ActionShiftRoleKey {
   return Object.prototype.hasOwnProperty.call(ACTION_SHIFT_ROLE_PACKS, value);
 }
 
-function canonicalRoleKey(value: string | undefined): ActionShiftRoleKey | null {
+export function canonicalRoleKey(value: string | undefined): ActionShiftRoleKey | null {
   const normalized = normalizeKey(value);
   const aliased = ROLE_ALIASES[normalized] ?? normalized;
   return isRoleKey(aliased) ? aliased : null;
@@ -233,34 +254,27 @@ export function buildActionShiftSetupPlan(
   const providerKey = normalizeKey(input.providerKey);
   if (!providerKey) return { ok: false, error: 'Enter the schedule or time-clock provider key.' };
 
-  const rosterStructureError = csvStructureError(input.rosterCsv);
+  const payroll = normalizePayrollRosterCsv(input.rosterCsv);
+  const rosterCsv = payroll.ok ? payroll.csv : input.rosterCsv;
+
+  const rosterStructureError = csvStructureError(rosterCsv);
   if (rosterStructureError) return { ok: false, error: `Roster CSV ${rosterStructureError}.` };
   const scheduleStructureError = csvStructureError(input.scheduleCsv);
   if (scheduleStructureError) return { ok: false, error: `Schedule CSV ${scheduleStructureError}.` };
 
-  const roster = parseCsv(input.rosterCsv);
+  const roster = parseCsv(rosterCsv);
   const schedule = parseCsv(input.scheduleCsv);
   if (roster.rows.length === 0) return { ok: false, error: 'Roster CSV has no data rows.' };
   if (schedule.rows.length === 0) return { ok: false, error: 'Schedule CSV has no data rows.' };
   if (roster.rows.some((row) => row.length !== roster.headers.length)) {
     return { ok: false, error: 'Roster CSV has a row with the wrong number of columns.' };
   }
-  if (schedule.rows.some((row) => row.length !== schedule.headers.length)) {
-    return { ok: false, error: 'Schedule CSV has a row with the wrong number of columns.' };
-  }
 
   const rosterColumns = columnMap(roster.headers, ROSTER_COLUMNS);
   if (!rosterColumns) {
     return {
       ok: false,
-      error: 'Roster needs external_worker_id, display_name, role_key, and status columns.',
-    };
-  }
-  const scheduleColumns = columnMap(schedule.headers, SCHEDULE_COLUMNS);
-  if (!scheduleColumns) {
-    return {
-      ok: false,
-      error: 'Schedule needs external_shift_id, external_worker_id, business_date, starts_at, and ends_at columns.',
+      error: 'Roster needs external_worker_id, display_name, role_key, and status columns. Weekly department sheets still need that ID roster — names are not an identity key.',
     };
   }
 
@@ -303,6 +317,44 @@ export function buildActionShiftSetupPlan(
     seats.push(seat);
     seatByExternalId.set(workerKey, seat);
   });
+
+  if (isWeeklyDepartmentSheet(schedule.headers)) {
+    const weekly = buildWeeklyDepartmentPlan({
+      rosterSeats: seats,
+      scheduleCsv: input.scheduleCsv,
+      providerKey,
+      generatedAt: input.generatedAt ?? new Date().toISOString(),
+      issues,
+      rolePacks: ACTION_SHIFT_ROLE_PACKS,
+      stationRole: canonicalRoleKey,
+      storeOpen: input.storeOpen,
+      storeClose: input.storeClose,
+      storeFirstCut: input.storeFirstCut,
+      timezoneOffset: input.timezoneOffset,
+    });
+    if (input.templatePack === 'ctap-lab') {
+      weekly.plan.shifts = weekly.plan.shifts.map((shift) => ({
+        ...shift,
+        checklistItems: checklistItemsForCtapLabShift({
+          roleKey: shift.roleKey,
+          businessDate: shift.businessDate,
+          startsAt: shift.startsAt,
+        }),
+      }));
+    }
+    return weekly;
+  }
+  if (schedule.rows.some((row) => row.length !== schedule.headers.length)) {
+    return { ok: false, error: 'Schedule CSV has a row with the wrong number of columns.' };
+  }
+
+  const scheduleColumns = columnMap(schedule.headers, SCHEDULE_COLUMNS);
+  if (!scheduleColumns) {
+    return {
+      ok: false,
+      error: 'Schedule needs external_shift_id, external_worker_id, business_date, starts_at, and ends_at columns.',
+    };
+  }
 
   const shifts: ActionShiftSetupPlan['shifts'] = [];
   const seenShiftIds = new Set<string>();

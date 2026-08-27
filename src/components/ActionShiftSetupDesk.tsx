@@ -7,6 +7,8 @@ import {
   ACTION_SHIFT_SCHEDULE_TEMPLATE,
   buildActionShiftSetupPlan,
 } from '@/lib/actionShiftSetup';
+import { ACTION_SHIFT_PAYROLL_TEMPLATE, normalizePayrollRosterCsv } from '@/lib/actionShiftPayrollRoster';
+import { ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE, ACTION_SHIFT_WEEKLY_TEMPLATE } from '@/lib/actionShiftWeeklySheet';
 
 function download(name: string, content: string, type: string) {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -42,12 +44,36 @@ export default function ActionShiftSetupDesk() {
   const [providerKey, setProviderKey] = useState('time-clock');
   const [rosterCsv, setRosterCsv] = useState(ACTION_SHIFT_ROSTER_TEMPLATE);
   const [scheduleCsv, setScheduleCsv] = useState(ACTION_SHIFT_SCHEDULE_TEMPLATE);
+  const [storeOpen, setStoreOpen] = useState('11:00 AM');
+  const [storeClose, setStoreClose] = useState('11:00 PM');
+  const [storeFirstCut, setStoreFirstCut] = useState('2:00 PM');
+  const [timezoneOffset, setTimezoneOffset] = useState('-05:00');
   const [fileError, setFileError] = useState<string | null>(null);
+  const [payrollNote, setPayrollNote] = useState<string | null>(null);
   const result = useMemo(() => buildActionShiftSetupPlan({
     rosterCsv,
     scheduleCsv,
     providerKey,
-  }), [providerKey, rosterCsv, scheduleCsv]);
+    storeOpen,
+    storeClose,
+    storeFirstCut,
+    timezoneOffset,
+  }), [providerKey, rosterCsv, scheduleCsv, storeClose, storeFirstCut, storeOpen, timezoneOffset]);
+
+  function ingestRoster(value: string) {
+    const normalized = normalizePayrollRosterCsv(value);
+    if (normalized.ok && normalized.source === 'payroll') {
+      setRosterCsv(normalized.csv);
+      setPayrollNote(
+        normalized.droppedHeaders.length
+          ? `Payroll census mapped to worker IDs in this browser. Dropped ${normalized.droppedHeaders.join(', ')}.`
+          : 'Payroll census mapped to worker IDs in this browser. Names stay display-only.',
+      );
+      return;
+    }
+    setPayrollNote(null);
+    setRosterCsv(value);
+  }
 
   return (
     <div className="space-y-8">
@@ -55,6 +81,7 @@ export default function ActionShiftSetupDesk() {
         <p className="text-sm font-semibold text-amber-200">Safe staging mode</p>
         <p className="mt-1 text-sm leading-relaxed text-white/65">
           Files are parsed in this browser only. Nothing is uploaded or written to the database.
+          A payroll census is reduced to worker ID, display name, role, and status before the packet is built.
           Export the deployment packet after every red row is resolved; database activation remains a separate gate.
         </p>
       </section>
@@ -65,17 +92,49 @@ export default function ActionShiftSetupDesk() {
             Time-clock / schedule provider key
             <input value={providerKey} onChange={(event) => setProviderKey(event.target.value)} className={inputClass} />
           </label>
+          <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Store open
+              <input value={storeOpen} onChange={(event) => setStoreOpen(event.target.value)} className={inputClass} />
+            </label>
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              First cut
+              <input value={storeFirstCut} onChange={(event) => setStoreFirstCut(event.target.value)} className={inputClass} />
+            </label>
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Store close
+              <input value={storeClose} onChange={(event) => setStoreClose(event.target.value)} className={inputClass} />
+            </label>
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Offset
+              <input value={timezoneOffset} onChange={(event) => setTimezoneOffset(event.target.value)} className={inputClass} />
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-white/40">
+            Weekly tokens: Open = store open, OPEN = first person cut, Close = store close, RO = skipped.
+            They are staging labels, not a live store rule.
+          </p>
           <div className="mt-5 flex items-center justify-between gap-3">
             <h2 className="font-semibold text-white">1. Active-worker roster</h2>
             <label className="cursor-pointer rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white hover:border-white/35">
               Load CSV
-              <input type="file" accept=".csv,text/csv" className="hidden" onChange={(event) => void readFile(event, setRosterCsv, setFileError)} />
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={(event) => void readFile(event, ingestRoster, setFileError)} />
             </label>
           </div>
-          <textarea value={rosterCsv} onChange={(event) => setRosterCsv(event.target.value)} rows={10} className={`${inputClass} font-mono text-xs`} spellCheck={false} />
+          <textarea value={rosterCsv} onChange={(event) => ingestRoster(event.target.value)} rows={10} className={`${inputClass} font-mono text-xs`} spellCheck={false} />
+          {payrollNote ? <p className="mt-2 text-xs text-amber-100/80">{payrollNote}</p> : null}
+          <button type="button" onClick={() => ingestRoster(ACTION_SHIFT_PAYROLL_TEMPLATE)} className="mt-3 mr-4 rounded-lg border border-amber-300/40 px-3 py-1.5 text-xs text-amber-100">
+            Stage payroll example
+          </button>
           <button type="button" onClick={() => download('action-shift-roster-template.csv', ACTION_SHIFT_ROSTER_TEMPLATE, 'text/csv')} className="mt-3 text-xs text-amber-200 underline underline-offset-4">
             Download blank-format example
           </button>
+          <button type="button" onClick={() => download('action-shift-payroll-example.csv', ACTION_SHIFT_PAYROLL_TEMPLATE, 'text/csv')} className="mt-3 ml-4 text-xs text-amber-200 underline underline-offset-4">
+            Download payroll census example
+          </button>
+          <p className="mt-2 text-xs text-white/40">
+            Drop the accountant payroll export here. File / employee ID becomes the stored key. SSN, wages, and bank columns are dropped in the browser.
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -87,9 +146,19 @@ export default function ActionShiftSetupDesk() {
             </label>
           </div>
           <textarea value={scheduleCsv} onChange={(event) => setScheduleCsv(event.target.value)} rows={10} className={`${inputClass} font-mono text-xs`} spellCheck={false} />
+          <button type="button" onClick={() => setScheduleCsv(ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE)} className="mt-3 mr-4 rounded-lg border border-amber-300/40 px-3 py-1.5 text-xs text-amber-100">
+            Stage weekly example
+          </button>
           <button type="button" onClick={() => download('action-shift-schedule-template.csv', ACTION_SHIFT_SCHEDULE_TEMPLATE, 'text/csv')} className="mt-3 text-xs text-amber-200 underline underline-offset-4">
             Download blank-format example
           </button>
+          <button type="button" onClick={() => download('action-shift-weekly-sheet-example.csv', ACTION_SHIFT_WEEKLY_TEMPLATE, 'text/csv')} className="mt-3 ml-4 text-xs text-amber-200 underline underline-offset-4">
+            Download weekly sheet example
+          </button>
+          <p className="mt-2 text-xs text-white/40">
+            Bar / kitchen / driver weekly sheets paste here. Join is worker ID from payroll/roster, then station.
+            Weekly employee must match the roster display name (First Last or Last, First). First-name-only rows stay blocked.
+          </p>
         </div>
       </section>
 
