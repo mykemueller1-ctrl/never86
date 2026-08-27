@@ -304,8 +304,19 @@ function cloneSteps(
   });
 }
 
+const MINUTE_MS = 60_000;
+
+function isOverdueUnverified(step: ManagerChecklistStep, dueAt: string, now: string): boolean {
+  const dueMs = Date.parse(dueAt);
+  const nowMs = Date.parse(now);
+  if (!Number.isFinite(dueMs) || !Number.isFinite(nowMs)) return false;
+  return step.isRequired
+    && step.status !== 'verified'
+    && dueMs + step.escalationMinutes * MINUTE_MS <= nowMs;
+}
+
 function runStatusFromSteps(steps: ManagerChecklistStep[], dueAt: string, now: string): ManagerRunStatus {
-  if (steps.some((step) => step.status === 'escalated' || (step.isRequired && step.status !== 'verified' && dueAt <= now))) {
+  if (steps.some((step) => step.status === 'escalated' || isOverdueUnverified(step, dueAt, now))) {
     return 'escalated';
   }
   if (steps.some((step) => step.status === 'not_done' || step.status === 'data_missing' || step.status === 'fix_failed')) {
@@ -324,7 +335,7 @@ function runStatusFromSteps(steps: ManagerChecklistStep[], dueAt: string, now: s
 
 function buildExceptions(runs: ManagerChecklistRun[], now: string): ManagerException[] {
   return runs.flatMap((run) => run.steps.flatMap((step) => {
-    const overdue = step.isRequired && step.status !== 'verified' && run.dueAt <= now;
+    const overdue = isOverdueUnverified(step, run.dueAt, now);
     const reason: ManagerException['reason'] | null = step.status === 'not_done'
       ? 'not_done'
       : step.status === 'data_missing'
@@ -349,6 +360,13 @@ function buildExceptions(runs: ManagerChecklistRun[], now: string): ManagerExcep
   }));
 }
 
+function countEscalationIncidents(runs: ManagerChecklistRun[], exceptions: ManagerException[]): number {
+  const overdue = exceptions.filter((item) => item.reason === 'overdue_unverified');
+  const overdueRunIds = new Set(overdue.map((item) => item.runId));
+  const extraEscalatedRuns = runs.filter((run) => run.status === 'escalated' && !overdueRunIds.has(run.id)).length;
+  return overdue.length + extraEscalatedRuns;
+}
+
 function summarize(runs: ManagerChecklistRun[], exceptions: ManagerException[]): ManagerBoard['summary'] {
   return {
     assigned: runs.filter((run) => run.status === 'assigned').length,
@@ -356,7 +374,7 @@ function summarize(runs: ManagerChecklistRun[], exceptions: ManagerException[]):
     awaitingProof: runs.flatMap((run) => run.steps).filter((step) => step.status === 'done_awaiting_proof').length,
     verified: runs.filter((run) => run.status === 'verified').length,
     exceptions: exceptions.filter((item) => item.reason !== 'overdue_unverified').length,
-    escalations: exceptions.filter((item) => item.reason === 'overdue_unverified').length + runs.filter((run) => run.status === 'escalated').length,
+    escalations: countEscalationIncidents(runs, exceptions),
   };
 }
 

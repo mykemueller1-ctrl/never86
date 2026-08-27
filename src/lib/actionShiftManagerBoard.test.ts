@@ -59,8 +59,29 @@ describe('Action Shift manager operating board', () => {
     expect(board.exceptions.some((item) => item.reason === 'overdue_unverified' && item.stationKey === 'driver')).toBe(true);
     expect(board.summary.awaitingProof).toBe(1);
     expect(board.summary.exceptions).toBeGreaterThan(0);
-    expect(board.summary.escalations).toBeGreaterThan(0);
+    expect(board.summary.escalations).toBe(1);
     expect(board.evidenceContracts.map((item) => item.family)).toEqual(['pdq', 'vendor', 'prime-cost']);
+  });
+
+  it('does not escalate a driver step during the 20-minute grace after dueAt', () => {
+    const driver = buildManagerRoleTemplates().find((template) => template.id === 'tmpl-driver-driver-open');
+    expect(driver?.steps[0]?.escalationMinutes).toBe(20);
+
+    const duringGrace = buildSyntheticManagerBoard('2026-08-26T15:19:00.000-05:00');
+    const graceRun = duringGrace.runs.find((run) => run.id === 'run-driver');
+    expect(graceRun?.dueAt).toBe('2026-08-26T15:00:00.000-05:00');
+    expect(graceRun?.status).toBe('assigned');
+    expect(duringGrace.exceptions.some((item) => item.reason === 'overdue_unverified' && item.stationKey === 'driver')).toBe(false);
+    expect(duringGrace.summary.escalations).toBe(0);
+  });
+
+  it('counts one overdue driver incident as one escalation, not two', () => {
+    const board = buildSyntheticManagerBoard(now);
+    const driver = board.runs.find((run) => run.id === 'run-driver');
+    const overdue = board.exceptions.filter((item) => item.reason === 'overdue_unverified' && item.stationKey === 'driver');
+    expect(driver?.status).toBe('escalated');
+    expect(overdue).toHaveLength(1);
+    expect(board.summary.escalations).toBe(1);
   });
 
   it('never invents live employee identities, PINs, or private dollars', () => {
