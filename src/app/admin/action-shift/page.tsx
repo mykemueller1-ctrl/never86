@@ -12,6 +12,7 @@ export default function ActionShiftSetupPage() {
           <Link href="/admin/operator-logins" className="hover:text-white">Operator logins</Link>
           <Link href="/action-shift" className="hover:text-white">Action Shift desk</Link>
           <Link href="/action-shift/manager" className="hover:text-white">Manager seat</Link>
+          <Link href="/action-shift/lab" className="hover:text-white">CTap lab templates</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">Community launch desk</p>
         <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-tight md:text-6xl">Roster, schedule, roles, and checklists—with every mismatch visible.</h1>

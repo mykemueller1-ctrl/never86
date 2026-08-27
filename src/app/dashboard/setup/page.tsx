@@ -20,6 +20,7 @@ export default async function OperatorActionShiftSetupPage() {
           <Link href="/dashboard" className="hover:text-white">← Dashboard</Link>
           <Link href="/dashboard/manager" className="hover:text-white">Manager board</Link>
           <Link href="/action-shift" className="hover:text-white">Action Shift desk</Link>
+          <Link href="/action-shift/lab" className="hover:text-white">CTap lab templates</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">Manager setup · operator {session.operatorId}</p>
         <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-tight md:text-6xl">Build the workforce packet without guessing who worked.</h1>

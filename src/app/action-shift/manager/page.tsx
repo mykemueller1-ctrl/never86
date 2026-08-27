@@ -14,6 +14,7 @@ export default function ActionShiftManagerPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
           <Link href="/action-shift" className="hover:text-white">← Action Shift desk</Link>
+          <Link href="/action-shift/lab" className="hover:text-white">CTap lab templates</Link>
           <Link href="/dashboard/setup" className="hover:text-white">Workforce setup</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">CTAP · Action Shift · manager seat</p>

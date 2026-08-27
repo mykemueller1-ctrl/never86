@@ -3,6 +3,7 @@ import {
   ACTION_SHIFT_ROLE_PACKS,
   buildActionShiftSetupPlan,
 } from './actionShiftSetup';
+import { findCtapLabPackPrivacyHits } from './ctapLabPack';
 
 const roster = [
   'external_worker_id,display_name,role_key,status',
@@ -136,5 +137,41 @@ describe('Action Shift setup plan', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.plan.seats[0].roleKey).toBe('kitchen_manager');
+  });
+
+  it('maps FOH Manager labels onto the existing manager role', () => {
+    const result = buildActionShiftSetupPlan({
+      rosterCsv: 'external_worker_id,display_name,role_key,status\n1,Example,FOH Manager,active',
+      scheduleCsv: 'external_shift_id,external_worker_id,business_date,starts_at,ends_at\n1,1,2026-08-24,2026-08-24T08:00:00Z,2026-08-24T09:00:00Z',
+      providerKey: 'provider',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.plan.seats[0].roleKey).toBe('manager');
+  });
+
+  it('attaches CTap lab templates to shifts without using live payroll names', () => {
+    const result = buildActionShiftSetupPlan({
+      rosterCsv: [
+        'external_worker_id,display_name,role_key,status',
+        'bar-1,Bar Station,bartender,active',
+        'drv-1,Driver Station,driver,active',
+      ].join('\n'),
+      scheduleCsv: [
+        'external_shift_id,external_worker_id,business_date,starts_at,ends_at',
+        'shift-bar,bar-1,2026-08-24,2026-08-24T08:00:00-05:00,2026-08-24T16:00:00-05:00',
+        'shift-drv,drv-1,2026-08-24,2026-08-24T16:00:00-05:00,2026-08-24T22:00:00-05:00',
+      ].join('\n'),
+      providerKey: 'provider',
+      templatePack: 'ctap-lab',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const bar = result.plan.shifts.find((shift) => shift.externalShiftId === 'shift-bar');
+    const driver = result.plan.shifts.find((shift) => shift.externalShiftId === 'shift-drv');
+    expect(bar?.checklistItems).toContain('Stock walk in');
+    expect(bar?.checklistItems.join('\n')).not.toMatch(/Beer comes today/);
+    expect(driver?.checklistItems.some((item) => /between runs/i.test(item))).toBe(true);
+    expect(findCtapLabPackPrivacyHits(result.plan)).toEqual([]);
   });
 });
