@@ -174,4 +174,23 @@ describe('Action Shift setup plan', () => {
     expect(driver?.checklistItems.some((item) => /between runs/i.test(item))).toBe(true);
     expect(findCtapLabPackPrivacyHits(result.plan)).toEqual([]);
   });
+
+  it('keeps a space-separated morning kitchen shift on open duties, not close', () => {
+    const result = buildActionShiftSetupPlan({
+      rosterCsv: 'external_worker_id,display_name,role_key,status\nkit-1,Kitchen Station,kitchen_manager,active',
+      scheduleCsv: [
+        'external_shift_id,external_worker_id,business_date,starts_at,ends_at',
+        'shift-kit,kit-1,2026-08-24,2026-08-24 08:00:00,2026-08-24 16:00:00',
+      ].join('\n'),
+      providerKey: 'provider',
+      templatePack: 'ctap-lab',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const kitchen = result.plan.shifts[0];
+    expect(kitchen?.checklistItems).toContain('Temperatures, prep plan, pars, and vendor exceptions');
+    expect(kitchen?.checklistItems).toContain('Deep freezer and dry storage');
+    expect(kitchen?.checklistItems).not.toContain('Turn pizza ovens off');
+    expect(kitchen?.checklistItems.join('\n')).not.toMatch(/steak fridge/);
+  });
 });

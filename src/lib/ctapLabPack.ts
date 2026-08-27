@@ -122,8 +122,18 @@ export function weekdayFromBusinessDate(businessDate: string): CtapLabWeekday | 
 }
 
 export function inferCtapLabShiftPhase(startsAt: string): Exclude<CtapLabShiftPhase, 'weekly'> {
-  const match = startsAt.match(/T(\d{2}):/);
-  const hour = match ? Number(match[1]) : Number.NaN;
+  const stampHour = startsAt.match(/(?:[Tt]| )(\d{1,2}):/);
+  if (stampHour) {
+    const hour = Number(stampHour[1]);
+    if (Number.isFinite(hour) && hour >= 0 && hour <= 23) {
+      return hour >= 15 ? 'close' : 'open';
+    }
+  }
+  const parsed = new Date(startsAt);
+  if (Number.isNaN(parsed.valueOf())) return 'open';
+  // Date-only values parse as UTC midnight. Do not dump close/security duties on them.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(startsAt.trim())) return 'open';
+  const hour = Number.isNaN(parsed.getUTCHours()) ? Number.NaN : parsed.getUTCHours();
   if (!Number.isFinite(hour) || hour >= 15) return 'close';
   return 'open';
 }
@@ -134,6 +144,22 @@ function roleMatches(templateRole: ActionShiftRoleKey, roleKey: ActionShiftRoleK
   return false;
 }
 
+function templateMatchesShiftPhase(
+  template: CtapLabTemplate,
+  shiftPhase: CtapLabShiftPhase,
+  weekday?: CtapLabWeekday | null,
+): boolean {
+  if (template.shiftPhase === shiftPhase) return true;
+  // Weekday-specific weekly work (e.g. Monday deep clean) may ride with that day's shift.
+  // Standing weekly templates (weekday null) stay off daily open/close/mid exports.
+  return (
+    template.shiftPhase === 'weekly'
+    && shiftPhase !== 'weekly'
+    && Boolean(template.weekday)
+    && template.weekday === weekday
+  );
+}
+
 export function selectCtapLabTemplates(input: {
   roleKey: ActionShiftRoleKey;
   weekday?: CtapLabWeekday | null;
@@ -142,7 +168,7 @@ export function selectCtapLabTemplates(input: {
   return CTAP_LAB_TEMPLATES.filter((template) => {
     if (!roleMatches(template.roleKey, input.roleKey)) return false;
     if (input.weekday && template.weekday && template.weekday !== input.weekday) return false;
-    if (input.shiftPhase && template.shiftPhase !== input.shiftPhase && template.shiftPhase !== 'weekly') {
+    if (input.shiftPhase && !templateMatchesShiftPhase(template, input.shiftPhase, input.weekday)) {
       return false;
     }
     return true;
@@ -158,12 +184,12 @@ export function checklistItemsForCtapLabShift(input: {
   const phase = inferCtapLabShiftPhase(input.startsAt);
   const phases: CtapLabShiftPhase[] = input.roleKey === 'driver'
     ? ['open', 'mid', 'close']
-    : [phase, 'weekly'];
+    : [phase];
   const selected = CTAP_LAB_TEMPLATES.filter((template) => {
     if (!roleMatches(template.roleKey, input.roleKey)) return false;
     if (template.weekday && weekday && template.weekday !== weekday) return false;
     if (template.weekday && !weekday) return false;
-    return phases.includes(template.shiftPhase);
+    return phases.some((shiftPhase) => templateMatchesShiftPhase(template, shiftPhase, weekday));
   });
   return [...new Set(selected.flatMap((template) => template.steps.map((step) => step.instruction)))];
 }

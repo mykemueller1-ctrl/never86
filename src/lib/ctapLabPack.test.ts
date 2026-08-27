@@ -93,6 +93,34 @@ describe('CTap lab pack', () => {
     });
     expect(kitchenClose).toContain('Turn pizza ovens off');
     expect(kitchenClose).toContain('Take all utensils back to dish area');
+    expect(kitchenClose).toContain('Deep freezer and dry storage');
+    expect(kitchenClose.join('\n')).not.toMatch(/steak fridge|Change foil on stove/i);
+    expect(kitchenClose.join('\n')).not.toMatch(/Weekly product order from the cadence/);
+  });
+
+  it('parses space-separated and date-only timestamps the same way setup validation accepts them', () => {
+    expect(inferCtapLabShiftPhase('2026-08-24 08:00:00')).toBe('open');
+    expect(inferCtapLabShiftPhase('2026-08-24 16:00:00')).toBe('close');
+    expect(inferCtapLabShiftPhase('2026-08-24t08:00:00-05:00')).toBe('open');
+    expect(inferCtapLabShiftPhase('2026-08-24')).toBe('open');
+
+    const morning = checklistItemsForCtapLabShift({
+      roleKey: 'kitchen_manager',
+      businessDate: '2026-08-24',
+      startsAt: '2026-08-24 08:00:00',
+    });
+    expect(morning).toContain('Temperatures, prep plan, pars, and vendor exceptions');
+    expect(morning).not.toContain('Turn pizza ovens off');
+  });
+
+  it('does not attach standing weekly manager templates to a daily FOH shift', () => {
+    const mondayOpen = checklistItemsForCtapLabShift({
+      roleKey: 'manager',
+      businessDate: '2026-08-24',
+      startsAt: '2026-08-24T08:00:00-05:00',
+    });
+    expect(mondayOpen).toContain('Walk dining and bar stations before first ticket');
+    expect(mondayOpen.join('\n')).not.toMatch(/Post the FOH schedule/);
   });
 
   it('maps calendar dates to weekdays without inventing an 8/26 sales figure', () => {

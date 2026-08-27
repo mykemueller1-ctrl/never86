@@ -542,14 +542,28 @@ export const CTAP_LAB_TEMPLATES: readonly CtapLabTemplate[] = [
       ['Oversee new-hire kitchen training and retraining on new procedures', 'Training'],
       ['Maintain small wares, plates, utensils, and scheduled equipment maintenance', 'Equipment'],
       ['Hold food-cost and portion-control coaching to policy constants, not live weekly dollars', 'Policy'],
-      ['Sunday: Change foil on stove', 'Deep Clean'],
-      ['Monday: Deep freezer and dry storage', 'Deep Clean'],
-      ['Tuesday: Deep clean steak fridge and BBQ fridge', 'Deep Clean'],
-      ['Wednesday: Bleach wall behind steam table', 'Deep Clean'],
-      ['Thursday: Run stove tops thru dishwasher', 'Deep Clean'],
-      ['Friday: Clean up around smoker — dump bucket, sweep, clean the shelf and front', 'Deep Clean'],
-      ['Saturday: Clean out bus tubs under charbroiler and seasoning shelf', 'Deep Clean'],
     ],
+  }),
+  ...CTAP_LAB_WEEKDAYS.map((weekday) => {
+    const deepClean: Record<CtapLabWeekday, StepInput> = {
+      Sunday: ['Change foil on stove', 'Deep Clean'],
+      Monday: ['Deep freezer and dry storage', 'Deep Clean'],
+      Tuesday: ['Deep clean steak fridge and BBQ fridge', 'Deep Clean'],
+      Wednesday: ['Bleach wall behind steam table', 'Deep Clean'],
+      Thursday: ['Run stove tops thru dishwasher', 'Deep Clean'],
+      Friday: ['Clean up around smoker — dump bucket, sweep, clean the shelf and front', 'Deep Clean'],
+      Saturday: ['Clean out bus tubs under charbroiler and seasoning shelf', 'Deep Clean'],
+    };
+    return template({
+      id: `kitchen-deep-clean-${weekday.toLowerCase()}`,
+      name: `Kitchen — ${weekday.slice(0, 3)} deep clean`,
+      roleKey: 'kitchen_manager',
+      stationKey: 'kitchen',
+      shiftPhase: 'weekly',
+      weekday,
+      source: 'kitchen-open-close',
+      steps: [deepClean[weekday]],
+    });
   }),
   template({
     id: 'prep-open',
