@@ -110,7 +110,7 @@ describe('Action Shift setup plan', () => {
       providerKey: 'provider',
     })).toEqual({
       ok: false,
-      error: 'Roster needs external_worker_id, display_name, role_key, and status columns.',
+      error: 'Roster needs external_worker_id, display_name, role_key, and status columns. Weekly department sheets still need that ID roster — names are not an identity key.',
     });
   });
 
@@ -173,5 +173,26 @@ describe('Action Shift setup plan', () => {
     expect(bar?.checklistItems.join('\n')).not.toMatch(/Beer comes today/);
     expect(driver?.checklistItems.some((item) => /between runs/i.test(item))).toBe(true);
     expect(findCtapLabPackPrivacyHits(result.plan)).toEqual([]);
+  });
+
+  it('accepts an ADP-style payroll census in the roster box and keeps the file number as the ID', () => {
+    const result = buildActionShiftSetupPlan({
+      rosterCsv: [
+        'File Number,First Name,Last Name,Job Title,Status,SSN',
+        '1001,Example,Manager,Manager,Active,000-00-0000',
+      ].join('\n'),
+      scheduleCsv: 'external_shift_id,external_worker_id,business_date,starts_at,ends_at\nshift-1,1001,2026-08-26,2026-08-26T08:00:00Z,2026-08-26T09:00:00Z',
+      providerKey: 'adp',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.plan.seats[0]).toEqual({
+      externalWorkerId: '1001',
+      displayName: 'Example Manager',
+      roleKey: 'manager',
+      checklistItems: ACTION_SHIFT_ROLE_PACKS.manager,
+    });
+    expect(result.plan.shifts[0].externalWorkerId).toBe('1001');
+    expect(JSON.stringify(result.plan)).not.toMatch(/000-00-0000/);
   });
 });

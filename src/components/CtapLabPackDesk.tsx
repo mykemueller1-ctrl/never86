@@ -46,6 +46,9 @@ export function CtapLabPackDesk() {
           <Link href="/action-shift/manager" style={chip()}>
             Manager seat
           </Link>
+          <Link href="/action-shift/setup" style={chip()}>
+            Payroll join
+          </Link>
           <Link href="/dashboard/setup" style={chip()}>
             Setup
           </Link>
