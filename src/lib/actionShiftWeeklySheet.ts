@@ -147,15 +147,15 @@ export function buildWeeklyDepartmentPlan(input: {
     }
     const seatMatch = seatsByName.get(displayName.toLowerCase())
       ?? displayNameKeys(displayName).map((key) => seatsByName.get(key)).find((value) => value);
+    if (!seatMatch) {
+      issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'worker_not_found' });
+      return;
+    }
     if (seatMatch === 'ambiguous') {
       issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'missing_immutable_id' });
       return;
     }
-    const seat = seatMatch && seatMatch !== 'ambiguous' ? seatMatch : undefined;
-    if (!seat) {
-      issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'worker_not_found' });
-      return;
-    }
+    const seat = seatMatch;
 
     for (let cursor = 1; cursor + 3 < Math.max(row.length, headers.length); cursor += 4) {
       const dateValue = normalize(row[cursor]);
