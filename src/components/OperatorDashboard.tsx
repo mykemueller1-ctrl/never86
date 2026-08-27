@@ -93,6 +93,7 @@ function Shell({ name, children }: { name: string; children: React.ReactNode }) 
             / NEVER 86&apos;D — COMMAND CENTER — {name}
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Manager board</Link>
             <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Workforce setup</Link>
             <SignOutButton />
           </div>
@@ -118,6 +119,9 @@ function EmptyState({ name }: { name: string }) {
         No POS API key. Morning = ≤3 ranked actions. Night = proof on those only.
       </p>
       <div className="flex gap-3 flex-wrap">
+        <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${BLUE}`, color: BLUE, padding: '10px 16px' }}>
+          Open manager board
+        </Link>
         <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${BLUE}`, color: BLUE, padding: '10px 16px' }}>
           Set up roster + schedule
         </Link>

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { DeskClose } from '@/lib/deskClose';
 import { serializeVendorSilencePacket } from '@/lib/vendorSilenceParse';
 
@@ -155,6 +156,12 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
       </h1>
       <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>
         Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. Vendor invoices, purchase orders, theoretical-usage, and vendor-silence packets feed the same Action Shift. No POS or vendor-portal password.
+      </p>
+      <p style={{ fontSize: 13, color: MUTED, marginBottom: 18 }}>
+        Manager seat owns station checklists.{' '}
+        <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: BLUE }}>
+          Open manager board →
+        </Link>
       </p>
 
       <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 16, marginBottom: 22 }}>
