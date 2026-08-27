@@ -1,5 +1,6 @@
 import { checklistItemsForCtapLabShift } from './ctapLabPack';
 import { findColumn, parseCsv } from './csv/core';
+import { normalizePayrollRosterCsv } from './actionShiftPayrollRoster';
 import { buildWeeklyDepartmentPlan, isWeeklyDepartmentSheet } from './actionShiftWeeklySheet';
 
 export const ACTION_SHIFT_ROLE_PACKS = {
@@ -54,14 +55,14 @@ export const ACTION_SHIFT_ROLE_PACKS = {
     'Close: drawer handoff, bottles, coolers, taps, waste, ice-bin wipe, and sanitation',
   ],
   server: [
-    'Open: section, tables, side work, specials, and 86 list',
-    'Shift: guest recovery, payment exceptions, and section handoff',
-    'Close: side work, checkout, cash owed, and manager sign-off',
+    'Open: section, tables, dining-room checklist, specials, and 86 list',
+    'Shift: guest recovery, payment exceptions, and section handoff; remakes are re-rung and promoed — voids only with manager approval',
+    'Close: dining-room checklist, side work, checkout, cash owed, and manager sign-off',
   ],
   host: [
-    'Open: reservations, waitlist, menus, phones, and entry area',
+    'Open: reservations, waitlist, menus, phones, entry area, and dining-room open checklist',
     'Shift: quote accuracy, seating notes, and guest recovery handoff',
-    'Close: reservations handoff, menus, entry area, and lost-and-found',
+    'Close: reservations handoff, menus, entry area, lost-and-found, and dining-room close checklist',
   ],
   driver: [
     'Start: vehicle, hot bags, route tools, and assigned orders',
@@ -104,6 +105,7 @@ export type ActionShiftSetupIssue = {
     | 'invalid_time_window'
     | 'missing_immutable_id'
     | 'unresolved_open_close'
+    | 'unresolved_first_cut'
     | 'unsupported_station';
 };
 
@@ -137,6 +139,7 @@ type BuildSetupInput = {
   templatePack?: 'generic' | 'ctap-lab';
   storeOpen?: string;
   storeClose?: string;
+  storeFirstCut?: string;
   timezoneOffset?: string;
 };
 
@@ -251,12 +254,15 @@ export function buildActionShiftSetupPlan(
   const providerKey = normalizeKey(input.providerKey);
   if (!providerKey) return { ok: false, error: 'Enter the schedule or time-clock provider key.' };
 
-  const rosterStructureError = csvStructureError(input.rosterCsv);
+  const payroll = normalizePayrollRosterCsv(input.rosterCsv);
+  const rosterCsv = payroll.ok ? payroll.csv : input.rosterCsv;
+
+  const rosterStructureError = csvStructureError(rosterCsv);
   if (rosterStructureError) return { ok: false, error: `Roster CSV ${rosterStructureError}.` };
   const scheduleStructureError = csvStructureError(input.scheduleCsv);
   if (scheduleStructureError) return { ok: false, error: `Schedule CSV ${scheduleStructureError}.` };
 
-  const roster = parseCsv(input.rosterCsv);
+  const roster = parseCsv(rosterCsv);
   const schedule = parseCsv(input.scheduleCsv);
   if (roster.rows.length === 0) return { ok: false, error: 'Roster CSV has no data rows.' };
   if (schedule.rows.length === 0) return { ok: false, error: 'Schedule CSV has no data rows.' };
@@ -323,6 +329,7 @@ export function buildActionShiftSetupPlan(
       stationRole: canonicalRoleKey,
       storeOpen: input.storeOpen,
       storeClose: input.storeClose,
+      storeFirstCut: input.storeFirstCut,
       timezoneOffset: input.timezoneOffset,
     });
     if (input.templatePack === 'ctap-lab') {

@@ -80,4 +80,82 @@ describe('Weekly department schedule sheet', () => {
     expect(result.plan.shifts).toHaveLength(0);
     expect(result.plan.issues.every((issue) => issue.reason === 'worker_not_found')).toBe(true);
   });
+
+  it('does not treat OPEN (first cut) as store Open, and refuses first-name-only weekly rows', () => {
+    const openToken = buildActionShiftSetupPlan({
+      rosterCsv: roster,
+      scheduleCsv: [
+        'employee,date,start time,end time,station,date,start time,end time,station',
+        'Example Bar,8/26/2026,Open,OPEN,BAR SIDE,8/27/2026,RO,,,',
+      ].join('\n'),
+      providerKey: 'bar-crew',
+      storeOpen: '11:00 AM',
+      storeClose: '11:00 PM',
+    });
+    expect(openToken.ok).toBe(true);
+    if (!openToken.ok) return;
+    expect(openToken.plan.issues).toContainEqual({
+      source: 'schedule',
+      row: 2,
+      externalId: 'worker-bar',
+      reason: 'unresolved_first_cut',
+    });
+
+    const firstCut = buildActionShiftSetupPlan({
+      rosterCsv: roster,
+      scheduleCsv: [
+        'employee,date,start time,end time,station,date,start time,end time,station',
+        'Example Bar,8/26/2026,Open,OPEN,BAR SIDE,8/27/2026,RO,,,',
+      ].join('\n'),
+      providerKey: 'bar-crew',
+      storeOpen: '11:00 AM',
+      storeClose: '11:00 PM',
+      storeFirstCut: '2:00 PM',
+      timezoneOffset: '-05:00',
+    });
+    expect(firstCut.ok).toBe(true);
+    if (!firstCut.ok) return;
+    expect(firstCut.plan.issues).toEqual([]);
+    expect(firstCut.plan.shifts[0]).toEqual(expect.objectContaining({
+      externalWorkerId: 'worker-bar',
+      startsAt: '2026-08-26T11:00:00-05:00',
+      endsAt: '2026-08-26T14:00:00-05:00',
+    }));
+
+    const firstNameOnly = buildActionShiftSetupPlan({
+      rosterCsv: roster,
+      scheduleCsv: [
+        'employee,date,start time,end time,station,date,start time,end time,station',
+        'Example,8/26/2026,11:00 AM,5:00 PM,WAITRESS,8/27/2026,RO,,,',
+      ].join('\n'),
+      providerKey: 'bar-crew',
+      storeOpen: '11:00 AM',
+      storeClose: '11:00 PM',
+    });
+    expect(firstNameOnly.ok).toBe(true);
+    if (!firstNameOnly.ok) return;
+    expect(firstNameOnly.plan.shifts).toHaveLength(0);
+    expect(firstNameOnly.plan.issues[0]?.reason).toBe('worker_not_found');
+  });
+
+  it('matches Last, First roster display names to First Last weekly rows without using the name as the stored ID', () => {
+    const result = buildActionShiftSetupPlan({
+      rosterCsv: 'external_worker_id,display_name,role_key,status\nfile-88,"Bar, Example",bartender,active',
+      scheduleCsv: [
+        'employee,date,start time,end time,station,date,start time,end time,station',
+        'Example Bar,8/26/2026,11:00 AM,5:00 PM,BAR SIDE,8/27/2026,RO,,,',
+      ].join('\n'),
+      providerKey: 'bar-crew',
+      timezoneOffset: '-05:00',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.plan.issues).toEqual([]);
+    expect(result.plan.shifts).toEqual([
+      expect.objectContaining({
+        externalWorkerId: 'file-88',
+        externalShiftId: 'file-88:2026-08-26:bartender:660',
+      }),
+    ]);
+  });
 });

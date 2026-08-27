@@ -17,6 +17,23 @@ function normalize(value: string | undefined): string {
   return (value ?? '').trim();
 }
 
+export function displayNameKeys(displayName: string): string[] {
+  const raw = displayName.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!raw) return [];
+  const keys = new Set<string>([raw]);
+  if (raw.includes(',')) {
+    const [last, ...firstParts] = raw.split(',').map((part) => part.trim());
+    const first = firstParts.join(' ').trim();
+    if (first && last) keys.add(`${first} ${last}`);
+  } else {
+    const parts = raw.split(' ');
+    if (parts.length >= 2) {
+      keys.add(`${parts[parts.length - 1]}, ${parts.slice(0, -1).join(' ')}`);
+    }
+  }
+  return [...keys];
+}
+
 export function isWeeklyDepartmentSheet(headers: string[]): boolean {
   const normalized = headers.map((header) => header.trim().toLowerCase());
   const employee = normalized[0] === 'employee' || normalized[0] === 'name';
@@ -56,9 +73,11 @@ function minutesToIso(date: string, minutes: number, offset: string, nextDay = f
   return `${businessDate}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00${offset}`;
 }
 
-function tokenKind(value: string): 'ro' | 'open' | 'close' | 'clock' | 'empty' | 'other' {
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return 'empty';
+function tokenKind(value: string): 'ro' | 'open' | 'close' | 'first_cut' | 'clock' | 'empty' | 'other' {
+  const trimmed = value.trim();
+  if (!trimmed) return 'empty';
+  if (trimmed === 'OPEN') return 'first_cut';
+  const normalized = trimmed.toLowerCase();
   if (normalized === 'ro' || normalized === 'r/o' || normalized === 'requested off') return 'ro';
   if (normalized === 'open') return 'open';
   if (normalized === 'close') return 'close';
@@ -71,6 +90,7 @@ type ResolveClockInput = {
   kind: 'start' | 'end';
   storeOpen?: string;
   storeClose?: string;
+  storeFirstCut?: string;
 };
 
 function resolveClock(input: ResolveClockInput): { ok: true; minutes: number } | { ok: false; reason: ActionShiftSetupIssue['reason'] } {
@@ -83,6 +103,10 @@ function resolveClock(input: ResolveClockInput): { ok: true; minutes: number } |
   if (kind === 'close') {
     const minutes = input.storeClose ? clockToMinutes(input.storeClose) : null;
     return minutes == null ? { ok: false, reason: 'unresolved_open_close' } : { ok: true, minutes };
+  }
+  if (kind === 'first_cut') {
+    const minutes = input.storeFirstCut ? clockToMinutes(input.storeFirstCut) : null;
+    return minutes == null ? { ok: false, reason: 'unresolved_first_cut' } : { ok: true, minutes };
   }
   if (kind === 'empty' || kind === 'other') return { ok: false, reason: 'missing_required_value' };
   return { ok: false, reason: 'missing_required_value' };
@@ -98,12 +122,18 @@ export function buildWeeklyDepartmentPlan(input: {
   stationRole: (value: string | undefined) => ActionShiftRoleKey | null;
   storeOpen?: string;
   storeClose?: string;
+  storeFirstCut?: string;
   timezoneOffset?: string;
 }): { ok: true; plan: ActionShiftSetupPlan } {
   const offset = input.timezoneOffset?.trim() || '-05:00';
   const schedule = parseCsv(input.scheduleCsv);
   const headers = schedule.headers.map((header) => header.trim().toLowerCase());
-  const seatsByName = new Map(input.rosterSeats.map((seat) => [seat.displayName.trim().toLowerCase(), seat]));
+  const seatsByName = new Map<string, WeeklySeat | 'ambiguous'>();
+  input.rosterSeats.forEach((seat) => {
+    displayNameKeys(seat.displayName).forEach((key) => {
+      seatsByName.set(key, seatsByName.has(key) ? 'ambiguous' : seat);
+    });
+  });
   const issues = [...input.issues];
   const shifts: ActionShiftSetupPlan['shifts'] = [];
   const seenShiftIds = new Set<string>();
@@ -115,9 +145,15 @@ export function buildWeeklyDepartmentPlan(input: {
       issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'missing_required_value' });
       return;
     }
-    const seat = seatsByName.get(displayName.toLowerCase());
+    const seatMatch = seatsByName.get(displayName.toLowerCase())
+      ?? displayNameKeys(displayName).map((key) => seatsByName.get(key)).find((value) => value);
+    if (seatMatch === 'ambiguous') {
+      issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'missing_immutable_id' });
+      return;
+    }
+    const seat = seatMatch && seatMatch !== 'ambiguous' ? seatMatch : undefined;
     if (!seat) {
-      issues.push({ source: 'schedule', row: rowNumber, externalId: displayName, reason: 'worker_not_found' });
+      issues.push({ source: 'schedule', row: rowNumber, externalId: '', reason: 'worker_not_found' });
       return;
     }
 
@@ -139,8 +175,20 @@ export function buildWeeklyDepartmentPlan(input: {
         continue;
       }
 
-      const start = resolveClock({ value: startValue, kind: 'start', storeOpen: input.storeOpen, storeClose: input.storeClose });
-      const end = resolveClock({ value: endValue, kind: 'end', storeOpen: input.storeOpen, storeClose: input.storeClose });
+      const start = resolveClock({
+        value: startValue,
+        kind: 'start',
+        storeOpen: input.storeOpen,
+        storeClose: input.storeClose,
+        storeFirstCut: input.storeFirstCut,
+      });
+      const end = resolveClock({
+        value: endValue,
+        kind: 'end',
+        storeOpen: input.storeOpen,
+        storeClose: input.storeClose,
+        storeFirstCut: input.storeFirstCut,
+      });
       if (!start.ok) {
         issues.push({ source: 'schedule', row: rowNumber, externalId: seat.externalWorkerId, reason: start.reason });
         continue;
