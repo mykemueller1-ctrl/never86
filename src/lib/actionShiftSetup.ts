@@ -1,3 +1,4 @@
+import { checklistItemsForCtapLabShift } from './ctapLabPack';
 import { findColumn, parseCsv } from './csv/core';
 
 export const ACTION_SHIFT_ROLE_PACKS = {
@@ -129,6 +130,7 @@ type BuildSetupInput = {
   scheduleCsv: string;
   providerKey: string;
   generatedAt?: string;
+  templatePack?: 'generic' | 'ctap-lab';
 };
 
 type ColumnSpec = { key: string; aliases: string[] };
@@ -160,6 +162,8 @@ const ROLE_ALIASES: Record<string, ActionShiftRoleKey> = {
   gm: 'general_manager',
   general_manager: 'general_manager',
   manager: 'manager',
+  foh_manager: 'manager',
+  bar_manager: 'manager',
   kitchen_lead: 'kitchen_manager',
   kitchen_manager: 'kitchen_manager',
   chef: 'kitchen_manager',
@@ -334,6 +338,13 @@ export function buildActionShiftSetupPlan(
       issues.push({ source: 'schedule', row: rowNumber, externalId: externalShiftId, reason: 'worker_not_found' });
       return;
     }
+    const checklistItems = input.templatePack === 'ctap-lab'
+      ? checklistItemsForCtapLabShift({
+        roleKey: seat.roleKey,
+        businessDate,
+        startsAt,
+      })
+      : seat.checklistItems;
     shifts.push({
       externalShiftId,
       externalWorkerId,
@@ -342,7 +353,7 @@ export function buildActionShiftSetupPlan(
       businessDate,
       startsAt,
       endsAt,
-      checklistItems: seat.checklistItems,
+      checklistItems,
     });
   });
 

@@ -115,6 +115,9 @@ export default function ActionShiftDeskPage() {
           <Link href="/mcp" className="underline-offset-4 hover:underline">
             LLM / MCP
           </Link>
+          <Link href="/action-shift/lab" className="underline-offset-4 hover:underline">
+            CTap lab templates
+          </Link>
         </nav>
 
         <section id="seats" className="mt-12 border-t border-white/10 pt-8">
