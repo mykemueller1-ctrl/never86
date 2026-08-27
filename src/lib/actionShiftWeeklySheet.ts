@@ -11,6 +11,12 @@ export const ACTION_SHIFT_WEEKLY_TEMPLATE = [
   'Example Server,8/26/2026,11:00 AM,5:00 PM,WAITRESS,8/27/2026,RO,,,',
 ].join('\n');
 
+export const ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE = [
+  'employee,date,start time,end time,station,date,start time,end time,station',
+  'Example Manager,8/26/2026,Open,4:00 PM,BAR SIDE,8/27/2026,4:00 PM,CLOSE,BAR SIDE',
+  'Example Cook,8/26/2026,11:00 AM,OPEN,FRY LINE,8/27/2026,RO,,,',
+].join('\n');
+
 type WeeklySeat = ActionShiftSetupPlan['seats'][number];
 
 function normalize(value: string | undefined): string {

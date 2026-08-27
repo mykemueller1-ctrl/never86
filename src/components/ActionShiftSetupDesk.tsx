@@ -8,7 +8,7 @@ import {
   buildActionShiftSetupPlan,
 } from '@/lib/actionShiftSetup';
 import { ACTION_SHIFT_PAYROLL_TEMPLATE, normalizePayrollRosterCsv } from '@/lib/actionShiftPayrollRoster';
-import { ACTION_SHIFT_WEEKLY_TEMPLATE } from '@/lib/actionShiftWeeklySheet';
+import { ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE, ACTION_SHIFT_WEEKLY_TEMPLATE } from '@/lib/actionShiftWeeklySheet';
 
 function download(name: string, content: string, type: string) {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -123,6 +123,9 @@ export default function ActionShiftSetupDesk() {
           </div>
           <textarea value={rosterCsv} onChange={(event) => ingestRoster(event.target.value)} rows={10} className={`${inputClass} font-mono text-xs`} spellCheck={false} />
           {payrollNote ? <p className="mt-2 text-xs text-amber-100/80">{payrollNote}</p> : null}
+          <button type="button" onClick={() => ingestRoster(ACTION_SHIFT_PAYROLL_TEMPLATE)} className="mt-3 mr-4 rounded-lg border border-amber-300/40 px-3 py-1.5 text-xs text-amber-100">
+            Stage payroll example
+          </button>
           <button type="button" onClick={() => download('action-shift-roster-template.csv', ACTION_SHIFT_ROSTER_TEMPLATE, 'text/csv')} className="mt-3 text-xs text-amber-200 underline underline-offset-4">
             Download blank-format example
           </button>
@@ -143,6 +146,9 @@ export default function ActionShiftSetupDesk() {
             </label>
           </div>
           <textarea value={scheduleCsv} onChange={(event) => setScheduleCsv(event.target.value)} rows={10} className={`${inputClass} font-mono text-xs`} spellCheck={false} />
+          <button type="button" onClick={() => setScheduleCsv(ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE)} className="mt-3 mr-4 rounded-lg border border-amber-300/40 px-3 py-1.5 text-xs text-amber-100">
+            Stage weekly example
+          </button>
           <button type="button" onClick={() => download('action-shift-schedule-template.csv', ACTION_SHIFT_SCHEDULE_TEMPLATE, 'text/csv')} className="mt-3 text-xs text-amber-200 underline underline-offset-4">
             Download blank-format example
           </button>

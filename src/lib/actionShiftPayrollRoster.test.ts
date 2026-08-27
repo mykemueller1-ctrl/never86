@@ -5,12 +5,7 @@ import {
   normalizePayrollRosterCsv,
 } from './actionShiftPayrollRoster';
 import { ACTION_SHIFT_ROLE_PACKS, buildActionShiftSetupPlan } from './actionShiftSetup';
-
-const weekly = [
-  'employee,date,start time,end time,station,date,start time,end time,station',
-  'Example Manager,8/26/2026,Open,4:00 PM,BAR SIDE,8/27/2026,4:00 PM,CLOSE,BAR SIDE',
-  'Example Cook,8/26/2026,11:00 AM,OPEN,FRY LINE,8/27/2026,RO,,,',
-].join('\n');
+import { ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE } from './actionShiftWeeklySheet';
 
 describe('Payroll census → Action Shift roster', () => {
   it('maps ADP File Number + split names and drops SSN/wage columns', () => {
@@ -77,7 +72,7 @@ describe('Payroll census → Action Shift roster', () => {
     if (!payroll.ok) return;
     const result = buildActionShiftSetupPlan({
       rosterCsv: payroll.csv,
-      scheduleCsv: weekly,
+      scheduleCsv: ACTION_SHIFT_PAYROLL_WEEKLY_TEMPLATE,
       providerKey: 'payroll',
       generatedAt: '2026-08-26T12:00:00.000Z',
       storeOpen: '11:00 AM',
