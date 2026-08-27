@@ -1,8 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { ROBOTS_ALLOW, ROBOTS_DISALLOW, WWW } from '@/lib/seoAeo';
 
 export default function robots(): MetadataRoute.Robots {
-  const disallow = ['/admin/', '/reports/', '/command-center/', '/tools/', '/api/', '/action-shift/lab'];
-  const allow = ['/', '/api/answers', '/api/mcp', '/api/llm-shells', '/api/quick-wins'];
+  // Allow public JSON first, then Disallow /api/. First-match crawlers honor order;
+  // Google still uses the longest path, so /api/answers wins over /api/.
+  const allow = [...ROBOTS_ALLOW];
+  const disallow = [...ROBOTS_DISALLOW];
   return {
     rules: [
       {
@@ -18,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow,
       },
     ],
-    sitemap: 'https://www.never86.ai/sitemap.xml',
-    host: 'https://www.never86.ai',
+    sitemap: `${WWW}/sitemap.xml`,
+    host: WWW,
   };
 }

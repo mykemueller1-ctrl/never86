@@ -301,5 +301,8 @@ export function roleSeoTitle(spec: RoleSpec): string {
 }
 
 export function roleSeoDescription(spec: RoleSpec): string {
+  if (spec.slug === 'owner') {
+    return `${spec.intro} One seat free at /trial. Prove one DoorDash statement at /audit — $0 variance is a feature.`;
+  }
   return `${spec.intro} One seat free at /trial.`;
 }

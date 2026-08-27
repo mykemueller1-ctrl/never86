@@ -16,6 +16,9 @@ describe('built-in operator answer corpus', () => {
     ]) expect(slugs.has(slug)).toBe(true);
     expect(OPERATOR_ANSWERS).toHaveLength(52);
     expect(new Set(OPERATOR_ANSWERS.map((answer) => answer.week)).size).toBe(52);
+    expect(new Set(OPERATOR_ANSWERS.map((answer) => answer.title)).size).toBe(52);
+    expect(new Set(OPERATOR_ANSWERS.map((answer) => answer.question)).size).toBe(52);
+    expect(new Set(OPERATOR_ANSWERS.map((answer) => answer.summary)).size).toBe(52);
   });
 
   it('ships a complete, citable record for every answer', () => {

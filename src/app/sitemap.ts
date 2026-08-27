@@ -2,11 +2,13 @@ import type { MetadataRoute } from 'next';
 import { listPublishedAnswers } from '@/lib/answersDb';
 import { AGENT_SPECS } from '@/lib/agentSpecs';
 import { POS_SPECS } from '@/lib/posSpecs';
+import { AEO_PAGE_LASTMOD, ISSUE_122_3P_SLUGS, SITE_LASTMOD, WWW } from '@/lib/seoAeo';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const BASE = 'https://www.never86.ai';
+const BASE = WWW;
+const AEO_PATHS = new Set<string>(['/', '/audit', '/for/owner', '/answers', ...ISSUE_122_3P_SLUGS.map((slug) => `/answers/${slug}`)]);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let answers: { slug: string; updatedAt: string }[] = [];
@@ -17,11 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fixed content release date: request-time timestamps mislead crawlers into
   // treating every URL as newly changed on every sitemap fetch.
-  const now = new Date('2026-08-21T05:30:00Z');
+  const now = SITE_LASTMOD;
+  const stamp = (path: string) => (AEO_PATHS.has(path) ? AEO_PAGE_LASTMOD : now);
 
   const fixed: MetadataRoute.Sitemap = [
-    { url: BASE, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${BASE}/audit`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: BASE, lastModified: stamp('/'), changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/audit`, lastModified: stamp('/audit'), changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/audit/payout-mismatch`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/audit/promotions-ads`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/audit/refunds-adjustments`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
@@ -32,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/for/coo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/cto`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/chef`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/for/owner`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/for/owner`, lastModified: stamp('/for/owner'), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/manager`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/for/crew`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/demo/void-hunter`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
@@ -49,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/install`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/onboard`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/operators`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE}/answers`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE}/answers`, lastModified: stamp('/answers'), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/delivery-marketplace-reconciliation`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/evidence-standard`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${BASE}/research/3p-operator-signal-august-2026`, lastModified: now, changeFrequency: 'monthly', priority: 0.92 },
@@ -64,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const dynamicEntries: MetadataRoute.Sitemap = answers.map((a) => ({
     url: `${BASE}/answers/${a.slug}`,
-    lastModified: a.updatedAt ? new Date(a.updatedAt) : now,
+    lastModified: a.updatedAt ? new Date(a.updatedAt) : stamp(`/answers/${a.slug}`),
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
