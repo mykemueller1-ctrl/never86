@@ -7,6 +7,7 @@ import {
   ACTION_SHIFT_SCHEDULE_TEMPLATE,
   buildActionShiftSetupPlan,
 } from '@/lib/actionShiftSetup';
+import { ACTION_SHIFT_WEEKLY_TEMPLATE } from '@/lib/actionShiftWeeklySheet';
 
 function download(name: string, content: string, type: string) {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -42,12 +43,18 @@ export default function ActionShiftSetupDesk() {
   const [providerKey, setProviderKey] = useState('time-clock');
   const [rosterCsv, setRosterCsv] = useState(ACTION_SHIFT_ROSTER_TEMPLATE);
   const [scheduleCsv, setScheduleCsv] = useState(ACTION_SHIFT_SCHEDULE_TEMPLATE);
+  const [storeOpen, setStoreOpen] = useState('11:00 AM');
+  const [storeClose, setStoreClose] = useState('11:00 PM');
+  const [timezoneOffset, setTimezoneOffset] = useState('-05:00');
   const [fileError, setFileError] = useState<string | null>(null);
   const result = useMemo(() => buildActionShiftSetupPlan({
     rosterCsv,
     scheduleCsv,
     providerKey,
-  }), [providerKey, rosterCsv, scheduleCsv]);
+    storeOpen,
+    storeClose,
+    timezoneOffset,
+  }), [providerKey, rosterCsv, scheduleCsv, storeClose, storeOpen, timezoneOffset]);
 
   return (
     <div className="space-y-8">
@@ -65,6 +72,21 @@ export default function ActionShiftSetupDesk() {
             Time-clock / schedule provider key
             <input value={providerKey} onChange={(event) => setProviderKey(event.target.value)} className={inputClass} />
           </label>
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Store open
+              <input value={storeOpen} onChange={(event) => setStoreOpen(event.target.value)} className={inputClass} />
+            </label>
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Store close
+              <input value={storeClose} onChange={(event) => setStoreClose(event.target.value)} className={inputClass} />
+            </label>
+            <label className="block text-xs uppercase tracking-wider text-white/50">
+              Offset
+              <input value={timezoneOffset} onChange={(event) => setTimezoneOffset(event.target.value)} className={inputClass} />
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-white/40">Open / CLOSE tokens on a weekly sheet resolve from these hours. They are staging labels, not a live store rule.</p>
           <div className="mt-5 flex items-center justify-between gap-3">
             <h2 className="font-semibold text-white">1. Active-worker roster</h2>
             <label className="cursor-pointer rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white hover:border-white/35">
@@ -90,6 +112,12 @@ export default function ActionShiftSetupDesk() {
           <button type="button" onClick={() => download('action-shift-schedule-template.csv', ACTION_SHIFT_SCHEDULE_TEMPLATE, 'text/csv')} className="mt-3 text-xs text-amber-200 underline underline-offset-4">
             Download blank-format example
           </button>
+          <button type="button" onClick={() => download('action-shift-weekly-sheet-example.csv', ACTION_SHIFT_WEEKLY_TEMPLATE, 'text/csv')} className="mt-3 ml-4 text-xs text-amber-200 underline underline-offset-4">
+            Download weekly sheet example
+          </button>
+          <p className="mt-2 text-xs text-white/40">
+            Bar / kitchen / driver weekly sheets paste here. Join is worker ID from the roster, then station. Names are display-only.
+          </p>
         </div>
       </section>
 

@@ -110,7 +110,7 @@ describe('Action Shift setup plan', () => {
       providerKey: 'provider',
     })).toEqual({
       ok: false,
-      error: 'Roster needs external_worker_id, display_name, role_key, and status columns.',
+      error: 'Roster needs external_worker_id, display_name, role_key, and status columns. Weekly department sheets still need that ID roster — names are not an identity key.',
     });
   });
 
