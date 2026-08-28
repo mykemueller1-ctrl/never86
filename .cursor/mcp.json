@@ -1,6 +1,10 @@
 {
   "mcpServers": {
+<<<<<<< HEAD
     "never86-operator-system": {
+=======
+    "never86": {
+>>>>>>> 20e7f32 (Publish MCP discovery manifest and 4-LLM install guide)
       "url": "https://www.never86.ai/api/mcp"
     }
   }

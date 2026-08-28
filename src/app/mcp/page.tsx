@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { NEVER86_MCP_DISCOVERY, NEVER86_MCP_URL } from '@/lib/mcpDiscovery';
 
 export const metadata: Metadata = {
   title: "Install in Grok + AI · Never 86'd",
@@ -7,6 +8,51 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.never86.ai/mcp' },
   robots: { index: true, follow: true },
 };
+
+const CONNECTOR_NAME = "Never86'd Operator Intelligence";
+
+const INSTALLS = [
+  {
+    id: 'grok',
+    label: 'Grok',
+    steps: [
+      <>Open <a href="https://grok.com/connectors" className="font-semibold text-[#0066ff] hover:underline">Grok Connectors</a> → <strong>New Connector → Custom</strong>.</>,
+      <>Name it <strong>{CONNECTOR_NAME}</strong>.</>,
+      <>Paste the MCP endpoint below. Save. No login required.</>,
+    ],
+    docs: { href: 'https://docs.x.ai/grok/connectors', label: 'Grok connector docs ↗' },
+  },
+  {
+    id: 'chatgpt',
+    label: 'ChatGPT',
+    steps: [
+      <>Open <a href="https://chatgpt.com" className="font-semibold text-[#0066ff] hover:underline">ChatGPT</a> → Settings → <strong>Connectors</strong> (or Apps &amp; Connectors).</>,
+      <>Add a <strong>custom / remote MCP</strong> connector.</>,
+      <>Name it <strong>{CONNECTOR_NAME}</strong> and paste the endpoint below.</>,
+    ],
+    docs: { href: 'https://help.openai.com/en/articles/11487775-connectors-in-chatgpt', label: 'ChatGPT connector help ↗' },
+  },
+  {
+    id: 'claude',
+    label: 'Claude',
+    steps: [
+      <>Open <a href="https://claude.ai/settings/connectors" className="font-semibold text-[#0066ff] hover:underline">Claude Connectors</a>.</>,
+      <>Add a <strong>remote MCP server</strong>.</>,
+      <>Name it <strong>{CONNECTOR_NAME}</strong> and paste the endpoint below.</>,
+    ],
+    docs: { href: 'https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp', label: 'Claude MCP docs ↗' },
+  },
+  {
+    id: 'gemini',
+    label: 'Gemini',
+    steps: [
+      <>Open <a href="https://gemini.google.com" className="font-semibold text-[#0066ff] hover:underline">Gemini</a> → Settings → <strong>Extensions / Connectors</strong> (wording varies by account).</>,
+      <>Add a <strong>remote MCP</strong> or custom connector if available on your plan.</>,
+      <>Name it <strong>{CONNECTOR_NAME}</strong> and paste the endpoint below.</>,
+    ],
+    docs: { href: 'https://ai.google.dev/gemini-api/docs', label: 'Gemini developer docs ↗' },
+  },
+] as const;
 
 export default function McpPage() {
   return (
@@ -37,24 +83,47 @@ export default function McpPage() {
           One public, read-only Model Context Protocol endpoint gives every supported AI the same versioned operator brain: Action Shift, deterministic 3P math, load-day onboarding, vendor silence, proof and memory rules, specialist-agent routines, POS and invoice routing, and the public answer desk.
         </p>
 
-        <div className="grid gap-4 md:grid-cols-[1.15fr_0.85fr]">
-          <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8">
-            <p className="compass-card-label" style={{ color: '#0066ff' }}>Install in Grok</p>
-            <ol className="compass-body mt-5 space-y-4 text-base">
-              <li><strong className="text-[#1d1d1f]">1.</strong> Open <a href="https://grok.com/connectors" className="font-semibold text-[#0066ff] hover:underline">Grok Connectors</a> and choose <strong>New Connector → Custom</strong>.</li>
-              <li><strong className="text-[#1d1d1f]">2.</strong> Name it <strong>Never86&apos;d Operator Intelligence</strong>.</li>
-              <li><strong className="text-[#1d1d1f]">3.</strong> Paste the endpoint below and add it. No restaurant login or marketplace password is required.</li>
-            </ol>
-            <div className="mt-6 rounded-2xl border border-[#b8d2ff] bg-white p-4">
-              <p className="compass-card-label">MCP endpoint</p>
-              <p className="mt-3 break-all font-mono text-[15px] text-[#1d1d1f]">https://www.never86.ai/api/mcp</p>
+        <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mb-5">
+          <p className="compass-card-label" style={{ color: '#0066ff' }}>One endpoint · four LLMs</p>
+          <p className="compass-body mt-3 text-base max-w-3xl">
+            The server is live. Each chat app needs one custom connector pointing at the same URL. Discovery manifest:{' '}
+            <a href="/.well-known/mcp.json" className="font-semibold text-[#0066ff] hover:underline">/.well-known/mcp.json</a>
+            {' '}· version {NEVER86_MCP_DISCOVERY.version}
+          </p>
+          <div className="mt-5 rounded-2xl border border-[#b8d2ff] bg-white p-4">
+            <p className="compass-card-label">MCP endpoint (copy into every connector)</p>
+            <p className="mt-3 break-all font-mono text-[15px] text-[#1d1d1f]">{NEVER86_MCP_URL}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {INSTALLS.map((install) => (
+            <div key={install.id} className="compass-card p-6 md:p-7">
+              <p className="compass-card-label">Install in {install.label}</p>
+              <ol className="compass-body mt-4 space-y-3 text-sm">
+                {install.steps.map((step, i) => (
+                  <li key={i}><strong className="text-[#1d1d1f]">{i + 1}.</strong> {step}</li>
+                ))}
+              </ol>
+              <a href={install.docs.href} className="mt-4 inline-flex text-sm font-semibold text-[#0066ff] hover:underline">{install.docs.label}</a>
             </div>
-            <a href="https://docs.x.ai/grok/connectors" className="mt-5 inline-flex text-sm font-semibold text-[#0066ff] hover:underline">Grok connector instructions ↗</a>
+          ))}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-[1.15fr_0.85fr] mt-5">
+          <div className="compass-card p-6 md:p-8">
+            <p className="compass-card-label">Cursor (developers)</p>
+            <p className="compass-body mt-4 text-base">
+              Repo ships <code className="font-mono text-sm">.cursor/mcp.json</code> pointing at this endpoint. Enable it in Cursor Settings → MCP if the cloud agent has not loaded it yet.
+            </p>
+            <p className="compass-body mt-4 text-sm text-[#6e6e73]">
+              Official Cursor Marketplace listing is a separate submission — this URL works today without waiting for approval.
+            </p>
           </div>
 
           <div className="compass-card p-6 md:p-8">
             <p className="compass-card-label">Load the whole system first</p>
-            <p className="compass-body mt-4 text-base">Ask Grok:</p>
+            <p className="compass-body mt-4 text-base">Ask any connected LLM:</p>
             <p className="mt-3 rounded-2xl bg-[#fbfbfd] p-4 font-mono text-sm leading-relaxed text-[#1d1d1f]">Use Never86&apos;d get_operator_system first. Then build my Action Shift for the prior complete business day. Give me one next action, its owner, the proof required tonight, and the exact missing evidence. Use only my store&apos;s approved targets and rules.</p>
             <p className="compass-body mt-5 text-sm">Typed totals stay unverified until matched to a finalized source. A variance ranks review work—it is not proof of theft, loss, or guaranteed savings.</p>
           </div>
