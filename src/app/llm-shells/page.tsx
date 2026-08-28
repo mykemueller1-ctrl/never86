@@ -5,8 +5,7 @@ import { getInstallMatrix } from '@/lib/llmShells';
 export const metadata: Metadata = {
   title: "LLM shells · Never 86'd",
   description: "Thin ChatGPT, Claude, Gemini, and Grok install shells for the same Never 86'd MCP backend. One skill pack. No forked restaurant math. Not a marketplace listing.",
-  alternates: { canonical: 'https://www.never86.ai/llm-shells' },
-  robots: { index: true, follow: true },
+  robots: { index: false, follow: false },
 };
 
 export default function LlmShellsPage() {
@@ -45,10 +44,10 @@ export default function LlmShellsPage() {
         <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mb-5">
           <p className="compass-card-label" style={{ color: '#0066ff' }}>Honest status</p>
           <ul className="compass-body mt-4 space-y-2 text-base">
-            <li>Repo state: drafted in git. Not merged, not production-deployed from this branch.</li>
+            <li>Provider installation: unverified. A human still has to add the connector in each app.</li>
             <li>Marketplace publication: not submitted — no GPT Store, Claude directory, Gemini gallery, or Grok featured-connector claim.</li>
-            <li>Live provider install: unverified. A human still has to add the connector in each app.</li>
             <li>Credentials: none claimed. Public MCP is unauthenticated and read-only.</li>
+            <li>READ-ONLY and DRAFT-ONLY: certified in repo. Live-verified on a provider UI: no. Live external writes: none.</li>
             <li>Restaurant-tenant OAuth for these four shells: not claimed.</li>
           </ul>
         </div>

@@ -72,7 +72,9 @@ describe('issue #122 3P AEO', () => {
 
 describe('robots.txt Allow /api/answers then Disallow /api/', () => {
   it('keeps the public JSON allowlist ahead of the /api/ deny', () => {
-    expect([...ROBOTS_ALLOW]).toEqual(['/', '/api/answers', '/api/mcp', '/api/llm-shells', '/api/quick-wins']);
+    expect([...ROBOTS_ALLOW]).toEqual(['/', '/api/answers', '/api/mcp', '/api/quick-wins']);
+    expect([...ROBOTS_ALLOW].some((path) => path.includes('llm-shells'))).toBe(false);
+    expect([...ROBOTS_DISALLOW]).toContain('/llm-shells');
     expect([...ROBOTS_DISALLOW]).toContain('/api/');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/lab');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/setup');
@@ -100,7 +102,7 @@ describe('sitemap lastmod for sharpened AEO URLs', () => {
       const lastModified = byUrl.get(`${WWW}${path}`)?.lastModified;
       expect(new Date(lastModified as Date).getTime()).toBe(AEO_PAGE_LASTMOD.getTime());
     }
-    expect(byUrl.get(`${WWW}/llm-shells`)).toBeTruthy();
+    expect(byUrl.get(`${WWW}/llm-shells`)).toBeUndefined();
   });
 });
 

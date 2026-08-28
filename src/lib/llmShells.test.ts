@@ -47,6 +47,10 @@ describe('Never86 four-LLM thin shells', () => {
     expect(matrix.status.marketplacePublication).toBe('not-submitted');
     expect(matrix.status.liveProviderInstall).toBe('unverified');
     expect(matrix.status.credentials).toBe('none-claimed');
+    expect(matrix.status.readOnlyCertified).toBe('certified-in-repo');
+    expect(matrix.status.draftOnlyCertified).toBe('certified-in-repo');
+    expect(matrix.status).not.toHaveProperty('repoState');
+    expect(JSON.stringify(matrix)).not.toMatch(/not merged|not-merged|not-deployed|preview-only|production-deployed/i);
     for (const shell of matrix.shells) {
       expect(shell.skillPackVersion).toBe(NEVER86_SKILL_PACK_VERSION);
       expect(shell.mcpUrl).toBe(matrix.skillPack.mcpUrl);

@@ -6,22 +6,32 @@ export const LLM_SHELL_PROVIDERS = ['chatgpt', 'claude', 'gemini', 'grok'] as co
 export type LlmShellProvider = (typeof LLM_SHELL_PROVIDERS)[number];
 
 export type HonestInstallStatus = {
-  repoState: 'drafted-in-git';
   marketplacePublication: 'not-submitted';
   liveProviderInstall: 'unverified';
   credentials: 'none-claimed';
   oauthForRestaurantTenant: 'not-claimed';
   publicMcpAuth: 'none-public-read-only';
+  readOnlyCertified: 'certified-in-repo';
+  draftOnlyCertified: 'certified-in-repo';
 };
 
 const HONEST_STATUS: HonestInstallStatus = {
-  repoState: 'drafted-in-git',
   marketplacePublication: 'not-submitted',
   liveProviderInstall: 'unverified',
   credentials: 'none-claimed',
   oauthForRestaurantTenant: 'not-claimed',
   publicMcpAuth: 'none-public-read-only',
+  readOnlyCertified: 'certified-in-repo',
+  draftOnlyCertified: 'certified-in-repo',
 };
+
+/** Durable claims only. Never encode merge/deploy/preview state that goes stale on a live build. */
+export const DURABLE_SHELL_CLAIMS = [
+  'Provider installation: unverified.',
+  'Marketplace publication: not submitted.',
+  'Credentials: none claimed.',
+  'READ-ONLY and DRAFT-ONLY: certified in repo.',
+] as const;
 
 function sharedShell(provider: LlmShellProvider, label: string, install: {
   client: string;
@@ -174,9 +184,10 @@ export function getInstallMatrix() {
     })),
     honesty: [
       'One skill pack. Four thin install shells. No forked restaurant logic.',
-      'Public MCP is live on www.never86.ai for prior deploys; these shells are drafted in git until a human installs them in each provider UI.',
+      'Provider installation is unverified until a human adds the connector in each provider UI.',
       'No GPT Store, Claude directory, Gemini gallery, or Grok featured-connector publication is claimed.',
       'No provider secrets, operator OAuth clients, or unverified credentials are included.',
+      'READ-ONLY and DRAFT-ONLY are certified in repo. Live external writes: none.',
     ],
   };
 }
