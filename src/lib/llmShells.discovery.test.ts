@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import robots from '../app/robots';
 import sitemap from '../app/sitemap';
 import { metadata as llmShellsMetadata } from '../app/llm-shells/page';
 import { GET as getLlmsTxt } from '../app/llms.txt/route';
@@ -17,68 +16,34 @@ const PUBLIC_LLM_SHELLS_URL = 'https://www.never86.ai/llm-shells';
 const IMPOSSIBLE_DEPLOY_STATUS =
   /\bnot merged\b|\bnot-merged\b|\bpreview-only\b|\bpreview only\b|\bnot production-deployed\b|\bnot-deployed\b|\bproduction-deployed from this branch\b|\bmerged \/ production-deployed\b/i;
 
-function firstRobotsRule() {
-  const doc = robots();
-  const rule = Array.isArray(doc.rules) ? doc.rules[0] : doc.rules;
-  if (!rule || typeof rule !== 'object') throw new Error('robots.txt missing rules');
-  return rule as { allow?: string | string[]; disallow?: string | string[] };
-}
-
-function asList(value: string | string[] | undefined): string[] {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
 describe('llm-shells crawler and LLM discovery gate', () => {
-  it('does not advertise /llm-shells in sitemap, robots, or LLM indexes', async () => {
+  it('advertises /llm-shells as the public try door', async () => {
     const entries = await sitemap();
-    expect(entries.some((entry) => String(entry.url).includes('/llm-shells'))).toBe(false);
-
-    const rule = firstRobotsRule();
-    const allow = asList(rule.allow);
-    const disallow = asList(rule.disallow);
-    expect(allow.some((path) => path.includes('llm-shells'))).toBe(false);
-    expect(disallow.some((path) => path.includes('llm-shells'))).toBe(false);
+    expect(entries.some((entry) => String(entry.url).includes('/llm-shells'))).toBe(true);
 
     const llmsTxt = await (await getLlmsTxt()).text();
     const llmsFull = await (await getLlmsFullTxt()).text();
-    expect(llmsTxt).not.toContain('/llm-shells');
-    expect(llmsFull).not.toContain('/llm-shells');
-    expect(llmsTxt).not.toContain(PUBLIC_LLM_SHELLS_URL);
-    expect(llmsFull).not.toContain(PUBLIC_LLM_SHELLS_URL);
+    expect(llmsTxt).toContain('/llm-shells');
+    expect(llmsFull).toContain('/llm-shells');
+    expect(llmsTxt).toContain(PUBLIC_LLM_SHELLS_URL);
+    expect(llmsFull).toContain(PUBLIC_LLM_SHELLS_URL);
 
-    expect(getNever86SkillPack().knowledge.publicSurfaces).not.toContain(PUBLIC_LLM_SHELLS_URL);
-    expect(llmShellsMetadata.robots).toMatchObject({ index: false, follow: false });
+    expect(getNever86SkillPack().knowledge.publicSurfaces).toContain(PUBLIC_LLM_SHELLS_URL);
+    expect(llmShellsMetadata.robots).toMatchObject({ index: true, follow: true });
   });
 
-  it('keeps /llm-shells out of crawler-surface source files', () => {
-    const crawlerFiles = [
-      'src/app/sitemap.ts',
-      'src/app/robots.ts',
-      'src/app/llms.txt/route.ts',
-      'src/app/llms-full.txt/route.ts',
-      'src/app/mcp/page.tsx',
-      'src/lib/llmShells/skillPack.ts',
-    ];
-    for (const relative of crawlerFiles) {
-      const source = readFileSync(join(ROOT, relative), 'utf8');
-      expect(source, relative).not.toContain(PUBLIC_LLM_SHELLS_URL);
-      expect(source, relative).not.toContain('href="/llm-shells"');
-      if (!relative.endsWith('robots.ts')) {
-        expect(source, relative).not.toMatch(/url: `\$\{BASE\}\/llm-shells`/);
-      }
-    }
-    const robotsSource = readFileSync(join(ROOT, 'src/app/robots.ts'), 'utf8');
-    expect(robotsSource).not.toMatch(/['"]\/api\/llm-shells['"]/);
-    expect(robotsSource).not.toMatch(/['"]\/llm-shells['"]/);
+  it('links the try page from crawler-surface source files', () => {
+    const sitemapSource = readFileSync(join(ROOT, 'src/app/sitemap.ts'), 'utf8');
+    expect(sitemapSource).toMatch(/\/llm-shells/);
 
-    const seoAeoPath = join(ROOT, 'src/lib/seoAeo.ts');
-    if (existsSync(seoAeoPath)) {
-      const seoAeo = readFileSync(seoAeoPath, 'utf8');
-      expect(seoAeo).not.toMatch(/['"]\/api\/llm-shells['"]/);
-      expect(seoAeo).not.toMatch(/['"]\/llm-shells['"]/);
-      expect(seoAeo).not.toContain(PUBLIC_LLM_SHELLS_URL);
-    }
+    const llmsSource = readFileSync(join(ROOT, 'src/app/llms.txt/route.ts'), 'utf8');
+    expect(llmsSource).toContain(PUBLIC_LLM_SHELLS_URL);
+
+    const skillSource = readFileSync(join(ROOT, 'src/lib/llmShells/skillPack.ts'), 'utf8');
+    expect(skillSource).toContain(PUBLIC_LLM_SHELLS_URL);
+
+    const mcpSource = readFileSync(join(ROOT, 'src/app/mcp/page.tsx'), 'utf8');
+    expect(mcpSource).toContain('href="/llm-shells"');
   });
 });
 
@@ -112,5 +77,6 @@ describe('llm-shells durable status claims', () => {
     expect(pageSource).toContain('Marketplace publication: not submitted');
     expect(pageSource).toContain('Credentials: none claimed');
     expect(pageSource).toContain('READ-ONLY and DRAFT-ONLY: certified in repo');
+    expect(pageSource).toContain('https://grok.com/connectors');
   });
 });

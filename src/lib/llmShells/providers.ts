@@ -36,6 +36,7 @@ export const DURABLE_SHELL_CLAIMS = [
 function sharedShell(provider: LlmShellProvider, label: string, install: {
   client: string;
   docs: string;
+  openUrl: string;
   steps: string[];
   nativeConfig: Record<string, unknown>;
 }) {
@@ -63,14 +64,13 @@ function sharedShell(provider: LlmShellProvider, label: string, install: {
 
 export function getChatgptShell() {
   return sharedShell('chatgpt', 'OpenAI ChatGPT', {
-    client: 'ChatGPT custom GPT, GPT Actions, or ChatGPT MCP connector when the account has remote MCP.',
-    docs: 'https://www.never86.ai/mcp',
+    client: 'ChatGPT Settings → Connectors. Paid plan. Developer Mode if ChatGPT asks for it.',
+    docs: 'https://help.openai.com/en/articles/11487775-connectors-in-chatgpt',
+    openUrl: 'https://chatgpt.com',
     steps: [
-      'This listing is not submitted to the GPT Store. Do not treat a store URL as live.',
-      'If the ChatGPT account shows Connectors / MCP, add a custom MCP server named Never86\'d Operator Intelligence with URL https://www.never86.ai/api/mcp.',
-      'If only Custom GPTs are available, paste the shared skill instructions and point any Action at the same MCP URL. Do not re-declare restaurant formulas as GPT Actions.',
-      'Call get_operator_system first. Keep the session READ-ONLY. Vendor copy is DRAFT-ONLY.',
-      'No Never86 ChatGPT client secret, operator OAuth client, or GPT Store slug is claimed.',
+      'Open ChatGPT → Settings → Connectors (or Apps & Connectors). Enable Developer Mode if the screen asks.',
+      'Create a custom / remote MCP connector named Never86\'d Operator Intelligence.',
+      'Paste https://www.never86.ai/api/mcp. No restaurant login. Then send the first prompt on this page.',
     ],
     nativeConfig: {
       name: "Never86'd Operator Intelligence",
@@ -82,13 +82,13 @@ export function getChatgptShell() {
 
 export function getClaudeShell() {
   return sharedShell('claude', 'Anthropic Claude', {
-    client: 'Claude Desktop, Claude.ai custom connector, or an Anthropic skill file that only points at MCP.',
-    docs: 'https://www.never86.ai/mcp',
+    client: 'Claude.ai Customize → Connectors, or Claude Desktop custom connector.',
+    docs: 'https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp',
+    openUrl: 'https://claude.ai/settings/connectors',
     steps: [
-      'Not submitted to an Anthropic connector marketplace. Do not invent a directory listing.',
-      'Claude Desktop: add a remote MCP server never86-operator-system at https://www.never86.ai/api/mcp. Prefer HTTP MCP if the client supports it; otherwise document the gap instead of forking tools into a local stdio server.',
-      'Optional skill file skills/never86/SKILL.md is a thin pointer at the same skill pack. It contains no restaurant math.',
-      'Call get_operator_system first. READ-ONLY then DRAFT-ONLY. Do not wire the private orchestrator OAuth client into Claude.',
+      'Open Claude → Customize → Connectors → Add custom connector.',
+      'Name it Never86\'d Operator Intelligence.',
+      'Paste https://www.never86.ai/api/mcp. Prefer HTTP/remote MCP. Then send the first prompt on this page.',
     ],
     nativeConfig: {
       mcpServers: {
@@ -103,13 +103,13 @@ export function getClaudeShell() {
 
 export function getGeminiShell() {
   return sharedShell('gemini', 'Google Gemini', {
-    client: 'Gemini Gem custom instructions, or Google AI Studio / Gemini app MCP connector if the account has remote MCP.',
-    docs: 'https://www.never86.ai/mcp',
+    client: 'Gemini Gem, or Gemini / AI Studio MCP connector when the account has it.',
+    docs: 'https://ai.google.dev/gemini-api/docs',
+    openUrl: 'https://gemini.google.com',
     steps: [
-      'Not submitted to Gemini Gems gallery or an extensions marketplace. No live Gem ID is claimed.',
-      'Create a Gem (or equivalent custom instruction) named Never86\'d Operator Intelligence and paste the shared skill instructions.',
-      'If the Gemini client supports remote MCP, add https://www.never86.ai/api/mcp. If it does not, keep the Gem as instructions-only and still call operators to the public MCP from a compatible client — do not reimplement tools as Gemini function-calling math.',
-      'READ-ONLY then DRAFT-ONLY. No Google Cloud service account or Gemini API key belongs in this repo.',
+      'Open Gemini. Create a Gem named Never86\'d Operator Intelligence.',
+      'If the account shows Extensions / Connectors, add https://www.never86.ai/api/mcp. If not, paste the shared skill instructions into the Gem.',
+      'Do not rebuild restaurant math as Gemini functions. Then send the first prompt on this page.',
     ],
     nativeConfig: {
       gemName: "Never86'd Operator Intelligence",
@@ -121,13 +121,13 @@ export function getGeminiShell() {
 
 export function getGrokShell() {
   return sharedShell('grok', 'xAI Grok', {
-    client: 'Grok Connectors custom MCP connector.',
+    client: 'Grok Connectors → New → Custom.',
     docs: 'https://docs.x.ai/grok/connectors',
+    openUrl: 'https://grok.com/connectors',
     steps: [
-      'Open Grok Connectors → New Connector → Custom. This repo does not claim that a named listing is already installed on grok.com.',
-      'Name it Never86\'d Operator Intelligence. Paste https://www.never86.ai/api/mcp. No restaurant login or marketplace password is required for the public pack.',
-      'Do not attach the private Grok→Cursor orchestrator OAuth client to this operator shell. That bridge is a separate, fail-closed factory endpoint.',
-      'Ask Grok to use get_operator_system first. READ-ONLY then DRAFT-ONLY.',
+      'Open grok.com/connectors → New Connector → Custom.',
+      'Name it Never86\'d Operator Intelligence.',
+      'Paste https://www.never86.ai/api/mcp. Save. Then send the first prompt on this page.',
     ],
     nativeConfig: {
       connectorName: "Never86'd Operator Intelligence",
@@ -180,6 +180,7 @@ export function getInstallMatrix() {
       liveProviderInstall: shell.status.liveProviderInstall,
       credentials: shell.status.credentials,
       installClient: shell.install.client,
+      openUrl: shell.install.openUrl,
       steps: shell.install.steps,
     })),
     honesty: [

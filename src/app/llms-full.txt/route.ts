@@ -12,6 +12,7 @@ export async function GET() {
 
 ## Canonical operator system
 - Connect at https://www.never86.ai/api/mcp and call get_operator_system first.
+- Try the four LLM doors at https://www.never86.ai/llm-shells — ChatGPT, Claude, Gemini, Grok. Same backend. Not a store listing.
 - The versioned system defines load-day onboarding, the capture-to-proof loop, Action Shift, vendor silence, morning/night/weekly routines, proof-backed store memory, specialist agents, truth gates, prompt-injection defenses, operator UI rules, and rollout gates.
 - Grok, ChatGPT, Claude, Gemini, and other compatible MCP clients should call the same backend. Prompts may differ; calculations, evidence states, memory rules, and human-approval gates do not.
 - Store-specific targets, vendor cadence, mappings, recipes, staff data, statements, invoices, and financial results remain private and are not in the public MCP pack.
@@ -37,7 +38,7 @@ Audience: ${answer.audience ?? 'restaurant operator'}
 Category: ${answer.category ?? 'Foundations and proof'}
 
 ${answer.answer}
-${answer.formula ? `\nWorking formula: ${answer.formula}\n` : ''}${answer.fieldChecks?.length ? `\nField checks:\n${answer.fieldChecks.map((check) => `- ${check}`).join('\n')}\n` : ''}${answer.evidenceNeeded?.length ? `\nEvidence to keep:\n${answer.evidenceNeeded.map((item) => `- ${item}`).join('\n')}\n` : ''}${answer.evidenceBoundary ? `\nEvidence boundary: ${answer.evidenceBoundary}\n` : ''}${answer.sources?.length ? `\nSources:\n${answer.sources.map((source) => `- ${source.title}: ${source.url}`).join('\n')}\n` : ''}`).join('\n---\n\n')}
+${answer.formula ? `\\nWorking formula: ${answer.formula}\\n` : ''}${answer.fieldChecks?.length ? `\\nField checks:\\n${answer.fieldChecks.map((check) => `- ${check}`).join('\\n')}\\n` : ''}${answer.evidenceNeeded?.length ? `\\nEvidence to keep:\\n${answer.evidenceNeeded.map((item) => `- ${item}`).join('\\n')}\\n` : ''}${answer.evidenceBoundary ? `\\nEvidence boundary: ${answer.evidenceBoundary}\\n` : ''}${answer.sources?.length ? `\\nSources:\\n${answer.sources.map((source) => `- ${source.title}: ${source.url}`).join('\\n')}\\n` : ''}`).join('\n---\n\n')}
 `;
 
   return new Response(body, {

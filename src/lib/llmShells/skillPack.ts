@@ -38,7 +38,7 @@ export const SHARED_SKILL_INSTRUCTIONS = [
   'Allowed MCP tools only: ' + MCP_PUBLIC_TOOL_NAMES.join(', ') + '.',
   'READ-ONLY first: every public MCP tool is read-only. Never add send, post, refund, payroll, payment, discipline, or access-grant tools.',
   'DRAFT-ONLY second: vendor/service messages are copyable drafts for a human to review and send. Never send them.',
-  'Keep store data tenant-scoped. Never copy one store\'s targets, cadence, recipes, roster, or dollars into another tenant.',
+  'Keep store data tenant-scoped. Never copy one store\'s targets, vendor cadence, mappings, recipes, roster, or dollars into another tenant.',
   'Label facts Verified, Reconciled, Partial, Estimated, Unverified, or Missing Evidence. Typed values stay Unverified until matched to a source. Missing Evidence is not $0.',
   'A verbal yes can acknowledge an action. It cannot close it. Require the named proof object.',
   'Missing proof or overdue unverified manager-checklist steps escalate to the manager seat as Missing Evidence / Unverified. They are not theft, discipline, or guaranteed-savings claims.',
@@ -70,6 +70,7 @@ export function getNever86SkillPack() {
       then: ['get_operator_logic', 'get_3p_audit_logic', 'list_source_tags'],
       publicSurfaces: [
         'https://www.never86.ai/mcp',
+        'https://www.never86.ai/llm-shells',
         'https://www.never86.ai/llms.txt',
         'https://www.never86.ai/llms-full.txt',
       ],

@@ -102,7 +102,7 @@ describe('sitemap lastmod for sharpened AEO URLs', () => {
       const lastModified = byUrl.get(`${WWW}${path}`)?.lastModified;
       expect(new Date(lastModified as Date).getTime()).toBe(AEO_PAGE_LASTMOD.getTime());
     }
-    expect(byUrl.get(`${WWW}/llm-shells`)).toBeUndefined();
+    expect(byUrl.get(`${WWW}/llm-shells`)?.url).toBe(`${WWW}/llm-shells`);
   });
 });
 
