@@ -11,7 +11,9 @@ import { CTAP_LAB_STATION_SEATS } from './ctapLabPack';
  */
 
 export const STAFF_SEAT_AUTH_STATUS = 'drafted' as const;
-export const STAFF_CREDENTIAL_ISSUANCE = 'blocked' as const;
+export type StaffCredentialIssuance = 'blocked' | 'enabled';
+export const STAFF_CREDENTIAL_ISSUANCE: StaffCredentialIssuance = 'blocked';
+export const STAFF_SEAT_LOGIN_ENABLED_ENV = 'STAFF_SEAT_LOGIN_ENABLED';
 
 export const STATION_SEAT_KEYS = [
   'owner',
@@ -21,12 +23,23 @@ export const STATION_SEAT_KEYS = [
   'server',
   'prep',
   'driver',
+  'line_cook',
+  'pizza',
+  'dishwasher',
 ] as const;
 
 export type StationSeatKey = (typeof STATION_SEAT_KEYS)[number];
 
 export const MANAGER_FIRST_SEAT_KEYS = ['foh_manager', 'kitchen_manager'] as const;
-export const CREW_STATION_SEAT_KEYS = ['bartender', 'server', 'prep', 'driver'] as const;
+export const CREW_STATION_SEAT_KEYS = [
+  'bartender',
+  'server',
+  'prep',
+  'driver',
+  'line_cook',
+  'pizza',
+  'dishwasher',
+] as const;
 
 export const STAFF_CAPABILITIES = [
   'view_own_station',
@@ -96,7 +109,7 @@ export type StaffAuditReceipt = {
   reason: string;
   tokenFingerprint: string | null;
   at: string;
-  liveIssuance: typeof STAFF_CREDENTIAL_ISSUANCE;
+  liveIssuance: StaffCredentialIssuance;
   mailSent: false;
 };
 
@@ -123,8 +136,8 @@ export type PrivateInputNeeded = {
   what: string;
 };
 
-const FOH_STATION_TARGETS: readonly StationSeatKey[] = ['bartender', 'server', 'driver'];
-const KITCHEN_STATION_TARGETS: readonly StationSeatKey[] = ['prep'];
+const FOH_STATION_TARGETS: readonly StationSeatKey[] = ['bartender', 'server'];
+const KITCHEN_STATION_TARGETS: readonly StationSeatKey[] = ['prep', 'line_cook', 'dishwasher', 'pizza', 'driver'];
 
 const CAPABILITY_BY_SEAT: Record<StationSeatKey, readonly StaffCapability[]> = {
   owner: [
@@ -147,7 +160,6 @@ const CAPABILITY_BY_SEAT: Record<StationSeatKey, readonly StaffCapability[]> = {
     'invite_station',
     'reset_seat',
     'revoke_seat',
-    'prove_cash',
     'prove_alarm',
     'assign_action',
   ],
@@ -165,6 +177,9 @@ const CAPABILITY_BY_SEAT: Record<StationSeatKey, readonly StaffCapability[]> = {
   server: ['view_own_station', 'acknowledge_shift'],
   prep: ['view_own_station', 'acknowledge_shift'],
   driver: ['view_own_station', 'acknowledge_shift'],
+  line_cook: ['view_own_station', 'acknowledge_shift'],
+  pizza: ['view_own_station', 'acknowledge_shift'],
+  dishwasher: ['view_own_station', 'acknowledge_shift'],
 };
 
 export const PRIVATE_INPUTS_BEFORE_REAL_CTAP_LOGIN: readonly PrivateInputNeeded[] = [
@@ -863,6 +878,62 @@ export function authenticateStaffSeat(input: {
     session,
     directory: { ...input.directory, receipts: [...input.directory.receipts, receipt] },
   };
+}
+
+export type StaffSeatLoginEnablement = {
+  ready: boolean;
+  issuance: StaffCredentialIssuance;
+  status: 'database_url_missing' | 'not_enabled' | 'ready_after_neon_apply';
+  error: string;
+  privateInputIds: readonly string[];
+  mailSent: false;
+  ownerPlane: '/login';
+};
+
+export function evaluateStaffSeatLoginEnablement(
+  env: Record<string, string | undefined> = process.env,
+): StaffSeatLoginEnablement {
+  const privateInputIds = PRIVATE_INPUTS_BEFORE_REAL_CTAP_LOGIN.map((item) => item.id);
+  if (!env.DATABASE_URL) {
+    return {
+      ready: false,
+      issuance: 'blocked',
+      status: 'database_url_missing',
+      error: 'Staff login fails closed: DATABASE_URL is missing. Owner /login remains owner-only. No mail sent.',
+      privateInputIds,
+      mailSent: false,
+      ownerPlane: '/login',
+    };
+  }
+  if (env[STAFF_SEAT_LOGIN_ENABLED_ENV] !== 'true') {
+    return {
+      ready: false,
+      issuance: 'blocked',
+      status: 'not_enabled',
+      error: 'Staff login stays blocked until Neon apply of sql/0005_staff_seat_auth.sql and STAFF_SEAT_LOGIN_ENABLED=true. Owner /login remains owner-only. Invite tokens are hashed only. No mail sent.',
+      privateInputIds,
+      mailSent: false,
+      ownerPlane: '/login',
+    };
+  }
+  return {
+    ready: true,
+    issuance: 'enabled',
+    status: 'ready_after_neon_apply',
+    error: '',
+    privateInputIds,
+    mailSent: false,
+    ownerPlane: '/login',
+  };
+}
+
+export function isSafeStaffInviteHandle(value: string): boolean {
+  const handle = value.trim();
+  if (handle.length < 3 || handle.length > 64) return false;
+  if (/@/.test(handle)) return false;
+  if (/\b(pin|password|ssn)\b/i.test(handle)) return false;
+  if (/^\d{4,}$/.test(handle)) return false;
+  return /^[a-z0-9][a-z0-9._-]*$/i.test(handle);
 }
 
 export function issueLiveStaffCredential(): {

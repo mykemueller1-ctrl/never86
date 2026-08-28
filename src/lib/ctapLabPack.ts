@@ -36,6 +36,9 @@ export const CTAP_LAB_STATION_SEATS: readonly CtapLabStationSeat[] = [
   { seatKey: 'server', label: 'Server', roleKey: 'server', stations: ['dining'], kind: 'station_seat' },
   { seatKey: 'prep', label: 'Prep', roleKey: 'prep_cook', stations: ['prep'], kind: 'station_seat' },
   { seatKey: 'driver', label: 'Driver', roleKey: 'driver', stations: ['delivery'], kind: 'station_seat' },
+  { seatKey: 'line_cook', label: 'Line cook', roleKey: 'line_cook', stations: ['fry', 'line'], kind: 'station_seat' },
+  { seatKey: 'pizza', label: 'Pizza', roleKey: 'cook', stations: ['pizza_side', 'pizza_line'], kind: 'station_seat' },
+  { seatKey: 'dishwasher', label: 'Dishwasher', roleKey: 'dishwasher', stations: ['dish'], kind: 'station_seat' },
 ];
 
 export type CtapVendorCadenceRule = {

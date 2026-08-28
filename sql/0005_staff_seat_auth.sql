@@ -1,7 +1,8 @@
--- DRAFT. Do not apply to live Neon or live Supabase.
--- Staff-seat invite / reset / revoke audit for the manager-first login plane.
--- No real Community Tap names, emails, phones, PINs, or live schedules.
--- Live issuance stays blocked until Myke supplies PRIVATE_INPUTS_BEFORE_REAL_CTAP_LOGIN.
+-- DRAFT. Do not apply to live Neon or live Supabase from this PR.
+-- Enable path after Myke applies this file: set STAFF_SEAT_LOGIN_ENABLED=true
+-- with DATABASE_URL present. Owner /login stays owner-only.
+-- Invite tokens are stored hashed only (token_hash). Never store plaintext
+-- secrets, real emails, or PINs. HTTP invite stays 403 with mail_sent = false.
 
 begin;
 
@@ -9,6 +10,11 @@ create table if not exists public.staff_seat_invites (
   id uuid primary key default gen_random_uuid(),
   operator_id integer not null,
   seat_id uuid not null,
+  seat_key text not null check (seat_key in (
+    'owner', 'foh_manager', 'kitchen_manager', 'bartender', 'server', 'prep',
+    'driver', 'line_cook', 'pizza', 'dishwasher'
+  )),
+  invite_handle text not null check (position('@' in invite_handle) = 0 and invite_handle !~* 'pin|password'),
   action text not null check (action in ('invite', 'reset')),
   token_hash text not null,
   expires_at timestamptz not null,
@@ -16,6 +22,7 @@ create table if not exists public.staff_seat_invites (
   created_by_seat_id uuid not null,
   created_at timestamptz not null default now(),
   unique (operator_id, id),
+  unique (invite_handle),
   foreign key (operator_id, seat_id)
     references public.operator_staff_seats(operator_id, id)
     on delete cascade,
@@ -37,7 +44,7 @@ create table if not exists public.staff_seat_audit_receipts (
   reason text not null,
   token_hash text,
   mail_sent boolean not null default false check (mail_sent = false),
-  live_issuance text not null default 'blocked' check (live_issuance = 'blocked'),
+  live_issuance text not null default 'blocked' check (live_issuance in ('blocked', 'enabled')),
   created_at timestamptz not null default now(),
   unique (operator_id, id),
   foreign key (operator_id, actor_seat_id)

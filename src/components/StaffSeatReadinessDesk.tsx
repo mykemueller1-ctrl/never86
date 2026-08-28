@@ -22,6 +22,7 @@ import {
   syntheticActor,
   syntheticSeatId,
 } from '@/lib/staffSeatFixtures';
+import { StaffRoleDayDesk } from '@/components/StaffRoleDayDesk';
 
 const NOW = '2026-08-24T16:00:00.000-05:00';
 const EXPIRES = '2026-08-25T16:00:00.000-05:00';
@@ -46,9 +47,9 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
     <div className="min-h-screen bg-[#0c1210] text-white">
       <div className="mx-auto max-w-6xl px-6 py-10">
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
-          <Link href="/action-shift/manager" className="hover:text-white">← Manager board</Link>
+          <Link href="/staff/desk" className="hover:text-white">← Staff desk</Link>
           <Link href="/staff/login" className="hover:text-white">Staff login</Link>
-          <Link href="/login" className="hover:text-white">Operator login</Link>
+          <Link href="/login" className="hover:text-white">Owner login</Link>
           <Link href="/dashboard/staff" className="hover:text-white">Signed desk</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">
@@ -59,9 +60,10 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
           Manager-first seats. Tenant line. No live credentials.
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/60">
-          Owner, FOH manager, kitchen manager, bartender, server, prep, and driver are station seats.
-          The current /login credential still grants full operator access. This desk proves least privilege
-          and invite / reset / revoke receipts on synthetic operators 101 and 202 only.
+          Owner (Myke), FOH manager (Kenzy), kitchen manager (Tom), bartender, server, prep, driver, line cook, pizza, and dishwasher
+          are station seats. Kenzy is FOH only. Tom owns kitchen and drivers. Myke owns the drawer and the bank.
+          The current /login credential still grants full operator access and stays owner-only. This desk proves
+          least privilege and invite / reset / revoke receipts on synthetic operators 101 and 202 only.
         </p>
         <p className="mt-3 text-sm text-amber-100/80">{message}</p>
 
@@ -78,6 +80,10 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
             </article>
           ))}
         </section>
+
+        <div className="mt-10">
+          <StaffRoleDayDesk />
+        </div>
 
         <section className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
           <h2 className="font-semibold">Synthetic roster · operator {SYNTHETIC_OPERATOR_A_ID}</h2>

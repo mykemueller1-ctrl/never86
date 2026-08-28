@@ -14,7 +14,10 @@ describe('staff seat auth draft migration', () => {
     expect(migration).toContain('references public.operator_staff_seats(operator_id, id)');
     expect(migration).not.toMatch(/references public\.operator_staff_seats\(id\)/);
     expect(migration).toContain("check (mail_sent = false)");
-    expect(migration).toContain("check (live_issuance = 'blocked')");
+    expect(migration).toContain("check (live_issuance in ('blocked', 'enabled'))");
+    expect(migration).toContain('invite_handle');
+    expect(migration).toContain('token_hash');
+    expect(migration).toContain('seat_key');
   });
 
   it('enables RLS without granting anonymous or destructive browser access', () => {

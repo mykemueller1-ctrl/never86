@@ -25,6 +25,9 @@ describe('CTap lab pack', () => {
       'Server',
       'Prep',
       'Driver',
+      'Line cook',
+      'Pizza',
+      'Dishwasher',
     ]);
     expect(CTAP_LAB_STATION_SEATS.every((seat) => seat.kind === 'station_seat')).toBe(true);
     expect(CTAP_LAB_STATION_SEATS.every((seat) => PRODUCT_ROLE_KEYS.includes(seat.roleKey))).toBe(true);

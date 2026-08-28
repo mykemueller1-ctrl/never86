@@ -198,6 +198,8 @@ const ROLE_ALIASES: Record<string, ActionShiftRoleKey> = {
   waitress: 'server',
   waitstaff: 'server',
   pizza_side: 'server',
+  pizza: 'cook',
+  pizza_line: 'cook',
   bar_side: 'bartender',
   bar: 'bartender',
   fry: 'line_cook',

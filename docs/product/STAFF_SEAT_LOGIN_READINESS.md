@@ -1,7 +1,7 @@
 # Staff seat login readiness
 
 **State:** drafted, tested, not merged, not deployed, not live-verified.  
-Live staff credentials are **not issued**. The existing `/login` operator credential still grants full operator access.
+Live staff credentials are **not issued** until Neon apply of `sql/0005_staff_seat_auth.sql` **and** `STAFF_SEAT_LOGIN_ENABLED=true`. The existing `/login` operator credential still grants full operator access and stays owner-only.
 
 ## What this slice is
 
@@ -10,11 +10,23 @@ Least-privilege **manager-first** station seats on top of the Action Shift workf
 | Seat | Kind | Can invite / reset / revoke | Privileged proof |
 |---|---|---|---|
 | Owner | manager | FOH manager, kitchen manager, crew stations in the same tenant | cash, dough, alarm — source proof only |
-| FOH manager | manager | bartender, server, driver | cash, alarm |
-| Kitchen manager | manager | prep | dough, alarm |
-| Bartender / server / prep / driver | station | none | none |
+| FOH manager | manager | bartender, server | alarm |
+| Kitchen manager | manager | prep, line cook, dishwasher, pizza, driver | dough, alarm |
+| Bartender / server / prep / driver / line cook / pizza / dishwasher | station | none | none |
 
 Operator A cannot own, prove, invite, or revoke operator B. A verbal yes does not close cash, dough, or alarm.
+
+## Login enable path (after Neon apply)
+
+This PR does **not** apply SQL, mint live passwords, or send mail.
+
+1. Fail closed if `DATABASE_URL` is missing.
+2. Stay blocked unless `STAFF_SEAT_LOGIN_ENABLED` is exactly `true`.
+3. After Myke applies `sql/0005_staff_seat_auth.sql`, set that flag plus `STAFF_SEAT_SESSION_SECRET`.
+4. Invite tokens are stored as `token_hash` only. Handles are not emails or PINs.
+5. `POST /api/staff/invite` remains 403 with `mailSent: false`. Delivery stays a human-approved channel.
+6. Owner `/login` is never copied onto a staff seat. Staff sessions set `grantsFullOperatorAccess: false`.
+
 
 ## What this slice is not
 
@@ -41,5 +53,6 @@ These stay off git. Supply them privately to Myke's operator plane:
 ## Surfaces
 
 - `/staff/login` — noindex staff door; live POST is fail-closed
+- `/staff/desk` — noindex Myke / Tom / Kenzy / line / dish desk
 - `/staff/seats` — noindex synthetic model + private-input stop
 - `/dashboard/staff` — operator-gated synthetic invite / reset / revoke desk
