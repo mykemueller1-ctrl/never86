@@ -6,13 +6,11 @@ One provider-neutral skill pack. Four install wrappers. The public MCP backend o
 
 | Claim | State |
 |---|---|
-| Drafted in this git branch | yes |
-| Submitted to GPT Store / Claude directory / Gemini gallery / Grok featured connectors | **no** |
+| Submitted to GPT Store / Claude directory / Gemini gallery / Grok featured connectors | **no — not submitted** |
 | Live-verified as installed inside ChatGPT, Claude, Gemini, or Grok | **no — unverified** |
 | Provider secrets or restaurant-tenant OAuth clients for these shells | **none claimed** |
 | READ-ONLY certified in repo | yes (not live-verified on a provider UI) |
 | DRAFT-ONLY certified in repo | yes (no live external writes) |
-| Merged / production-deployed from this branch | no |
 
 ## Shared source
 

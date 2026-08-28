@@ -72,7 +72,6 @@ export function getNever86SkillPack() {
         'https://www.never86.ai/mcp',
         'https://www.never86.ai/llms.txt',
         'https://www.never86.ai/llms-full.txt',
-        'https://www.never86.ai/llm-shells',
       ],
       storeSpecificBoundary: NEVER86_OPERATOR_SYSTEM.storeSpecificBoundary,
     },

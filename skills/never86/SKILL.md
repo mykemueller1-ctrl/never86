@@ -24,4 +24,4 @@ This file is a thin pointer. The Never86 OAuth/MCP backend owns restaurant logic
 9. Do not claim a marketplace listing, live provider install, or credentials that are unverified.
 
 Canonical pack: `src/lib/llmShells/skillPack.ts`.
-Install matrix: https://www.never86.ai/llm-shells
+Install matrix: `docs/llm-shells/INSTALL.md` and `GET /api/llm-shells` (not a crawler/LLM index URL).
