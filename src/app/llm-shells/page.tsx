@@ -33,7 +33,7 @@ export default function LlmShellsPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86'd <span className="italic text-ink-600">· try it in four LLMs</span>
+                Never 86{"'"}d <span className="italic text-ink-600">· try it in four LLMs</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">One URL · same operator backend</p>
             </span>
@@ -70,7 +70,7 @@ export default function LlmShellsPage() {
             One endpoint · four LLMs
           </p>
           <p className="compass-body mt-3 text-base max-w-3xl">
-            Name the connector <strong>Never86'd Operator Intelligence</strong>. No restaurant login.
+            Name the connector <strong>Never86{"'"}d Operator Intelligence</strong>. No restaurant login.
             Public pack is read-only. You send vendor messages yourself.
           </p>
           <CopyMcpUrl url={mcpUrl} />
