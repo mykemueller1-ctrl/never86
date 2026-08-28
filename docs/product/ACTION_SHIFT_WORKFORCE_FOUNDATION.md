@@ -42,6 +42,10 @@ and export a deployment packet. The CSV contents stay inside the browser and are
 not posted to the application. This does not claim that the live tenant database
 has been migrated or that staff logins have been activated.
 
+Staff-seat login readiness (manager-first owner / FOH / kitchen / crew station
+seats, tenant boundary, invite/reset/revoke receipts) is drafted in
+`docs/product/STAFF_SEAT_LOGIN_READINESS.md`. Live credentials remain blocked.
+
 ## Deterministic schedule matching
 
 `src/lib/actionShiftWorkforce.ts` maps a provider worker ID to exactly one active
