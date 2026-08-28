@@ -35,6 +35,9 @@ not claim that the public `/action-shift` page is a staff login surface. Staff
 authentication, owner/manager administration, and per-role API policy tests are
 the next delivery slice.
 
+Role-day station checklists and policies live on the noindex `/staff/desk`
+(see `docs/product/STAFF_ROLE_DAY_DESK.md`). Live staff login remains blocked.
+
 The operator-authenticated `/dashboard/setup` and admin-only
 `/admin/action-shift` routes provide a local staging desk. A manager can load a
 roster and schedule, resolve invalid rows, preview role-specific checklist packs,

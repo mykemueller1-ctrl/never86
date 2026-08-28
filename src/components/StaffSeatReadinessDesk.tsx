@@ -22,6 +22,7 @@ import {
   syntheticActor,
   syntheticSeatId,
 } from '@/lib/staffSeatFixtures';
+import { StaffRoleDayDesk } from '@/components/StaffRoleDayDesk';
 
 const NOW = '2026-08-24T16:00:00.000-05:00';
 const EXPIRES = '2026-08-25T16:00:00.000-05:00';
@@ -48,6 +49,7 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
           <Link href="/action-shift/manager" className="hover:text-white">← Manager board</Link>
           <Link href="/staff/login" className="hover:text-white">Staff login</Link>
+          <Link href="/staff/desk" className="hover:text-white">Role-day desk</Link>
           <Link href="/login" className="hover:text-white">Operator login</Link>
           <Link href="/dashboard/staff" className="hover:text-white">Signed desk</Link>
         </nav>
@@ -78,6 +80,10 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
             </article>
           ))}
         </section>
+
+        <div className="mt-10">
+          <StaffRoleDayDesk />
+        </div>
 
         <section className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
           <h2 className="font-semibold">Synthetic roster · operator {SYNTHETIC_OPERATOR_A_ID}</h2>

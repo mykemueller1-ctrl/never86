@@ -63,9 +63,13 @@ export function StaffLoginForm() {
         <Link href="/login" className="underline" style={{ textDecorationColor: '#0066ff' }}>
           /login
         </Link>
-        . Model:{' '}
+        .         Model:{' '}
         <Link href="/staff/seats" className="underline" style={{ textDecorationColor: '#0066ff' }}>
           /staff/seats
+        </Link>
+        . Today:{' '}
+        <Link href="/staff/desk" className="underline" style={{ textDecorationColor: '#0066ff' }}>
+          /staff/desk
         </Link>
         .
       </p>

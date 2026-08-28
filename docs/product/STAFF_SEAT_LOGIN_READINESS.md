@@ -42,4 +42,5 @@ These stay off git. Supply them privately to Myke's operator plane:
 
 - `/staff/login` — noindex staff door; live POST is fail-closed
 - `/staff/seats` — noindex synthetic model + private-input stop
+- `/staff/desk` — noindex role-day checklist + policies from the wall pack
 - `/dashboard/staff` — operator-gated synthetic invite / reset / revoke desk
