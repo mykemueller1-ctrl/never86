@@ -7,6 +7,8 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
   // #122 / CURSOR-GTM: /for/owner (and seats) land on free /trial, not full onboard.
   const seatHref = '/trial';
   const seatLabel = spec.slug === 'owner' ? 'Claim one free seat' : 'Start free seat';
+  const secondaryHref = spec.slug === 'owner' ? '/audit' : spec.freeAgents[0].href;
+  const secondaryLabel = spec.slug === 'owner' ? 'Audit one DoorDash statement' : `Try ${spec.freeAgents[0].name}`;
 
   return (
     <main className="compass min-h-screen">
@@ -41,8 +43,8 @@ export function RolePage({ spec }: { spec: RoleSpec }) {
           <TrackedLink href={seatHref} event="role_hero_cta_click" meta={{ role: spec.badge, target: seatHref, label: seatLabel, variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>
             {seatLabel} →
           </TrackedLink>
-          <TrackedLink href={spec.freeAgents[0].href} event="role_hero_cta_click" meta={{ role: spec.badge, target: spec.freeAgents[0].href, agentName: spec.freeAgents[0].name, label: `Try ${spec.freeAgents[0].name}`, variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
-            Try {spec.freeAgents[0].name}
+          <TrackedLink href={secondaryHref} event="role_hero_cta_click" meta={{ role: spec.badge, target: secondaryHref, label: secondaryLabel, variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
+            {secondaryLabel}
           </TrackedLink>
         </div>
       </section>

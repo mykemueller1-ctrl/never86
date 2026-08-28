@@ -7,24 +7,24 @@ import type { ReactNode } from 'react';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "Free Marketplace Statement Audit | Never 86'd",
+  title: "What did this DoorDash statement actually cost? · Never 86'd",
   description:
-    'Send one redacted DoorDash statement. See what the evidence supports, what is missing, and what to do next. Uber Eats and Grubhub are early access.',
+    'Paste one redacted statement. See eligible sales, documented deductions, expected payout, and whether variance is $0. No portal password. $0 clean math is a feature.',
   alternates: {
     canonical: 'https://www.never86.ai/audit',
   },
   openGraph: {
-    title: 'Your DoorDash commission is not your DoorDash cost.',
+    title: 'What did this DoorDash statement actually cost?',
     description:
-      'One redacted statement. Free audit. No portal password, no integration, and no fake recovery claim.',
+      'One redacted statement. No portal password. $0 payout variance means the statement math is clean.',
     url: 'https://www.never86.ai/audit',
     siteName: "Never 86'd",
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Where did your delivery money go?',
-    description: 'Send one redacted statement. Never 86’d will audit it free.',
+    title: 'What did this DoorDash statement actually cost?',
+    description: 'Paste one redacted statement. $0 variance is a feature when the file is complete.',
   },
 };
 
