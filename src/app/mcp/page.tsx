@@ -26,7 +26,7 @@ const INSTALLS = [
     id: 'chatgpt',
     label: 'ChatGPT',
     steps: [
-      <>Open <a href="https://chatgpt.com" className="font-semibold text-[#0066ff] hover:underline">ChatGPT</a> → Settings → <strong>Connectors</strong> (or Apps &amp; Connectors).</>,
+      <>Open <a href="https://chatgpt.com" className="font-semibold text-[#0066ff] hover:underline">ChatGPT</a> → Settings → <strong>Connectors</strong> (or Apps & Connectors).</>,
       <>Add a <strong>custom / remote MCP</strong> connector.</>,
       <>Name it <strong>{CONNECTOR_NAME}</strong> and paste the endpoint below.</>,
     ],
@@ -63,12 +63,13 @@ export default function McpPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· for AI</span>
+                Never 86'd <span className="italic text-ink-600">· for AI</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Restaurant margin intelligence · MCP endpoint</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
+            <Link href="/llm-shells" className="compass-pill"><span className="avatar">4</span><span>Four LLMs</span></Link>
             <Link href="/" className="compass-pill"><span className="avatar">H</span><span>Home</span></Link>
           </nav>
         </div>
@@ -124,7 +125,7 @@ export default function McpPage() {
           <div className="compass-card p-6 md:p-8">
             <p className="compass-card-label">Load the whole system first</p>
             <p className="compass-body mt-4 text-base">Ask any connected LLM:</p>
-            <p className="mt-3 rounded-2xl bg-[#fbfbfd] p-4 font-mono text-sm leading-relaxed text-[#1d1d1f]">Use Never86&apos;d get_operator_system first. Then build my Action Shift for the prior complete business day. Give me one next action, its owner, the proof required tonight, and the exact missing evidence. Use only my store&apos;s approved targets and rules.</p>
+            <p className="mt-3 rounded-2xl bg-[#fbfbfd] p-4 font-mono text-sm leading-relaxed text-[#1d1d1f]">Use Never86'd get_operator_system first. Then build my Action Shift for the prior complete business day. Give me one next action, its owner, the proof required tonight, and the exact missing evidence. Use only my store's approved targets and rules.</p>
             <p className="compass-body mt-5 text-sm">Typed totals stay unverified until matched to a finalized source. A variance ranks review work—it is not proof of theft, loss, or guaranteed savings.</p>
           </div>
         </div>
@@ -155,6 +156,7 @@ export default function McpPage() {
           <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Do not rebuild the logic inside each chatbot.</h2>
           <p className="compass-body mt-4 max-w-3xl">Grok, ChatGPT, Claude, Gemini, and any other client with compatible remote MCP support should call this same endpoint. Their wording can differ. The formulas, evidence states, store-memory contract, action limits, and human-approval gates stay the same.</p>
           <p className="compass-body mt-4 max-w-3xl">Thin ChatGPT, Claude, Gemini, and Grok install wrappers share this same MCP. Provider installation is unverified. Marketplace listings are not submitted. Credentials are not claimed. READ-ONLY and DRAFT-ONLY are certified in repo.</p>
+          <p className="compass-body mt-4"><Link href="/llm-shells" className="font-semibold text-[#0066ff] hover:underline">Open the four LLM try doors →</Link></p>
         </div>
 
         <div className="compass-card mt-5 p-6 md:p-8">
@@ -172,7 +174,7 @@ export default function McpPage() {
         <div className="max-w-5xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
             <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d · Built by operators</span>
+            <span>Never 86'd · Built by operators</span>
           </div>
           <Link href="/" className="hover:text-ink-800 transition-colors">Home</Link>
         </div>
