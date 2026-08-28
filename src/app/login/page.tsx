@@ -105,7 +105,7 @@ export default function OperatorLoginPage() {
           <Link href="/onboard" className="underline" style={{ textDecorationColor: '#0066ff' }}>
             Claim the free seat
           </Link>
-          . One store, one login.
+          . One store, one login. Staff station seats are not issued.
         </p>
       </section>
     </main>
