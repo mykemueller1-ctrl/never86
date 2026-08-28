@@ -5,7 +5,7 @@ import { getStoreListingPacket } from '@/lib/llmShells/storeListing';
 export const metadata: Metadata = {
   title: "Store listing packet · Never 86'd",
   description:
-    'Paste-ready ChatGPT Plugin Directory and Claude Connectors Directory filing. Not listed yet.',
+    'ChatGPT Plugin Directory and Claude Connectors Directory filing for Never 86\'d Inc. Not a restaurant task.',
   alternates: { canonical: 'https://www.never86.ai/store-listing' },
   robots: { index: false, follow: false },
 };
@@ -24,7 +24,7 @@ export default function StoreListingPage() {
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86{"'"}d <span className="italic text-ink-600">· store listing</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Kenzy / Tom filing desk · not listed yet</p>
+              <p className="compass-eyebrow-dim mt-2">Never 86{"'"}d Inc. publisher · not CTAP staff</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
@@ -42,8 +42,8 @@ export default function StoreListingPage() {
           Search Never86{"'"}d. <em>Click Install.</em>
         </h1>
         <p className="compass-body text-lg mb-8">
-          That only happens after ChatGPT or Claude list us. I cannot log into those publisher accounts.
-          Paste the fields below. Do not tell operators we are listed until the directory shows Published.
+          This is a company publisher job. Community Tap managers do not file this.
+          Operators never paste a URL. They search the directory and click Install after OpenAI or Anthropic list us.
         </p>
 
         <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 mb-5">
@@ -58,10 +58,9 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">1. ChatGPT · do this first</p>
+          <p className="compass-card-label">1. ChatGPT · Never 86{"'"}d Inc. org</p>
           <p className="compass-body mt-3 text-sm">
-            Log in as Never 86{"'"}d Inc. Open the plugin portal. Create plugin → With MCP.
-            Auth: none. URL type: Universal.
+            Log in as the company. Create plugin → With MCP. Auth: none. URL type: Universal.
           </p>
           <a
             href={L.chatgptPortal}
@@ -73,7 +72,7 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">Paste these fields</p>
+          <p className="compass-card-label">Publisher form fields</p>
           <dl className="mt-4 space-y-3 text-sm">
             {[
               ['Name', L.name],
@@ -140,7 +139,7 @@ export default function StoreListingPage() {
         </div>
 
         <p className="compass-body text-sm">
-          Domain token from OpenAI goes at <code>{packet.domainChallengePath}</code>. Send the token. Do not invent one.
+          Domain token from OpenAI goes at <code>{packet.domainChallengePath}</code>. Company publisher sends the token. Do not invent one.
         </p>
       </section>
     </main>
