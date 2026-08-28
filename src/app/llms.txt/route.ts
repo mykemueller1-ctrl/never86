@@ -54,6 +54,7 @@ export async function GET() {
 - [Pricing](https://www.never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
 
 ## Connect any AI
+- [Try Never86'd in ChatGPT, Claude, Gemini, or Grok](https://www.never86.ai/llm-shells) — paste one public MCP URL. Not a store listing.
 - [Full LLM-readable public corpus](https://www.never86.ai/llms-full.txt)
 - [AI assistant integration guide](https://www.never86.ai/mcp)
 - MCP endpoint: https://www.never86.ai/api/mcp
