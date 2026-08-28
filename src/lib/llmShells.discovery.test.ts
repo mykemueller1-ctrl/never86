@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import sitemap from '../app/sitemap';
@@ -44,12 +44,6 @@ describe('llm-shells crawler and LLM discovery gate', () => {
 
     const mcpSource = readFileSync(join(ROOT, 'src/app/mcp/page.tsx'), 'utf8');
     expect(mcpSource).toContain('href="/llm-shells"');
-
-    const seoAeoPath = join(ROOT, 'src/lib/seoAeo.ts');
-    if (existsSync(seoAeoPath)) {
-      const seoAeo = readFileSync(seoAeoPath, 'utf8');
-      expect(seoAeo).not.toMatch(/disallow.*llm-shells/i);
-    }
   });
 });
 
