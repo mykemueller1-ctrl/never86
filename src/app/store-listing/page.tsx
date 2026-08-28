@@ -22,7 +22,7 @@ export default function StoreListingPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86'd <span className="italic text-ink-600">· store listing</span>
+                Never 86{"'"}d <span className="italic text-ink-600">· store listing</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">Kenzy / Tom filing desk · not listed yet</p>
             </span>
@@ -39,7 +39,7 @@ export default function StoreListingPage() {
       <section className="max-w-3xl mx-auto px-6 pt-16 pb-24">
         <p className="compass-eyebrow mb-6">— 1-click Install</p>
         <h1 className="compass-display text-5xl md:text-6xl mb-8">
-          Search Never86'd. <em>Click Install.</em>
+          Search Never86{"'"}d. <em>Click Install.</em>
         </h1>
         <p className="compass-body text-lg mb-8">
           That only happens after ChatGPT or Claude list us. I cannot log into those publisher accounts.
@@ -60,7 +60,7 @@ export default function StoreListingPage() {
         <div className="compass-card p-6 mb-5">
           <p className="compass-card-label">1. ChatGPT · do this first</p>
           <p className="compass-body mt-3 text-sm">
-            Log in as Never 86'd Inc. Open the plugin portal. Create plugin → With MCP.
+            Log in as Never 86{"'"}d Inc. Open the plugin portal. Create plugin → With MCP.
             Auth: none. URL type: Universal.
           </p>
           <a
