@@ -12,6 +12,8 @@ One provider-neutral skill pack. Four install wrappers. The public MCP backend o
 | READ-ONLY certified in repo | yes (not live-verified on a provider UI) |
 | DRAFT-ONLY certified in repo | yes (no live external writes) |
 
+1-click search-and-install is a directory listing. Filing packet: `docs/llm-shells/STORE-LISTING.md` and `/store-listing`. Do not claim listed until Published.
+
 ## Shared source
 
 - Skill pack: `src/lib/llmShells/skillPack.ts` (`never86-operator-skill` v1.0.0)
@@ -20,6 +22,7 @@ One provider-neutral skill pack. Four install wrappers. The public MCP backend o
 - Machine-readable matrix: `GET /api/llm-shells`
 - Per-shell JSON: `GET /api/llm-shells/{chatgpt,claude,gemini,grok}`
 - Human page: `/llm-shells`
+- Store listing packet: `/store-listing` (noindex)
 
 ## Public MCP
 
