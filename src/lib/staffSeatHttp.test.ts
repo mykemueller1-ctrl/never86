@@ -44,6 +44,7 @@ describe('staff credential HTTP plane', () => {
     expect(staffLoginMetadata.robots).toMatchObject({ index: false, follow: false });
     expect(staffSeatsMetadata.robots).toMatchObject({ index: false, follow: false });
     expect(staffDeskMetadata.robots).toMatchObject({ index: false, follow: false });
+    expect(String(staffDeskMetadata.title)).toMatch(/Worker Home/i);
     const entries = await sitemap();
     expect(entries.some((entry) => String(entry.url).includes('/staff'))).toBe(false);
   });

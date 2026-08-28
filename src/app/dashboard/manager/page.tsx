@@ -23,7 +23,7 @@ export default async function OperatorManagerBoardPage() {
           <Link href="/dashboard" className="hover:text-white">← Dashboard</Link>
           <Link href="/dashboard/setup" className="hover:text-white">Workforce setup</Link>
           <Link href="/dashboard/staff" className="hover:text-white">Staff seats</Link>
-          <Link href="/staff/desk" className="hover:text-white">Role-day desk</Link>
+          <Link href="/staff/desk" className="hover:text-white">Worker Home</Link>
           <Link href="/action-shift/manager" className="hover:text-white">Public manager proof</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">Manager seat · operator {session.operatorId}</p>

@@ -35,8 +35,9 @@ not claim that the public `/action-shift` page is a staff login surface. Staff
 authentication, owner/manager administration, and per-role API policy tests are
 the next delivery slice.
 
-Role-day station checklists, coverage/schedule rules, and in-app station comms
-live on the noindex `/staff/desk` (see `docs/product/STAFF_ROLE_DAY_DESK.md`).
+Role-day station checklists stay wired by seat and weekday on `/staff/seats`
+(see `docs/product/STAFF_ROLE_DAY_DESK.md`). `/staff/desk` is Worker Home
+(Ask, All/FOH/BOH, request-off, miss board) — `docs/product/STAFF_WORKER_HOME.md`.
 Live staff login remains fail-closed without `DATABASE_URL` and stays blocked
 until Neon apply of `sql/0005_staff_seat_auth.sql` plus `STAFF_SEAT_LOGIN_ENABLED=true`.
 

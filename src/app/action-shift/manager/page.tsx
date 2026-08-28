@@ -17,7 +17,7 @@ export default function ActionShiftManagerPage() {
           <Link href="/action-shift/setup" className="hover:text-white">Payroll join</Link>
           <Link href="/action-shift/lab" className="hover:text-white">CTap lab templates</Link>
           <Link href="/staff/seats" className="hover:text-white">Staff seats</Link>
-          <Link href="/staff/desk" className="hover:text-white">Role-day desk</Link>
+          <Link href="/staff/desk" className="hover:text-white">Worker Home</Link>
           <Link href="/dashboard/setup" className="hover:text-white">Workforce setup</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">CTAP · Action Shift · manager seat</p>
