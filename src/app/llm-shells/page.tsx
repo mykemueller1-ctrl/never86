@@ -33,7 +33,7 @@ export default function LlmShellsPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· try it in four LLMs</span>
+                Never 86'd <span className="italic text-ink-600">· try it in four LLMs</span>
               </p>
               <p className="compass-eyebrow-dim mt-2">One URL · same operator backend</p>
             </span>
@@ -60,13 +60,17 @@ export default function LlmShellsPage() {
           Copy the URL. Open your chat app. Add a custom connector. Ask it to load the operator system.
           Restaurant math stays on Never86. These are install doors, not four products.
         </p>
+        <p className="compass-body text-base md:text-lg mb-8 max-w-3xl">
+          1-click search-and-install is the ChatGPT Plugin Directory and Claude Connectors Directory.
+          Those listings are not submitted. Until they are, paste is the product. Same brain. Thin shell.
+        </p>
 
         <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mb-5">
           <p className="compass-card-label" style={{ color: '#0066ff' }}>
             One endpoint · four LLMs
           </p>
           <p className="compass-body mt-3 text-base max-w-3xl">
-            Name the connector <strong>Never86&apos;d Operator Intelligence</strong>. No restaurant login.
+            Name the connector <strong>Never86'd Operator Intelligence</strong>. No restaurant login.
             Public pack is read-only. You send vendor messages yourself.
           </p>
           <CopyMcpUrl url={mcpUrl} />
@@ -122,6 +126,11 @@ export default function LlmShellsPage() {
             ))}
           </ul>
           <p className="compass-body mt-4 text-sm">
+            Filing packet for Kenzy / Tom:{' '}
+            <Link href="/store-listing" className="font-semibold text-[#0066ff] hover:underline">
+              /store-listing
+            </Link>
+            {' · '}
             Machine matrix:{' '}
             <Link href="/api/llm-shells" className="font-semibold text-[#0066ff] hover:underline">
               /api/llm-shells
