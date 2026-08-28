@@ -41,6 +41,7 @@ export type DeskClose = {
   families: Array<'z-summary' | 'hourly' | 'void-promo' | 'vendor-invoice' | 'purchase-order' | 'theoretical-usage' | 'vendor-silence'>;
   injectionSuspected: boolean;
   sales: DeskNumber;
+  grandTotal: DeskNumber;
   mix: {
     food: DeskNumber;
     beer: DeskNumber;
@@ -52,6 +53,11 @@ export type DeskClose = {
   cash: DeskNumber & { status: PdqZSummary['cashStatus'] };
   hourlyPeak: HourlyRow | null;
   voids: DeskNumber;
+  lateDeliveryCount: number | null;
+  lateDeliverySales: DeskNumber;
+  inHouseDeliveryCount: number | null;
+  inHouseDeliverySales: DeskNumber;
+  deliveryChannel: 'in_house' | null;
   missingEvidence: string[];
   actionShift: ActionShiftResult | null;
   actionShiftError: string | null;
@@ -83,6 +89,8 @@ export function buildDeskFromPdqParts(input: {
   hourly?: PdqHourly;
   voids?: PdqVoidPromo;
   injectionSuspected?: boolean;
+  seat?: 'owner' | 'kitchen_manager' | 'default';
+  ownerSaidDepositPresent?: boolean;
 }): DeskClose {
   const missingEvidence: string[] = [];
   const z = input.z;
@@ -120,11 +128,24 @@ export function buildDeskFromPdqParts(input: {
   }
 
   const net = z?.netSales ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Subtotal' };
+  const grand = z?.grandTotal ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Grand Total' };
   const labor = z?.laborDollars ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Labor Summary' };
   const voidField = voids?.voids ?? z?.voids ?? { value: null, state: 'missing-evidence' as const, sourceLabel: '# Voids' };
   const promoField = voids?.promotions ?? z?.promotions ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Promo' };
+  const lateSales = z?.lateDeliverySales ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Late Deliverys' };
+  const inHouseSales = z?.inHouseDeliverySales ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Sales Summary · Delivery (in-house)' };
+  const salesField = net.value != null ? net : grand;
 
-  const salesValue = moneyLine(net, 'Z-report Subtotal / net sales', missingEvidence);
+  const salesValue = moneyLine(salesField, salesField.sourceLabel, missingEvidence);
+  if (net.value == null && grand.value != null) {
+    missingEvidence.push('Subtotal is Missing Evidence. Desk is using Grand Total until net sales land.');
+  }
+  if (z?.deliveryChannel === 'in_house' || (z?.inHouseDeliveryCount ?? 0) > 0 || (inHouseSales.value ?? 0) > 0) {
+    missingEvidence.push('Delivery on the Z is in-house, not DoorDash.');
+  }
+  if (input.seat === 'owner' && cashStatus === 'unentered') {
+    missingEvidence.push('Owner seat: prove the deposit before close. Unentered cash is not driver late.');
+  }
   let actionShift: ActionShiftResult | null = null;
   let actionShiftError: string | null = null;
   if (salesValue != null && salesValue > 0) {
@@ -133,20 +154,28 @@ export function buildDeskFromPdqParts(input: {
       businessDate: z?.businessDate || hourly?.businessDate || voids?.businessDate || undefined,
       grossSales: salesValue,
       laborDollars: moneyLine(labor, 'Labor Summary · Total', missingEvidence),
-      expectedCash: cashStatus === 'entered' ? z?.expectedCash.value ?? undefined : undefined,
+      expectedCash: cashStatus === 'entered' || input.seat === 'owner'
+        ? z?.expectedCash.value && z.expectedCash.value > 0
+          ? z.expectedCash.value
+          : undefined
+        : cashStatus === 'entered' ? z?.expectedCash.value ?? undefined : undefined,
       enteredDeposit: cashStatus === 'entered' ? z?.actualDeposit.value ?? undefined : undefined,
       cashEntered: cashStatus === 'entered',
+      ownerSaidDepositPresent: input.ownerSaidDepositPresent,
+      seat: input.seat,
       payouts: moneyLine(z?.payouts ?? { value: null, state: 'missing-evidence', sourceLabel: 'Pay Outs' }, 'Pay Outs', []),
       voids: moneyLine(voidField, '# Voids', missingEvidence),
       promotions: moneyLine(promoField, 'Promo', []),
       lateDeliveryCount: z?.lateDeliveryCount ?? undefined,
-      lateDeliverySales: z?.lateDeliverySales.value ?? undefined,
+      lateDeliverySales: lateSales.value ?? undefined,
       averageDeliveryMinutes: z?.averageDeliveryMinutes ?? undefined,
+      inHouseDeliveryCount: z?.inHouseDeliveryCount ?? undefined,
+      inHouseDeliverySales: inHouseSales.value ?? undefined,
     });
     if (built.ok) actionShift = built.result;
     else actionShiftError = built.error;
   } else {
-    actionShiftError = 'No net sales on the Z. Missing Evidence — not a $0 night.';
+    actionShiftError = 'No Grand Total or Subtotal on the Z. Missing Evidence — not a $0 night.';
   }
 
   const uniqueMissing = [...new Set([
@@ -160,7 +189,8 @@ export function buildDeskFromPdqParts(input: {
     channel: input.channel,
     families,
     injectionSuspected: Boolean(input.injectionSuspected),
-    sales: deskMoney('Net sales', net),
+    sales: deskMoney(salesField.sourceLabel === 'Grand Total' ? 'Grand total' : 'Net sales', salesField),
+    grandTotal: deskMoney('Grand total', grand),
     mix: {
       food: deskMoney('Food', food),
       beer: deskMoney('Beer', beer),
@@ -172,6 +202,11 @@ export function buildDeskFromPdqParts(input: {
     cash: { ...deskMoney('Cash', cashField), status: cashStatus },
     hourlyPeak: hourly?.peak ?? null,
     voids: deskMoney('Voids', voidField),
+    lateDeliveryCount: z?.lateDeliveryCount ?? null,
+    lateDeliverySales: deskMoney('Late tickets', lateSales),
+    inHouseDeliveryCount: z?.inHouseDeliveryCount ?? null,
+    inHouseDeliverySales: deskMoney('In-house delivery', inHouseSales),
+    deliveryChannel: z?.deliveryChannel ?? null,
     missingEvidence: uniqueMissing,
     actionShift,
     actionShiftError,
@@ -199,6 +234,7 @@ export function buildVendorInvoiceDesk(input: {
     families: input.families?.length ? input.families : ['vendor-invoice'],
     injectionSuspected: Boolean(input.injectionSuspected),
     sales: deskMoney('Net sales', missing),
+    grandTotal: deskMoney('Grand total', missingMoneyField('Grand Total')),
     mix: {
       food: deskMoney('Food', missingMoneyField('Food')),
       beer: deskMoney('Beer', missingMoneyField('Beer')),
@@ -210,6 +246,11 @@ export function buildVendorInvoiceDesk(input: {
     cash: { ...deskMoney('Cash', missingMoneyField('Cash')), status: 'missing-evidence' },
     hourlyPeak: null,
     voids: deskMoney('Voids', missingMoneyField('Voids')),
+    lateDeliveryCount: null,
+    lateDeliverySales: deskMoney('Late tickets', missingMoneyField('Late Deliverys')),
+    inHouseDeliveryCount: null,
+    inHouseDeliverySales: deskMoney('In-house delivery', missingMoneyField('Sales Summary · Delivery (in-house)')),
+    deliveryChannel: null,
     missingEvidence: input.vendorShift.missingEvidence,
     actionShift: input.vendorShift,
     actionShiftError: null,
@@ -233,6 +274,10 @@ function intakeFamilies(input: {
 export function ingestCloseDocuments(
   docs: IntakeDocument[],
   store?: string,
+  options?: {
+    seat?: 'owner' | 'kitchen_manager' | 'default';
+    ownerSaidDepositPresent?: boolean;
+  },
 ): { ok: true; desk: DeskClose } | { ok: false; error: string; status: number } {
   if (!docs.length) {
     return { ok: false, error: 'Paste, upload, or forward yesterday\'s close first.', status: 400 };
@@ -318,7 +363,16 @@ export function ingestCloseDocuments(
     };
   }
 
-  const desk = buildDeskFromPdqParts({ store, channel, z, hourly, voids, injectionSuspected });
+  const desk = buildDeskFromPdqParts({
+    store,
+    channel,
+    z,
+    hourly,
+    voids,
+    injectionSuspected,
+    seat: options?.seat,
+    ownerSaidDepositPresent: options?.ownerSaidDepositPresent,
+  });
   if (vendorShift) {
     desk.families = [...desk.families, 'vendor-invoice'];
     desk.actionShift = feedVendorDriftIntoActionShift(desk.actionShift, vendorShift);

@@ -1,7 +1,7 @@
 # Staff role-day desk
 
 **State:** drafted, tested, not merged, not deployed, not live-verified.  
-Includes `/staff/desk` because PR #160 was still open. Live staff credentials stay **blocked** until Neon apply. This PR does not merge or production-deploy.
+Stacked on PR #161 staff-desk copy. Live staff credentials stay **blocked** until Neon apply. This PR does not merge or production-deploy.
 
 ## What this slice is
 
@@ -30,6 +30,20 @@ Tom board counts (coverage, not roster names):
 - Sun: 4 pizza, 2 line, 2 good drivers
 
 Station comms stay in-app notes only. Front → Kenzy. Back → Tom. Dollars → Myke. No auto email. No Action Shift jargon on staff screens.
+
+## 8/26 and 8/27 yesterday close (this slice)
+
+Same ingest path as the 8/24 PDQ packet: parse → desk → Action Shift. Delivery on the Z is **in-house, not DoorDash**.
+
+| Date | Grand | Food | Beer | Liquor | Pop | Labor | Late | Delivery | Cash |
+|---|---|---|---|---|---|---|---|---|---|
+| Wed 8/26 | 5195.97 | 2776 | 847 | 597 | 147 | 1407 | 5 / 433 | 21 / 957 in-house | not on this close |
+| Thu 8/27 | 4386.65 | 2409 | 920 | 487 | 131 | 1448 | 4 / 152 | 15 / 776 in-house | 1351.46 expected; owner said deposit was there |
+
+Owner seat: **deposit before close**. Not late tickets. Unentered POS cash is not a shortage and is not driver late.
+Kitchen seat (Tom): late on Z / dispatch. Friday/Saturday night board stays **5 pizza, 3 line, dish, 3 drivers**. Lunch 11–1 slot has **no name**. Sunday: 2 only if good drivers. Order path: ticket out of the printer, bag and tag, driver area, grab, hit dispatch, leave, come back.
+
+These field maps live on the noindex owner/staff desk. Typed values stay Unverified until a source PDF is attached. This PR does not merge or production-deploy.
 
 ## Surfaces
 

@@ -241,6 +241,13 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
               {desk.hourlyPeak.guests != null ? ` · ${desk.hourlyPeak.guests} guests` : ''} · Unverified
             </p>
           ) : null}
+          {desk.deliveryChannel === 'in_house' || desk.inHouseDeliveryCount != null || desk.lateDeliveryCount != null ? (
+            <p className="font-mono" style={{ fontSize: 12, color: MUTED, marginBottom: 24 }}>
+              {desk.lateDeliveryCount != null ? `Late ${desk.lateDeliveryCount} · ${desk.lateDeliverySales.display}` : 'Late Missing Evidence'}
+              {desk.inHouseDeliveryCount != null ? ` · In-house delivery ${desk.inHouseDeliveryCount} · ${desk.inHouseDeliverySales.display}` : ''}
+              {' · '}not DoorDash
+            </p>
+          ) : null}
 
           <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: INK, marginBottom: 8 }}>Action Shift · ≤3 moves</p>
           {desk.actionShift ? (

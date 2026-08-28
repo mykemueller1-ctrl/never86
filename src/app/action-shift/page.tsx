@@ -238,6 +238,8 @@ export default function ActionShiftDeskPage() {
             <p className="mt-4 text-sm text-[#a8b5ac]">
               Sales {desk.sales.display} · Food {desk.mix.food.display} · Beer {desk.mix.beer.display} · Liquor {desk.mix.liquor.display} · Pop {desk.mix.pop.display}
               {' · '}Labor {desk.labor.display} · Cash {desk.cash.status === 'unentered' ? 'unentered (not a shortage)' : desk.cash.display}
+              {desk.lateDeliveryCount != null ? ` · Late ${desk.lateDeliveryCount}/${desk.lateDeliverySales.display}` : ''}
+              {desk.inHouseDeliveryCount != null ? ` · In-house delivery ${desk.inHouseDeliveryCount}/${desk.inHouseDeliverySales.display}` : ''}
               {desk.hourlyPeak ? ` · Peak ${desk.hourlyPeak.hour}` : ''}
             </p>
           ) : null}

@@ -17,6 +17,12 @@ export type ActionShiftInput = {
   lateDeliverySales?: number;
   averageDeliveryMinutes?: number;
   targetDeliveryMinutes?: number;
+  /** Owner vs kitchen ranking. Default keeps the public MCP path unchanged. */
+  seat?: 'owner' | 'kitchen_manager' | 'default';
+  /** Owner said the deposit was there even if POS actual is still $0 / unentered. */
+  ownerSaidDepositPresent?: boolean;
+  inHouseDeliveryCount?: number;
+  inHouseDeliverySales?: number;
 };
 
 export type ActionShiftProof = {
@@ -86,6 +92,8 @@ export function buildActionShift(
     ['lateDeliverySales', input.lateDeliverySales],
     ['averageDeliveryMinutes', input.averageDeliveryMinutes],
     ['targetDeliveryMinutes', input.targetDeliveryMinutes],
+    ['inHouseDeliveryCount', input.inHouseDeliveryCount],
+    ['inHouseDeliverySales', input.inHouseDeliverySales],
   ];
   for (const [name, value] of optionalNumbers) {
     const error = validOptionalNumber(name, value);
@@ -96,10 +104,37 @@ export function buildActionShift(
   }
 
   const actions: RankedAction[] = [];
+  const seat = input.seat ?? 'default';
+  const ownerSeat = seat === 'owner';
+  const kitchenSeat = seat === 'kitchen_manager';
 
   const cashEntered = input.cashEntered ?? (input.enteredDeposit !== undefined);
-  if (
-    cashEntered
+  if (ownerSeat) {
+    const expected = input.expectedCash;
+    const evidence = input.ownerSaidDepositPresent && expected != null && expected > 0
+      ? `${money(expected)} expected cash. Owner said the deposit was there. Unentered POS cash is not a shortage and is not driver late.`
+      : expected != null && expected > 0
+        ? `${money(expected)} expected cash on the close. Prove the deposit before close. That is not driver late.`
+        : 'Owner seat proves last night\'s deposit before close. Late tickets are not this seat.';
+    actions.push({
+      id: 'cash-proof',
+      score: 200,
+      title: 'Run the deposit before close',
+      owner: 'Owner',
+      evidence,
+      move: 'Attach the deposit slip or bank record before close. Do not treat late tickets as the owner move.',
+      dollarsObserved: expected != null && expected > 0 ? expected : null,
+      sourceStatus: 'unverified',
+      claimBoundary: 'A verbal yes does not close it. Unentered cash is not a shortage and is not driver late.',
+      proof: {
+        object: 'Deposit slip or matching bank/deposit record',
+        nightCheck: 'Attach the deposit slip or bank/deposit proof before close.',
+        verbalYesCloses: false,
+      },
+    });
+  } else if (
+    !kitchenSeat
+    && cashEntered
     && input.expectedCash !== undefined
     && input.enteredDeposit !== undefined
   ) {
@@ -166,7 +201,7 @@ export function buildActionShift(
       });
   }
 
-  if ((input.lateDeliveryCount ?? 0) > 0) {
+  if (!ownerSeat && (input.lateDeliveryCount ?? 0) > 0) {
     const minutes = input.averageDeliveryMinutes !== undefined
       ? ` Average delivery time was ${input.averageDeliveryMinutes.toFixed(1)} minutes${input.targetDeliveryMinutes !== undefined ? ` vs the operator target of ${input.targetDeliveryMinutes.toFixed(1)}` : ''}.`
       : '';

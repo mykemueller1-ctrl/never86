@@ -46,6 +46,11 @@ describe('PDQ ZReport_Summary native text', () => {
     expect(z.laborDollars.value).toBe(280);
     expect(z.cashStatus).toBe('unentered');
     expect(z.expectedCash.value).toBe(0);
+    expect(z.lateDeliveryCount).toBe(1);
+    expect(z.lateDeliverySales.value).toBe(22);
+    expect(z.inHouseDeliveryCount).toBe(8);
+    expect(z.inHouseDeliverySales.value).toBe(220);
+    expect(z.deliveryChannel).toBe('in_house');
   });
 
   it('does not invent wine when the category is absent', () => {

@@ -9,7 +9,8 @@
  * - Missing category = Missing Evidence, not $0.
  * - $0 cash field = unentered POS, not a shortage.
  *
- * Fixtures are synthetic. Do not commit live restaurant totals or staff names.
+ * Fixtures stay synthetic unless an operator-supplied yesterday-close field map
+ * is wired through the owner/staff path. Do not commit phones, PINs, or roster names.
  */
 
 export type EvidenceState =
@@ -57,6 +58,10 @@ export type PdqZSummary = {
   lateDeliveryCount: number | null;
   lateDeliverySales: MoneyEvidence;
   averageDeliveryMinutes: number | null;
+  /** PDQ Sales Summary Delivery — in-house, not DoorDash / marketplace 3P. */
+  inHouseDeliveryCount: number | null;
+  inHouseDeliverySales: MoneyEvidence;
+  deliveryChannel: 'in_house' | null;
 };
 
 export type PdqHourly = {
@@ -79,6 +84,7 @@ export type PdqParseResult = PdqZSummary | PdqHourly | PdqVoidPromo | {
 };
 
 const MONEY = String.raw`\$?\s*([\d,]+\.\d{2})`;
+const MONEY_FLEX = String.raw`\$?\s*([\d,]+(?:\.\d{1,2})?)`;
 
 export function parseFilenameBusinessDate(filename: string): string | null {
   const base = filename.trim().split(/[/\\]/).pop() || filename;
@@ -126,10 +132,15 @@ function firstMatch(text: string, re: RegExp): string | null {
 
 function labeledMoney(text: string, labels: string[], sourceLabel: string): MoneyEvidence {
   for (const label of labels) {
-    const re = new RegExp(`${label}\\s*[:\\-]?\\s*(?:\\d+\\s+)?${MONEY}`, 'i');
-    const token = firstMatch(text, re);
-    const value = parseMoneyToken(token);
-    if (value != null) return presentMoney(value, sourceLabel);
+    const patterns = [
+      new RegExp(`${label}\\s*[:\\-]?\\s*(?:\\d+\\s+)?${MONEY}`, 'i'),
+      new RegExp(`${label}\\s*[:\\-]?\\s*(?:\\d+\\s+)?${MONEY_FLEX}\\b`, 'i'),
+    ];
+    for (const re of patterns) {
+      const token = firstMatch(text, re);
+      const value = parseMoneyToken(token);
+      if (value != null) return presentMoney(value, sourceLabel);
+    }
   }
   return missingMoney(sourceLabel);
 }
@@ -139,6 +150,8 @@ function categoryMoney(text: string, category: string): MoneyEvidence {
   const patterns = [
     new RegExp(`(?:^|\\n)\\s*${label}\\s+\\d+\\s+${MONEY}`, 'im'),
     new RegExp(`(?:^|\\n)\\s*${label}\\s+${MONEY}`, 'im'),
+    // Operator shorthand: "Food 2776" (no qty, optional cents). Do not steal the qty from "Food 40 $600.00".
+    new RegExp(`(?:^|\\n)\\s*${label}\\s+(?!\\d+\\s+\\$)${MONEY_FLEX}\\b`, 'im'),
   ];
   for (const re of patterns) {
     const token = firstMatch(text, re);
@@ -206,10 +219,51 @@ function cashStatus(expected: MoneyEvidence, actual: MoneyEvidence): PdqZSummary
 }
 
 function lateDeliveryCount(text: string): number | null {
-  const m = text.match(/Late\s+Deliverys?\s+(\d+)/i);
+  const m = text.match(/Late\s+Deliverys?\s+(\d+)/i)
+    ?? text.match(/\bLate\s+(\d+)\s*\/\s*[\d,.]+/i);
   if (!m) return null;
   const n = Number(m[1]);
   return Number.isFinite(n) ? n : null;
+}
+
+function lateDeliverySales(text: string): MoneyEvidence {
+  const slash = firstMatch(text, /\bLate\s+\d+\s*\/\s*([\d,]+(?:\.\d{1,2})?)/i);
+  const slashValue = parseMoneyToken(slash);
+  if (slashValue != null) return presentMoney(slashValue, 'Late Deliverys');
+  return labeledMoney(text, ['Late Deliverys', 'Late Deliveries'], 'Late Deliverys');
+}
+
+function inHouseDelivery(text: string): { count: number | null; sales: MoneyEvidence } {
+  const missing = missingMoney('Sales Summary · Delivery (in-house)');
+  const slash = text.match(/\bDelivery\s+(\d+)\s*\/\s*([\d,]+(?:\.\d{1,2})?)/i);
+  if (slash) {
+    const count = Number(slash[1]);
+    const sales = parseMoneyToken(slash[2]);
+    return {
+      count: Number.isFinite(count) ? count : null,
+      sales: sales != null ? presentMoney(sales, 'Sales Summary · Delivery (in-house)') : missing,
+    };
+  }
+  const section = sliceSection(text, /Sales Summary/i, [
+    /Taxable:/i,
+    /Menu Category/i,
+    /Labor Summary/i,
+    /Misc Summary/i,
+    /Discount Summary/i,
+  ]) || text;
+  const line = new RegExp(`(?:^|\\n)\\s*Delivery\\s+(\\d+)\\s+${MONEY}`, 'im').exec(section)
+    ?? new RegExp(`(?:^|\\n)\\s*Delivery\\s+(\\d+)\\s+${MONEY_FLEX}`, 'im').exec(section);
+  if (!line) return { count: null, sales: missing };
+  const count = Number(line[1]);
+  const sales = parseMoneyToken(line[2]);
+  return {
+    count: Number.isFinite(count) ? count : null,
+    sales: sales != null ? presentMoney(sales, 'Sales Summary · Delivery (in-house)') : missing,
+  };
+}
+
+function firstPresent(fields: MoneyEvidence[]): MoneyEvidence {
+  return fields.find((field) => field.value != null) ?? fields[0];
 }
 
 function averageDeliveryMinutes(text: string): number | null {
@@ -221,14 +275,25 @@ function averageDeliveryMinutes(text: string): number | null {
 }
 
 export function parsePdqZSummary(text: string, filename = ''): PdqZSummary {
-  const expectedCash = labeledMoney(text, ['Expected Cash'], 'Expected Cash');
+  const expectedCash = firstPresent([
+    labeledMoney(text, ['Expected Cash'], 'Expected Cash'),
+    labeledMoney(text, ['Cash'], 'Expected Cash'),
+  ]);
   const actualDeposit = labeledMoney(text, ['Actual Deposit'], 'Shift Deposit · Actual Deposit');
+  const inHouse = inHouseDelivery(text);
+  const labor = firstPresent([
+    laborTotal(text),
+    labeledMoney(text, ['Labor Summary', 'Labor'], 'Labor Summary · Total'),
+  ]);
   return {
     family: 'z-summary',
     businessDate: parseFilenameBusinessDate(filename) || parseBusinessDateFromBody(text),
     store: parseStore(text),
     netSales: labeledMoney(text, ['Subtotal'], 'Subtotal'),
-    grandTotal: labeledMoney(text, ['Grand Total'], 'Grand Total'),
+    grandTotal: firstPresent([
+      labeledMoney(text, ['Grand Total'], 'Grand Total'),
+      labeledMoney(text, ['Grand'], 'Grand Total'),
+    ]),
     mix: {
       food: categoryMoney(text, 'Food'),
       beer: categoryMoney(text, 'Beer'),
@@ -236,7 +301,7 @@ export function parsePdqZSummary(text: string, filename = ''): PdqZSummary {
       pop: categoryMoney(text, 'Pop'),
       wine: categoryMoney(text, 'Wine'),
     },
-    laborDollars: laborTotal(text),
+    laborDollars: labor,
     expectedCash,
     actualDeposit,
     cashStatus: cashStatus(expectedCash, actualDeposit),
@@ -244,8 +309,11 @@ export function parsePdqZSummary(text: string, filename = ''): PdqZSummary {
     voids: labeledMoney(text, ['# Voids', 'Voids'], '# Voids'),
     promotions: labeledMoney(text, ['Promo'], 'Promo'),
     lateDeliveryCount: lateDeliveryCount(text),
-    lateDeliverySales: labeledMoney(text, ['Late Deliverys', 'Late Deliveries'], 'Late Deliverys'),
+    lateDeliverySales: lateDeliverySales(text),
     averageDeliveryMinutes: averageDeliveryMinutes(text),
+    inHouseDeliveryCount: inHouse.count,
+    inHouseDeliverySales: inHouse.sales,
+    deliveryChannel: inHouse.count != null || inHouse.sales.value != null ? 'in_house' : null,
   };
 }
 
