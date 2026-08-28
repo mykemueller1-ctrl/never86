@@ -70,16 +70,21 @@ describe('staff seat auth model', () => {
     expect(capabilitiesForSeat('foh_manager')).toContain('invite_station');
     expect(capabilitiesForSeat('foh_manager')).not.toContain('invite_manager');
     expect(capabilitiesForSeat('foh_manager')).not.toContain('prove_dough');
+    expect(capabilitiesForSeat('foh_manager')).not.toContain('prove_cash');
+    expect(capabilitiesForSeat('owner')).toContain('prove_cash');
     expect(capabilitiesForSeat('kitchen_manager')).toContain('prove_dough');
     expect(capabilitiesForSeat('kitchen_manager')).not.toContain('prove_cash');
     expect(canManageTargetSeat('foh_manager', 'bartender')).toBe(true);
-    expect(canManageTargetSeat('foh_manager', 'pizza')).toBe(true);
+    expect(canManageTargetSeat('foh_manager', 'server')).toBe(true);
+    expect(canManageTargetSeat('foh_manager', 'driver')).toBe(false);
+    expect(canManageTargetSeat('foh_manager', 'pizza')).toBe(false);
     expect(canManageTargetSeat('foh_manager', 'kitchen_manager')).toBe(false);
     expect(canManageTargetSeat('kitchen_manager', 'prep')).toBe(true);
     expect(canManageTargetSeat('kitchen_manager', 'line_cook')).toBe(true);
     expect(canManageTargetSeat('kitchen_manager', 'dishwasher')).toBe(true);
+    expect(canManageTargetSeat('kitchen_manager', 'pizza')).toBe(true);
+    expect(canManageTargetSeat('kitchen_manager', 'driver')).toBe(true);
     expect(canManageTargetSeat('kitchen_manager', 'server')).toBe(false);
-    expect(canManageTargetSeat('kitchen_manager', 'pizza')).toBe(false);
     expect(canManageTargetSeat('server', 'bartender')).toBe(false);
     expect(bartender.capabilities).toEqual(['view_own_station', 'acknowledge_shift']);
   });
@@ -297,8 +302,23 @@ describe('Action Shift proof rules on staff seats', () => {
     }
   });
 
-  it('lets FOH manager close cash with a deposit slip and refuses crew cash close', () => {
-    const cash = provePrivilegedShiftItem({
+  it('lets owner close cash with a deposit slip and refuses FOH and crew cash close', () => {
+    const owner = provePrivilegedShiftItem({
+      directory: buildSyntheticStaffDirectory(),
+      actor: syntheticActor(SYNTHETIC_OPERATOR_A_ID, 'owner'),
+      target: {
+        operatorId: SYNTHETIC_OPERATOR_A_ID,
+        locationId: 11,
+        seatId: syntheticSeatId(SYNTHETIC_OPERATOR_A_ID, 'owner'),
+        family: 'cash',
+      },
+      outcome: 'verified',
+      proofKind: 'deposit-slip',
+      now: NOW,
+    });
+    expect(owner.ok).toBe(true);
+
+    const foh = provePrivilegedShiftItem({
       directory: buildSyntheticStaffDirectory(),
       actor: syntheticActor(SYNTHETIC_OPERATOR_A_ID, 'foh_manager'),
       target: {
@@ -311,7 +331,9 @@ describe('Action Shift proof rules on staff seats', () => {
       proofKind: 'deposit-slip',
       now: NOW,
     });
-    expect(cash.ok).toBe(true);
+    expect(foh.ok).toBe(false);
+    if (foh.ok) return;
+    expect(foh.error).toMatch(/cannot close cash/i);
 
     const crew = provePrivilegedShiftItem({
       directory: buildSyntheticStaffDirectory(),

@@ -136,8 +136,8 @@ export type PrivateInputNeeded = {
   what: string;
 };
 
-const FOH_STATION_TARGETS: readonly StationSeatKey[] = ['bartender', 'server', 'driver', 'pizza'];
-const KITCHEN_STATION_TARGETS: readonly StationSeatKey[] = ['prep', 'line_cook', 'dishwasher'];
+const FOH_STATION_TARGETS: readonly StationSeatKey[] = ['bartender', 'server'];
+const KITCHEN_STATION_TARGETS: readonly StationSeatKey[] = ['prep', 'line_cook', 'dishwasher', 'pizza', 'driver'];
 
 const CAPABILITY_BY_SEAT: Record<StationSeatKey, readonly StaffCapability[]> = {
   owner: [
@@ -160,7 +160,6 @@ const CAPABILITY_BY_SEAT: Record<StationSeatKey, readonly StaffCapability[]> = {
     'invite_station',
     'reset_seat',
     'revoke_seat',
-    'prove_cash',
     'prove_alarm',
     'assign_action',
   ],

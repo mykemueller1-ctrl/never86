@@ -15,16 +15,16 @@ export default function StaffRoleDayPage() {
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
           <Link href="/staff/seats" className="hover:text-white">← Staff seats</Link>
           <Link href="/staff/login" className="hover:text-white">Staff login</Link>
-          <Link href="/action-shift/lab" className="hover:text-white">Wall templates</Link>
+          <Link href="/login" className="hover:text-white">Owner login</Link>
         </nav>
         <p className="mt-8 text-xs uppercase tracking-[0.2em] text-amber-200">Staff desk · noindex · not live</p>
         <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-tight md:text-6xl">
-          Today by role. Checklist, coverage, comms.
+          Myke, Tom, Kenzy, line, dish.
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/60">
-          Pizza, line cook, and dish seats sit with bartender, server, prep, driver, FOH manager,
-          kitchen manager, and owner. Front questions to Kenzy, back to Tom, dollars to Myke —
-          in-app station notes only. Owner /login stays owner-only.
+          Ticket out of the printer, bag and tag, driver area, grab, hit dispatch, leave, come back.
+          Kenzy is FOH only. Myke owns the drawer and the bank. The 11–1 weekday slot has no name on this desk.
+          Owner /login stays owner-only. Staff login fails closed.
         </p>
         <div className="mt-10">
           <StaffRoleDayDesk />

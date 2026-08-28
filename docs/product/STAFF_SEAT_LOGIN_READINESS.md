@@ -10,8 +10,8 @@ Least-privilege **manager-first** station seats on top of the Action Shift workf
 | Seat | Kind | Can invite / reset / revoke | Privileged proof |
 |---|---|---|---|
 | Owner | manager | FOH manager, kitchen manager, crew stations in the same tenant | cash, dough, alarm — source proof only |
-| FOH manager | manager | bartender, server, driver, pizza | cash, alarm |
-| Kitchen manager | manager | prep, line cook, dishwasher | dough, alarm |
+| FOH manager | manager | bartender, server | alarm |
+| Kitchen manager | manager | prep, line cook, dishwasher, pizza, driver | dough, alarm |
 | Bartender / server / prep / driver / line cook / pizza / dishwasher | station | none | none |
 
 Operator A cannot own, prove, invite, or revoke operator B. A verbal yes does not close cash, dough, or alarm.
@@ -53,5 +53,6 @@ These stay off git. Supply them privately to Myke's operator plane:
 ## Surfaces
 
 - `/staff/login` — noindex staff door; live POST is fail-closed
+- `/staff/desk` — noindex Myke / Tom / Kenzy / line / dish desk
 - `/staff/seats` — noindex synthetic model + private-input stop
 - `/dashboard/staff` — operator-gated synthetic invite / reset / revoke desk

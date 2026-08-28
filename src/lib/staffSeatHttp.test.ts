@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 import sitemap from '../app/sitemap';
@@ -46,5 +48,14 @@ describe('staff credential HTTP plane', () => {
     expect(staffDeskMetadata.robots).toMatchObject({ index: false, follow: false });
     const entries = await sitemap();
     expect(entries.some((entry) => String(entry.url).includes('/staff'))).toBe(false);
+  });
+
+  it('keeps Action Shift jargon off staff desk screens', () => {
+    const deskPage = readFileSync(join(process.cwd(), 'src/app/staff/desk/page.tsx'), 'utf8');
+    const deskUi = readFileSync(join(process.cwd(), 'src/components/StaffRoleDayDesk.tsx'), 'utf8');
+    expect(deskPage).not.toMatch(/Action Shift/i);
+    expect(deskUi).not.toMatch(/Action Shift/i);
+    expect(deskPage).toMatch(/Ticket out of the printer, bag and tag, driver area/);
+    expect(deskPage).toMatch(/Owner \/login stays owner-only/);
   });
 });

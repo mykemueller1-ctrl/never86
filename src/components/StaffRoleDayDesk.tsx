@@ -13,7 +13,7 @@ import { STATION_SEAT_KEYS, type StationSeatKey } from '@/lib/staffSeatAuth';
 const VIEWS: readonly StaffRoleDayView[] = ['today', 'open', 'close'];
 
 export function StaffRoleDayDesk({
-  initialSeatKey = 'foh_manager',
+  initialSeatKey = 'owner',
   initialWeekday,
 }: {
   initialSeatKey?: StationSeatKey;
@@ -37,9 +37,9 @@ export function StaffRoleDayDesk({
       </p>
       <h2 className="mt-2 font-semibold">{desk.stationLabel} · {desk.weekday}</h2>
       <p className="mt-2 text-sm text-white/60">
-        Today&apos;s checklist, coverage/schedule board, and station comms for this seat.
-        Front → Kenzy. Back → Tom. Dollars → Myke. In-app notes only — no auto email.
-        Cooked food is a promo, not a void. No recipe book.
+        Myke: drawer and bank. Kenzy: FOH only. Tom: kitchen and drivers.
+        Line and dish: ticket out of the printer, bag and tag, driver area.
+        The bag is not the cue. In-app notes only — no auto email.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">

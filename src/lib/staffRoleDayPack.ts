@@ -11,9 +11,14 @@ import {
 import type { StationSeatKey } from './staffSeatAuth';
 import { STATION_SEAT_KEYS } from './staffSeatAuth';
 
-export const STAFF_ROLE_DAY_PACK_ID = 'staff-role-day-v2';
+export const STAFF_ROLE_DAY_PACK_ID = 'staff-deep-seats-v1';
 export const STAFF_ROLE_DAY_PACK_STATUS = 'drafted' as const;
 export const STAFF_ROLE_DAY_TIMEZONE = 'America/Chicago';
+
+export const ORDER_PATH_LINE =
+  'Ticket out of the printer, bag and tag, driver area.';
+export const ORDER_PATH_FULL =
+  'Ticket out of the printer, bag and tag, driver area, grab, hit dispatch, leave, come back. The bag is not the cue.';
 
 export type StaffRoleDayView = CtapLabShiftPhase | 'today';
 
@@ -24,10 +29,12 @@ export type StaffRoleDayPolicyKind =
   | 'cost_band'
   | 'coverage'
   | 'deposit'
+  | 'drawer'
   | 'dough'
-  | 'late_delivery'
+  | 'late_z'
   | 'fry_rotation'
   | 'order_night'
+  | 'order_path'
   | 'driver_window'
   | 'weekend_drivers';
 
@@ -99,7 +106,7 @@ const STATION_LABELS: Record<StationSeatKey, string> = {
 const WALL_ROLES_FOR_SEAT: Record<StationSeatKey, readonly ActionShiftRoleKey[]> = {
   owner: ['owner'],
   foh_manager: ['manager', 'bartender', 'server'],
-  kitchen_manager: ['kitchen_manager', 'prep_cook', 'driver'],
+  kitchen_manager: ['kitchen_manager', 'prep_cook'],
   bartender: ['bartender'],
   server: ['server'],
   prep: ['prep_cook'],
@@ -169,7 +176,9 @@ const LINE_COOK_MID: CtapLabTemplate = {
   weekday: null,
   source: 'kitchen-open-close',
   steps: steps([
-    ['Shift: record 86s, waste, and food-safety exceptions; remakes are re-rung and promoed — voids only if food never started', 'Shift'],
+    [ORDER_PATH_LINE, 'Order path'],
+    ['Do not hold the second lunch ticket.', 'Lunch'],
+    ['Remakes are re-rung and promoed — voids only if food never started', 'Shift'],
   ]),
 };
 
@@ -242,8 +251,8 @@ const DISH_MID: CtapLabTemplate = {
   weekday: null,
   source: 'kitchen-open-close',
   steps: steps([
-    ['Shift: scrape before load, do not overload, check rinse arms, replace dirty water', 'Shift'],
-    ['Take delivery dishes from drivers, rinse, and load — do not leave them on the counter', 'Drivers'],
+    ['Dishes between runs. Scrape before load, do not overload, check rinse arms, replace dirty water', 'Shift'],
+    ['Delivery dishes come in. Do not go to the lot.', 'Drivers'],
   ]),
 };
 
@@ -262,6 +271,34 @@ const DISH_CLOSE: CtapLabTemplate = {
 
 export const DISH_TEMPLATES: readonly CtapLabTemplate[] = [DISH_OPEN, DISH_MID, DISH_CLOSE];
 
+const DRIVER_ORDER_PATH: CtapLabTemplate = {
+  id: 'driver-order-path',
+  name: 'Driver — order path',
+  roleKey: 'driver',
+  stationKey: 'delivery',
+  shiftPhase: 'mid',
+  weekday: null,
+  source: 'kitchen-open-close',
+  steps: steps([
+    [ORDER_PATH_FULL, 'Order path'],
+  ]),
+};
+
+const KITCHEN_ORDER_PATH: CtapLabTemplate = {
+  id: 'kitchen-order-path',
+  name: 'Kitchen — ticket to driver area',
+  roleKey: 'kitchen_manager',
+  stationKey: 'kitchen',
+  shiftPhase: 'mid',
+  weekday: null,
+  source: 'kitchen-open-close',
+  steps: steps([
+    [ORDER_PATH_FULL, 'Order path'],
+  ]),
+};
+
+export const ORDER_PATH_TEMPLATES: readonly CtapLabTemplate[] = [DRIVER_ORDER_PATH, KITCHEN_ORDER_PATH];
+
 /** Station-role titles Myke authorized 2026-08-28. First names only; no roster, emails, or PINs. */
 export const STAFF_STATION_COMMS: readonly StaffStationComm[] = [
   {
@@ -269,7 +306,7 @@ export const STAFF_STATION_COMMS: readonly StaffStationComm[] = [
     channel: 'front',
     roleTitle: 'FOH lead',
     stationName: 'Kenzy',
-    rule: 'Front questions go to the FOH lead (Kenzy) as an in-app station note. This desk does not send mail.',
+    rule: 'FOH only. Front questions go to Kenzy as an in-app station note. Not kitchen make-time. Not the driver board. This desk does not send mail.',
     delivery: 'in_app_note',
     mailSent: false,
   },
@@ -278,7 +315,7 @@ export const STAFF_STATION_COMMS: readonly StaffStationComm[] = [
     channel: 'back',
     roleTitle: 'Kitchen lead',
     stationName: 'Tom',
-    rule: 'Back questions go to the kitchen lead (Tom) as an in-app station note. This desk does not send mail.',
+    rule: 'Kitchen and drivers go to Tom as an in-app station note. Ticket out of the printer, bag and tag, driver area, grab, hit dispatch. This desk does not send mail.',
     delivery: 'in_app_note',
     mailSent: false,
   },
@@ -287,21 +324,36 @@ export const STAFF_STATION_COMMS: readonly StaffStationComm[] = [
     channel: 'dollars',
     roleTitle: 'Owner',
     stationName: 'Myke',
-    rule: 'Dollars only go to the owner (Myke) as an in-app station note. This desk does not send mail.',
+    rule: 'Drawer and bank go to Myke as an in-app station note. Deposit before close. A $0 actual with a counted drawer is unentered, not a shortage, and not driver late. This desk does not send mail.',
     delivery: 'in_app_note',
     mailSent: false,
   },
 ];
 
+const COMMS_FOR_SEAT: Record<StationSeatKey, readonly StaffStationCommChannel[]> = {
+  owner: ['dollars'],
+  foh_manager: ['front'],
+  bartender: ['front'],
+  server: ['front'],
+  kitchen_manager: ['back'],
+  prep: ['back'],
+  driver: ['back'],
+  line_cook: ['back'],
+  pizza: ['back'],
+  dishwasher: ['back'],
+};
+
 const WEEKDAYS_MON_THU: readonly CtapLabWeekday[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday'];
 const WEEKDAYS_FRI_SAT: readonly CtapLabWeekday[] = ['Friday', 'Saturday'];
 const WEEKDAYS_SUNDAY: readonly CtapLabWeekday[] = ['Sunday'];
+const KITCHEN_BOARD_AUDIENCE: readonly StationSeatKey[] = ['kitchen_manager', 'line_cook', 'pizza', 'dishwasher', 'driver'];
+const DRIVER_BOARD_AUDIENCE: readonly StationSeatKey[] = ['kitchen_manager', 'driver'];
 
 export const STAFF_SCHEDULE_BOARD: readonly StaffScheduleBoardRule[] = [
   {
     id: 'foh-coverage',
     title: 'FOH coverage',
-    audience: ['owner', 'foh_manager'],
+    audience: ['foh_manager'],
     weekdays: 'all',
     rules: [
       'Dining / back room coverage is Tuesday–Sunday. Never Monday.',
@@ -311,30 +363,84 @@ export const STAFF_SCHEDULE_BOARD: readonly StaffScheduleBoardRule[] = [
   },
   {
     id: 'weekday-driver-11-1',
-    title: 'Weekday 11–1 driver',
-    audience: ['owner', 'kitchen_manager', 'driver', 'foh_manager'],
+    title: 'Weekday 11–1 driver slot',
+    audience: DRIVER_BOARD_AUDIENCE,
     weekdays: WEEKDAYS_MON_THU,
     rules: [
-      'Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window.',
-      'The public desk stores the coverage rule, not the worker identity.',
+      'Weekdays 11:00–13:00 driver slot exists. No name on this desk.',
     ],
   },
   {
-    id: 'weekend-three-drivers',
-    title: 'Friday / Saturday drivers',
-    audience: ['owner', 'kitchen_manager', 'driver', 'foh_manager'],
+    id: 'mon-thu-am',
+    title: 'Mon–Thu AM board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: WEEKDAYS_MON_THU,
+    rules: [
+      'AM: 2 line, 1 pizza.',
+    ],
+  },
+  {
+    id: 'mon-night',
+    title: 'Monday night board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: ['Monday'],
+    rules: [
+      'Night: 3 pizza, 2 line, 2 drivers.',
+    ],
+  },
+  {
+    id: 'tue-board',
+    title: 'Tuesday board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: ['Tuesday'],
+    rules: [
+      '3 pizza, 2–3 line, 2 drivers + dish.',
+    ],
+  },
+  {
+    id: 'wed-board',
+    title: 'Wednesday board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: ['Wednesday'],
+    rules: [
+      '3 pizza, 2 line, 2 drivers + dish.',
+    ],
+  },
+  {
+    id: 'thu-board',
+    title: 'Thursday board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: ['Thursday'],
+    rules: [
+      '4 pizza, 2 line, dish, 2 drivers.',
+    ],
+  },
+  {
+    id: 'fri-day',
+    title: 'Friday day board',
+    audience: KITCHEN_BOARD_AUDIENCE,
+    weekdays: ['Friday'],
+    rules: [
+      'Day: 2 fry/line, 2 pizza, 1 driver.',
+    ],
+  },
+  {
+    id: 'fri-sat-night',
+    title: 'Friday / Saturday night board',
+    audience: KITCHEN_BOARD_AUDIENCE,
     weekdays: WEEKDAYS_FRI_SAT,
     rules: [
-      'Friday and Saturday: three drivers.',
+      'Night: 5 pizza, 3 line, dish, 3 drivers.',
     ],
   },
   {
-    id: 'sunday-two-drivers',
-    title: 'Sunday drivers',
-    audience: ['owner', 'kitchen_manager', 'driver', 'foh_manager'],
+    id: 'sunday-board',
+    title: 'Sunday board',
+    audience: KITCHEN_BOARD_AUDIENCE,
     weekdays: WEEKDAYS_SUNDAY,
     rules: [
-      'Sunday: two good drivers.',
+      '4 pizza, 2 line, 2 drivers only if good.',
+      'Sunday till 6 is open.',
     ],
   },
 ];
@@ -384,7 +490,7 @@ export const STAFF_ROLE_DAY_POLICIES: readonly StaffRoleDayPolicy[] = [
     id: 'cost-bands',
     title: 'Cost bands (policy constants)',
     kind: 'cost_band',
-    audience: ['owner', 'foh_manager', 'kitchen_manager'],
+    audience: ['owner', 'kitchen_manager'],
     moneyKind: 'percent_band',
     rules: CTAP_COGS_BONUS_POLICY.map(
       (band) => `${band.category}: ${band.targetMinPct}–${band.targetMaxPct}% of category sales. Not this week\'s dollars.`,
@@ -394,7 +500,7 @@ export const STAFF_ROLE_DAY_POLICIES: readonly StaffRoleDayPolicy[] = [
     id: 'coverage',
     title: 'FOH coverage',
     kind: 'coverage',
-    audience: ['foh_manager', 'owner'],
+    audience: ['foh_manager'],
     moneyKind: 'none',
     rules: [
       'Dining / back room coverage is Tuesday–Sunday. Never Monday.',
@@ -406,11 +512,25 @@ export const STAFF_ROLE_DAY_POLICIES: readonly StaffRoleDayPolicy[] = [
     id: 'deposit-before-close',
     title: 'Deposit before close',
     kind: 'deposit',
-    audience: ['foh_manager', 'bartender'],
+    audience: ['owner'],
     moneyKind: 'none',
     rules: [
-      'Run the deposit before close.',
+      'Drawer and bank. Run the deposit before close.',
+      'A $0 actual with a counted drawer is unentered, not a shortage.',
+      'That is not driver late.',
       'Cash proof closes it. A verbal yes does not.',
+    ],
+  },
+  {
+    id: 'drawer-bank',
+    title: 'Drawer and bank',
+    kind: 'drawer',
+    audience: ['owner'],
+    moneyKind: 'none',
+    rules: [
+      'Myke owns the drawer and the bank.',
+      'Deposit before close.',
+      'A $0 actual plus a counted drawer is unentered, not a shortage, and not driver late.',
     ],
   },
   {
@@ -425,17 +545,15 @@ export const STAFF_ROLE_DAY_POLICIES: readonly StaffRoleDayPolicy[] = [
     ],
   },
   {
-    id: 'late-delivery-four',
-    title: 'Late-delivery four questions',
-    kind: 'late_delivery',
-    audience: ['kitchen_manager'],
+    id: 'late-on-z',
+    title: 'Late on Z',
+    kind: 'late_z',
+    audience: ['kitchen_manager', 'driver'],
     moneyKind: 'none',
     rules: [
-      'Promise time — was the ticket already late when promised?',
-      'Make-line — did kitchen finish on time?',
-      'Handoff — was it ready for the driver?',
-      'Driver arrival — did the run leave or arrive late?',
-      'Save the late-ticket list. A verbal yes does not close it.',
+      'Late on Z: ask dispatch first.',
+      'Then check the 11:00–13:00 window.',
+      'Do not restaff off a missed button.',
     ],
   },
   {
@@ -451,25 +569,47 @@ export const STAFF_ROLE_DAY_POLICIES: readonly StaffRoleDayPolicy[] = [
     ],
   },
   {
-    id: 'weekday-driver-11-1',
-    title: 'Weekday 11–1 driver',
-    kind: 'driver_window',
-    audience: ['owner', 'kitchen_manager', 'driver', 'foh_manager'],
+    id: 'order-path',
+    title: 'Order path',
+    kind: 'order_path',
+    audience: ['kitchen_manager', 'line_cook', 'pizza', 'driver'],
     moneyKind: 'none',
     rules: [
-      'Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window.',
-      'The public desk stores the coverage rule, not the worker identity.',
+      ORDER_PATH_FULL,
+      'Line: ticket out, bag and tag, driver area. Do not hold the second lunch ticket.',
+    ],
+  },
+  {
+    id: 'dish-path',
+    title: 'Dish path',
+    kind: 'order_path',
+    audience: ['dishwasher', 'kitchen_manager'],
+    moneyKind: 'none',
+    rules: [
+      'Dishes between runs.',
+      'Delivery dishes come in. Not the lot.',
+    ],
+  },
+  {
+    id: 'weekday-driver-11-1',
+    title: 'Weekday 11–1 driver slot',
+    kind: 'driver_window',
+    audience: DRIVER_BOARD_AUDIENCE,
+    moneyKind: 'none',
+    rules: [
+      'Weekdays 11:00–13:00 driver slot exists. No name on this desk.',
     ],
   },
   {
     id: 'weekend-drivers',
     title: 'Weekend driver coverage',
     kind: 'weekend_drivers',
-    audience: ['owner', 'kitchen_manager', 'driver', 'foh_manager'],
+    audience: DRIVER_BOARD_AUDIENCE,
     moneyKind: 'none',
     rules: [
-      'Friday and Saturday: three drivers.',
-      'Sunday: two good drivers.',
+      'Friday and Saturday night: 3 drivers.',
+      'Sunday: 2 drivers only if good.',
+      'Sunday till 6 is open.',
     ],
   },
 ];
@@ -495,6 +635,10 @@ function wallTemplatesForSeat(
 ): CtapLabTemplate[] {
   const roles = WALL_ROLES_FOR_SEAT[seatKey];
   const fromWall = CTAP_LAB_TEMPLATES.filter((template) => {
+    if (template.id === 'driver-between-runs') return false;
+    if (seatKey === 'foh_manager' && /make-time|driver board|dispatch/i.test(template.name)) {
+      return false;
+    }
     if (seatKey === 'pizza') {
       return template.stationKey === 'pizza_side'
         && templateFitsWeekday(template, weekday)
@@ -521,23 +665,39 @@ function extrasForSeat(seatKey: StationSeatKey, weekday: CtapLabWeekday, view: S
         `${rule.action === 'order' ? 'Order night' : 'Receive'} ${rule.vendor} ${rule.category.replace('_', '/')} — ${rule.note}`,
       );
     }
-    if (view === 'today' || view === 'close') {
-      extras.push('Deposit before close — cash proof, not a verbal yes.');
-    }
   }
-  if (seatKey === 'kitchen_manager' && (view === 'today' || view === 'open' || view === 'mid' || view === 'close')) {
-    extras.push('Walk drivers: between-runs dishes are the side work. No sheet = no reimbursement.');
+  if (seatKey === 'owner' && (view === 'today' || view === 'close')) {
+    extras.push('Deposit before close. A $0 actual with a counted drawer is unentered, not a shortage, and not driver late.');
+  }
+  if (seatKey === 'kitchen_manager') {
+    extras.push(ORDER_PATH_FULL);
+    extras.push('Late on Z: ask dispatch first. Then the 11:00–13:00 window. Do not restaff off a missed button.');
+  }
+  if (seatKey === 'line_cook') {
+    extras.push(ORDER_PATH_LINE);
+    extras.push('Do not hold the second lunch ticket.');
+  }
+  if (seatKey === 'driver') {
+    extras.push(ORDER_PATH_FULL);
+  }
+  if (seatKey === 'dishwasher') {
+    extras.push('Dishes between runs. Delivery dishes come in. Not the lot.');
   }
   if ((seatKey === 'kitchen_manager' || seatKey === 'driver') && WEEKDAYS_MON_THU.includes(weekday)) {
-    extras.push('Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window.');
+    extras.push('Weekdays 11:00–13:00 driver slot exists. No name on this desk.');
   }
   if ((seatKey === 'kitchen_manager' || seatKey === 'driver') && WEEKDAYS_FRI_SAT.includes(weekday)) {
-    extras.push('Friday and Saturday: three drivers.');
+    extras.push('Friday and Saturday night: 3 drivers.');
   }
   if ((seatKey === 'kitchen_manager' || seatKey === 'driver') && weekday === 'Sunday') {
-    extras.push('Sunday: two good drivers.');
+    extras.push('Sunday: 2 drivers only if good. Sunday till 6 is open.');
   }
   return extras;
+}
+
+export function commsForSeat(seatKey: StationSeatKey): StaffStationComm[] {
+  const channels = COMMS_FOR_SEAT[seatKey];
+  return STAFF_STATION_COMMS.filter((comm) => channels.includes(comm.channel));
 }
 
 export function stationLabelForSeat(seatKey: StationSeatKey): string {
@@ -584,6 +744,12 @@ export function buildStaffRoleDayDesk(input: {
   if (input.seatKey === 'dishwasher') {
     checklist.push(...DISH_TEMPLATES.filter((template) => templateFitsView(template, view)));
   }
+  if (input.seatKey === 'kitchen_manager') {
+    checklist.push(...ORDER_PATH_TEMPLATES.filter((template) => template.roleKey === 'kitchen_manager' && templateFitsView(template, view)));
+  }
+  if (input.seatKey === 'driver') {
+    checklist.push(...ORDER_PATH_TEMPLATES.filter((template) => template.roleKey === 'driver' && templateFitsView(template, view)));
+  }
   return {
     packId: STAFF_ROLE_DAY_PACK_ID,
     status: STAFF_ROLE_DAY_PACK_STATUS,
@@ -594,7 +760,7 @@ export function buildStaffRoleDayDesk(input: {
     checklist,
     policies: policiesForSeat(input.seatKey),
     scheduleBoard: scheduleBoardForSeat(input.seatKey, input.weekday),
-    comms: STAFF_STATION_COMMS,
+    comms: commsForSeat(input.seatKey),
     extras: extrasForSeat(input.seatKey, input.weekday, view),
     boundary: {
       livePayroll: false,
@@ -627,6 +793,10 @@ const PRIVATE_HITS: readonly RegExp[] = [
 export function findStaffRoleDayPrivacyHits(value: unknown): string[] {
   const text = JSON.stringify(value);
   return PRIVATE_HITS.filter((pattern) => pattern.test(text)).map((pattern) => pattern.source);
+}
+
+export function staffDeskContainsActionShiftJargon(value: unknown): boolean {
+  return /action\s*shift/i.test(JSON.stringify(value));
 }
 
 export const STAFF_ROLE_DAY_WEEKDAYS = CTAP_LAB_WEEKDAYS;
