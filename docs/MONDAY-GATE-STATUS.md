@@ -5,29 +5,56 @@ Grok (phone) → Cursor (agents/bots/code/PRs) → Codex (outside review).
 One Cursor factory job at a time.
 
 ## Live deploy
-Production SHA `84e543a` = `main`. This repo deploys www.never86.ai.
+Production SHA on `main` still serves www.never86.ai. This slice does **not** deploy or apply Neon.
 
-## Branch
-`cursor/monday-gate-onboard-6e56` from `codex/action-shift-122-safe` → PR #127.
+## Live stack (landed on allowlist)
+| PR | Branch | Status |
+| --- | --- | --- |
+| **#131** | `cursor/never86-pr-130-merge-ready-0699` | Merged into `codex/action-shift-122-safe`. Dirty **#130** closed. |
+| **#132** | `cursor/never86-vendor-drift-action-shift-6c5c` | Landed. |
+| **#133** | `cursor/never86-po-receive-usage-gap-b6b2` | Landed. |
+| **#134** | `cursor/never86-vendor-silence-action-shift-69a5` | Landed @ `f92f89d`. |
+| **#135** | `cursor/monday-gate-apply-neon-6e56` | Open; Monday gate + two-date unattended. Claimed red (TS at operatorActivation). |
+| **#137** | `cursor/neon-free-seat-apply-9d74` | Draft; ops apply + door probe. Claimed green. |
 
-## Free seat without Supabase (tonight)
-Activation + login use **Neon** (`DATABASE_URL`):
-- `seat_activation_tokens`, `seat_operators`, `seat_locations`, `seat_credentials`
-- SQL: `drizzle/0002_free_seat_neon.sql`
-- Free-seat operator ids ≥ `1_000_000` (no OPS id collision)
-- Dashboard empty state asks for prior business-day close
-- Password never emailed
+Allowlisted tip: `codex/action-shift-122-safe` @ `f92f89d`. Reconcile PR: **#138** `cursor/never86-pr-135-137-reconcile-c42a`.
 
-## Supabase
-**Deferred to tomorrow morning** per Myke. Project `never86` unpaid/INACTIVE.
-Toast/CTAP OPS evidence waits. Do not block factory on it tonight.
+Local evidence (this agent, not CI yet): `npx vitest run` **221/221** (30 files). `npm run lint` green. `npm run build` TypeScript + Next production green. Does not merge/deploy/apply Neon.
 
-## Apply Neon tables
-On Neon console or CI with `DATABASE_URL`:
+## What this reconcile keeps
+- Join → email activation token → one Neon free store + one login.
+- Yesterday close via paste / file upload / forwarded email. PDQ native-text → desk numbers + ≤3 Action Shift moves.
+- Vendor drift / PO gap / vendor silence from #131–#134.
+- **Two-business-date unattended gate from #135:** Z + Hourly + Void each parse on two different dates. Same-day re-upload does not count. Desk returns `unattendedRoutines.enabled: false` until then.
+- **One Neon apply/probe path:** `npm run db:apply-free-seat` → `scripts/apply-free-seat.sh` (exit 2 if `DATABASE_URL` missing; never prints the URL). Applies `0002` + `0003` + `0004`. Probe: `node scripts/probe-free-seat-door.mjs https://www.never86.ai`. Do not add `apply-free-seat-neon.sh`.
+
+## Onboarding harden (this slice)
+- Fail closed if activation email is unavailable. Never return raw tokens.
+- Normalized-email + trusted-IP request throttles; login throttling.
+- HTML-escape user values in activation/owner mail.
+- Atomic token consume (`consumed_at IS NULL` + unexpired).
+- Activation consume + operator/location/credential writes run in one WebSocket transaction (neon-http cannot BEGIN/COMMIT).
+- Unattended gate reads each document's parsed family + parsed business date; empty/garbage/injection rows are rejected.
+- Login throttle is stored on Neon (`seat_auth_attempts`) so it is shared across Vercel instances; in-memory fallback if 0004 is missing.
+
+## Apply Neon (ops, not this agent)
 ```bash
-psql "$DATABASE_URL" -f drizzle/0002_free_seat_neon.sql
-# or: npx drizzle-kit push
+npm run db:apply-free-seat
+# exits 2 if DATABASE_URL is missing (do not paste the URL in chat, git, PR, or logs)
+node scripts/probe-free-seat-door.mjs https://www.never86.ai
 ```
 
-## Grok
-See `docs/GROK-KEEP-BUILDING.md` — keep dispatching Cursor; Supabase is morning work.
+Or paste in Neon SQL Editor:
+- `drizzle/0002_free_seat_neon.sql`
+- `drizzle/0003_free_seat_intake.sql`
+- `drizzle/0004_seat_auth_attempts.sql`
+
+## Residuals
+- Neon 0002+0003 apply is ops (blocking stranger door on www).
+- Inbound DNS.
+- Gmail poll later.
+- OCR later.
+- `docs/company/intake/CHATGPT_HANDOFF.md` and `INBOX.md` were not in this checkout.
+
+## Do not
+Merge this PR. Merge grok-sales-org (#121). Re-open dirty #130. Deploy production. Apply Neon from the factory. Auto-send. Invent dollars. Print private store totals or `DATABASE_URL` in public comments.

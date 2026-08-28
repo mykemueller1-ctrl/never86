@@ -1,0 +1,9 @@
+Purchase Order
+Vendor: PFG
+PO Number: PO-SYN-1001
+Order Date: 05/10/2026
+
+SKU SYN-OIL-01 Sample Olive Oil 4/1 GAL Qty Ordered 4 Unit Price 68.40
+SKU SYN-PASTA-02 Sample Penne 2/10 LB Qty Ordered 10 Unit Price 18.10
+SKU SYN-TOMATO-03 Sample Crushed Tomato 6/10 Qty Ordered 6 Unit Price 100.00
+SKU SYN-HONEY-04 Sample Honey Pack 6/5 LB Qty Ordered 2 Unit Price 12.95

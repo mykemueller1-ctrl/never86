@@ -84,6 +84,7 @@ export default async function AdminNever86() {
             <a href="#outbound" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Outbound</a>
             <a href="#ops" className="hidden md:inline px-2.5 py-1.5 text-dark-200 hover:text-white rounded-lg hover:bg-white/[0.03]">Ops</a>
             <Link href="/" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 ml-2 transition-colors">Site</Link>
+            <Link href="/admin/action-shift" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Action Shift setup</Link>
             <a href="/command-center" className="border border-white/10 hover:border-gold-500/60 hover:bg-gold-500/5 text-dark-50 rounded-lg px-3 py-1.5 transition-colors">Operator view</a>
           </nav>
         </div>

@@ -1,0 +1,3 @@
+vendor,store,last_seen_date,as_of_date,expected_cadence_days,grace_days,pause_weekends,paused_dates,program_started_date
+Example Beverage,Sample Kitchen Lab,2026-08-10,2026-08-22,7,0,false,,2026-07-01
+Example Beverage,Sample Kitchen Lab,2026-08-10,2026-08-22,7,0,false,,2026-07-01
