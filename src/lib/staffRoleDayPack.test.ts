@@ -111,7 +111,8 @@ describe('staff role-day desk pack', () => {
     expect(templateIds(pm)).toContain('fry-close');
     expect(templateIds(pm)).not.toContain('fry-open');
     const blob = JSON.stringify(buildAllStaffRoleDayDesks('Friday'));
-    expect(blob).not.toMatch(/1\/3 lb|8 oz dough|recipe book/i);
+    expect(blob).not.toMatch(/1\/3 lb|8 oz dough|Braveheart|Hormel/i);
+    expect(blob).toMatch(/does not invent a recipe book/);
   });
 
   it('treats cooked food as promo not void and stores cost bands as policy percents', () => {
