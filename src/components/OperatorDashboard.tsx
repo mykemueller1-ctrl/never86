@@ -4,6 +4,7 @@ import { buildCoachCards, type CoachCard } from '@/lib/coachCards';
 import { opsDbConfigured } from '@/lib/opsDb';
 import { isFreeSeatOperatorId } from '@/lib/operatorActivation';
 import SignOutButton from './SignOutButton';
+import FreeSeatDesk from './FreeSeatDesk';
 
 // The operator's home in the COMPASS brief design — the exact language of the
 // demo docs (Weekly Brief / coaching cards): cream paper, serif display, mono
@@ -91,7 +92,11 @@ function Shell({ name, children }: { name: string; children: React.ReactNode }) 
           <Link href="/" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: INK }}>
             / NEVER 86&apos;D — COMMAND CENTER — {name}
           </Link>
-          <SignOutButton />
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Manager board</Link>
+            <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Workforce setup</Link>
+            <SignOutButton />
+          </div>
         </div>
       </header>
       <div className="max-w-5xl mx-auto px-6 pt-10 pb-16">{children}</div>
@@ -114,6 +119,12 @@ function EmptyState({ name }: { name: string }) {
         No POS API key. Morning = ≤3 ranked actions. Night = proof on those only.
       </p>
       <div className="flex gap-3 flex-wrap">
+        <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${BLUE}`, color: BLUE, padding: '10px 16px' }}>
+          Open manager board
+        </Link>
+        <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${BLUE}`, color: BLUE, padding: '10px 16px' }}>
+          Set up roster + schedule
+        </Link>
         <Link href="/action-shift" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>
           Open Action Shift desk →
         </Link>
@@ -126,8 +137,15 @@ function EmptyState({ name }: { name: string }) {
 }
 
 export default async function OperatorDashboard({ operatorId, displayName }: { operatorId: number; displayName?: string }) {
-  // Neon free-seat operators (Monday gate) do not read Supabase OPS yet.
-  if (isFreeSeatOperatorId(operatorId) || !opsDbConfigured()) {
+  // Neon free-seat operators (Monday gate) stay on the prior-day desk — no OPS command center.
+  if (isFreeSeatOperatorId(operatorId)) {
+    return (
+      <Shell name="DESK">
+        <FreeSeatDesk operatorId={operatorId} />
+      </Shell>
+    );
+  }
+  if (!opsDbConfigured()) {
     return <Shell name="DASHBOARD"><EmptyState name="YOUR RESTAURANT" /></Shell>;
   }
   let d: CommandCenterData;

@@ -55,18 +55,18 @@ export default function OnboardPage() {
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setMessage(
-          data.debugActivatePath
-            ? `${data.message} Dev link: ${data.debugActivatePath}`
-            : data.message || 'Check your email for the activation link.',
-        );
+        setMessage(data.message || 'Check your email for the activation link.');
         setStep(4);
         trackEvent('onboard_submit_success', { meta: { posType, interestedAgent, dataPreference, path: 'activation' } });
         return;
       }
 
-      // If activation DB is offline, fall back to waitlist so the form never dead-ends.
-      if (res.status === 503) {
+      if (data.code === 'activation_email_unavailable') {
+        throw new Error(data.error || 'Activation email is unavailable. Try again later.');
+      }
+
+      // If free-seat tables are missing, fall back to waitlist so the form never dead-ends.
+      if (res.status === 503 && data.code === 'neon_tables_missing') {
         const wait = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -216,9 +216,9 @@ export default function OnboardPage() {
                 <em>Welcome.</em>
               </h1>
               <p className="compass-body text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-                Your free one-store <span className="text-ink-800 font-semibold">{interestedAgent}</span> setup is queued for{' '}
-                <span className="text-ink-800 font-semibold">{restaurantName}</span>.
-                Start with one operator login. Myke will reach out from <span className="font-mono text-ink-800">myke@n86.app</span> within 24 hours.
+                Check <span className="text-ink-800 font-semibold">{email}</span> for the activation link.
+                You choose the password — we never email one. Then the desk asks only for yesterday&apos;s close.
+                {message ? <span className="block mt-4 font-mono text-sm">{message}</span> : null}
               </p>
 
               <div className="compass-card text-left mb-8">

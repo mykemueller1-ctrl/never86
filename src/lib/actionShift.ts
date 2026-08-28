@@ -7,6 +7,8 @@ export type ActionShiftInput = {
   laborTargetPct?: number;
   expectedCash?: number;
   enteredDeposit?: number;
+  /** False when the POS cash field was blank/$0 (unentered), not a counted miss. */
+  cashEntered?: boolean;
   payouts?: number;
   discounts?: number;
   promotions?: number;
@@ -17,8 +19,15 @@ export type ActionShiftInput = {
   targetDeliveryMinutes?: number;
 };
 
+export type ActionShiftProof = {
+  object: string;
+  nightCheck: string;
+  verbalYesCloses: false;
+};
+
 export type ActionShiftAction = {
-  id: 'cash-proof' | 'labor-window' | 'payout-proof' | 'delivery-clock' | 'approval-proof' | 'close-packet';
+  id: 'cash-proof' | 'labor-window' | 'payout-proof' | 'delivery-clock' | 'approval-proof' | 'close-packet' | 'vendor-drift' | 'vendor-silence' | 'po-receive-usage';
+  instanceKey?: string;
   title: string;
   owner: string;
   evidence: string;
@@ -26,6 +35,7 @@ export type ActionShiftAction = {
   dollarsObserved: number | null;
   sourceStatus: 'unverified';
   claimBoundary: string;
+  proof: ActionShiftProof;
 };
 
 export type ActionShiftResult = {
@@ -87,7 +97,12 @@ export function buildActionShift(
 
   const actions: RankedAction[] = [];
 
-  if (input.expectedCash !== undefined && input.enteredDeposit !== undefined) {
+  const cashEntered = input.cashEntered ?? (input.enteredDeposit !== undefined);
+  if (
+    cashEntered
+    && input.expectedCash !== undefined
+    && input.enteredDeposit !== undefined
+  ) {
     const variance = Math.abs(input.expectedCash - input.enteredDeposit);
     if (variance >= 0.01) {
       actions.push({
@@ -100,6 +115,11 @@ export function buildActionShift(
         dollarsObserved: variance,
         sourceStatus: 'unverified',
         claimBoundary: 'An entered deposit variance is not proof of theft, loss, or bank receipt.',
+        proof: {
+          object: 'Deposit slip or matching bank/deposit record',
+          nightCheck: 'Attach the deposit slip or bank/deposit proof and reconcile expected cash to the final entered deposit.',
+          verbalYesCloses: false,
+        },
       });
     }
   }
@@ -118,6 +138,11 @@ export function buildActionShift(
         dollarsObserved: excess,
         sourceStatus: 'unverified',
         claimBoundary: 'The amount above target is an observed target variance, not guaranteed savings or unauthorized labor.',
+        proof: {
+          object: 'Approved schedule and final time clock',
+          nightCheck: 'Save the approved schedule and final time clock, including manager edits and reasons.',
+          verbalYesCloses: false,
+        },
       });
     }
   }
@@ -130,10 +155,15 @@ export function buildActionShift(
       owner: 'Closing manager',
       evidence: `${money(input.payouts ?? 0)} in POS payouts needs receipt and ledger coding.`,
       move: 'Attach each receipt, name the business purpose, and map it to the correct expense bucket before close.',
-      dollarsObserved: input.payouts ?? 0,
-      sourceStatus: 'unverified',
-      claimBoundary: 'A payout is not a leak unless supporting evidence shows it was invalid, duplicated, or miscoded.',
-    });
+        dollarsObserved: input.payouts ?? 0,
+        sourceStatus: 'unverified',
+        claimBoundary: 'A payout is not a leak unless supporting evidence shows it was invalid, duplicated, or miscoded.',
+        proof: {
+          object: 'Payout receipts and ledger coding',
+          nightCheck: 'Attach receipts and business-purpose coding for every payout.',
+          verbalYesCloses: false,
+        },
+      });
   }
 
   if ((input.lateDeliveryCount ?? 0) > 0) {
@@ -150,6 +180,11 @@ export function buildActionShift(
       dollarsObserved: input.lateDeliverySales ?? null,
       sourceStatus: 'unverified',
       claimBoundary: 'Sales tied to late tickets are exposed revenue, not proven lost sales or recoverable cash.',
+      proof: {
+        object: 'Late-ticket exception list',
+        nightCheck: 'Save the late-ticket exception list with cause and manager follow-up.',
+        verbalYesCloses: false,
+      },
     });
   }
 
@@ -165,6 +200,11 @@ export function buildActionShift(
       dollarsObserved: null,
       sourceStatus: 'unverified',
       claimBoundary: 'These categories can overlap. They are not added together, and approved exceptions are not automatically waste, abuse, or theft.',
+      proof: {
+        object: 'Ticket-level exception detail',
+        nightCheck: 'Confirm ticket-level reason and manager authorization for discounts, promos, refunds, and voids.',
+        verbalYesCloses: false,
+      },
     });
   }
 
@@ -179,6 +219,11 @@ export function buildActionShift(
       dollarsObserved: null,
       sourceStatus: 'unverified',
       claimBoundary: 'No flag from typed inputs does not prove the shift was clean.',
+      proof: {
+        object: 'Complete same-scope close packet',
+        nightCheck: 'Save one complete, same-scope close packet before leaving the store.',
+        verbalYesCloses: false,
+      },
     });
   }
 

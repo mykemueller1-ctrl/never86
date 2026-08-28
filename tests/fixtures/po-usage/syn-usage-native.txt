@@ -1,0 +1,6 @@
+Theoretical Usage
+Period: 2026-05-12
+
+SKU SYN-OIL-01 Sample Olive Oil Theoretical Qty 2.50 Unit Cost 68.40 Recipe Qty Per Sold 0.05 Yield 1 Units Sold 50
+SKU SYN-PASTA-02 Sample Penne Theoretical Qty 10.00 Unit Cost 18.10 Recipe Qty Per Sold 1 Yield 1 Units Sold 10
+SKU SYN-SPICE-05 Sample Seasonal Spice Theoretical Qty 1.00 Unit Cost 10.00 Recipe Qty Per Sold 0.125 Yield 1 Units Sold 8

@@ -34,7 +34,7 @@ create table public.action_shift_role_assignments (
   seat_id uuid not null,
   location_id integer,
   role_key text not null
-    check (role_key in ('owner', 'general_manager', 'manager', 'kitchen_manager', 'shift_lead', 'cook', 'server', 'bartender', 'driver', 'dishwasher', 'staff')),
+    check (role_key in ('owner', 'general_manager', 'manager', 'kitchen_manager', 'shift_lead', 'prep_cook', 'line_cook', 'cook', 'server', 'bartender', 'host', 'driver', 'dishwasher', 'staff')),
   is_primary boolean not null default false,
   active_from date not null default current_date,
   active_until date,
@@ -83,8 +83,12 @@ create table public.action_shift_schedule_shifts (
   external_shift_id text not null,
   external_worker_id text,
   position_name text,
+  business_date date not null,
   starts_at timestamptz not null,
   ends_at timestamptz not null,
+  match_status text not null default 'unmatched'
+    check (match_status in ('matched', 'unmatched', 'needs_review')),
+  match_reason text,
   status text not null default 'scheduled'
     check (status in ('scheduled', 'worked', 'missed', 'cancelled')),
   source_updated_at timestamptz,
@@ -282,7 +286,7 @@ revoke all on table
   public.action_shift_checklist_runs,
   public.action_shift_step_receipts,
   public.action_shift_feedback
-from anon;
+from anon, authenticated;
 
 -- Workforce and evidence records use status/retention fields instead of client
 -- deletion. Destructive cleanup remains a controlled service-role operation.
@@ -297,6 +301,15 @@ grant select, insert, update on table
   public.action_shift_step_receipts,
   public.action_shift_feedback
 to authenticated;
+
+revoke all on sequence
+  public.action_shift_role_assignments_id_seq,
+  public.action_shift_identity_links_id_seq,
+  public.action_shift_schedule_shifts_id_seq,
+  public.action_shift_checklist_steps_id_seq,
+  public.action_shift_step_receipts_id_seq,
+  public.action_shift_feedback_id_seq
+from anon, authenticated;
 
 grant usage, select on sequence
   public.action_shift_role_assignments_id_seq,
@@ -333,7 +346,15 @@ begin
     'action_shift_feedback'
   ] loop
     execute format(
-      'create policy operator_isolation on public.%I for all to authenticated using (operator_id = (select public.current_operator_id())) with check (operator_id = (select public.current_operator_id()))',
+      'create policy operator_select on public.%I for select to authenticated using (operator_id = (select public.current_operator_id()))',
+      table_name
+    );
+    execute format(
+      'create policy operator_insert on public.%I for insert to authenticated with check (operator_id = (select public.current_operator_id()))',
+      table_name
+    );
+    execute format(
+      'create policy operator_update on public.%I for update to authenticated using (operator_id = (select public.current_operator_id())) with check (operator_id = (select public.current_operator_id()))',
       table_name
     );
   end loop;

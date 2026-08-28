@@ -24,7 +24,8 @@ operator supplies or approves the source.
 
 Every table carries `operator_id`, has row-level security enabled, rejects
 anonymous table access, and uses the existing `current_operator_id()` tenant
-policy. Composite `(operator_id, parent_id)` foreign keys also prevent a child
+policies. Select, insert, and update have separate policies; browser delete is
+not granted. Composite `(operator_id, parent_id)` foreign keys also prevent a child
 record from linking to another tenant's seat, location, template, shift, run, or
 receipt parent even if an ID is guessed. Evidence URIs must target private
 tenant-scoped storage.
@@ -33,6 +34,13 @@ Role assignments are represented in the database, but the current migration does
 not claim that the public `/action-shift` page is a staff login surface. Staff
 authentication, owner/manager administration, and per-role API policy tests are
 the next delivery slice.
+
+The operator-authenticated `/dashboard/setup` and admin-only
+`/admin/action-shift` routes provide a local staging desk. A manager can load a
+roster and schedule, resolve invalid rows, preview role-specific checklist packs,
+and export a deployment packet. The CSV contents stay inside the browser and are
+not posted to the application. This does not claim that the live tenant database
+has been migrated or that staff logins have been activated.
 
 ## Deterministic schedule matching
 
@@ -66,7 +74,10 @@ learning from unverified or private data by accident.
 ## Release state
 
 - Code generation: complete.
-- Unit tests, lint, and production build: required before each push.
+- Manager staging/import preview: complete; no server persistence in this slice.
+- Unit tests, lint, production build, and PostgreSQL 14 migration smoke: required before each push.
 - Live database migration: not applied by this commit.
+- Supabase Data API exposure: must be checked during live activation; grants and
+  RLS do not by themselves enable a table when project Data API auto-exposure is off.
 - Real staff/schedule import: blocked until Myke supplies the approved roster and
   schedule source and the live database is active.

@@ -75,6 +75,7 @@ describe('robots.txt Allow /api/answers then Disallow /api/', () => {
     expect([...ROBOTS_ALLOW]).toEqual(['/', '/api/answers', '/api/mcp', '/api/llm-shells', '/api/quick-wins']);
     expect([...ROBOTS_DISALLOW]).toContain('/api/');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/lab');
+    expect([...ROBOTS_DISALLOW]).toContain('/action-shift/setup');
     const doc = robots();
     const rule = Array.isArray(doc.rules) ? doc.rules[0] : doc.rules;
     expect(rule).toBeTruthy();
@@ -99,8 +100,7 @@ describe('sitemap lastmod for sharpened AEO URLs', () => {
       const lastModified = byUrl.get(`${WWW}${path}`)?.lastModified;
       expect(new Date(lastModified as Date).getTime()).toBe(AEO_PAGE_LASTMOD.getTime());
     }
-    // /llm-shells lives on the factory branch (#141). Do not sitemap a 404 on main.
-    expect(byUrl.has(`${WWW}/llm-shells`)).toBe(false);
+    expect(byUrl.get(`${WWW}/llm-shells`)).toBeTruthy();
   });
 });
 

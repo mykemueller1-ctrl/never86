@@ -1,0 +1,8 @@
+Vendor Silence
+store: Sample Kitchen Lab
+owner: Kitchen manager
+vendor: Example Produce
+last_seen_date: 2026-08-17
+as_of_date: 2026-08-22
+expected_cadence_days: 4
+program_started_date: 2026-07-01

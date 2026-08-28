@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   findOperatorCredential,
   verifyPassword,
   touchOperatorLogin,
 } from '@/lib/operatorAuth';
 import {
+  chooseLoginPlane,
   findFreeSeatCredential,
+  normalizeEmail,
   touchFreeSeatLogin,
 } from '@/lib/operatorActivation';
 import {
@@ -14,13 +16,16 @@ import {
   OPERATOR_COOKIE,
   OPERATOR_COOKIE_OPTS,
 } from '@/lib/operatorSession';
+import { pickTrustedClientIp } from '@/lib/trustedClientIp';
+import { allowDurableLoginAttempt } from '@/lib/authThrottle';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // POST /api/operator/login  { email, password } -> sets the signed operator
 // session cookie. Prefers Neon free-seat credentials (Monday gate), then OPS.
-export async function POST(req: Request) {
+// A Neon hit with a bad password never falls through to OPS for the same email.
+export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const email = typeof body?.email === 'string' ? body.email.trim() : '';
   const password = typeof body?.password === 'string' ? body.password : '';
@@ -35,8 +40,19 @@ export async function POST(req: Request) {
     );
   }
 
+  const ip = pickTrustedClientIp(req.headers);
+  if (!(await allowDurableLoginAttempt({ email: normalizeEmail(email), ip }))) {
+    return NextResponse.json(
+      { success: false, error: 'Too many sign-in attempts. Try again in an hour.' },
+      { status: 429 },
+    );
+  }
+
   const free = await findFreeSeatCredential(email).catch(() => null);
-  if (free && verifyPassword(password, free.passwordHash)) {
+  const neonPasswordOk = free ? verifyPassword(password, free.passwordHash) : false;
+  const plane = chooseLoginPlane(free, neonPasswordOk);
+
+  if (plane === 'neon' && free) {
     const token = await signOperatorSession(free.operatorId, free.email, Date.now());
     if (!token) {
       return NextResponse.json(
@@ -53,6 +69,10 @@ export async function POST(req: Request) {
     });
     res.cookies.set(OPERATOR_COOKIE, token, OPERATOR_COOKIE_OPTS);
     return res;
+  }
+
+  if (plane === 'deny-neon') {
+    return NextResponse.json({ success: false, error: 'Wrong email or password.' }, { status: 401 });
   }
 
   const cred = await findOperatorCredential(email).catch(() => null);

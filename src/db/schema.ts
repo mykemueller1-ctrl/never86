@@ -345,8 +345,11 @@ export const actionShiftScheduleShifts = pgTable('action_shift_schedule_shifts',
   externalShiftId: text('external_shift_id').notNull(),
   externalWorkerId: text('external_worker_id'),
   positionName: text('position_name'),
+  businessDate: date('business_date').notNull(),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  matchStatus: text('match_status').default('unmatched').notNull(),
+  matchReason: text('match_reason'),
   status: text('status').default('scheduled').notNull(),
   sourceUpdatedAt: timestamp('source_updated_at', { withTimezone: true }),
   importedAt: timestamp('imported_at', { withTimezone: true }).defaultNow().notNull(),
@@ -627,7 +630,59 @@ export const seatCredentials = pgTable('seat_credentials', {
   lastLoginAt: timestamp('last_login_at'),
 });
 
+export const seatAuthAttempts = pgTable('seat_auth_attempts', {
+  id: serial('id').primaryKey(),
+  kind: text('kind').notNull(),
+  email: text('email'),
+  requestIp: text('request_ip'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const seatIntakeEvents = pgTable('seat_intake_events', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id').notNull(),
+  channel: text('channel').notNull(),
+  sourceFilename: text('source_filename'),
+  sourceFrom: text('source_from'),
+  reportFamily: text('report_family'),
+  businessDate: date('business_date'),
+  payload: jsonb('payload').default({}).notNull(),
+  injectionSuspected: boolean('injection_suspected').default(false).notNull(),
+  rejectedReason: text('rejected_reason'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const seatCloses = pgTable('seat_closes', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id').notNull(),
+  businessDate: date('business_date').notNull(),
+  desk: jsonb('desk').default({}).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('seat_closes_operator_location_date_idx').on(
+    table.operatorId,
+    table.locationId,
+    table.businessDate,
+  ),
+]);
+
+export const seatProofs = pgTable('seat_proofs', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  closeId: integer('close_id').notNull(),
+  actionId: text('action_id').notNull(),
+  outcome: text('outcome').notNull(),
+  proofKind: text('proof_kind').notNull(),
+  proofNote: text('proof_note'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export type SeatActivationToken = typeof seatActivationTokens.$inferSelect;
 export type SeatOperator = typeof seatOperators.$inferSelect;
 export type SeatLocation = typeof seatLocations.$inferSelect;
 export type SeatCredential = typeof seatCredentials.$inferSelect;
+export type SeatIntakeEvent = typeof seatIntakeEvents.$inferSelect;
+export type SeatClose = typeof seatCloses.$inferSelect;
+export type SeatProof = typeof seatProofs.$inferSelect;

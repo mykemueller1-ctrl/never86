@@ -1,0 +1,2 @@
+vendor,store,last_seen_date,as_of_date,expected_cadence_days,grace_days,pause_weekends,paused_dates,program_started_date
+Example Produce,Sample Kitchen Lab,2026-08-17,2026-08-22,4,0,false,,2026-07-01

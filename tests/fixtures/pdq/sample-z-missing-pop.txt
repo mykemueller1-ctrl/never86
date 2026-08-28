@@ -1,0 +1,18 @@
+Z Report / End Of Day
+Sample Kitchen Lab
+Business Date: 8/23/2026
+
+Subtotal: $900.00
+Grand Total: $963.00
+Expected Cash: $0.00
+Actual Deposit $0.00
+
+Labor Summary
+Total: 2 $210.00
+
+Menu Category
+Category Name QTY Total
+Food 30 $540.00
+Beer 18 $180.00
+Liquor 12 $180.00
+Total: 60 $900.00
