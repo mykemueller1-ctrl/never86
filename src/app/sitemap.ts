@@ -59,6 +59,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/press`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/mcp`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/llm-shells`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/privacy`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE}/terms`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/people`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/story`, lastModified: now, changeFrequency: 'monthly', priority: 0.92 },
     { url: `${BASE}/changelog`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
