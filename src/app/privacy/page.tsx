@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <span className="compass-mark">N</span>
           <span>
             <p className="font-serif text-[24px] leading-none text-ink-800">
-              Never 86'd <span className="italic text-ink-600">· privacy</span>
+              Never 86{"'"}d <span className="italic text-ink-600">· privacy</span>
             </p>
             <p className="compass-eyebrow-dim mt-2">Public MCP · website</p>
           </span>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           What we take. <em>What we do not.</em>
         </h1>
         <p className="compass-body text-lg mb-10">
-          Last updated August 28, 2026. Company: Never 86'd Inc., Fort Dodge, Iowa.
+          Last updated August 28, 2026. Company: Never 86{"'"}d Inc., Fort Dodge, Iowa.
           Contact <a className="font-semibold text-[#0066ff] hover:underline" href="mailto:press@never86.ai">press@never86.ai</a>
           {' '}or{' '}
           <a className="font-semibold text-[#0066ff] hover:underline" href="mailto:myke@n86.app">myke@n86.app</a>.
