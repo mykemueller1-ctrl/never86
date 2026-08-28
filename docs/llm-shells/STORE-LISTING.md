@@ -1,7 +1,9 @@
 # 1-click store listing
 
-Operators want: search Never86'd inside ChatGPT or Claude, click Install.
-That is a directory listing. Paste still works today. Do not claim listed until Published.
+Operators search Never86'd inside ChatGPT or Claude and click Install.
+They do not paste a URL. Community Tap managers do not file this.
+
+This is a Never 86'd Inc. publisher job. Do not claim listed until Published.
 
 ## Status
 
@@ -12,7 +14,7 @@ That is a directory listing. Paste still works today. Do not claim listed until 
 | Grok featured catalog | none | no public submit form |
 | Gemini consumer connectors | none | partnership-only |
 
-## Paste fields
+## Publisher form fields
 
 - Name: Never86'd Operator Intelligence
 - MCP: https://www.never86.ai/api/mcp
@@ -25,7 +27,8 @@ That is a directory listing. Paste still works today. Do not claim listed until 
 
 ## Who clicks Submit
 
-A human on the Never 86'd Inc. OpenAI org with Apps Management write + verified identity.
+Never 86'd Inc. OpenAI org: Apps Management write + verified identity.
+Not Kenzy. Not CTAP. Not a one-seat manager.
 Claude needs a Team or Enterprise org. Grok/Gemini have no form.
 
 ## After submit
