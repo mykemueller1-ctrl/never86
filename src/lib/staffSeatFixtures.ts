@@ -40,6 +40,9 @@ const SEAT_LABELS: Record<StationSeatKey, string> = {
   server: 'Example Server',
   prep: 'Example Prep',
   driver: 'Example Driver',
+  line_cook: 'Example Line Cook',
+  pizza: 'Example Pizza',
+  dishwasher: 'Example Dishwasher',
 };
 
 function workerId(operatorId: number, seatKey: StationSeatKey): string {
@@ -81,6 +84,9 @@ const SHIFT_WINDOWS: Record<StationSeatKey, { start: string; end: string; statio
   server: { start: '16:00:00', end: '22:00:00', station: 'dining' },
   prep: { start: '07:00:00', end: '15:00:00', station: 'prep' },
   driver: { start: '16:00:00', end: '22:00:00', station: 'delivery' },
+  line_cook: { start: '10:00:00', end: '22:00:00', station: 'fry' },
+  pizza: { start: '16:00:00', end: '22:00:00', station: 'pizza_side' },
+  dishwasher: { start: '16:00:00', end: '23:00:00', station: 'dish' },
 };
 
 export const SYNTHETIC_STAFF_SCHEDULE: readonly SyntheticScheduleRow[] = SYNTHETIC_STAFF_ROSTER.map((row) => {
@@ -165,6 +171,10 @@ const PRIVATE_PAYLOAD = [
   /\b(pin|password|ssn|social security)\b/i,
   /community tap/i,
   /\bsally\b/i,
+  /\bkarlee\b/i,
+  /\bsturtz\b/i,
+  /\bashley\b/i,
+  /\bholding\b/i,
   /\$\s?\d{2,}/,
   /\bfacebook\b/i,
 ];

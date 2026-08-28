@@ -105,7 +105,7 @@ export default function OperatorLoginPage() {
           <Link href="/onboard" className="underline" style={{ textDecorationColor: '#0066ff' }}>
             Claim the free seat
           </Link>
-          . One store, one login. Staff station seats are not issued.
+          . One store, one login. Staff seats use /staff/login after Neon apply — they do not copy this owner credential.
         </p>
       </section>
     </main>
