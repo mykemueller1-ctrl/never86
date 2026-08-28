@@ -74,7 +74,7 @@ describe('robots.txt Allow /api/answers then Disallow /api/', () => {
   it('keeps the public JSON allowlist ahead of the /api/ deny', () => {
     expect([...ROBOTS_ALLOW]).toEqual(['/', '/api/answers', '/api/mcp', '/api/quick-wins']);
     expect([...ROBOTS_ALLOW].some((path) => path.includes('llm-shells'))).toBe(false);
-    expect([...ROBOTS_DISALLOW]).toContain('/llm-shells');
+    expect([...ROBOTS_DISALLOW].some((path) => path.includes('llm-shells'))).toBe(false);
     expect([...ROBOTS_DISALLOW]).toContain('/api/');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/lab');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/setup');

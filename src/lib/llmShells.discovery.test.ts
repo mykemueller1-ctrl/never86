@@ -38,7 +38,7 @@ describe('llm-shells crawler and LLM discovery gate', () => {
     const allow = asList(rule.allow);
     const disallow = asList(rule.disallow);
     expect(allow.some((path) => path.includes('llm-shells'))).toBe(false);
-    expect(disallow).toContain('/llm-shells');
+    expect(disallow.some((path) => path.includes('llm-shells'))).toBe(false);
 
     const llmsTxt = await (await getLlmsTxt()).text();
     const llmsFull = await (await getLlmsFullTxt()).text();
@@ -70,11 +70,13 @@ describe('llm-shells crawler and LLM discovery gate', () => {
     }
     const robotsSource = readFileSync(join(ROOT, 'src/app/robots.ts'), 'utf8');
     expect(robotsSource).not.toMatch(/['"]\/api\/llm-shells['"]/);
+    expect(robotsSource).not.toMatch(/['"]\/llm-shells['"]/);
 
     const seoAeoPath = join(ROOT, 'src/lib/seoAeo.ts');
     if (existsSync(seoAeoPath)) {
       const seoAeo = readFileSync(seoAeoPath, 'utf8');
       expect(seoAeo).not.toMatch(/['"]\/api\/llm-shells['"]/);
+      expect(seoAeo).not.toMatch(/['"]\/llm-shells['"]/);
       expect(seoAeo).not.toContain(PUBLIC_LLM_SHELLS_URL);
     }
   });
