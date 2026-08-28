@@ -148,17 +148,17 @@ export function buildDeskFromPdqParts(input: {
   }
   let actionShift: ActionShiftResult | null = null;
   let actionShiftError: string | null = null;
+  const ownerExpected = input.seat === 'owner' && z?.expectedCash.value != null && z.expectedCash.value > 0
+    ? z.expectedCash.value
+    : undefined;
+  const enteredExpected = cashStatus === 'entered' ? z?.expectedCash.value ?? undefined : undefined;
   if (salesValue != null && salesValue > 0) {
     const built = buildActionShift({
       store: input.store || z?.store || 'Unspecified store',
       businessDate: z?.businessDate || hourly?.businessDate || voids?.businessDate || undefined,
       grossSales: salesValue,
       laborDollars: moneyLine(labor, 'Labor Summary · Total', missingEvidence),
-      expectedCash: cashStatus === 'entered' || input.seat === 'owner'
-        ? z?.expectedCash.value && z.expectedCash.value > 0
-          ? z.expectedCash.value
-          : undefined
-        : cashStatus === 'entered' ? z?.expectedCash.value ?? undefined : undefined,
+      expectedCash: ownerExpected ?? enteredExpected,
       enteredDeposit: cashStatus === 'entered' ? z?.actualDeposit.value ?? undefined : undefined,
       cashEntered: cashStatus === 'entered',
       ownerSaidDepositPresent: input.ownerSaidDepositPresent,

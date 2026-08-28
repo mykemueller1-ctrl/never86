@@ -9,6 +9,7 @@ Total: 15 $4,386.65
 
 Grand Total: $4,386.65
 Expected Cash: $1,351.46
+Actual Deposit: $0.00
 
 Shift Deposit
 Dep Shift Expected Deposit Actual Deposit Over Under

@@ -150,8 +150,8 @@ function categoryMoney(text: string, category: string): MoneyEvidence {
   const patterns = [
     new RegExp(`(?:^|\\n)\\s*${label}\\s+\\d+\\s+${MONEY}`, 'im'),
     new RegExp(`(?:^|\\n)\\s*${label}\\s+${MONEY}`, 'im'),
-    // Operator shorthand: "Food 2776" (no qty, optional cents). Do not steal the qty from "Food 40 $600.00".
-    new RegExp(`(?:^|\\n)\\s*${label}\\s+(?!\\d+\\s+\\$)${MONEY_FLEX}\\b`, 'im'),
+    // Operator shorthand may sit mid-line: "Grand 5195.97 Food 2776 Beer 847".
+    new RegExp(`\\b${label}\\s+(?!\\d+\\s+\\$)${MONEY_FLEX}\\b`, 'i'),
   ];
   for (const re of patterns) {
     const token = firstMatch(text, re);

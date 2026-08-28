@@ -109,6 +109,7 @@ export function serializeOperatorCloseAsPdq(close: OperatorSuppliedClose): strin
     '',
     `Grand Total: $${close.grandTotal.toFixed(2)}`,
     expected,
+    'Actual Deposit: $0.00',
     '',
     'Shift Deposit',
     'Dep Shift Expected Deposit Actual Deposit Over Under',
