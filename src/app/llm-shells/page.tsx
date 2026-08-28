@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getInstallMatrix } from '@/lib/llmShells';
+import { DURABLE_SHELL_CLAIMS, getInstallMatrix } from '@/lib/llmShells';
 import { CopyMcpUrl } from './CopyMcpUrl';
 
 export const metadata: Metadata = {
@@ -113,6 +113,9 @@ export default function LlmShellsPage() {
             Status · not in the stores yet
           </summary>
           <ul className="compass-body mt-4 space-y-2 text-base">
+            {DURABLE_SHELL_CLAIMS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
             {matrix.honesty.map((line) => (
               <li key={line}>{line}</li>
             ))}
