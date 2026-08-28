@@ -8,7 +8,18 @@ import {
   CTAP_VENDOR_CADENCE_RULES,
 } from '@/lib/ctapLabPack';
 
-const SEAT_ORDER = ['owner', 'foh_manager', 'kitchen_manager', 'bartender', 'server', 'prep', 'driver'] as const;
+const SEAT_ORDER = [
+  'owner',
+  'foh_manager',
+  'kitchen_manager',
+  'bartender',
+  'server',
+  'prep',
+  'driver',
+  'line_cook',
+  'pizza',
+  'dishwasher',
+] as const;
 
 export function CtapLabPackDesk() {
   const seats = SEAT_ORDER.map((seatKey) =>
@@ -49,6 +60,9 @@ export function CtapLabPackDesk() {
           <Link href="/staff/seats" style={chip()}>
             Staff seats
           </Link>
+          <Link href="/staff/desk" style={chip()}>
+            Role-day desk
+          </Link>
           <Link href="/action-shift/setup" style={chip()}>
             Payroll join
           </Link>
@@ -64,7 +78,7 @@ export function CtapLabPackDesk() {
           <h2 style={h2()}>Station seats</h2>
           <p style={{ color: '#9db0a3', fontSize: 14 }}>
             Owner; FOH Manager stations (bar side / pizza side); Kitchen Manager station; bartender, server, prep,
-            driver checklists.
+            driver, line cook, pizza, and dishwasher checklists.
           </p>
           <ul style={{ paddingLeft: 18, color: '#d7e3db' }}>
             {seats.map((seat) => (

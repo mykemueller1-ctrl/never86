@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import sitemap from '../app/sitemap';
 import { metadata as staffLoginMetadata } from '../app/staff/login/page';
 import { metadata as staffSeatsMetadata } from '../app/staff/seats/page';
+import { metadata as staffDeskMetadata } from '../app/staff/desk/page';
 import { GET as loginGet, POST as loginPost } from '../app/api/staff/login/route';
 import { POST as invitePost } from '../app/api/staff/invite/route';
 import { PRIVATE_INPUTS_BEFORE_REAL_CTAP_LOGIN } from './staffSeatAuth';
@@ -16,6 +17,7 @@ describe('staff credential HTTP plane', () => {
     expect(body.success).toBe(false);
     expect(body.issuance).toBe('blocked');
     expect(body.mailSent).toBe(false);
+    expect(body.ownerPlane).toBe('/login');
     expect(body.privateInputIds).toEqual(PRIVATE_INPUTS_BEFORE_REAL_CTAP_LOGIN.map((item) => item.id));
     expect(res.headers.get('set-cookie')).toBeNull();
   });
@@ -41,6 +43,7 @@ describe('staff credential HTTP plane', () => {
   it('keeps staff auth surfaces noindex and out of the sitemap', async () => {
     expect(staffLoginMetadata.robots).toMatchObject({ index: false, follow: false });
     expect(staffSeatsMetadata.robots).toMatchObject({ index: false, follow: false });
+    expect(staffDeskMetadata.robots).toMatchObject({ index: false, follow: false });
     const entries = await sitemap();
     expect(entries.some((entry) => String(entry.url).includes('/staff'))).toBe(false);
   });

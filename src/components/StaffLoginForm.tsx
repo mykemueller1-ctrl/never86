@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const inputClass =
   'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
 
 export function StaffLoginForm() {
+  const router = useRouter();
   const [handle, setHandle] = useState('');
   const [secret, setSecret] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'blocked'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'blocked' | 'ok'>('idle');
   const [error, setError] = useState('');
 
   async function onSubmit(e: React.FormEvent) {
@@ -23,11 +25,17 @@ export function StaffLoginForm() {
         body: JSON.stringify({ inviteHandle: handle, deliverySecret: secret }),
       });
       const data = await res.json();
+      if (data.success === true && typeof data.redirect === 'string') {
+        setStatus('ok');
+        router.push(data.redirect);
+        router.refresh();
+        return;
+      }
       setStatus('blocked');
-      setError(typeof data.error === 'string' ? data.error : 'Staff credentials are not issued.');
+      setError(typeof data.error === 'string' ? data.error : 'Staff login fails closed.');
     } catch {
       setStatus('blocked');
-      setError('Staff credentials are not issued.');
+      setError('Staff login fails closed. Owner /login remains owner-only.');
     }
   }
 
@@ -55,17 +63,18 @@ export function StaffLoginForm() {
         className="btn-primary w-full disabled:opacity-50"
         style={{ background: '#0066ff' }}
       >
-        {status === 'loading' ? 'Checking…' : 'Staff sign-in is not live'}
+        {status === 'loading' ? 'Checking…' : 'Staff sign-in'}
       </button>
       {error ? <p className="text-[#ff453a] text-sm text-center">{error}</p> : null}
       <p className="text-center text-[13px]" style={{ color: '#6e6e73' }}>
-        Operator door:{' '}
+        Fails closed without DATABASE_URL. Live only after Neon apply + STAFF_SEAT_LOGIN_ENABLED.
+        Owner door:{' '}
         <Link href="/login" className="underline" style={{ textDecorationColor: '#0066ff' }}>
           /login
         </Link>
-        . Model:{' '}
-        <Link href="/staff/seats" className="underline" style={{ textDecorationColor: '#0066ff' }}>
-          /staff/seats
+        . Desk:{' '}
+        <Link href="/staff/desk" className="underline" style={{ textDecorationColor: '#0066ff' }}>
+          /staff/desk
         </Link>
         .
       </p>

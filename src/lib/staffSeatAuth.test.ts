@@ -38,7 +38,7 @@ const NOW = '2026-08-24T16:00:00.000-05:00';
 const EXPIRES = '2026-08-25T16:00:00.000-05:00';
 
 describe('staff seat auth model', () => {
-  it('maps owner, FOH manager, kitchen manager, bartender, server, prep, and driver as station seats', () => {
+  it('maps owner, FOH manager, kitchen manager, crew, pizza, line cook, and dish as station seats', () => {
     expect([...STATION_SEAT_KEYS]).toEqual([
       'owner',
       'foh_manager',
@@ -47,6 +47,9 @@ describe('staff seat auth model', () => {
       'server',
       'prep',
       'driver',
+      'line_cook',
+      'pizza',
+      'dishwasher',
     ]);
     expect(labStationSeatsMatchAuthModel()).toBe(true);
     expect(CTAP_LAB_STATION_SEATS.every((seat) => seat.kind === 'station_seat')).toBe(true);
@@ -70,9 +73,13 @@ describe('staff seat auth model', () => {
     expect(capabilitiesForSeat('kitchen_manager')).toContain('prove_dough');
     expect(capabilitiesForSeat('kitchen_manager')).not.toContain('prove_cash');
     expect(canManageTargetSeat('foh_manager', 'bartender')).toBe(true);
+    expect(canManageTargetSeat('foh_manager', 'pizza')).toBe(true);
     expect(canManageTargetSeat('foh_manager', 'kitchen_manager')).toBe(false);
     expect(canManageTargetSeat('kitchen_manager', 'prep')).toBe(true);
+    expect(canManageTargetSeat('kitchen_manager', 'line_cook')).toBe(true);
+    expect(canManageTargetSeat('kitchen_manager', 'dishwasher')).toBe(true);
     expect(canManageTargetSeat('kitchen_manager', 'server')).toBe(false);
+    expect(canManageTargetSeat('kitchen_manager', 'pizza')).toBe(false);
     expect(canManageTargetSeat('server', 'bartender')).toBe(false);
     expect(bartender.capabilities).toEqual(['view_own_station', 'acknowledge_shift']);
   });
@@ -328,8 +335,8 @@ describe('Action Shift proof rules on staff seats', () => {
 describe('synthetic roster and live issuance stop', () => {
   it('ships synthetic roster and schedule fixtures with no private CTap payload', () => {
     expect(syntheticRosterUsesLabStationSeats()).toBe(true);
-    expect(SYNTHETIC_STAFF_ROSTER).toHaveLength(14);
-    expect(SYNTHETIC_STAFF_SCHEDULE).toHaveLength(14);
+    expect(SYNTHETIC_STAFF_ROSTER).toHaveLength(20);
+    expect(SYNTHETIC_STAFF_SCHEDULE).toHaveLength(20);
     expect(new Set(SYNTHETIC_STAFF_ROSTER.map((row) => row.operatorId))).toEqual(new Set([
       SYNTHETIC_OPERATOR_A_ID,
       SYNTHETIC_OPERATOR_B_ID,
