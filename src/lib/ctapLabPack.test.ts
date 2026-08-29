@@ -81,6 +81,33 @@ describe('CTap lab pack', () => {
     expect(mondayOpen[0]?.steps.map((step) => step.instruction).join('\n')).not.toMatch(/Beer comes today/);
   });
 
+  it('posts Tuesday beer-in plus fruit and Wednesday/Sunday no-alarm on bartender extras', () => {
+    const tuesdayOpen = selectCtapLabTemplates({
+      roleKey: 'bartender',
+      weekday: 'Tuesday',
+      shiftPhase: 'open',
+    });
+    expect(tuesdayOpen[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/Beer comes today/);
+    expect(tuesdayOpen[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/Cut fruit/);
+
+    const wednesdayClose = selectCtapLabTemplates({
+      roleKey: 'bartender',
+      weekday: 'Wednesday',
+      shiftPhase: 'close',
+    });
+    expect(wednesdayClose[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/Do not arm the alarm/);
+    expect(wednesdayClose[0]?.steps.map((step) => step.instruction).join('\n')).not.toMatch(/set alarm/);
+
+    const thursdayOpen = selectCtapLabTemplates({
+      roleKey: 'bartender',
+      weekday: 'Thursday',
+      shiftPhase: 'open',
+    });
+    expect(thursdayOpen[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/bar towels/);
+    expect(thursdayOpen[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/Bloody Mary/);
+    expect(thursdayOpen[0]?.steps.map((step) => step.instruction).join('\n')).toMatch(/fountain pop/);
+  });
+
   it('attaches between-runs dishes to a driver shift and kitchen close to the kitchen manager', () => {
     const driverItems = checklistItemsForCtapLabShift({
       roleKey: 'driver',

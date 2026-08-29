@@ -8,10 +8,11 @@ import {
   type CtapLabWeekday,
   vendorCadenceForWeekday,
 } from './ctapLabPack';
+import { barWeekExtrasForSeat } from './ctapBarWeekExtras';
 import type { StationSeatKey } from './staffSeatAuth';
 import { STATION_SEAT_KEYS } from './staffSeatAuth';
 
-export const STAFF_ROLE_DAY_PACK_ID = 'staff-role-day-v2';
+export const STAFF_ROLE_DAY_PACK_ID = 'staff-role-day-v3';
 export const STAFF_ROLE_DAY_PACK_STATUS = 'drafted' as const;
 export const STAFF_ROLE_DAY_TIMEZONE = 'America/Chicago';
 
@@ -536,6 +537,9 @@ function extrasForSeat(seatKey: StationSeatKey, weekday: CtapLabWeekday, view: S
   }
   if ((seatKey === 'kitchen_manager' || seatKey === 'driver') && weekday === 'Sunday') {
     extras.push('Sunday: two good drivers.');
+  }
+  for (const extra of barWeekExtrasForSeat(seatKey, weekday)) {
+    extras.push(`${extra.slotLabel}: ${extra.item}`);
   }
   return extras;
 }

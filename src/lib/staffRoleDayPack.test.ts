@@ -128,11 +128,16 @@ describe('staff role-day desk pack', () => {
 
     expect(templateIds(bartender).every((id) => id.startsWith('bar-'))).toBe(true);
     expect(instructions(bartender)).toMatch(/Cut fruit\/extra for weekend/);
+    expect(bartender.extras.join('\n')).toMatch(/extra fruit/);
+    expect(bartender.extras.join('\n')).toMatch(/extra mixers/);
+    expect(bartender.extras.join('\n')).toMatch(/kids cups/);
     expect(instructions(bartender)).not.toContain('Turn pizza ovens off');
     expect(instructions(bartender)).not.toContain('Dining / back room coverage');
 
     expect(templateIds(server)).toEqual(['waitstaff-open-wednesday', 'waitstaff-close-wednesday']);
     expect(instructions(server)).toMatch(/Buff floors/);
+    expect(server.extras.join('\n')).toMatch(/Buff floors/);
+    expect(server.extras.join('\n')).toMatch(/Do not arm the alarm/);
     expect(instructions(server)).not.toContain('Stock walk in (Beer comes today)');
 
     expect(templateIds(prep)).toEqual(['prep-open']);
@@ -155,6 +160,7 @@ describe('staff role-day desk pack', () => {
       'pizza-line-close',
     ]));
     expect(instructions(pizza)).toContain('Turn pizza ovens off');
+    expect(pizza.extras.join('\n')).toMatch(/soak tabs/);
     expect(instructions(pizza)).not.toContain('Wash & clean under all mats');
 
     expect(templateIds(line)).toEqual(expect.arrayContaining([
@@ -207,5 +213,8 @@ describe('staff role-day desk pack', () => {
     expect(blob).toMatch(/Kenzy/);
     expect(blob).toMatch(/Tom/);
     expect(blob).toMatch(/Myke/);
+    expect(blob).toMatch(/Stock pop/);
+    expect(blob).toMatch(/Cut fruit/);
+    expect(blob).toMatch(/Do not arm the alarm/);
   });
 });

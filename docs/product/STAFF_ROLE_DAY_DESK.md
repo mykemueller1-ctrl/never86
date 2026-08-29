@@ -13,7 +13,7 @@ Each station seat sees **today** by role:
 
 | Seat | Today | Policies / board |
 |---|---|---|
-| FOH manager | Bar whip + FOH Mon–Sun extras + liquor/beer cadence | Pour/POS, bucket prices, void vs promo, cost bands, coverage, deposit-before-close |
+| FOH manager | Bar whip + FOH Mon–Sun extras (bar-week on Schedule) + liquor/beer cadence | Pour/POS, bucket prices, void vs promo, cost bands, coverage, deposit-before-close |
 | Kitchen manager | Kitchen whip + prep dough-by-3 + fry AM/PM + drivers | Void vs promo, food cost band, dough by 3, late-delivery four questions, weekday 11–1 driver naming, weekend driver counts |
 | Bartender / server / prep / driver | Own station card + that day's extras | Only the policies that station rings or cooks |
 | Line cook | Fry AM/PM + line station card | Fry rotation policy, void vs promo |

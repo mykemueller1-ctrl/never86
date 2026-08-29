@@ -85,9 +85,25 @@ const AM_BARTENDER_BEER_DAY: StepInput[] = [
   ['Get bus tub/silverware tub ready', 'Setup'],
   ['Make pitchers of water', 'Prep'],
   ['Stock walk in (Beer comes today)', 'Stocking'],
+  ['Cut fruit', 'Prep'],
   ['Stock coolers/overstock', 'Stocking'],
   ['Fill ice', 'Ice'],
   ['Trashes/Cans', 'Cleaning'],
+  ['Fill kids cups/lids/straws/plastic cups', 'Stocking'],
+  ['Empty slop bucket in kitchen', 'Cleaning'],
+  ['Deposit', 'Cash'],
+];
+
+const AM_BARTENDER_THU: StepInput[] = [
+  ['Get out all condiments on both sides', 'Setup'],
+  ['Get bus tub/silverware tub ready', 'Setup'],
+  ['Make pitchers of water', 'Prep'],
+  ['Stock coolers/overstock', 'Stocking'],
+  ['Fill ice', 'Ice'],
+  ['Trashes/Cans', 'Cleaning'],
+  ['Restock bar towels', 'Stocking'],
+  ['Make Bloody Mary mix from the posted bar card', 'Prep'],
+  ['Check fountain pop and replace empty/almost empty', 'Stocking'],
   ['Fill kids cups/lids/straws/plastic cups', 'Stocking'],
   ['Empty slop bucket in kitchen', 'Cleaning'],
   ['Deposit', 'Cash'],
@@ -154,6 +170,24 @@ const PM_BARTENDER_MON: StepInput[] = [
   ['Turn off tvs/speaker down', 'Closing'],
   ['Deposit/A.M. & P.M. kitchen tips', 'Cash'],
   ['Make sure all doors are locked, air is right, set alarm', 'Security'],
+];
+
+const PM_BARTENDER_BUFF_NIGHT: StepInput[] = [
+  ['Wash & clean under all mats', 'Bar Cleaning'],
+  ['Wash waitress only and yuengling mats', 'Bar Cleaning'],
+  ['Clean tops of wells and underneath liquor bottles', 'Bar Cleaning'],
+  ['Stock coolers', 'Stocking'],
+  ['Stock pop', 'Stocking'],
+  ['Stock walk in', 'Stocking'],
+  ['Dump Slop bucket & wash', 'Cleaning'],
+  ['Fill ice', 'Ice'],
+  ['Clean Bathrooms (Fill toilet paper/paper towels, clean toilets, ice urinals, and trashes)', 'Bathrooms'],
+  ['Take out trashes behind bar & waitress/refill liners/cans', 'Trash'],
+  ['Lock all doors', 'Security'],
+  ['Close out all computers', 'Closing'],
+  ['Turn off tvs/speaker down', 'Closing'],
+  ['Deposit/A.M. & P.M. kitchen tips', 'Cash'],
+  ['Make sure all doors are locked and air is right. Do not arm the alarm — FOH buffs floors', 'Security'],
 ];
 
 const PM_WAITSTAFF_DEFAULT: StepInput[] = [
@@ -289,7 +323,7 @@ const AM_BARTENDER_BY_DAY: Record<CtapLabWeekday, StepInput[]> = {
   Monday: AM_BARTENDER_MON,
   Tuesday: AM_BARTENDER_BEER_DAY,
   Wednesday: AM_BARTENDER_BASE,
-  Thursday: AM_BARTENDER_BASE,
+  Thursday: AM_BARTENDER_THU,
   Friday: AM_BARTENDER_FRI,
   Saturday: AM_BARTENDER_WEEKEND,
   Sunday: AM_BARTENDER_WEEKEND,
@@ -298,11 +332,11 @@ const AM_BARTENDER_BY_DAY: Record<CtapLabWeekday, StepInput[]> = {
 const PM_BARTENDER_BY_DAY: Record<CtapLabWeekday, StepInput[]> = {
   Monday: PM_BARTENDER_MON,
   Tuesday: PM_BARTENDER,
-  Wednesday: PM_BARTENDER,
+  Wednesday: PM_BARTENDER_BUFF_NIGHT,
   Thursday: PM_BARTENDER,
   Friday: PM_BARTENDER,
   Saturday: PM_BARTENDER,
-  Sunday: PM_BARTENDER,
+  Sunday: PM_BARTENDER_BUFF_NIGHT,
 };
 
 const PM_WAITSTAFF_BY_DAY: Record<CtapLabWeekday, StepInput[]> = {

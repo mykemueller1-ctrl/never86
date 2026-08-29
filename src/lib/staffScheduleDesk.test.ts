@@ -35,6 +35,15 @@ describe('staff Schedule / Time Off', () => {
     expect(fridayPizza.date).toBe(STAFF_SCHEDULE_WEEK_DATES.Friday);
     expect(fridayPizza.weekStrip.map((day) => day.weekday)).toEqual([...CTAP_LAB_WEEKDAYS]);
     expect(fridayPizza.weekStrip.every((day) => day.namedPeople === false)).toBe(true);
+    expect(fridayPizza.weekStrip.map((day) => day.barWeekShortLabel)).toEqual([
+      'pop/ice',
+      'beer-in + fruit',
+      'buff + no alarm',
+      'towels/bloody/fountain',
+      'extra fruit/mixers/kids cups + BBQ',
+      'pop machine soak',
+      'parm + buff',
+    ]);
     expect(fridayPizza.myShifts.length).toBeGreaterThan(0);
     expect(fridayPizza.myShifts.every((shift) => shift.namedPerson === false)).toBe(true);
     expect(fridayPizza.myShifts.every((shift) => shift.stationLabel === 'Pizza station')).toBe(true);
@@ -220,6 +229,49 @@ describe('staff Schedule / Time Off', () => {
     expect(availabilityVisibleTo('foh_manager', rows)).toEqual([]);
   });
 
+  it('posts CTap bar-week extras onto Schedule as unnamed station slots', () => {
+    const monday = buildStaffScheduleDesk({ seatKey: 'bartender', weekday: 'Monday' });
+    const tuesday = buildStaffScheduleDesk({ seatKey: 'server', weekday: 'Tuesday' });
+    const wednesday = buildStaffScheduleDesk({ seatKey: 'foh_manager', weekday: 'Wednesday' });
+    const thursday = buildStaffScheduleDesk({ seatKey: 'bartender', weekday: 'Thursday' });
+    const friday = buildStaffScheduleDesk({ seatKey: 'server', weekday: 'Friday' });
+    const saturday = buildStaffScheduleDesk({ seatKey: 'pizza', weekday: 'Saturday' });
+    const sunday = buildStaffScheduleDesk({ seatKey: 'server', weekday: 'Sunday' });
+
+    expect(monday.barWeekShortLabel).toBe('pop/ice');
+    expect(monday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Stock pop/);
+    expect(monday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Fill ice/);
+    expect(tuesday.barWeekShortLabel).toBe('beer-in + fruit');
+    expect(tuesday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Beer comes in/);
+    expect(tuesday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Cut fruit/);
+    expect(wednesday.barWeekShortLabel).toBe('buff + no alarm');
+    expect(wednesday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Buff floors/);
+    expect(wednesday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Do not arm the alarm/);
+    expect(thursday.barWeekShortLabel).toBe('towels/bloody/fountain');
+    expect(thursday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/bar towels/);
+    expect(thursday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Bloody Mary/);
+    expect(thursday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/fountain pop/);
+    expect(friday.barWeekShortLabel).toBe('extra fruit/mixers/kids cups + BBQ');
+    expect(friday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/extra fruit/);
+    expect(friday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/extra mixers/);
+    expect(friday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/kids cups/);
+    expect(friday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/BBQ sauce/);
+    expect(saturday.barWeekShortLabel).toBe('pop machine soak');
+    expect(saturday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/soak tabs/);
+    expect(sunday.barWeekShortLabel).toBe('parm + buff');
+    expect(sunday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/parmesan/);
+    expect(sunday.barWeekExtras.map((row) => row.item).join('\n')).toMatch(/Buff floors/);
+
+    const blob = JSON.stringify([monday, tuesday, wednesday, thursday, friday, saturday, sunday]);
+    expect(blob).not.toMatch(/karlee|sturtz|ashley|holding/i);
+    expect([monday, tuesday, wednesday, thursday, friday, saturday, sunday].every((desk) => (
+      desk.barWeekExtras.every((row) => row.namedPerson === false)
+    ))).toBe(true);
+    expect(monday.boundary.neonApply).toBe(false);
+    expect(monday.boundary.autoEmail).toBe(false);
+    expect(monday.boundary.liveCredentials).toBe(false);
+  });
+
   it('posts CTap board coverage as slot counts with no invented names', () => {
     const friday = coverageCountsForWeekday('Friday');
     const saturday = coverageCountsForWeekday('Saturday');
@@ -322,5 +374,7 @@ describe('staff Schedule / Time Off', () => {
     expect(blob).not.toMatch(/invite token|password|pin/i);
     expect(blob).toMatch(/unnamed/);
     expect(blob).toMatch(/canSeeNeedsApprovalInbox/);
+    expect(blob).toMatch(/barWeekExtras/);
+    expect(blob).toMatch(/pop\/ice/);
   });
 });
