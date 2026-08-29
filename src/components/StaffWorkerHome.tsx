@@ -59,7 +59,7 @@ export function StaffWorkerHome({
         </p>
         <h2 className="mt-2 font-semibold">{home.checklist.stationLabel} · {home.weekday}</h2>
         <p className="mt-2 text-sm text-white/60">
-          Ask the house. Talk in All / FOH / BOH. Schedule holds the week strip, my shifts, time off, swap/cover, standing availability, and coverage counts — slots, not names.
+          Ask the house. Talk in All / FOH / BOH. Schedule holds the week strip, bar-week extras, my shifts, time off, swap/cover, standing availability, and coverage counts — slots, not names.
           Dollars never. Crew does not see each other&apos;s checklist misses.
         </p>
         {home.floorPath ? (

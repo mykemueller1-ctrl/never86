@@ -1,5 +1,10 @@
 import { CTAP_LAB_WEEKDAYS, type CtapLabWeekday } from './ctapLabPack';
 import {
+  barWeekExtrasForWeekday,
+  barWeekShortLabel,
+  type CtapBarWeekExtra,
+} from './ctapBarWeekExtras';
+import {
   SYNTHETIC_LOCATION_A_ID,
   SYNTHETIC_OPERATOR_A_ID,
 } from './staffSeatFixtures';
@@ -17,7 +22,7 @@ import {
  * Coverage is slot counts, never invented roster names.
  * Live credentials, Neon apply, and mail stay blocked.
  */
-export const STAFF_SCHEDULE_PACK_ID = 'staff-schedule-v1';
+export const STAFF_SCHEDULE_PACK_ID = 'staff-schedule-v2';
 export const STAFF_SCHEDULE_STATUS = 'drafted' as const;
 export const STAFF_SCHEDULE_TIMEZONE = 'America/Chicago';
 
@@ -54,6 +59,7 @@ export type StaffWeekStripDay = {
   weekday: CtapLabWeekday;
   date: string;
   summary: string;
+  barWeekShortLabel: string;
   slotTotal: number;
   namedPeople: false;
 };
@@ -134,6 +140,8 @@ export type StaffScheduleDesk = {
   weekStrip: readonly StaffWeekStripDay[];
   myShifts: readonly StaffMyShift[];
   coverage: readonly StaffCoverageCount[];
+  barWeekShortLabel: string;
+  barWeekExtras: readonly CtapBarWeekExtra[];
   requestOff: StaffRequestOffRoute | null;
   canSeeNeedsApprovalInbox: boolean;
   boundary: {
@@ -257,6 +265,7 @@ export function buildWeekStrip(): StaffWeekStripDay[] {
       weekday,
       date: dateForScheduleWeekday(weekday),
       summary: coverageSummary(weekday),
+      barWeekShortLabel: barWeekShortLabel(weekday),
       slotTotal: coverage.reduce((sum, row) => sum + row.slotsNeeded, 0),
       namedPeople: false,
     };
@@ -561,6 +570,8 @@ export function buildStaffScheduleDesk(input: {
     weekStrip: buildWeekStrip(),
     myShifts: myShiftsForSeat(input.seatKey, input.weekday),
     coverage: coverageCountsForWeekday(input.weekday),
+    barWeekShortLabel: barWeekShortLabel(input.weekday),
+    barWeekExtras: barWeekExtrasForWeekday(input.weekday),
     requestOff: requestOffRoute(input.seatKey),
     canSeeNeedsApprovalInbox: canSeeNeedsApprovalInbox(input.seatKey),
     boundary: {

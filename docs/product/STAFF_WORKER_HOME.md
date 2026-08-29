@@ -7,7 +7,7 @@ Live staff credentials stay **blocked** until Neon apply of `sql/0005_staff_seat
 
 `/staff/desk` is the people-platform **Worker Home**, not the builder wall.
 
-1. **Schedule** — week strip, my shifts, Time Off (full or partial day, date, note), same-house same-seat swap or cover, standing availability, coverage counts as slots not people, manager Needs Approval inbox. See `docs/product/STAFF_SCHEDULE.md`.
+1. **Schedule** — week strip, CTap bar-week extras (Mon pop/ice through Sun parm + buff), my shifts, Time Off (full or partial day, date, note), same-house same-seat swap or cover, standing availability, coverage counts as slots not people, manager Needs Approval inbox. See `docs/product/STAFF_SCHEDULE.md`.
 2. **Ask** — answers only from the CTap waitress/server quiz, dress SOP, and menu-special extracts already in the repo / Drive: Community Special, what can I wear, pour spec. No invented dollars. Cannot-answer is first-class.
 3. **Comms rooms** All / FOH / BOH. Staff talk inside their house. Managers see all. Crew does not see each other's checklist misses.
 4. **Role-day checklists** stay wired by seat + weekday via `buildStaffRoleDayDesk`. The builder wall remains on `/staff/seats`.

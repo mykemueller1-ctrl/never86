@@ -55,7 +55,7 @@ export function StaffScheduleDesk({
         <h3 className="mt-1 font-medium">Week strip · slots, not people</h3>
         <p className="mt-2 text-sm text-white/60">
           Coverage counts only. No invented names. Weekday 11–1 is an unnamed driver slot.
-          Time off, swap, and cover stay in-app. No mail.
+          Bar-week extras sit on the selected day as station slots. Time off, swap, and cover stay in-app. No mail.
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-7">
           {schedule.weekStrip.map((day) => (
@@ -71,7 +71,8 @@ export function StaffScheduleDesk({
             >
               <p className="text-[11px] uppercase tracking-[0.12em]">{day.weekday.slice(0, 3)}</p>
               <p className="mt-1 text-xs text-white/50">{day.date.slice(5)}</p>
-              <p className="mt-2 text-[11px] leading-snug text-white/70">{day.summary}</p>
+              <p className="mt-2 text-[11px] leading-snug text-emerald-100/80">{day.barWeekShortLabel}</p>
+              <p className="mt-1 text-[11px] leading-snug text-white/70">{day.summary}</p>
             </button>
           ))}
         </div>
@@ -113,6 +114,26 @@ export function StaffScheduleDesk({
             ))}
           </ul>
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-lime-200/20 bg-lime-200/[0.04] p-5">
+        <p className="text-xs uppercase tracking-[0.16em] text-lime-100/80">
+          Bar week extras · {schedule.barWeekShortLabel} · slots, not names
+        </p>
+        <h3 className="mt-1 font-medium">{weekday} extras</h3>
+        <p className="mt-2 text-sm text-white/60">
+          CTap bar-week extras for this weekday. Station slots only. Never a roster name.
+        </p>
+        <ul className="mt-4 space-y-2 text-sm text-white/75">
+          {schedule.barWeekExtras.map((extra) => (
+            <li key={extra.id} className="rounded-xl border border-white/5 bg-black/20 p-3">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-white/40">
+                {extra.slotLabel} · unnamed
+              </p>
+              <p className="mt-1">{extra.item}</p>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

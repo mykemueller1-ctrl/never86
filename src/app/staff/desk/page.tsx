@@ -4,7 +4,7 @@ import { StaffWorkerHome } from '@/components/StaffWorkerHome';
 
 export const metadata: Metadata = {
   title: "Staff Worker Home | Never 86'd",
-  description: 'CTap Worker Home: Schedule with week strip, my shifts, time off, swap/cover, standing availability, coverage counts, Needs Approval. Ask, comms, miss board. Live staff credentials wait on Neon apply.',
+  description: 'CTap Worker Home: Schedule with week strip, bar-week extras, my shifts, time off, swap/cover, standing availability, coverage counts, Needs Approval. Ask, comms, miss board. Live staff credentials wait on Neon apply.',
   robots: { index: false, follow: false },
 };
 
@@ -21,7 +21,7 @@ export default function StaffWorkerHomePage() {
           Worker Home. Schedule. Ask the house.
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/60">
-          Schedule is the week strip, my shifts, time off (full or partial day, date, note), same-house same-seat swap or cover,
+          Schedule is the week strip, bar-week extras (pop/ice through parm + buff), my shifts, time off (full or partial day, date, note), same-house same-seat swap or cover,
           standing availability, and coverage counts as slots — never invented names. Friday/Saturday night is 5 pizza, 3 line,
           1 dish, 3 drivers. Weekday 11–1 is an unnamed driver slot. Needs Approval is the manager inbox.
           Ask stays on the waitress quiz, dress SOP, Community Special, and pour spec. Comms rooms All / FOH / BOH.
