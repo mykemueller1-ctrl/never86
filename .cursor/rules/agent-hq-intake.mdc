@@ -1,0 +1,26 @@
+---
+description: All agents report finished work to HQ intake — never leave Myke juggling chats
+alwaysApply: true
+---
+
+# Agent HQ routing
+
+Canonical human hub: Grok project `Command center from never 86`, chat `Cursor agents: You talk, I run`.
+Canonical code factory: Cursor agents working from this repository.
+Intake folder: `docs/company/intake/`
+HQ guide: `docs/company/AGENT_HQ.md`
+
+## When you finish a task
+
+1. Write `docs/company/intake/YYYY-MM-DD-<slug>.md` with: what found, files changed, open loops, cloud vs desktop limits
+2. Update `docs/company/intake/INBOX.md` status row to DONE
+3. Return one concise evidence packet for Grok; do NOT ask Myke to open another chat to find your work
+
+## Execution model
+
+- Grok hub: Myke conversation, context, routing, approvals, and consolidated reporting
+- Cursor factory: code, repository research, branches, tests, builds, deploy preparation, and evidence
+- Codex watchtower: orchestration, verification, drift detection, and material alerts to Myke
+- Connected MCPs, apps, and browser/computer controls: execution surfaces used by Cursor when verified in the current run. Myke's 28 Aug standing order: use them for owned jobs and tell him the exact click. Cloud agents cannot take over local Chrome. Agents never type passwords/2FA/CAPTCHA.
+- Sentia+ is the CRM source of truth; Apollo is not used
+- Never claim a tool or permission is available until it is verified in the current environment

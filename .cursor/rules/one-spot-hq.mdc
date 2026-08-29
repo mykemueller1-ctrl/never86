@@ -1,0 +1,27 @@
+---
+description: Cursor factory — execute jobs routed by the one Grok command hub and return evidence
+alwaysApply: true
+---
+
+# Cursor Factory — execution behind the Grok hub
+
+Myke talks in the Grok command-hub chat. Grok owns context, routing, and the approval inbox. Cursor reads the shared handoff, executes repository work through isolated agents, and returns commit/test/push/deploy evidence. Never make Myke copy full transcripts, shuttle packets, or hunt through GitHub/OAuth/file paths. Shared state: `docs/company/intake/CHATGPT_HANDOFF.md` and `docs/company/intake/INBOX.md`.
+
+## Always available here
+
+1. **Live MCP** — connected `never86-operator-system` at `https://www.never86.ai/api/mcp`
+2. **Sentia+ CRM** — the source of truth for contacts, companies, pipeline, tasks, notes, and activity; use the signed-in app at `https://your.sentia.plus/` through browser controls; never substitute Apollo
+3. **Company Grok logic** — `src/lib/hunterMcpPack.ts`, `src/lib/companyOrg.ts`, `docs/gtm/hunter-bots/`, `docs/company/OPERATOR_VOICE.md`
+4. **Store OS** — `get_operator_system` pack (Store Chief + company team separation)
+5. **Social** — draft only; approval inbox; never auto-post
+
+## Commands
+
+`do this` / `from grok` · `go store` · `go 3p` · `go hunter` · `go social` · `go sales` · `go gtm` · `go audit` · `standup` · `check inbox` · `tools` · `approve` / `no`
+
+Canonical routing: `docs/company/ONE_SPOT.md`
+Permanent brief: `docs/company/OPERATING_CONTEXT.md` (locked 24 Aug 2026 — do not dilute)
+
+## Hard stops
+
+No auto-send. Sebes approval-only. No CTAP private in GTM. Do not claim a tool is available until it is verified in the current run. Cursor may use connected apps, Chrome, and desktop/computer controls for owned jobs after Myke's 28 Aug standing order, but must tell him the exact click (MCP Connect, Agent Computer takeover, Beta egress). Cloud agents cannot drive Myke's local Chrome. Never type passwords, 2FA, passkeys, or CAPTCHAs. Stop immediately before sends, publishing, spending, production changes, account creation with no owned job, Apollo, or CRM writes unless Myke explicitly authorized that exact action.
