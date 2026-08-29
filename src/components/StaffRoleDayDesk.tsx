@@ -9,6 +9,7 @@ import {
   type StaffRoleDayView,
 } from '@/lib/staffRoleDayPack';
 import { STATION_SEAT_KEYS, type StationSeatKey } from '@/lib/staffSeatAuth';
+import { OWNER_YESTERDAY_CLOSE_DATES, ownerYesterdayCloseStrip } from '@/lib/yesterdayClosePack';
 
 const VIEWS: readonly StaffRoleDayView[] = ['today', 'open', 'close'];
 
@@ -29,6 +30,15 @@ export function StaffRoleDayDesk({
     () => buildStaffRoleDayDesk({ seatKey, weekday, view }),
     [seatKey, weekday, view],
   );
+  const ownerCloses = useMemo(
+    () => {
+      if (seatKey !== 'owner') return [];
+      return OWNER_YESTERDAY_CLOSE_DATES
+        .map((date) => ownerYesterdayCloseStrip(date))
+        .filter((row): row is NonNullable<ReturnType<typeof ownerYesterdayCloseStrip>> => row != null);
+    },
+    [seatKey],
+  );
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -40,7 +50,27 @@ export function StaffRoleDayDesk({
         Today&apos;s checklist, coverage/schedule board, and station comms for this seat.
         Front → Kenzy. Back → Tom. Dollars → Myke. In-app notes only — no auto email.
         Cooked food is a promo, not a void. No recipe book.
+        Tom path: ticket out of the printer, driver area, dispatch. Unentered cash is not a shortage.
       </p>
+
+      {ownerCloses.length > 0 ? (
+        <div className="mt-6 grid gap-3 md:grid-cols-2">
+          {ownerCloses.map((close) => (
+            <article key={close.businessDate} className="rounded-xl border border-amber-200/30 bg-amber-200/[0.05] p-4">
+              <p className="text-xs uppercase tracking-[0.14em] text-amber-100/70">
+                Yesterday close · {close.weekday} {close.businessDate}
+              </p>
+              <h3 className="mt-1 font-medium">{close.move}</h3>
+              <p className="mt-2 text-sm text-white/75">
+                Grand {close.grandTotal} · Food {close.food} · Beer {close.beer} · Liquor {close.liquor} · Pop {close.pop}
+                {' · '}Labor {close.labor} · Late {close.late} · Delivery {close.inHouseDelivery}
+              </p>
+              <p className="mt-2 text-sm text-white/75">{close.cash}</p>
+              <p className="mt-2 text-xs text-white/50">{close.deliveryNote} Unentered cash is not a shortage.</p>
+            </article>
+          ))}
+        </div>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {STATION_SEAT_KEYS.map((key) => (

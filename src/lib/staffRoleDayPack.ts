@@ -16,6 +16,9 @@ export const STAFF_ROLE_DAY_PACK_ID = 'staff-role-day-v3';
 export const STAFF_ROLE_DAY_PACK_STATUS = 'drafted' as const;
 export const STAFF_ROLE_DAY_TIMEZONE = 'America/Chicago';
 
+/** Tom kitchen / driver path. Same floor words as Worker Home. No invented roster names. */
+export const TOM_ORDER_PATH = 'Ticket out of the printer. Driver area. Dispatch.';
+
 export type StaffRoleDayView = CtapLabShiftPhase | 'today';
 
 export type StaffRoleDayPolicyKind =
@@ -527,7 +530,11 @@ function extrasForSeat(seatKey: StationSeatKey, weekday: CtapLabWeekday, view: S
     }
   }
   if (seatKey === 'kitchen_manager' && (view === 'today' || view === 'open' || view === 'mid' || view === 'close')) {
+    extras.push(TOM_ORDER_PATH);
     extras.push('Walk drivers: between-runs dishes are the side work. No sheet = no reimbursement.');
+  }
+  if (seatKey === 'driver' && (view === 'today' || view === 'open' || view === 'mid' || view === 'close')) {
+    extras.push(TOM_ORDER_PATH);
   }
   if ((seatKey === 'kitchen_manager' || seatKey === 'driver') && WEEKDAYS_MON_THU.includes(weekday)) {
     extras.push('Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window.');

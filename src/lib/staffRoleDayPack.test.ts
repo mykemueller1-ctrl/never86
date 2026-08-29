@@ -95,6 +95,7 @@ describe('staff role-day desk pack', () => {
     expect(text).toContain('Filter oil before close');
     expect(text).toContain('Portion weights stay on the fry card');
     expect(text).toContain('Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window.');
+    expect(text).toContain('Ticket out of the printer. Driver area. Dispatch.');
     expect(desk.stationLabel).toBe('Kitchen manager station');
   });
 

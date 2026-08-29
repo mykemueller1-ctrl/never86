@@ -19,10 +19,11 @@ Each station seat sees **today** by role:
 | Line cook | Fry AM/PM + line station card | Fry rotation policy, void vs promo |
 | Pizza | Pizza-side wall card + pizza-line open/close from existing kitchen steps | Dough by 3, void vs promo |
 | Dishwasher | Dish start / shift / close | Dish pit card only |
-| Owner | Owner desk | Cost bands, coverage, driver board, dollars comms |
+| Owner | Owner desk + 8/26–8/27 yesterday-close strip (Grand / mix / labor / late / in-house delivery). Unentered cash is not a shortage. | Cost bands, coverage, driver board, dollars comms |
 
 Coverage: dining/back room Tue–Sun, never Monday; day Mon–Thu one out front; night two front + one back room.  
 Weekdays 11:00–13:00: kitchen lead (Tom) names the driver on that window. Friday/Saturday: three drivers. Sunday: two good drivers.  
+Tom kitchen/driver path: ticket out of the printer → driver area → dispatch. Delivery on the Z is in-house, not DoorDash.  
 Station comms: front → Kenzy, back → Tom, dollars → Myke. **In-app notes only. No auto email.**  
 Cooked food is a **promo**, not a void. Cost bands are **percent policy**, not this week's dollars. Fry portion weights stay on the fry card — no invented recipe book.
 
