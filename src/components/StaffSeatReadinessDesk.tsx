@@ -49,7 +49,7 @@ export function StaffSeatReadinessDesk({ signedInOperatorId }: { signedInOperato
         <nav className="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-white/45">
           <Link href="/action-shift/manager" className="hover:text-white">← Manager board</Link>
           <Link href="/staff/login" className="hover:text-white">Staff login</Link>
-          <Link href="/staff/desk" className="hover:text-white">Role-day desk</Link>
+          <Link href="/staff/desk" className="hover:text-white">Worker Home</Link>
           <Link href="/login" className="hover:text-white">Operator login</Link>
           <Link href="/dashboard/staff" className="hover:text-white">Signed desk</Link>
         </nav>
