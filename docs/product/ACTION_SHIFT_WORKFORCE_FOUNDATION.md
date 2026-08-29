@@ -37,7 +37,8 @@ the next delivery slice.
 
 Role-day station checklists stay wired by seat and weekday on `/staff/seats`
 (see `docs/product/STAFF_ROLE_DAY_DESK.md`). `/staff/desk` is Worker Home
-(Ask, All/FOH/BOH, request-off, miss board) — `docs/product/STAFF_WORKER_HOME.md`.
+(Schedule / Time Off, Ask, All/FOH/BOH, miss board) — `docs/product/STAFF_WORKER_HOME.md`
+and `docs/product/STAFF_SCHEDULE.md`.
 Live staff login remains fail-closed without `DATABASE_URL` and stays blocked
 until Neon apply of `sql/0005_staff_seat_auth.sql` plus `STAFF_SEAT_LOGIN_ENABLED=true`.
 

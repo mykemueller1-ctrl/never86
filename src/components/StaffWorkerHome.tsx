@@ -10,6 +10,7 @@ import {
   answerStaffWorkerAsk,
   type StaffAskResult,
 } from '@/lib/staffWorkerAskPack';
+import { StaffScheduleDesk } from '@/components/StaffScheduleDesk';
 import {
   STAFF_COMM_ROOMS,
   STAFF_FLOOR_PATH,
@@ -18,11 +19,8 @@ import {
   buildStaffWorkerHome,
   messagesVisibleTo,
   postCommMessage,
-  requestsVisibleTo,
-  submitRequestOff,
   type StaffCommMessage,
   type StaffCommRoom,
-  type StaffRequestOff,
 } from '@/lib/staffWorkerHome';
 import { STATION_SEAT_KEYS, type StationSeatKey } from '@/lib/staffSeatAuth';
 
@@ -38,8 +36,6 @@ export function StaffWorkerHome({
   const [room, setRoom] = useState<StaffCommRoom>('all');
   const [note, setNote] = useState('');
   const [messages, setMessages] = useState<StaffCommMessage[]>(() => [...SYNTHETIC_COMM_SEED]);
-  const [offNote, setOffNote] = useState('');
-  const [requests, setRequests] = useState<StaffRequestOff[]>([]);
   const [flash, setFlash] = useState('');
 
   const home = useMemo(
@@ -49,7 +45,6 @@ export function StaffWorkerHome({
   const visibleRooms = home.rooms;
   const activeRoom = visibleRooms.includes(room) ? room : visibleRooms[0] ?? 'all';
   const visibleMessages = messagesVisibleTo(seatKey, messages).filter((row) => row.room === activeRoom);
-  const visibleRequests = requestsVisibleTo(seatKey, requests);
 
   function runAsk(question: string) {
     const next = answerStaffWorkerAsk(question);
@@ -64,7 +59,7 @@ export function StaffWorkerHome({
         </p>
         <h2 className="mt-2 font-semibold">{home.checklist.stationLabel} · {home.weekday}</h2>
         <p className="mt-2 text-sm text-white/60">
-          Ask the house. Talk in All / FOH / BOH. Request off in-app — FOH to Kenzy, BOH and drivers to Tom.
+          Ask the house. Talk in All / FOH / BOH. Schedule holds the week strip, my shifts, time off, swap/cover, standing availability, and coverage counts — slots, not names.
           Dollars never. Crew does not see each other&apos;s checklist misses.
         </p>
         {home.floorPath ? (
@@ -101,6 +96,8 @@ export function StaffWorkerHome({
           ))}
         </div>
       </div>
+
+      <StaffScheduleDesk seatKey={seatKey} weekday={weekday} onWeekday={setWeekday} />
 
       <div className="rounded-2xl border border-sky-200/20 bg-sky-200/[0.04] p-5">
         <p className="text-xs uppercase tracking-[0.16em] text-sky-100/80">Ask</p>
@@ -161,8 +158,7 @@ export function StaffWorkerHome({
         ) : null}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
           <p className="text-xs uppercase tracking-[0.16em] text-white/45">Comms · in-app only</p>
           <h3 className="mt-1 font-medium">Staff talk inside their house. Managers see all.</h3>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -233,62 +229,6 @@ export function StaffWorkerHome({
             </button>
           </form>
         </div>
-
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-          <p className="text-xs uppercase tracking-[0.16em] text-white/45">Request off · in-app</p>
-          {home.requestOff ? (
-            <>
-              <h3 className="mt-1 font-medium">
-                {home.requestOff.house === 'foh' ? 'FOH' : 'BOH / drivers'} → {home.requestOff.routedTo} ({home.requestOff.routedRoleTitle})
-              </h3>
-              <p className="mt-2 text-sm text-white/60">Dollars never. No email.</p>
-              <form
-                className="mt-4 space-y-2"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  const result = submitRequestOff({
-                    requests,
-                    fromSeatKey: seatKey,
-                    weekday,
-                    note: offNote,
-                    at: new Date().toISOString(),
-                  });
-                  if (!result.ok) {
-                    setFlash(result.error);
-                    return;
-                  }
-                  setRequests(result.requests);
-                  setOffNote('');
-                  setFlash(`Request off routed to ${result.posted.routedTo}. Mail sent: false.`);
-                }}
-              >
-                <textarea
-                  value={offNote}
-                  onChange={(event) => setOffNote(event.target.value)}
-                  rows={3}
-                  placeholder="Which shift. No dollars."
-                  className="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30"
-                />
-                <button type="submit" className="rounded-xl border border-white/20 px-4 py-2 text-xs uppercase tracking-wider">
-                  Send in-app to {home.requestOff.routedTo}
-                </button>
-              </form>
-            </>
-          ) : (
-            <p className="mt-2 text-sm text-white/60">Owner does not request off on this desk. Dollars never.</p>
-          )}
-          <ul className="mt-4 space-y-2 text-sm text-white/75">
-            {visibleRequests.map((row) => (
-              <li key={row.id} className="rounded-xl border border-white/5 bg-black/20 p-3">
-                <p className="text-[11px] uppercase tracking-[0.12em] text-white/40">
-                  {row.fromSeatKey.replaceAll('_', ' ')} → {row.routedTo} · {row.weekday} · mail {String(row.mailSent)}
-                </p>
-                <p className="mt-1">{row.note}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
 
       {flash ? <p className="text-sm text-amber-100/80">{flash}</p> : null}
 

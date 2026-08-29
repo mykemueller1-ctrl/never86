@@ -28,7 +28,7 @@ Cooked food is a **promo**, not a void. Cost bands are **percent policy**, not t
 
 ## Surfaces
 
-- `/staff/desk` — Worker Home (Ask, All/FOH/BOH, request-off, miss board). See `docs/product/STAFF_WORKER_HOME.md`.
+- `/staff/desk` — Worker Home (Schedule, Ask, All/FOH/BOH, miss board). See `docs/product/STAFF_WORKER_HOME.md` and `docs/product/STAFF_SCHEDULE.md`.
 - `/staff/seats` and `/dashboard/staff` embed this role-day wall (seat + weekday checklists)
 - `POST /api/staff/login` fails closed without `DATABASE_URL`; live only after Neon apply + `STAFF_SEAT_LOGIN_ENABLED=true`
 - `POST /api/staff/invite` still 403, no mail
