@@ -76,4 +76,45 @@ describe('Action Shift', () => {
       error: 'laborTargetPct must be between 0 and 100.',
     });
   });
+
+  it('owner seat ranks deposit before close and skips late tickets', () => {
+    const shift = buildActionShift({
+      store: 'Sample Kitchen Lab',
+      businessDate: '2026-08-27',
+      grossSales: 4386.65,
+      expectedCash: 1351.46,
+      cashEntered: false,
+      ownerSaidDepositPresent: true,
+      seat: 'owner',
+      lateDeliveryCount: 4,
+      lateDeliverySales: 152,
+      inHouseDeliveryCount: 15,
+      inHouseDeliverySales: 776,
+    });
+    expect(shift.ok).toBe(true);
+    if (!shift.ok) return;
+    expect(shift.result.morningActions.map((action) => action.id)).toEqual(['cash-proof']);
+    expect(shift.result.morningActions[0].title).toMatch(/deposit before close/i);
+    expect(shift.result.morningActions[0].evidence).toMatch(/not a shortage/i);
+    expect(shift.result.morningActions[0].evidence).toMatch(/not driver late/i);
+  });
+
+  it('kitchen seat ranks late tickets and not the drawer', () => {
+    const shift = buildActionShift({
+      grossSales: 4386.65,
+      expectedCash: 1351.46,
+      enteredDeposit: 0,
+      cashEntered: true,
+      seat: 'kitchen_manager',
+      lateDeliveryCount: 4,
+      lateDeliverySales: 152,
+    });
+    expect(shift.ok).toBe(true);
+    if (!shift.ok) return;
+    expect(shift.result.morningActions.map((action) => action.id)).toContain('delivery-clock');
+    expect(shift.result.morningActions.map((action) => action.id)).not.toContain('cash-proof');
+    expect(shift.result.morningActions[0].move).toMatch(/ticket out of the printer/i);
+    expect(shift.result.morningActions[0].move).toMatch(/driver area/i);
+    expect(shift.result.morningActions[0].move).toMatch(/dispatch/i);
+  });
 });

@@ -1,0 +1,32 @@
+Z Report / End Of Day
+Sample Kitchen Lab
+Business Date: 8/26/2026
+
+Sales Summary
+Trans Type QTY Amount Avg Check % Last Year
+Delivery 21 $957.00 $0.00 0.00 $0.00
+Total: 21 $5,195.97
+
+Grand Total: $5,195.97
+Expected Cash: $0.00
+Actual Deposit: $0.00
+
+Shift Deposit
+Dep Shift Expected Deposit Actual Deposit Over Under
+1 $0.00 $0.00 $0.00
+Total: $0.00 $0.00 $0.00
+
+Labor Summary
+Job Description QTY Total %
+Total: 1 $1,407.00 0.00
+
+Misc Summary
+Description Num Value
+Late Deliverys 5 $433.00
+
+Menu Category
+Category Name QTY Total
+Food 1 $2,776.00
+Beer 1 $847.00
+Liquor 1 $597.00
+Pop 1 $147.00
