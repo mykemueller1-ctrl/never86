@@ -1,0 +1,3 @@
+Location,Employee,Scheduled Start,Scheduled End,Clock In,Clock Out,Net Sales,Wage Rate
+Sample Store One,Kitchen Lead,2026-08-28T16:00:00Z,2026-08-28T22:00:00Z,2026-08-28T15:40:00Z,2026-08-28T22:20:00Z,2100.00,16
+Sample Store One,Closer A,2026-08-28T17:00:00Z,2026-08-28T23:00:00Z,2026-08-28T17:00:00Z,2026-08-28T23:02:00Z,1800.00,15
