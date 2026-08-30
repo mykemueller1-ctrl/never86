@@ -2,6 +2,8 @@
 
 **When:** 2026-08-30  
 **From:** Cursor factory worker on `cursor/never86-grok-shareable-86-swarm-e264`  
+**Commit:** `a985508` (this file may trail by a receipt commit)  
+**PR:** https://github.com/mykemueller1-ctrl/never86/pull/172 (draft, unmerged)  
 **Swarm:** `bc-16edf4c0`, `bc-ed7a0a8a`, `bc-a564c62a` (research, now IDLE)
 
 ## Outcome
