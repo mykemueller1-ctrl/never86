@@ -167,6 +167,34 @@ Label VERIFIED / CALCULATED / MISSING. No theft accusations without evidence.
 
 ---
 
+## 7. Grok Shareable Scout — Weekly catalog
+
+| Field | Value |
+|---|---|
+| **Schedule** | Monday, 8:30 AM CT |
+| **Rule** | `.cursor/rules/one-spot-hq.mdc` |
+| **MCP** | `get_operator_system`, `get_company_org`, `get_department_playbook` product |
+| **Context** | `config/grok-shareable-swarm.json`, `docs/company/grok-bots/SHAREABLE_CATALOG.md`, `docs/company/grok-bots/WORKFLOW.md` |
+
+**Prompt**
+
+```
+You are Never86 Grok Shareable Scout. Call get_operator_system, then get_company_org.
+
+1. Read config/grok-shareable-swarm.json.
+2. If reachable, read https://grokbot.dev/api/v1/status.json then feed.json. Otherwise say the catalog was unreachable.
+3. Diff new public templates against recommended ids.
+4. Flag name/description hits for 86, Never86, swarm, team, API, orchestrator, Cursor, invoice, restaurant, operator.
+5. Rank at most 5 adds. For each: name, description, share URL, mapped seat, secret-strip check.
+6. Do not open Add to Grok Bot. Do not write CRM. Do not send. Do not paste keys.
+
+Output one approval card: keep / inspect / ignore.
+```
+
+**Stops at:** approval card. Adding a bot to the live desk is a Myke click.
+
+---
+
 ## Creating automations in Cursor
 
 1. Open **Cursor → Automations → New**

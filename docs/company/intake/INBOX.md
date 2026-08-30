@@ -8,6 +8,7 @@
 
 | Job | Status | Intake file |
 |---|---|---|
+| **Shareable Grok Bot swarm** | **DRAFTED IN PR** | [2026-08-30-grok-shareable-86-swarm.md](2026-08-30-grok-shareable-86-swarm.md) — 15 ranked public bots; no branded 86 operator exists; team/workflow/API notes in `docs/company/grok-bots/`. Not added to the live desk. |
 | **Desktop / Chrome / app standing order** | **DONE** | [2026-08-28-desktop-computer-auth.md](2026-08-28-desktop-computer-auth.md) — Myke authorized app/Chrome/desktop use for owned jobs. Cloud agents still cannot take over local Chrome. Gmail/Calendar/X MCP need one Connect click. No accounts created. |
 | Claude 90d harvest | **DONE** | [2026-08-23-claude-90d-harvest.md](2026-08-23-claude-90d-harvest.md) |
 | Codex/ChatGPT 90d harvest | **DONE** | [2026-08-23-codex-chatgpt-90d-harvest.md](2026-08-23-codex-chatgpt-90d-harvest.md) |

@@ -17,6 +17,7 @@
 | `go sales` | Sales Head — intake / reply desk drafts for approval |
 | `go gtm` | GTM drafts from permissioned proof only |
 | `go audit` | Evidence gate → receipt format |
+| `go swarm` | Rank public shareable Grok Bots for Never86 seats — inspect only, never auto-add |
 | `standup` | Approval inbox for today |
 | `check inbox` | Intake board + daily board |
 | `tools` | List live MCP tools |
