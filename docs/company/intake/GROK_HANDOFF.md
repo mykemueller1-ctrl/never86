@@ -22,4 +22,6 @@ Store-private close packets do **not** belong on the public default branch. Keep
 
 Public-safe record only: Tuesday close ran; one floor move was assigned to driver lead + closer; proof is that night’s late line. Factory does not run the drivers.
 
+**PDQ menu drift (parked):** UNKNOWN, Large Pizzas, and negative/neg lines roll into Food for mix reads. Come back and fix POS categories after this build is done. Not now.
+
 Monday close remains a private operator-plane packet, not a public doc.

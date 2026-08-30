@@ -42,6 +42,7 @@
 | **Old manual packet loop** | **SUPERSEDED 25 Aug** | no Myke copy/paste; direct authenticated Cursor dispatch remains open |
 | **Monday 8/24 PDQ → MCP** | **DONE 25 Aug 15:10 CT** | [GROK_HANDOFF.md](GROK_HANDOFF.md) · [2026-08-25-monday-pdq-mcp.md](2026-08-25-monday-pdq-mcp.md) |
 | **Tuesday 8/25 CTAP close** | **RAN — FLOOR MOVE SET** | [GROK_HANDOFF.md](GROK_HANDOFF.md) · late deliveries; owner driver lead + closer; proof tonight’s late line. Store-private — not GTM |
+| **PDQ menu drift (UNKNOWN / large pizza / neg lines)** | **PARKED — AFTER THIS BUILD** | Roll into Food for mix now. Fix POS categories later. Not tonight |
 | **CTAP Action Shift workforce/checklists** | **PR #140 REPAIRED — OPEN/GREEN** | Same PR/branch now at `597b23456763fbc1ad62769e4434d829ef6b832e`. Repair uses `dueAt + step.escalationMinutes`, removes escalation double-counting, and adds the two focused regression tests. Cursor reports 235/235 tests, lint/build green; GitHub CI and Vercel preview independently pass. No real identities/PINs/schedules/private dollars; not merged/deployed/live |
 | **Factory slot** | **#167 CLOSED — AUTH BRANCH LOCAL ONLY** | `#167` closed without merge. Local branch `cursor/one-seat-claim-contain-29aug` holds the one-seat draft. Not pushed |
 | **Current product job** | **DRAFTED — NOT PUSHED** | [2026-08-29-one-seat-contain.md](2026-08-29-one-seat-contain.md) · email/Google → pending → Myke/Tom roster match. Fail-closed without DB/mail/Google secrets. No Neon apply |
