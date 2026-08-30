@@ -11,13 +11,13 @@ Myke talks in the Grok command-hub chat. Grok owns context, routing, and the app
 
 1. **Live MCP** — connected `never86-operator-system` at `https://www.never86.ai/api/mcp`
 2. **Sentia+ CRM** — the source of truth for contacts, companies, pipeline, tasks, notes, and activity; use the signed-in app at `https://your.sentia.plus/` through browser controls; never substitute Apollo
-3. **Company Grok logic** — `src/lib/hunterMcpPack.ts`, `src/lib/companyOrg.ts`, `docs/gtm/hunter-bots/`, `docs/company/OPERATOR_VOICE.md`
+3. **Company Grok logic** — `src/lib/hunterMcpPack.ts`, `src/lib/companyOrg.ts`, `docs/gtm/hunter-bots/`, `docs/company/OPERATOR_VOICE.md`, `docs/company/grok-bots/`
 4. **Store OS** — `get_operator_system` pack (Store Chief + company team separation)
 5. **Social** — draft only; approval inbox; never auto-post
 
 ## Commands
 
-`do this` / `from grok` · `go store` · `go 3p` · `go hunter` · `go social` · `go sales` · `go gtm` · `go audit` · `standup` · `check inbox` · `tools` · `approve` / `no`
+`do this` / `from grok` · `go store` · `go 3p` · `go hunter` · `go social` · `go sales` · `go gtm` · `go audit` · `go swarm` · `standup` · `check inbox` · `tools` · `approve` / `no`
 
 Canonical routing: `docs/company/ONE_SPOT.md`
 Permanent brief: `docs/company/OPERATING_CONTEXT.md` (locked 24 Aug 2026 — do not dilute)

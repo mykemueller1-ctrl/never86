@@ -34,6 +34,7 @@ const PLAYBOOK_100_STATEMENT = 'docs/launch/100-statement-agent-playbook.md';
 const PLAYBOOK_EARNED_AUTHORITY = 'docs/launch/earned-authority-outreach-pack.md';
 const PLAYBOOK_SOCIAL = 'docs/launch/100-statement-social-pack.md';
 const PLAYBOOK_SOCIAL_OS = 'docs/gtm/social-bots/operating-system.md';
+const PLAYBOOK_GROK_SWARM = 'docs/company/grok-bots/WORKFLOW.md';
 
 export const APPROVAL_GATES = [
   'external_email_send',
@@ -87,7 +88,7 @@ export const DEPARTMENTS: Department[] = [
     name: 'Product and Truth',
     headId: 'product-head',
     mission: 'Build the smallest testable workflow and block unsupported math, claims, or fake integrations.',
-    playbookRefs: [],
+    playbookRefs: [PLAYBOOK_GROK_SWARM],
   },
 ];
 
@@ -533,6 +534,26 @@ export const COMPANY_ROLES: CompanyRole[] = [
     prohibited: ['approving illustrative numbers as proof', 'allowing recovery claims without evidence'],
     approvalRequired: [],
   },
+  {
+    id: 'grok-shareable-scout',
+    name: 'Grok Shareable Scout',
+    tier: 'specialist',
+    departmentId: 'product',
+    reportsTo: 'product-head',
+    job: 'Watch public Grok Bot catalogs, rank shareable templates for the Never86 operator system, and keep the harness map current. Never add a third-party bot to the live desk or paste API keys.',
+    playbookRef: PLAYBOOK_GROK_SWARM,
+    playbookSection: 'Weekly shareable scout',
+    mcpFirstCall: ['get_operator_system', 'get_company_org'],
+    triggers: ['Monday scout', 'new x.ai/bot share link', 'grokbot.dev feed notice'],
+    outputs: ['ranked catalog delta', '86/swarm/team/API match note', 'add-to-desk recommendation', 'secret-strip check'],
+    prohibited: [
+      'auto-installing a share link',
+      'pasting API keys or connector secrets into a bot or Git',
+      'claiming a public bot is a Never86 restaurant operator',
+      'merging or deploying from a scout run',
+    ],
+    approvalRequired: [],
+  },
 ];
 
 const roleById = new Map(COMPANY_ROLES.map((role) => [role.id, role]));
@@ -596,6 +617,7 @@ export function getDepartmentPlaybook(deptId: string) {
     hunterObjections: 'docs/gtm/hunter-bots/objections.md',
     hunterHandoff: 'docs/gtm/hunter-bots/handoff-to-sales.md',
     hunterUtm: 'docs/gtm/hunter-bots/utm-links.md',
+    grokShareableSwarm: PLAYBOOK_GROK_SWARM,
   };
 }
 
@@ -628,5 +650,8 @@ export function getAllPlaybookRefs(): string[] {
   refs.add(PLAYBOOK_HUNTER);
   refs.add(PLAYBOOK_HUNTER_HUNT);
   refs.add(PLAYBOOK_HUNTER_QUERIES);
+  refs.add(PLAYBOOK_GROK_SWARM);
+  refs.add('docs/company/grok-bots/SHAREABLE_CATALOG.md');
+  refs.add('docs/company/grok-bots/API_KEYS.md');
   return [...refs];
 }

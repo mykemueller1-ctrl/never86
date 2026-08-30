@@ -46,6 +46,12 @@ Then update `INBOX.md` status line.
 
 ---
 
+## Shareable Grok Bot swarm
+
+Ranked public templates and Never86 seats: [`docs/company/grok-bots/`](grok-bots/README.md). No public bot is branded 86. Adding an `x.ai/bot` link to the live desk is a Myke click after Vet. Intake: [`intake/2026-08-30-grok-shareable-86-swarm.md`](intake/2026-08-30-grok-shareable-86-swarm.md).
+
+---
+
 ## What the shared HQ owns
 
 1. Myke founder dossier + operator voice
