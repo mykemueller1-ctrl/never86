@@ -3,6 +3,8 @@ import { listPublishedAnswers, getPublishedAnswer } from '@/lib/answersDb';
 import { AGENT_SPECS, SOURCE_TAGS } from '@/lib/agentSpecs';
 import { buildActionShift, type ActionShiftInput } from '@/lib/actionShift';
 import { getOperatorSystem } from '@/lib/operatorSystem';
+import { getCompanyOrg, getDepartmentPlaybook } from '@/lib/companyOrg';
+import { getHunterStandupPack } from '@/lib/hunterMcpPack';
 import { MCP_PUBLIC_ENDPOINT, MCP_PUBLIC_SERVER_INFO, MCP_PUBLIC_TOOLS } from '@/lib/mcpPublicContract';
 import { buildVendorSilenceTicket, type VendorSilenceInput } from '@/lib/vendorSilence';
 import {
@@ -276,6 +278,25 @@ async function handle(req: JsonRpcReq): Promise<Response> {
 
       if (name === 'get_operator_system') {
         return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getOperatorSystem(), null, 2) }] });
+      }
+
+      if (name === 'get_company_org') {
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getCompanyOrg(), null, 2) }] });
+      }
+
+      if (name === 'get_department_playbook') {
+        const deptId = String(args.dept_id ?? '').trim();
+        const playbook = getDepartmentPlaybook(deptId);
+        if (!playbook.ok) {
+          return ok(req.id, { content: [{ type: 'text', text: playbook.error }], isError: true });
+        }
+        const payload =
+          deptId === 'marketing' ? { ...playbook, hunterStandup: getHunterStandupPack() } : playbook;
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }] });
+      }
+
+      if (name === 'get_hunter_standup') {
+        return ok(req.id, { content: [{ type: 'text', text: JSON.stringify(getHunterStandupPack(), null, 2) }] });
       }
 
       return err(req.id, -32601, `Unknown tool: ${name}`);

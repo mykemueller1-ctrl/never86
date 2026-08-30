@@ -186,6 +186,31 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
+  {
+    name: 'get_company_org',
+    description: 'Return the Never86 company org chart: departments, department heads, specialists, reporting lines, approval gates, and playbook references. Use after get_operator_system when routing founder, sales, GTM, audit, or product work.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'get_department_playbook',
+    description: 'Return one department playbook pack: head role, specialists, triggers, outputs, prohibited actions, and linked doc paths. dept_id: sales, gtm, marketing, audit, or product. Marketing includes inline hunterStandup.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        dept_id: { type: 'string', enum: ['sales', 'gtm', 'marketing', 'social', 'audit', 'product'], description: 'Department id' },
+      },
+      required: ['dept_id'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'get_hunter_standup',
+    description: 'Return the full inline Head of Marketing daily hunt pack for Grok: ICP scoring, search queries (X/Reddit/Facebook/TikTok), voice rules, UTM template, output format, and hard stops. Use this first in Grok — no repo file access required.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
 ];
 
 export const MCP_PUBLIC_TOOL_NAMES = MCP_PUBLIC_TOOLS.map((tool) => tool.name);
