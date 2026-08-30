@@ -28,10 +28,10 @@
 
 ## What's already here
 
-### A. Live Never86 MCP (`https://www.never86.ai/api/mcp` v3.0.0)
-Grok and workers call these for the shared operating logic:
+### A. Live Never86 MCP (`https://www.never86.ai/api/mcp` v3.1.0)
+Grok and workers call these for the shared operating logic (probed 29 Aug 11:18 PM CT, prod `115b7b6`):
 
-`get_operator_system` · `build_action_shift` · `calculate_3p_marketplace_cost` · `get_3p_audit_logic` · `get_operator_logic` · `build_vendor_silence_ticket` · `list_answers` · `search_answers` · `get_answer` · `list_free_agents` · `get_agent` · `list_seats` · `list_source_tags`
+`get_operator_system` · `build_action_shift` · `calculate_3p_marketplace_cost` · `get_3p_audit_logic` · `get_operator_logic` · `build_vendor_silence_ticket` · `list_answers` · `search_answers` · `get_answer` · `list_free_agents` · `get_agent` · `list_seats` · `list_source_tags` · `get_hunter_standup` · `get_company_org` · `get_department_playbook`
 
 ### B. Your company logic
 Grok routes it; Cursor reads and maintains the canonical repository:
@@ -61,7 +61,7 @@ Myke authorized app/Chrome/desktop use for owned jobs on 28 Aug. Cloud agents st
 | Sentia+ CRM | Signed-in app; browser-controlled until Sentia exposes an MCP/API. No CRM write without exact approval. |
 | Google Calendar | MCP `needsAuth` — Connect Google Calendar on desktop. |
 | Google Drive | **Ready** on this cloud worker. HQ Drive doc ID was not found on the connected account. |
-| `get_hunter_standup` on production | Commit ready — deploy without whole +46k dump |
+| `get_hunter_standup` on production | **LIVE** v3.1.0 — `tools/call` 200 on 29 Aug 11:18 PM CT |
 | Grok → Cursor direct launch | Authenticated connector is live per `CHATGPT_HANDOFF.md`; this worker is not the dispatch bridge. Cap remains 1. |
 
 Until X auth: hunter uses web search + your paste leads; drafts still land here.
