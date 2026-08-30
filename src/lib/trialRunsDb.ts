@@ -23,7 +23,7 @@ export function newShareToken(): string {
   return crypto.randomBytes(12).toString('hex');
 }
 
-/** The 7 leak agents that can persist a trial run (the ops column is free text). */
+/** CSV-first agents that can persist a trial run (the ops column is free text). */
 export type TrialAgent =
   | 'void-hunter'
   | 'leak-detector'
@@ -32,7 +32,10 @@ export type TrialAgent =
   | 'catering-leak'
   | 'beverage-score'
   | 'vendor-drift'
-  | 'refund-auditor';
+  | 'refund-auditor'
+  | '3p-fee-finder'
+  | 'rate-card-audit'
+  | 'shift-pulse';
 
 export async function saveTrialRun(input: {
   sessionToken: string;
