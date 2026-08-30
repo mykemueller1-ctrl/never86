@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://never86.ai/schemas/daily-founder-clip-batch.schema.json",
+  "title": "Never86 Daily Founder Clip Batch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "date",
+    "priority",
+    "audienceLane",
+    "sourceStatus",
+    "noveltyCheck",
+    "publishState",
+    "creatives",
+    "approval"
+  ],
+  "properties": {
+    "date": { "type": "string", "format": "date" },
+    "priority": { "type": "string", "minLength": 1 },
+    "audienceLane": { "type": "string", "minLength": 1 },
+    "sourceStatus": { "enum": ["VERIFIED_FOOTAGE", "ORIGINAL_MOTION", "BLOCKED"] },
+    "sourceEvidence": { "type": "string" },
+    "noveltyCheck": { "enum": ["PASS", "FAIL", "BLOCKED"] },
+    "publishState": { "const": "DRAFT_ONLY" },
+    "creatives": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        { "$ref": "#/$defs/creative" },
+        { "$ref": "#/$defs/creative" },
+        { "$ref": "#/$defs/creative" }
+      ],
+      "items": false
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "needed", "published"],
+      "properties": {
+        "owner": { "const": "Myke" },
+        "needed": { "type": "string", "minLength": 1 },
+        "published": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "creative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lane",
+        "viewerPromise",
+        "sourceRange",
+        "finalDurationSeconds",
+        "openingFrame",
+        "firstSpokenLine",
+        "script",
+        "captions",
+        "onScreenTitle",
+        "postCopy",
+        "cta",
+        "behavioralHypothesis",
+        "primaryMetric",
+        "verificationStatus",
+        "renderStatus"
+      ],
+      "properties": {
+        "lane": { "enum": ["CONFLICT", "IDENTITY", "PAYOFF"] },
+        "viewerPromise": { "type": "string", "minLength": 1 },
+        "sourceRange": { "type": "string", "minLength": 1 },
+        "finalDurationSeconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 75 },
+        "openingFrame": { "type": "string", "minLength": 1 },
+        "firstSpokenLine": { "type": "string", "minLength": 1 },
+        "script": { "type": "string", "minLength": 1 },
+        "captions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "pictureNotes": { "type": "string" },
+        "soundNotes": { "type": "string" },
+        "colorNotes": { "type": "string" },
+        "patternInterrupts": { "type": "array", "items": { "type": "string" } },
+        "onScreenTitle": { "type": "string", "minLength": 1 },
+        "postCopy": { "type": "string", "minLength": 1 },
+        "cta": { "type": "string", "minLength": 1 },
+        "hashtags": { "type": "array", "items": { "type": "string" } },
+        "behavioralHypothesis": { "type": "string", "minLength": 1 },
+        "primaryMetric": { "type": "string", "minLength": 1 },
+        "verificationStatus": { "enum": ["PASS", "ORIGINAL_MOTION", "BLOCKED"] },
+        "factualRisk": { "type": "string" },
+        "renderStatus": { "enum": ["READY", "BLOCKED"] },
+        "renderPath": { "type": "string" },
+        "renderBlocker": { "type": "string" }
+      }
+    }
+  }
+}
