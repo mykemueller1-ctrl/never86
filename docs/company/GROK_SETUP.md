@@ -120,3 +120,16 @@ Cloud agents cannot complete interactive MCP auth; do this once on desktop.
 - Access private restaurant store memory or credentials
 - Promise refunds or recovery without evidence
 - Mix CTAP/private operator numbers into public GTM
+
+---
+
+## 8. Keys access
+
+Public operator MCP needs no API key. The private Cursor factory uses Vercel secrets (`NEVER86_OAUTH_CLIENT_SECRET`, `CURSOR_API_KEY`). The optional Grok **model** API uses `XAI_API_KEY` at `https://api.x.ai/v1`.
+
+Canonical names, storage rules, and the no-secret probe: `docs/company/KEYS_ACCESS.md`.  
+Copy placeholders from `.env.example`. Never paste a live key into Git, a shareable bot, or this file.
+
+```bash
+npm run keys:probe
+```

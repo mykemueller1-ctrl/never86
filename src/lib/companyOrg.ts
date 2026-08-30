@@ -583,6 +583,7 @@ export function getDepartmentPlaybook(deptId: string) {
     ],
     founderStandup: 'docs/company/FOUNDER_STANDUP.md',
     grokSetup: 'docs/company/GROK_SETUP.md',
+    keysAccess: 'docs/company/KEYS_ACCESS.md',
     cursorAutomations: 'docs/company/CURSOR_AUTOMATIONS.md',
     socialOperatingSystem: PLAYBOOK_SOCIAL_OS,
     hunterFirstHunt: PLAYBOOK_HUNTER_HUNT,
@@ -614,6 +615,7 @@ export function getAllPlaybookRefs(): string[] {
   }
   refs.add('docs/company/FOUNDER_STANDUP.md');
   refs.add('docs/company/GROK_SETUP.md');
+  refs.add('docs/company/KEYS_ACCESS.md');
   refs.add('docs/company/CURSOR_AUTOMATIONS.md');
   refs.add('docs/company/OPERATOR_VOICE.md');
   refs.add(PLAYBOOK_SOCIAL_OS);

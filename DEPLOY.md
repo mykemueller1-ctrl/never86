@@ -50,12 +50,14 @@ Repo: `github.com/mykemueller1-ctrl/never86`
 
 1. Go to [vercel.com](https://vercel.com) → Sign up / Log in
 2. Click "Import Project" → Select the `never86` repo from GitHub
-3. Add environment variables:
+3. Add environment variables (placeholders in `.env.example`; full map in `docs/company/KEYS_ACCESS.md`):
    - `DATABASE_URL` = your Neon connection string
    - `ANTHROPIC_API_KEY` = your Claude API key
    - `RESEND_API_KEY` = your Resend key
    - `CRON_SECRET` = any random string (e.g. `n86-cron-2024`)
    - `OWNER_EMAIL` = `myke@n86.app`
+   - Optional Grok model API: `XAI_API_KEY` (xAI console → Vercel encrypted env; never Git)
+   - Private Grok → Cursor factory: `NEVER86_OAUTH_CLIENT_SECRET`, `CURSOR_API_KEY` (already live; do not rotate from a factory job)
 4. Click Deploy
 
 ---
