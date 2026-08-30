@@ -132,7 +132,7 @@ describe('keys access probes', () => {
 
 describe('catalogPresence uses process.env without leaking', () => {
   it('serializes only names and flags', () => {
-    const rows = catalogPresence({ [XAI_API_KEY_NAME]: undefined } as NodeJS.ProcessEnv);
+    const rows = catalogPresence({ [XAI_API_KEY_NAME]: undefined });
     expect(rows.some((row) => row.name === XAI_API_KEY_NAME)).toBe(true);
     expect(JSON.stringify(rows)).not.toMatch(/xai-[A-Za-z0-9]{16,}/);
   });
