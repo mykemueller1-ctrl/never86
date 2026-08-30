@@ -126,6 +126,22 @@ describe('companyOrg', () => {
     expect(getAllPlaybookRefs()).toContain('docs/company/KEYS_ACCESS.md');
   });
 
+  it('adds Grok Shareable Scout under product with a resolving playbook', () => {
+    const scout = getRoleById('grok-shareable-scout');
+    expect(scout?.departmentId).toBe('product');
+    expect(scout?.reportsTo).toBe('product-head');
+    expect(scout?.playbookRef).toBe('docs/company/grok-bots/WORKFLOW.md');
+    expect(scout?.prohibited).toEqual(
+      expect.arrayContaining(['auto-installing a share link', 'pasting API keys or connector secrets into a bot or Git']),
+    );
+    const pack = getDepartmentPlaybook('product');
+    expect(pack.ok).toBe(true);
+    if (pack.ok) {
+      expect(pack.specialists.map((s) => s.id)).toContain('grok-shareable-scout');
+      expect(pack.playbookRefs).toContain('docs/company/grok-bots/WORKFLOW.md');
+    }
+  });
+
   it('sales and reply desk require approval for external actions', () => {
     const salesHead = getRoleById('sales-head');
     const replyDesk = getRoleById('reply-desk');

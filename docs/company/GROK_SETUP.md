@@ -114,7 +114,23 @@ Cloud agents cannot complete interactive MCP auth; do this once on desktop.
 
 ---
 
-## 7. What Grok does not do
+## 7. Shareable Grok Bot swarm
+
+Public catalogs (`bots.new/grok/shareable`, gbt.grok.me, sharegrokbots.com, grokbot.dev) have **no Never86 operator bot**. Use the ranked pack in `docs/company/grok-bots/`.
+
+Grok prompt:
+
+```
+Act as Never86 Grok Shareable Scout. Call get_department_playbook with dept_id product.
+Read docs/company/grok-bots/WORKFLOW.md. Return the ranked catalog delta and any 86/swarm/team/API matches.
+Do not add share links to the desk. Do not ask for API keys.
+```
+
+Optional discovery connector on a Grok Bot (not required for the Cursor factory): `https://mcp.grokbot.dev/mcp`, no credentials. Key names and storage rules: `docs/company/grok-bots/API_KEYS.md`.
+
+---
+
+## 8. What Grok does not do
 
 - Auto-post, auto-email, or auto-DM
 - Access private restaurant store memory or credentials

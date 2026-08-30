@@ -1,0 +1,359 @@
+{
+  "taskId": "grok-shareable-86-swarm",
+  "researchedAt": "2026-08-30",
+  "status": "drafted",
+  "owner": "Grok command hub",
+  "nextOwner": "Myke — add approved share links on the Grok Bot desk",
+  "eightySixMatches": {
+    "found": false,
+    "nameOrDescriptionHits": 0,
+    "note": "No public shareable Grok Bot name or description contains Never86 or a branded 86 operator template. ShareGrokBots has a Restaurants waitlist category with zero verified restaurant bots.",
+    "falsePositives": [
+      "grokbot.dev awesome_score 86 on the Chief of Staff use case — directory quality score, not a bot name",
+      "hospitality slang 86 (86 a dish / eject a guest) — unrelated to Never86"
+    ]
+  },
+  "catalogCounts": {
+    "bots.new/grok/shareable": 157,
+    "bots.new/grok/templates": 110,
+    "gbt.grok.me": 36,
+    "sharegrokbots.com": 162,
+    "grokyard.com": 10,
+    "grokbots.space": 5,
+    "grokbot.dev/templates": 253
+  },
+  "sources": [
+    { "id": "bots-new-shareable", "url": "https://bots.new/grok/shareable", "kind": "shareable-catalog" },
+    { "id": "bots-new-templates", "url": "https://bots.new/grok/templates", "kind": "named-role-templates" },
+    { "id": "gbt", "url": "https://gbt.grok.me", "kind": "community-catalog" },
+    { "id": "sharegrokbots", "url": "https://sharegrokbots.com", "kind": "scored-live-listings" },
+    { "id": "grokyard", "url": "https://www.grokyard.com", "kind": "paid-directory" },
+    { "id": "grokbots-space", "url": "https://grokbots.space", "kind": "gallery" },
+    { "id": "grokbot-dev", "url": "https://grokbot.dev/api/v1/templates.json", "kind": "json-api" },
+    { "id": "grokcamp", "url": "https://grokcamp.com/", "kind": "use-case-directory" }
+  ],
+  "recommended": [
+    {
+      "id": "master-orchestrator",
+      "name": "Master (Orchestrator)",
+      "creator": "@farzyness",
+      "description": "A lean orchestrator that routes every task to the right specialist and never does the work itself.",
+      "shareUrl": "https://x.ai/bot/j7B5LHnEIPTuPQZxxQwpx",
+      "detailUrl": "https://bots.new/grok/shareable/master-orchestrator",
+      "matchTags": ["swarm", "team", "orchestrator", "workflow"],
+      "never86Lane": "command-hub",
+      "mapsToRole": "founder-chief-of-staff",
+      "whyUseful": "Public pattern for Grok-as-router, Cursor-as-factory. Matches one-owner-per-job.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "thefounder",
+      "name": "TheFounder",
+      "creator": "@DaniAcostaAI",
+      "description": "Holds logins and the shared machine. Loads only after you tap send. Routes founder work to specialists.",
+      "shareUrl": "https://x.ai/bot/Bt48h63v32_q_shWVlEBb",
+      "detailUrl": "https://bots.new/grok/shareable/thefounder",
+      "matchTags": ["team", "workflow", "command-center", "api"],
+      "never86Lane": "command-hub",
+      "mapsToRole": "founder-chief-of-staff",
+      "whyUseful": "Shared-computer keeper plus approval gate before send/spend. Closest public command-center bot.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "alfred",
+      "name": "Alfred (Bot Chief Advisor)",
+      "creator": "@heyrobinai",
+      "description": "Designs and keeps restructuring your whole roster of bots.",
+      "shareUrl": "https://x.ai/bot/KZ9xav0Qad1U5QigEn7rh",
+      "detailUrl": "https://bots.new/grok/shareable/alfred-bot-chief-advisor",
+      "matchTags": ["swarm", "team", "workflow"],
+      "never86Lane": "agent-knowledge",
+      "mapsToRole": "grok-shareable-scout",
+      "whyUseful": "Weekly roster audit so the swarm does not grow into uncontrolled bots.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "projects-manager",
+      "name": "Projects Manager",
+      "creator": "@ericzakariasson",
+      "description": "Runs a team of Grok bots as a project org, with Notion as the source of truth.",
+      "shareUrl": "https://x.ai/bot/FU-Ev6_Ju4lFGWwWRD0GD",
+      "detailUrl": "https://bots.new/grok/shareable/projects-manager",
+      "matchTags": ["team", "workflow", "project"],
+      "never86Lane": "product",
+      "mapsToRole": "product-head",
+      "whyUseful": "Project rows plus specialist claim. Adapt to never86 Git/PRs instead of Notion as truth.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "chief-router",
+      "name": "Chief (Router)",
+      "creator": "@nykdotdev",
+      "description": "A pure router that assigns one owner per job and otherwise stays out of the way.",
+      "shareUrl": "https://x.ai/bot/JugVUSPe_wSZg-in69owM",
+      "detailUrl": "https://bots.new/grok/shareable/chief-router",
+      "matchTags": ["swarm", "team", "workflow"],
+      "never86Lane": "command-hub",
+      "mapsToRole": "founder-chief-of-staff",
+      "whyUseful": "Matches Codex/Grok routing: one owner, one queue item, no mega-agent.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "invoice-hunter",
+      "name": "Invoice Hunter",
+      "creator": "@scheemunai",
+      "description": "Finds invoice PDFs in Gmail and packs a month into a CSV.",
+      "shareUrl": "https://x.ai/bot/-kO6HrXokJZANVwUOMZO9",
+      "detailUrl": "https://bots.new/grok/shareable/invoice-hunter",
+      "matchTags": ["workflow", "api"],
+      "never86Lane": "product",
+      "mapsToRole": "builder",
+      "whyUseful": "Invoice capture toward vendor silence / COGS. Never treat invoice as food cost.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "cursor-agent-local",
+      "name": "Cursor Agent (Local)",
+      "creator": "@ryanthawks",
+      "description": "Runs the cursor-agent CLI locally for experiments and shop-floor work.",
+      "shareUrl": "https://x.ai/bot/z4r7D8iILsTQDf7r7DwKR",
+      "detailUrl": "https://bots.new/grok/shareable/cursor-agent-local",
+      "matchTags": ["workflow", "api", "cursor"],
+      "never86Lane": "cursor-factory",
+      "mapsToRole": "builder",
+      "whyUseful": "Grok Bot can drive local Cursor CLI. Cloud factory stays on the Never86 Cursor bridge.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "google-agent",
+      "name": "Google Agent",
+      "creator": "@ryanthawks",
+      "description": "A read-first operator for Gmail, Drive and Calendar.",
+      "shareUrl": "https://x.ai/bot/tttQVA2UtlNwCzITNCIr0",
+      "detailUrl": "https://bots.new/grok/shareable/google-agent",
+      "matchTags": ["workflow", "api", "team"],
+      "never86Lane": "operations",
+      "mapsToRole": "founder-chief-of-staff",
+      "whyUseful": "Daily Myke Handoff calendar refresh. Read-first; send stays behind approval.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "index-aeo",
+      "name": "Index (SEO/AEO Teammate)",
+      "creator": "@adamta",
+      "description": "An SEO and AEO teammate that writes briefs for your writers.",
+      "shareUrl": "https://x.ai/bot/Viv2NbC5skPslV1WH9Fs7",
+      "detailUrl": "https://bots.new/grok/shareable/index-seo-aeo-teammate",
+      "matchTags": ["workflow", "team"],
+      "never86Lane": "gtm",
+      "mapsToRole": "gtm-head",
+      "whyUseful": "Issue #122 AEO lane. Drafts only; no new search-page work without a product job.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "lurk-reddit",
+      "name": "Lurk (Reddit Researcher)",
+      "creator": "@tinkerersanky",
+      "description": "Mines Reddit for exact quotes and files a pain-point pack.",
+      "shareUrl": "https://x.ai/bot/12Gbp1lPVsfTVAHPXKd3B",
+      "detailUrl": "https://bots.new/grok/shareable/lurk-reddit-researcher",
+      "matchTags": ["workflow", "team"],
+      "never86Lane": "gtm",
+      "mapsToRole": "hunter-scanner",
+      "whyUseful": "Hunter Scanner pattern. Draft replies only; humans send.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "socials-short-form",
+      "name": "Socials (Short-Form Scout)",
+      "creator": "@ashen_one",
+      "description": "Hourly scout that hands you filmable short-form content kits.",
+      "shareUrl": "https://x.ai/bot/bjsbaj_a2ds2pQY1YiXqE",
+      "detailUrl": "https://bots.new/grok/shareable/socials-short-form-scout",
+      "matchTags": ["workflow"],
+      "never86Lane": "social",
+      "mapsToRole": "short-form-studio",
+      "whyUseful": "Feeds the X daily clip factory. Draft/render only; Myke releases.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "vet",
+      "name": "Vet",
+      "creator": "@GaurangKaria",
+      "description": "Audits a bot before you let it near your account.",
+      "shareUrl": "https://x.ai/bot/9Vmfeck_zr6jo9dO-xEBT",
+      "detailUrl": "https://bots.new/grok/shareable/vet",
+      "matchTags": ["api", "team"],
+      "never86Lane": "quality",
+      "mapsToRole": "truth-qa-critic",
+      "whyUseful": "Inspect share links before Add to Grok Bot. Shared computer is not a security boundary.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "grant-gm",
+      "name": "Grant (General Manager)",
+      "creator": "@HouseHackerJon",
+      "description": "A general manager for a trades company that stands up the back office.",
+      "shareUrl": "https://x.ai/bot/fkM4b8n4RqZTbrq5fw5L_",
+      "detailUrl": "https://bots.new/grok/shareable/grant-general-manager",
+      "matchTags": ["team", "workflow", "command-center"],
+      "never86Lane": "product",
+      "mapsToRole": "product-head",
+      "whyUseful": "Closest public shop-desk command center. Adapt to restaurant Action Shift, not construction.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "agent-looper",
+      "name": "Agent Looper",
+      "creator": "@dancingteeth",
+      "description": "Keeps a local coding agent iterating until your acceptance test passes.",
+      "shareUrl": "https://x.ai/bot/AETdGbRRNWfckrRGv22LD",
+      "detailUrl": "https://bots.new/grok/shareable/agent-looper",
+      "matchTags": ["cursor", "workflow", "api"],
+      "never86Lane": "cursor-factory",
+      "mapsToRole": "builder",
+      "whyUseful": "Acceptance-test loop for isolated Cursor jobs. Cap remains 1 writer until three clean jobs.",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "spark-onboarding",
+      "name": "Spark (Onboarding)",
+      "creator": "@vincentzhu",
+      "description": "A five-minute onboarding bot that spawns the starter bots you need.",
+      "shareUrl": "https://x.ai/bot/_2vi1lOY4oiBaJDA3S8l1",
+      "detailUrl": "https://bots.new/grok/shareable/spark-onboarding",
+      "matchTags": ["swarm", "team", "workflow"],
+      "never86Lane": "agent-knowledge",
+      "mapsToRole": "grok-shareable-scout",
+      "whyUseful": "Spawn only the Never86-mapped seats. Do not spawn thousands of bots.",
+      "harnessStatus": "drafted"
+    }
+  ],
+  "team": [
+    {
+      "seatId": "n86-router",
+      "title": "Never86 Router",
+      "borrowedFrom": ["master-orchestrator", "chief-router"],
+      "mapsToRole": "founder-chief-of-staff",
+      "queue": "one bounded job from the Grok command hub",
+      "allowedTools": ["get_operator_system", "get_company_org", "cursor_prepare_dispatch"],
+      "stopCondition": "real decision, missing private input, permission boundary, or external blocker",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-watchtower",
+      "title": "Codex Watchtower",
+      "borrowedFrom": ["alfred", "vet"],
+      "mapsToRole": "truth-qa-critic",
+      "queue": "30-minute evidence audit; no second daily inbox",
+      "allowedTools": ["cursor_list_agents", "cursor_get_agent"],
+      "stopCondition": "material drift, failed evidence, or a human decision",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-factory",
+      "title": "Cursor Factory",
+      "borrowedFrom": ["cursor-agent-local", "agent-looper", "projects-manager"],
+      "mapsToRole": "builder",
+      "queue": "one isolated-branch product writer",
+      "allowedTools": ["never86-operator-system", "cursor factory tools"],
+      "stopCondition": "pushed PR with tests; no merge or deploy",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-invoice",
+      "title": "Invoice Capture",
+      "borrowedFrom": ["invoice-hunter"],
+      "mapsToRole": "builder",
+      "queue": "vendor PDFs already in a connected mailbox; draft CSV only",
+      "allowedTools": ["Gmail plugin read", "build_vendor_silence_ticket"],
+      "stopCondition": "no portal login; invoice is not COGS",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-hunter",
+      "title": "Hunter Scanner",
+      "borrowedFrom": ["lurk-reddit"],
+      "mapsToRole": "hunter-scanner",
+      "queue": "public operator pain in the last 72 hours",
+      "allowedTools": ["get_hunter_standup", "X MCP after Connect"],
+      "stopCondition": "draft replies only; no auto-post",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-clips",
+      "title": "Clip Factory Scout",
+      "borrowedFrom": ["socials-short-form"],
+      "mapsToRole": "short-form-studio",
+      "queue": "daily 7:00 AM America/Chicago draft/render batch",
+      "allowedTools": ["existing X as Myke Grok Bot"],
+      "stopCondition": "three creatives + approval card; never publish",
+      "harnessStatus": "drafted"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "never86-operator-system",
+      "surface": "Grok Bot Plugins + Cursor MCP",
+      "url": "https://www.never86.ai/api/mcp",
+      "auth": "none-public-readonly",
+      "secretEnv": null,
+      "setup": "Add custom connector Never86'd Operator Intelligence. Call get_operator_system first. No restaurant login.",
+      "status": "live-verified"
+    },
+    {
+      "id": "never86-cursor-factory",
+      "surface": "Grok custom connector",
+      "url": "https://www.never86.ai/api/orchestrator/mcp",
+      "auth": "oauth-pkce",
+      "secretEnv": ["NEVER86_OAUTH_CLIENT_SECRET", "CURSOR_API_KEY", "NEVER86_ORCHESTRATOR_TOKEN"],
+      "setup": "Already connected in the Grok hub. Secrets stay in approved Vercel/secret storage. Never paste into a shareable bot or this repo.",
+      "status": "live-verified"
+    },
+    {
+      "id": "grokbot-directory",
+      "surface": "Grok Bot Plugins",
+      "url": "https://mcp.grokbot.dev/mcp",
+      "auth": "none",
+      "secretEnv": null,
+      "setup": "Optional discovery MCP. Tools: search_directory, whats_new, get_entry, list_collections. Leave credentials empty. Never auto-install a share link.",
+      "status": "drafted"
+    },
+    {
+      "id": "xai-model-api",
+      "surface": "server-side only if a future worker needs Grok chat completions",
+      "url": "https://api.x.ai/v1",
+      "auth": "api-key",
+      "secretEnv": ["XAI_API_KEY"],
+      "setup": "Create the key in the xAI console. Store only in approved secret storage. Do not put the key in a shareable bot, chat, or Git. Grok Bot itself is not this API.",
+      "status": "drafted"
+    },
+    {
+      "id": "cursor-desktop-mcp",
+      "surface": "Cursor desktop",
+      "url": "Cursor Settings → MCP",
+      "auth": "oauth-connect-click",
+      "secretEnv": [],
+      "setup": "Myke clicks Connect for Gmail, Calendar, and X. Cloud agents cannot finish interactive OAuth. Apollo stays off.",
+      "status": "needs-human-click"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "shareable-scout-weekly",
+      "title": "Weekly shareable Grok Bot scout",
+      "schedule": "Monday 8:30 AM America/Chicago",
+      "ownerSeat": "n86-watchtower",
+      "promptRef": "docs/company/CURSOR_AUTOMATIONS.md#7-grok-shareable-scout",
+      "status": "drafted"
+    },
+    {
+      "id": "add-to-desk-gate",
+      "title": "Add-to-desk inspection gate",
+      "schedule": "on demand before adding any x.ai/bot link",
+      "ownerSeat": "n86-watchtower",
+      "promptRef": "docs/company/grok-bots/WORKFLOW.md",
+      "status": "drafted"
+    }
+  ]
+}
