@@ -91,18 +91,21 @@ describe('one-seat claim', () => {
     const rejected = decideClaim({ store: db, claimId: claim.id, approver: 'myke', decision: 'reject' });
     expect(rejected.ok).toBe(true);
     expect(rejected.claim?.status).toBe('rejected');
-    expect(sessionFromClaim(db, rejected.claim!).hasTenantAccess).toBe(false);
+    expect(rejected.claim).toBeTruthy();
+    expect(sessionFromClaim(db, rejected.claim!)?.hasTenantAccess).toBe(false);
 
     startEmailClaim({ email: 'kitchen@example.test', ip: '203.0.113.11', store: db });
     const kitchen = approvalInbox(db)[0];
     decideClaim({ store: db, claimId: kitchen.id, approver: 'myke', decision: 'approve' });
     const revoked = decideClaim({ store: db, claimId: kitchen.id, approver: 'tom', decision: 'revoke' });
     expect(revoked.claim?.status).toBe('revoked');
-    expect(sessionFromClaim(db, revoked.claim!).hasTenantAccess).toBe(false);
+    expect(revoked.claim).toBeTruthy();
+    expect(sessionFromClaim(db, revoked.claim!)?.hasTenantAccess).toBe(false);
 
     const reset = decideClaim({ store: db, claimId: kitchen.id, approver: 'myke', decision: 'reset' });
     expect(reset.claim?.status).toBe('pending');
-    expect(sessionFromClaim(db, reset.claim!).kind).toBe('identity-pending');
+    expect(reset.claim).toBeTruthy();
+    expect(sessionFromClaim(db, reset.claim!)?.kind).toBe('identity-pending');
   });
 
   it('verifies hashed email challenges and Google PKCE without granting a seat', () => {
