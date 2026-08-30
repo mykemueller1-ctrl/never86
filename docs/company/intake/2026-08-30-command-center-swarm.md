@@ -9,7 +9,7 @@
 - Operator System v3.1 store + company specialists are now a runnable orchestration layer.
 - All 10 free agents accept CSV. Sample Store One has inputs, outputs, and a first Action Shift.
 - Truth gates, injection/secret defenses, and human-approval (never-send) are on the code path.
-- Status dashboard: `/command-center/swarm`. CLI: `npm run swarm:run`.
+- Status dashboard: `/action-shift/swarm` (no login). CLI: `npm run swarm:run`.
 
 ## Files created/changed
 

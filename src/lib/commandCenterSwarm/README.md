@@ -11,7 +11,7 @@ npx tsx scripts/run-command-center-swarm.ts
 npm test -- src/lib/commandCenterSwarm.test.ts
 ```
 
-Open `/command-center/swarm` (noindex; already disallowed in robots).
+Open `/action-shift/swarm` (noindex, no login). `/command-center/swarm` is the same view behind the reports gate.
 
 ## Layout
 

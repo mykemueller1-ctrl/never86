@@ -7,7 +7,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Same sample dashboard; this path stays behind the existing reports gate. */
-export default function CommandCenterSwarmPage() {
+/** Sample-store swarm status. No portal login. Noindex. */
+export default function ActionShiftSwarmPage() {
   return <CommandCenterSwarmDashboard />;
 }

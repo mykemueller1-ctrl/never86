@@ -8,7 +8,7 @@
 
 | Job | Status | Intake file |
 |---|---|---|
-| **Command-center specialist swarm v1** | **DRAFTED — PR / NOT MERGED** | [2026-08-30-command-center-swarm.md](2026-08-30-command-center-swarm.md) — Store + company specialists, 10 CSV-first free agents, Sample Store One Action Shift, `/command-center/swarm`. No send, no portal login, no merge |
+| **Command-center specialist swarm v1** | **DRAFTED — PR / NOT MERGED** | [2026-08-30-command-center-swarm.md](2026-08-30-command-center-swarm.md) — Store + company specialists, 10 CSV-first free agents, Sample Store One Action Shift, `/action-shift/swarm`. No send, no portal login, no merge |
 | **Desktop / Chrome / app standing order** | **DONE** | [2026-08-28-desktop-computer-auth.md](2026-08-28-desktop-computer-auth.md) — Myke authorized app/Chrome/desktop use for owned jobs. Cloud agents still cannot take over local Chrome. Gmail/Calendar/X MCP need one Connect click. No accounts created. |
 | Claude 90d harvest | **DONE** | [2026-08-23-claude-90d-harvest.md](2026-08-23-claude-90d-harvest.md) |
 | Codex/ChatGPT 90d harvest | **DONE** | [2026-08-23-codex-chatgpt-90d-harvest.md](2026-08-23-codex-chatgpt-90d-harvest.md) |
