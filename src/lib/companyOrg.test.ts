@@ -123,6 +123,7 @@ describe('companyOrg', () => {
       const fullPath = path.join(REPO_ROOT, ref);
       expect(fs.existsSync(fullPath), `missing playbook: ${ref}`).toBe(true);
     }
+    expect(getAllPlaybookRefs()).toContain('docs/company/KEYS_ACCESS.md');
   });
 
   it('adds Grok Shareable Scout under product with a resolving playbook', () => {

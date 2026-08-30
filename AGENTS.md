@@ -4,6 +4,8 @@ Public site: https://www.never86.ai
 MCP: `https://www.never86.ai/api/mcp`
 `.cursor/mcp.json` already points here. Enable it in Cursor Settings if the cloud agent has not loaded it.
 
+Keys / xAI / Grok factory env: `docs/company/KEYS_ACCESS.md`. Placeholders in `.env.example`. Never commit live secrets. Probe: `npm run keys:probe`.
+
 ## How we work (locked)
 - **Grok** is the founder front door. Myke talks to Grok on the phone. Grok dispatches Cursor.
 - **Cursor** runs agents, bots, code, tests, and PRs. Cursor does not wait for Myke to merge from a laptop.
