@@ -234,14 +234,16 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
 const SECRET_LIKE =
   /(sk-ant-[A-Za-z0-9_-]{8,}|sk-[A-Za-z0-9]{16,}|xai-[A-Za-z0-9]{16,}|re_[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}|key_[A-Za-z0-9]{16,}|postgres:\/\/[^:\s]+:[^@\s]+@)/;
 
-export function xaiApiBase(env: NodeJS.ProcessEnv = process.env): string {
+type EnvMap = Record<string, string | undefined>;
+
+export function xaiApiBase(env: EnvMap = process.env): string {
   const raw = env.XAI_API_BASE?.trim();
   return raw && raw.length > 0 ? raw.replace(/\/$/, '') : XAI_API_BASE_DEFAULT;
 }
 
 export function inspectKeyPresence(
   names: readonly string[],
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvMap = process.env,
 ): KeyPresence[] {
   return names.map((name) => {
     const raw = env[name];
@@ -255,7 +257,7 @@ export function inspectKeyPresence(
   });
 }
 
-export function catalogPresence(env: NodeJS.ProcessEnv = process.env): KeyPresence[] {
+export function catalogPresence(env: EnvMap = process.env): KeyPresence[] {
   return inspectKeyPresence(KEYS_ACCESS_CATALOG.map((item) => item.name), env);
 }
 
@@ -281,7 +283,7 @@ export function assertNoEmbeddedSecrets(value: unknown, path = 'root'): string[]
 }
 
 export async function probeXaiModels(
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvMap = process.env,
   fetchFn: FetchLike = fetch,
 ): Promise<{ status: ProbeStatus; httpStatus?: number; modelCount?: number; detail?: string }> {
   const key = env[XAI_API_KEY_NAME]?.trim();
