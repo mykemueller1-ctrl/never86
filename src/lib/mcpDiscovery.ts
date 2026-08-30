@@ -8,7 +8,7 @@ export const NEVER86_MCP_DISCOVERY = {
   title: "Never 86'd Operator Intelligence",
   description:
     "Evidence-first restaurant operating system for Grok, ChatGPT, Claude, Gemini, and other MCP clients. Action Shift, 3P Quick Win, vendor silence, proof/memory, routines, and public operator logic. Read-only.",
-  version: '3.0.0',
+  version: '3.1.0',
   homepage: NEVER86_MCP_INSTALL_URL,
   documentation: `${NEVER86_SITE_URL}/delivery-marketplace-reconciliation`,
   transport: 'http',

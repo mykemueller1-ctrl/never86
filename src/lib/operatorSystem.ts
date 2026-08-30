@@ -1,4 +1,7 @@
-export const OPERATOR_SYSTEM_VERSION = '3.0.0';
+import { getCompanyOrg } from './companyOrg';
+import { getOperatorVoice } from './operatorVoice';
+
+export const OPERATOR_SYSTEM_VERSION = '3.1.0';
 
 export const NEVER86_OPERATOR_SYSTEM = {
   identity: {
@@ -120,5 +123,7 @@ export function getOperatorSystem() {
   return {
     version: OPERATOR_SYSTEM_VERSION,
     system: NEVER86_OPERATOR_SYSTEM,
+    companyOrg: getCompanyOrg(),
+    operatorVoice: getOperatorVoice(),
   };
 }
