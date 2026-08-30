@@ -18,9 +18,9 @@ Grok Bot shareable templates copy prompts, not keys. Official xAI rule: strip AP
 
 | Check | State |
 |---|---|
-| Public operator MCP | **live-verified** by `npm run keys:probe` (no secret) |
-| Private factory MCP without credentials | **fail-closed** (401/503 expected) |
-| `XAI_API_KEY` in this Cursor cloud worker | **absent** — xAI model probe is `not-configured`, not live-verified |
+| Public operator MCP | **live-verified** — `initialize` + `tools/list` HTTP 200, server `never86`, **16** tools |
+| Private factory MCP without credentials | **fail-closed** — HTTP 401, no tools leaked |
+| `XAI_API_KEY` in this Cursor cloud worker | **absent** — xAI `GET /v1/models` not attempted; status `not-configured` |
 | Vercel `never86` env names | **not readable** from this worker's Vercel MCP (only the unrelated `compass` project is visible) |
 | `grok-shareable-86-swarm` (`bc-ee4c1774`) | Authenticates to public MCP with no xAI key. Draft API notes live on PR `#172`. Not merged. |
 | Production env / deploy | **not changed** |
