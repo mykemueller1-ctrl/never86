@@ -11,11 +11,14 @@ export async function POST(req: Request) {
     provider: body?.provider,
     ip,
   });
-  if (!result.ok) return oneSeatBlocked(result.error, result.error.includes('Too many') ? 429 : 503);
+  if (!result.ok) {
+    const error = result.error ?? 'Claim blocked.';
+    return oneSeatBlocked(error, /too many/i.test(error) ? 429 : 503);
+  }
   return oneSeatOk({
     status: 'pending',
     hasTenantAccess: false,
-    challengeIssued: result.challengeIssued,
+    challengeIssued: result.challengeIssued === true,
     redirect: '/staff/pending',
   });
 }
