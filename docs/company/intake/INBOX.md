@@ -2,7 +2,7 @@
 
 **HQ chat:** [Cursor agents: You talk, I run](https://grok.com/project/d3f103b5-2add-4fc1-9cd7-aabbc6a3484f?chat=3f690a7c-b2e5-4101-be38-89cc8b5df3f6)
 **Mind dump:** `docs/company/MYKE_MIND_DUMP_60_90_DAYS.md`  
-**Last updated:** 2026-08-29 11:20 PM CT
+**Last updated:** 2026-08-30 8:20 AM CT
 
 ## Status
 
@@ -19,6 +19,8 @@
 | **Daily Myke Handoff & Tomorrow Brief** | **DESIGNED — EXECUTION SETUP QUEUED** | Grok owns one verified master packet: what Myke did today, decisions/commitments, unfinished work, and tomorrow's calendar/attendees/prep. Proposed default: 5:00 PM CT draft + 6:30 AM CT refresh. Produce separate need-to-know Kristin and Vadim versions; stop on missing calendar access, unverified destinations, conflicting facts, or absent Myke send approval. No external send yet |
 | **Never86 bot organization** | **DESIGNED — INSTANTIATION QUEUED** | Myke CEO gate → Codex Watchtower → Grok dispatcher → Cursor code factory; six bounded lanes for Product, Integrations, Quality, Agent/Knowledge, GTM/Sentia+, and Victor/Media. Start one code worker + parallel read/draft queues after the junk slot is stopped; require three clean bounded jobs before cap 2 |
 | **Never86 daily Grok clip factory** | **TEMPLATES BUILT — XAI ENABLEMENT/RENDER PROOF OPEN** | `docs/company/social/GROK_BOT_CLIP_FACTORY.md` + `GROK_ROUTINE_X_DAILY_DRAFT.md`; default `X as Myke` schedule is daily 7:00 AM America/Chicago, draft/render only, exactly three distinct creatives (conflict, identity, payoff), 30-day novelty check, and Myke release gate. First batch: `docs/company/social/batches/2026-08-29-founder-product-clips.md`. xAI enabled state, first trigger, and playable exports are not yet proven |
+| **Never86 Bolt social-to-order** | **55S CONCEPT DEMO DONE — PACKET IN THIS SEND** | [2026-08-30-never86-bolt-social-to-order.md](2026-08-30-never86-bolt-social-to-order.md) |
+| **Swarms + PRDs + Cursor chat index** | **SENT 8:20 AM CT** | [2026-08-30-swarm-prd-cursor-send.md](2026-08-30-swarm-prd-cursor-send.md) · PRs `#172` `#173` `#174` undrafted |
 | **Rolling Grok task queue** | **MAIN MOVED — HUNTER LIVE** | Production `main` is `115b7b6` (Vercel Production 02:10 UTC 30 Aug). `#162`/`#167` stay closed. `#168` `#169` `#170` merged. Public MCP **v3.1.0** 16 tools live. Do not apply staff SQL or issue credentials until roster exists |
 | **CTAP public-data incident — #162, merged #166, draft #167** | **PRS CLOSED — MAIN HANDOFF STILL NEEDS MERGE** | `#162` and `#167` titles/bodies redacted and closed without merge. Public `GROK_HANDOFF.md` redaction is on the claim branch, not yet on production `main`. History rewrite / GitHub Support remains a later gate |
 | **Production overlap audit for #162** | **PARTIAL — POTENTIAL OLDER EXPOSURE** | PR-162-only dated fixtures and `yesterdayClosePack` files are absent from `main` `bac9d966`, and PR `#164` did not carry them. Three exact value-bearing lines also exist in main fixtures `sample-z-summary.txt` and `sample-z-missing-pop.txt`, introduced by `346c72c` and labeled synthetic. Compare privately to authoritative reports; do not repeat figures publicly |
