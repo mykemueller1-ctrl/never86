@@ -7,17 +7,17 @@ import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "What we check · Never 86'd",
-  description: 'Eight checks that read your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. Every number labeled.',
+  description: 'Ten checks that read your sales, labor, voids, delivery fees, tips, catering, and how shifts are going. Every number labeled.',
   openGraph: {
-    title: "Never 86'd · Eight ways we find your leak",
-    description: 'Find the leak. Name who owns it. Keep the receipt. Eight checks, every number labeled Verified / Estimated / Unverified.',
+    title: "Never 86'd · Ten ways we find your leak",
+    description: 'Find the leak. Name who owns it. Keep the receipt. Ten checks, every number labeled Verified / Estimated / Unverified.',
     url: 'https://www.never86.ai/agents',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Never 86'd · Eight ways we find your leak",
-    description: 'Eight checks that read your whole operation. Every number labeled.',
+    title: "Never 86'd · Ten ways we find your leak",
+    description: 'Ten checks that read your whole operation. Every number labeled.',
   },
   alternates: { canonical: 'https://www.never86.ai/agents' },
 };
@@ -35,7 +35,7 @@ export default function AgentsPage() {
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86&apos;d <span className="italic text-ink-600">· what we check</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">The checks that find your leak · 8 free to try</p>
+              <p className="compass-eyebrow-dim mt-2">The checks that find your leak · 10 free to try</p>
             </span>
           </Link>
           <AgentsNavLinks />
@@ -43,7 +43,7 @@ export default function AgentsPage() {
       </div>
 
       <section className="max-w-5xl mx-auto px-6 pt-12 md:pt-16 pb-12">
-        <p className="compass-eyebrow mb-6">— Eight ways we find your leak</p>
+        <p className="compass-eyebrow mb-6">— Ten ways we find your leak</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-6">
           We read your numbers. <em>We name the leak.</em>
         </h1>

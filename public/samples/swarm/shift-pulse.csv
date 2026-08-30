@@ -1,0 +1,4 @@
+Store,Shift,Station,Forecast Covers,Actual Covers,Forecast Net,Actual Net,Voids,Comps,Crew,Role
+Sample Store One,Dinner,Make Line,80,83,2400.00,2496.00,12.00,0,Kitchen Lead,Kitchen
+Sample Store One,Dinner,Front,40,41,1200.00,1188.00,8.00,0,Closer A,FOH
+Sample Store One,Dinner,Bar,20,19,800.00,760.00,6.00,5,Bar Lead,Bar

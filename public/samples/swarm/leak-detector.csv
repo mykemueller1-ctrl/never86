@@ -1,0 +1,4 @@
+Location,Employee,Ticket Total,Tender,Void Amount,Voided,Comp Amount,Comped,Discount Amount,Discount Count,Paid Flag,Post Void,Closed At,Discount Time
+Sample Store One,Closer A,42.50,Credit,0,0,0,0,0,0,1,0,,
+Sample Store One,Server B,38.00,Cash,38.00,1,0,0,0,0,1,1,2026-08-28T19:40:00Z,
+Sample Store One,Kitchen Lead,26.00,Credit,0,0,0,0,4.00,1,1,0,2026-08-28T18:10:00Z,

@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "swarm:run": "tsx scripts/run-command-center-swarm.ts",
     "indexnow:submit": "node scripts/submit-indexnow.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

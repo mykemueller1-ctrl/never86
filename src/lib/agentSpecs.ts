@@ -79,6 +79,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'Source-stamped statement receipt: observed cost by category · expected payout · unexplained variance · missing evidence · up to three next actions.',
     sampleSignal: 'One anonymized 12-period DoorDash case: 27.2% observed all-in marketplace cost, made up of 8.7% commission, 17.0% restaurant-funded ads and promotions, 1.0% error charges, and 0.5% fees.',
     posSupport: 'DoorDash pilot · Uber Eats and Grubhub early access',
+    csvRunnable: true,
   },
   {
     slug: 'labor-leak',
@@ -161,6 +162,7 @@ export const AGENT_SPECS: AgentSpec[] = [
     output: 'Expected rule · observed calculation · reproducible difference · evidence status · next record or action.',
     sampleSignal: 'Needs evidence: the statement shows the charge, but the governing fee base is missing. No overcharge claim is made.',
     posSupport: 'Restaurant-held agreement and marketplace statement',
+    csvRunnable: true,
   },
   {
     slug: 'beverage-score',
@@ -221,7 +223,8 @@ export const AGENT_SPECS: AgentSpec[] = [
     needs: 'POS live feed + forecast input (or last 8-week average).',
     output: 'Single-screen crew view · pacing meter · the goal · the streak.',
     sampleSignal: 'Tonight pacing 104% of forecast · station median set · 4-shift zero-comp streak active.',
-    posSupport: 'Toast · Square · Clover (live feed)',
+    posSupport: 'Toast · Square · Clover (CSV today; live feed later)',
+    csvRunnable: true,
   },
 ];
 

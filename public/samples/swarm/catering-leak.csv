@@ -1,0 +1,3 @@
+Location,Order ID,Customer,Event Date,Invoice Amount,POS Amount
+Sample Store One,INV-S1-01,Account A,2026-08-27,840.00,840.00
+Sample Store One,INV-S1-02,Account B,2026-08-28,620.00,0
