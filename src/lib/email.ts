@@ -20,6 +20,18 @@ export function getOwnerEmail(): string {
     : FALLBACK_OWNER_EMAIL;
 }
 
+/** Public lead forms fail closed when Resend is not configured. */
+export function emailDeliveryConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
+/** Resend returns `{ error }` without throwing. Treat that as a failed send. */
+export function emailSendSucceeded(
+  result: { data?: unknown; error?: unknown } | null | undefined,
+): boolean {
+  return Boolean(result && !result.error);
+}
+
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
 

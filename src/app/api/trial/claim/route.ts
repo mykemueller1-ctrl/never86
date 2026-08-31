@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { attachEmailToRun } from '@/lib/trialRunsDb';
-import { captureLead } from '@/lib/leadCapture';
+import {
+  deliverPublicLead,
+  publicLeadHttpStatus,
+} from '@/lib/publicLeadIntake';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -13,32 +16,51 @@ const schema = z.object({
   restaurantName: z.string().optional(),
 });
 
-// POST /api/trial/claim · attach email to a saved trial run so the
-// operator can come back to the exact same read tomorrow.
-// Also runs the standard lead capture so /admin/never86 sees it.
+// POST /api/trial/claim · email Myke via hello@ / alerts@, then optionally
+// attach the email to a saved trial run. Run persist is extra and fail-soft.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = schema.parse(body);
-    const ok = await attachEmailToRun(data.shareToken, data.email, data.restaurantName);
 
-    await captureLead({
+    const result = await deliverPublicLead({
+      kind: 'trial_claim',
       email: data.email,
       name: data.name,
       restaurantName: data.restaurantName,
       sourcePage: '/trial · run claim',
-      requestedAgent: 'Trial run · saved',
-      referrer: req.headers.get('referer') ?? undefined,
-      userAgent: req.headers.get('user-agent') ?? undefined,
-      ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
+      agentRequested: 'Trial run · saved',
     });
 
+    if (!result.ok) {
+      return NextResponse.json(
+        { ok: false, success: false, error: result.error, code: result.code },
+        { status: publicLeadHttpStatus(result) },
+      );
+    }
+
+    let runAttached = false;
+    try {
+      runAttached = await attachEmailToRun(data.shareToken, data.email, data.restaurantName);
+    } catch (err) {
+      console.error('trial claim attachEmailToRun failed:', err);
+    }
+
     return NextResponse.json({
-      ok,
+      ok: true,
+      success: true,
+      emailSent: result.operatorEmailed,
+      ownerNotified: result.ownerNotified,
+      persisted: result.persisted,
+      runAttached,
+      message: result.confirmation,
       shareUrl: `https://www.never86.ai/trial/run/${data.shareToken}`,
     });
   } catch (e: unknown) {
+    if (e instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, success: false, error: 'Check the form and try again.' }, { status: 400 });
+    }
     const msg = e instanceof Error ? e.message : 'Bad request';
-    return NextResponse.json({ ok: false, error: msg }, { status: 400 });
+    return NextResponse.json({ ok: false, success: false, error: msg }, { status: 400 });
   }
 }
