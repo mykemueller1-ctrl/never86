@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
+import { databaseUrlPresent } from '@/lib/persistHealth';
 import * as schema from './schema';
 
 // Lazy singleton. Building the Neon client at module load means a missing or
@@ -7,14 +8,15 @@ import * as schema from './schema';
 // evaluated — which on Next.js surfaces as a 500 on that route (and at build
 // time can fail the whole deploy). Defer construction to first actual use so a
 // bad env var becomes a caught, per-request error instead of a hard crash.
+// Never log or return the URL. Public /audit and /trial must not import this.
 type DrizzleClient = ReturnType<typeof drizzle<typeof schema>>;
 
 let _client: DrizzleClient | null = null;
 
 function getClient(): DrizzleClient {
   if (_client) return _client;
-  const url = process.env.DATABASE_URL;
-  if (!url) {
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url || !databaseUrlPresent()) {
     throw new Error(
       'DATABASE_URL is not set. The primary (Neon) database is unavailable — ' +
         'set DATABASE_URL in the environment.',
