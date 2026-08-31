@@ -18,4 +18,17 @@ describe('hunterUtm', () => {
       'tiktok_comment_rant_20260825_2',
     );
   });
+
+  it('builds YouTube organic slate URLs to /audit', () => {
+    const url = buildHunterAuditUrl({
+      source: 'youtube',
+      medium: 'organic',
+      contentId: hunterContentId('youtube', 'answer what-never86d-does', new Date('2026-08-31T12:00:00Z'), 1),
+    });
+    expect(url).toContain('utm_source=youtube');
+    expect(url).toContain('utm_medium=organic');
+    expect(url).toContain('utm_campaign=100_statement_audit');
+    expect(url).toContain('utm_content=youtube_answer_what_never86d_does_20260831_1');
+    expect(url.startsWith('https://www.never86.ai/audit?')).toBe(true);
+  });
 });

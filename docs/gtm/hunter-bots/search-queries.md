@@ -54,6 +54,19 @@ MarginEdge restaurant frustrated
 
 Browse: `#restaurantowner` `#restaurantlife` `#restauranttok` `#smallbusinessowner` `#doordash` `#ubereats` `#iowa` `#desmoines`
 
+## YouTube (public search + comments — see `docs/company/grok-bots/YOUTUBE_DESK.md`)
+
+```
+DoorDash fees restaurant owner
+Uber Eats payout restaurant statement
+Grubhub commission independent restaurant
+third party delivery killing my restaurant
+MarginEdge restaurant frustrated
+restaurant prime cost owner
+```
+
+72-hour window. Hunter ICP, keep ≥60. Draft replies only. No upload. Owner-1 is the only private-file door.
+
 ## Facebook (web search — see facebook-groups.md)
 
 ```

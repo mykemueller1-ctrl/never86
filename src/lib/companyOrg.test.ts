@@ -100,6 +100,10 @@ describe('companyOrg', () => {
           'editorial-strategist',
           'x-linkedin-desk',
           'short-form-studio',
+          'youtube-hunt',
+          'youtube-script-cutter',
+          'youtube-answer-film',
+          'youtube-channel-producer',
           'facebook-community-desk',
           'reddit-forum-desk',
           'repurposing-editor',
@@ -124,6 +128,25 @@ describe('companyOrg', () => {
       expect(fs.existsSync(fullPath), `missing playbook: ${ref}`).toBe(true);
     }
     expect(getAllPlaybookRefs()).toContain('docs/company/KEYS_ACCESS.md');
+  });
+
+  it('adds first-party YouTube desk seats under social with a drafts-only publish gate', () => {
+    for (const id of ['youtube-hunt', 'youtube-script-cutter', 'youtube-answer-film', 'youtube-channel-producer']) {
+      const role = getRoleById(id);
+      expect(role?.departmentId).toBe('social');
+      expect(role?.reportsTo).toBe('social-head');
+      expect(role?.playbookRef).toBe('docs/company/grok-bots/YOUTUBE_DESK.md');
+      expect(role?.approvalRequired).toContain('social_post');
+      expect(role?.prohibited).toEqual(
+        expect.arrayContaining(['auto-uploading to YouTube', 'opening private CTAP or customer files']),
+      );
+    }
+    const pack = getDepartmentPlaybook('social');
+    expect(pack.ok).toBe(true);
+    if (pack.ok) {
+      expect(pack.playbookRefs).toContain('docs/company/grok-bots/YOUTUBE_DESK.md');
+      expect(pack.youtubeDesk).toBe('docs/company/grok-bots/YOUTUBE_DESK.md');
+    }
   });
 
   it('adds Grok Shareable Scout under product with a resolving playbook', () => {

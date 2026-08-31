@@ -1,4 +1,4 @@
-export type HunterUtmSource = 'reddit' | 'facebook' | 'x' | 'tiktok' | 'linkedin';
+export type HunterUtmSource = 'reddit' | 'facebook' | 'x' | 'tiktok' | 'linkedin' | 'youtube';
 
 const BASE = 'https://www.never86.ai/audit';
 const CAMPAIGN = '100_statement_audit';

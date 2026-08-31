@@ -37,6 +37,30 @@ Use before any `x.ai/bot` add.
 
 Myke talks in Grok. Grok routes. Cursor writes code on an isolated branch. Grok Bots run scheduled departments. Codex watches. Shareable templates feed those seats; they do not become a second command hub.
 
+## YouTube desk (first-party)
+
+**Schedule:** Hunt daily 8:00 AM America/Chicago. Channel Producer weekly Monday 9:00 AM America/Chicago.  
+**Cursor automation:** `docs/company/CURSOR_AUTOMATIONS.md` §8  
+**Config:** `config/youtube-desk-swarm.json`  
+**Paste recipes:** [YOUTUBE_DESK.md](YOUTUBE_DESK.md)
+
+```
+Call get_operator_system, then get_company_org, then get_department_playbook social.
+
+1. YouTube Hunt: public videos/comments, last 72 hours, hunter ICP, keep ≥60, max 3 drafts.
+2. Script Cutter: 30–45s from a published /answers page or an Owner-1 permissioned excerpt.
+3. Answer Film: talking-head from exactly one never86.ai/answers page.
+4. Channel Producer: weekly 3-video slate, caption, pinned AUDIT, UTM to never86.ai/audit.
+
+Do not upload to YouTube. Do not install a public botdirectory bot.
+Do not open CTAP, customer, employee, mailbox, or Drive files — Owner-1 is the only private-file door.
+Optional model API: XAI_API_KEY at https://api.x.ai/v1, default grok-4.6. Never paste the key.
+
+Return one approval card. Myke approves every publish.
+```
+
+**Stop:** missing public source, unpublished private numbers, or any attempt to upload.
+
 ## Native Never86 template
 
-Draft job for a first-party shareable bot: [templates/never86-operator-command.md](templates/never86-operator-command.md). Publishing that `x.ai/bot` link is a later human gate.
+Draft job for a first-party shareable bot: [templates/never86-operator-command.md](templates/never86-operator-command.md). Publishing that `x.ai/bot` link is a later human gate. YouTube seats use the first-party recipes under [templates/](templates/) and are not published to the public catalog from this job.

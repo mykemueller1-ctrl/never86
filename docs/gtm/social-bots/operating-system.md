@@ -10,7 +10,7 @@ Draft, queue, learn. Never auto-post, auto-DM, or auto-email.
 
 1. **Social Intelligence Desk** — scan operator conversations and objections. Separate content signals from sales leads.
 2. **Editorial Strategist** — one job and one CTA per asset. No identical captions across accounts.
-3. **Platform desks** — X, LinkedIn, TikTok, Reels, Facebook, Reddit. Unique voice per account.
+3. **Platform desks** — X, LinkedIn, TikTok, Reels, YouTube (Hunt / Script Cutter / Answer Film / Channel Producer), Facebook, Reddit. Unique voice per account. YouTube is drafts-only; Myke approves every upload.
 4. **Community / Reply** — answer in thread first. Qualified AUDIT mentions go to Sales.
 5. **Measurement** — qualified operator behavior, not vanity views.
 6. **Approval packet** — `{ dept, role, action, draft, proof, approve Y/N }` for Myke.
@@ -31,3 +31,4 @@ Update Drive **Never86 HQ Handoff** and `docs/company/intake/GROK_HANDOFF.md` wi
 - No recovery promises without evidence
 - Truth/QA blocks unsupported dollar claims
 - One CTA: https://www.never86.ai/audit
+- YouTube desk never auto-uploads. Owner-1 is the only private-file door.
