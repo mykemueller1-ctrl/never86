@@ -1,9 +1,11 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle, type NeonDatabase } from 'drizzle-orm/neon-serverless';
+import { databaseUrlPresent } from '@/lib/persistHealth';
 import * as schema from './schema';
 
 // neon-http cannot BEGIN/COMMIT. Activation writes use a WebSocket pool
 // so consume + operator/location/credential land in one transaction.
+// Fail-closed when DATABASE_URL is missing. Never log the URL.
 
 if (typeof WebSocket !== 'undefined') {
   neonConfig.webSocketConstructor = WebSocket;
@@ -15,8 +17,8 @@ let _pool: Pool | null = null;
 let _wsDb: SeatTxDb | null = null;
 
 function getWsDb(): SeatTxDb {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url || !databaseUrlPresent()) {
     throw new Error(
       'DATABASE_URL is not set. The primary (Neon) database is unavailable — ' +
         'set DATABASE_URL in the environment.',

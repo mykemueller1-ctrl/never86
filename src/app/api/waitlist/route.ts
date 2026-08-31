@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { waitlist } from '@/db/schema';
 import { sendWelcomeEmail, sendNotification } from '@/lib/email';
 import { captureLead } from '@/lib/leadCapture';
+import { databaseUrlPresent } from '@/lib/persistHealth';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -45,7 +46,40 @@ export async function POST(req: NextRequest) {
       ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
     });
 
-    // 2) Primary waitlist insert (Neon)
+    const agentLine = data.agentRequested
+      ? `⚡ <strong>UNLOCK REQUEST · ${data.agentRequested}</strong><br/>`
+      : '';
+
+    // 2) Neon persist is optional (aligns with draft PR #177). Public forms
+    //    keep working when DATABASE_URL is missing. Never echo the URL.
+    if (!databaseUrlPresent()) {
+      await sendWelcomeEmail(data.email, data.name);
+      await sendNotification(
+        process.env.OWNER_EMAIL || 'myke@n86.app',
+        data.agentRequested
+          ? `⚡ ${data.agentRequested} unlock · ${data.name || data.email}`
+          : data.interestedAgent
+          ? `🚪 Self-onboard · ${data.name || data.email} · ${data.interestedAgent}`
+          : `New lead · ${data.name || data.email}${data.restaurantName ? ' · ' + data.restaurantName : ''}`,
+        `<p>${agentLine}<strong>${data.name || 'Someone'}</strong> just hit the form.</p>
+       <p>Email: ${data.email}<br/>
+       ${data.restaurantName ? `Restaurant: ${data.restaurantName}<br/>` : ''}
+       ${unitsNum ? `Units: ${unitsNum}<br/>` : ''}
+       ${data.role ? `Role: ${data.role}<br/>` : ''}
+       ${data.posType ? `POS: ${data.posType}<br/>` : ''}
+       ${data.interestedAgent ? `Wants agent: ${data.interestedAgent}<br/>` : ''}
+       ${data.dataPreference ? `Data-share: ${data.dataPreference}<br/>` : ''}
+       ${sourcePage ? `From: ${sourcePage}` : ''}</p>
+       <p>Neon persist skipped — DATABASE_URL not present. Email is the receipt.</p>`
+      );
+      return NextResponse.json({
+        success: true,
+        persisted: false,
+        message: "You're on the list.",
+      });
+    }
+
+    // 3) Primary waitlist insert (Neon) when DATABASE_URL is present
     const [entry] = await db
       .insert(waitlist)
       .values({
@@ -65,9 +99,6 @@ export async function POST(req: NextRequest) {
     await sendWelcomeEmail(data.email, data.name);
 
     // 4) Notify Myke — agent unlock requests jump the queue
-    const agentLine = data.agentRequested
-      ? `⚡ <strong>UNLOCK REQUEST · ${data.agentRequested}</strong><br/>`
-      : '';
     await sendNotification(
       process.env.OWNER_EMAIL || 'myke@n86.app',
       data.agentRequested

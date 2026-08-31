@@ -10,6 +10,7 @@ import {
 } from '../db/schema';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
+import { databaseUrlPresent } from './persistHealth';
 
 // Monday gate (#118) — free seat on Neon (DATABASE_URL).
 // Supabase OPS is deferred; Toast/CTAP data comes back later.
@@ -29,7 +30,7 @@ export function isFreeSeatOperatorId(operatorId: number): boolean {
 }
 
 export function neonConfigured(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return databaseUrlPresent();
 }
 
 export function activationEmailConfigured(): boolean {
