@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Never86 Operator Console</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f6f1;
+      --panel: #ffffff;
+      --panel-soft: #f2f0e8;
+      --text: #171713;
+      --muted: #68665e;
+      --line: #dedbd0;
+      --accent: #9a7116;
+      --accent-soft: #f2e5bd;
+      --good: #326a4a;
+      --good-soft: #e2f0e8;
+      --watch: #886316;
+      --watch-soft: #f6edcf;
+      --risk: #9b3b30;
+      --risk-soft: #f5e2df;
+      --neutral: #626058;
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151512;
+        --panel: #1c1c18;
+        --panel-soft: #24241f;
+        --text: #f4f1e8;
+        --muted: #aaa69b;
+        --line: #3c3a31;
+        --accent: #e2b84c;
+        --accent-soft: #3d3217;
+        --good: #80c49c;
+        --good-soft: #1f3a2a;
+        --watch: #e0bd5d;
+        --watch-soft: #3c3217;
+        --risk: #e58c80;
+        --risk-soft: #402521;
+        --neutral: #aaa69b;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; min-height: 100%; }
+    body {
+      padding: 10px;
+      background: transparent;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+
+    .shell {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-line { display: flex; gap: 9px; align-items: center; margin-bottom: 8px; }
+    .mark {
+      width: 28px; height: 28px; display: grid; place-items: center;
+      border-radius: 8px; background: var(--accent); color: #11110d;
+      font-weight: 900; letter-spacing: -0.04em;
+    }
+    .eyebrow { font-size: 11px; letter-spacing: 0.12em; font-weight: 800; color: var(--accent); }
+    h1 { margin: 0; font-size: clamp(19px, 4vw, 27px); line-height: 1.1; letter-spacing: -0.025em; }
+    .subtitle { margin: 7px 0 0; max-width: 590px; color: var(--muted); }
+    .meta { flex: 0 0 auto; text-align: right; color: var(--muted); font-size: 12px; }
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: 5px; margin-top: 6px;
+      border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px;
+      background: var(--panel-soft); color: var(--muted); font-weight: 700; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    .tabs {
+      display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px;
+      border-bottom: 1px solid var(--line); scrollbar-width: thin;
+    }
+    .tab {
+      min-height: 40px; white-space: nowrap; border: 1px solid var(--line); border-radius: 999px;
+      background: transparent; color: var(--muted); padding: 8px 12px; cursor: pointer; font-weight: 700;
+    }
+    .tab[aria-selected="true"] { background: var(--accent-soft); color: var(--text); border-color: var(--accent); }
+    .tab:disabled { opacity: 0.55; cursor: progress; }
+
+    .metrics {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px; background: var(--line); border-bottom: 1px solid var(--line);
+    }
+    .metric { min-width: 0; padding: 12px 14px; background: var(--panel); }
+    .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { margin-top: 3px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+    .metric-detail { margin-top: 2px; font-size: 11px; color: var(--muted); }
+
+    .body { padding: 14px; display: grid; gap: 12px; }
+    .decision-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 12px; }
+    .card { border: 1px solid var(--line); border-radius: 14px; padding: 14px; min-width: 0; }
+    .card-label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--neutral); flex: 0 0 auto; }
+    .dot.good { background: var(--good); }
+    .dot.watch { background: var(--watch); }
+    .dot.risk { background: var(--risk); }
+    .card h2 { margin: 0; font-size: 17px; line-height: 1.2; letter-spacing: -0.015em; }
+    .card p { margin: 7px 0 0; color: var(--muted); }
+    .impact { margin-top: 10px; font-weight: 800; color: var(--risk); }
+    .confidence { margin-top: 8px; font-size: 11px; color: var(--muted); }
+
+    .action-card { background: var(--panel-soft); }
+    .action-meta { display: grid; gap: 7px; margin-top: 12px; }
+    .action-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
+    .action-key { color: var(--muted); font-size: 12px; }
+    .action-value { font-weight: 650; }
+
+    .evidence-header, .detail-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;
+    }
+    .section-title { margin: 0; font-size: 14px; font-weight: 800; }
+    .evidence-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .receipt { padding: 10px; border-radius: 11px; border: 1px solid var(--line); background: var(--panel-soft); min-width: 0; }
+    .receipt-top { display: flex; align-items: center; gap: 7px; font-weight: 750; }
+    .receipt-source, .receipt-detail { margin-top: 4px; font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 570px; }
+    th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; background: var(--panel-soft); }
+    tbody tr:last-child td { border-bottom: 0; }
+    td:first-child { font-weight: 700; }
+    .status-text.good { color: var(--good); }
+    .status-text.watch { color: var(--watch); }
+    .status-text.risk { color: var(--risk); }
+
+    .footer-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .primary, .secondary {
+      min-height: 42px; border-radius: 10px; padding: 9px 13px; cursor: pointer; font-weight: 800;
+    }
+    .primary { border: 1px solid var(--accent); background: var(--accent); color: #11110d; }
+    .secondary { border: 1px solid var(--line); background: transparent; color: var(--text); }
+    .primary:disabled, .secondary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .status-message { flex: 1 1 220px; min-width: 0; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 620px) {
+      body { padding: 6px; }
+      .topbar { padding: 13px; }
+      .meta { display: none; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .decision-grid { grid-template-columns: 1fr; }
+      .evidence-list { grid-template-columns: 1fr; }
+      .body { padding: 10px; }
+      .action-row { grid-template-columns: 82px minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" id="app" aria-live="polite">
+    <section class="topbar">
+      <div>
+        <div class="brand-line">
+          <div class="mark" aria-hidden="true">86</div>
+          <div class="eyebrow" id="eyebrow">ACTION SHIFT</div>
+        </div>
+        <h1 id="title">One leak. One action. One proof.</h1>
+        <p class="subtitle" id="subtitle">Never86 turns yesterday into the next operator move instead of another dashboard.</p>
+      </div>
+      <div class="meta">
+        <div id="location">Demo Location</div>
+        <div id="date">2026-08-30</div>
+        <div class="demo-pill" id="demo-pill">Synthetic preview</div>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Operator views" role="tablist">
+      <button class="tab" type="button" role="tab" data-view="action_shift" aria-selected="true">Action Shift</button>
+      <button class="tab" type="button" role="tab" data-view="vendor_drift" aria-selected="false">Vendor Drift</button>
+      <button class="tab" type="button" role="tab" data-view="item_trace" aria-selected="false">Item Trace</button>
+      <button class="tab" type="button" role="tab" data-view="inventory_risk" aria-selected="false">Inventory Risk</button>
+    </nav>
+
+    <section class="metrics" id="metrics" aria-label="Key metrics"></section>
+
+    <section class="body">
+      <div class="decision-grid">
+        <article class="card">
+          <div class="card-label"><span class="dot risk" id="leak-dot"></span>Leak found</div>
+          <h2 id="leak-title"></h2>
+          <p id="leak-summary"></p>
+          <div class="impact" id="leak-impact"></div>
+          <div class="confidence" id="leak-confidence"></div>
+        </article>
+
+        <article class="card action-card">
+          <div class="card-label"><span class="dot good"></span>Do this now</div>
+          <h2 id="action-title"></h2>
+          <p id="action-why"></p>
+          <div class="action-meta">
+            <div class="action-row"><span class="action-key">Owner</span><span class="action-value" id="action-owner"></span></div>
+            <div class="action-row"><span class="action-key">Due</span><span class="action-value" id="action-due"></span></div>
+            <div class="action-row"><span class="action-key">Proof</span><span class="action-value" id="action-proof"></span></div>
+          </div>
+        </article>
+      </div>
+
+      <section class="card">
+        <div class="evidence-header">
+          <h2 class="section-title">Receipts and proof</h2>
+          <span class="demo-pill">Evidence chain</span>
+        </div>
+        <div class="evidence-list" id="evidence"></div>
+      </section>
+
+      <section>
+        <div class="detail-header">
+          <h2 class="section-title">Why Never86 flagged it</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Signal</th><th>Current</th><th>Baseline</th><th>Variance</th></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="footer-actions">
+        <button class="primary" id="ask-button" type="button">Ask ChatGPT about this</button>
+        <button class="secondary" id="refresh-button" type="button">Refresh this view</button>
+        <span class="status-message" id="status">Interactive preview. No private restaurant data is loaded.</span>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    const toolByView = {
+      action_shift: "get_action_shift_preview",
+      vendor_drift: "get_vendor_drift_preview",
+      item_trace: "get_item_trace_preview",
+      inventory_risk: "get_inventory_risk_preview",
+    };
+
+    const fallbackSnapshot = {
+      view: "action_shift",
+      stateVersion: 1,
+      isDemo: true,
+      locationAlias: "Demo Location",
+      businessDate: "2026-08-30",
+      eyebrow: "ACTION SHIFT",
+      title: "One leak. One action. One proof.",
+      subtitle: "Never86 turns yesterday into the next operator move instead of another dashboard.",
+      metrics: [
+        { label: "Net sales", value: "$12.8k", status: "neutral", detail: "Synthetic preview only" },
+        { label: "Labor", value: "29.4%", status: "watch", detail: "1.4 pts over demo target" },
+        { label: "Prime cost", value: "61.8%", status: "risk", detail: "Above demo target band" },
+        { label: "Open flags", value: "3", status: "watch", detail: "One needs action today" },
+      ],
+      leak: {
+        title: "Late labor ran past the sales curve",
+        severity: "high",
+        summary: "The final two labor hours stayed flat while sales tapered, creating the clearest controllable variance in this demo shift.",
+        dollarImpact: "$186 estimated exposure",
+        confidence: 0.91,
+      },
+      action: {
+        title: "Move one closer cut 45 minutes earlier tonight",
+        ownerRole: "Shift manager",
+        due: "Tonight",
+        proofRequired: "Closing labor snapshot plus manager note",
+        why: "It directly attacks the highest-confidence controllable leak without changing service coverage earlier in the shift.",
+      },
+      evidence: [
+        { id: "ev-z", label: "POS close", source: "Z report", detail: "Sales curve and close totals parsed", status: "verified" },
+        { id: "ev-labor", label: "Labor close", source: "Timeclock", detail: "Late-hour staffing compared with sales", status: "verified" },
+        { id: "ev-proof", label: "Night proof", source: "Manager", detail: "Pending after tonight's close", status: "needs_review" },
+      ],
+      rows: [
+        { label: "9-10 PM", current: "$1,140 sales / 5 staff", baseline: "$1,260 / 5", variance: "Watch", status: "watch" },
+        { label: "10-11 PM", current: "$610 sales / 5 staff", baseline: "$860 / 4", variance: "Risk", status: "risk" },
+        { label: "11-close", current: "$220 sales / 4 staff", baseline: "$410 / 3", variance: "Risk", status: "risk" },
+      ],
+      promptSuggestion: "Explain why the labor leak is the first action and what proof I should require tonight.",
+    };
+
+    const els = {
+      eyebrow: document.querySelector("#eyebrow"),
+      title: document.querySelector("#title"),
+      subtitle: document.querySelector("#subtitle"),
+      location: document.querySelector("#location"),
+      date: document.querySelector("#date"),
+      metrics: document.querySelector("#metrics"),
+      leakDot: document.querySelector("#leak-dot"),
+      leakTitle: document.querySelector("#leak-title"),
+      leakSummary: document.querySelector("#leak-summary"),
+      leakImpact: document.querySelector("#leak-impact"),
+      leakConfidence: document.querySelector("#leak-confidence"),
+      actionTitle: document.querySelector("#action-title"),
+      actionWhy: document.querySelector("#action-why"),
+      actionOwner: document.querySelector("#action-owner"),
+      actionDue: document.querySelector("#action-due"),
+      actionProof: document.querySelector("#action-proof"),
+      evidence: document.querySelector("#evidence"),
+      rows: document.querySelector("#rows"),
+      status: document.querySelector("#status"),
+      askButton: document.querySelector("#ask-button"),
+      refreshButton: document.querySelector("#refresh-button"),
+      tabs: Array.from(document.querySelectorAll(".tab")),
+    };
+
+    let snapshot = fallbackSnapshot;
+    let isBusy = false;
+    let bridgeAvailable = window.parent !== window;
+    let rpcId = 0;
+    const pendingRequests = new Map();
+
+    function clampText(value, fallback = "-") {
+      if (typeof value !== "string") return fallback;
+      const trimmed = value.trim();
+      return trimmed ? trimmed.slice(0, 800) : fallback;
+    }
+
+    function safeStatus(value) {
+      return ["good", "watch", "risk", "neutral"].includes(value) ? value : "neutral";
+    }
+
+    function createTextElement(tag, className, text) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      el.textContent = clampText(text);
+      return el;
+    }
+
+    function renderMetric(metric) {
+      const card = document.createElement("div");
+      card.className = "metric";
+      card.append(
+        createTextElement("div", "metric-label", metric?.label),
+        createTextElement("div", `metric-value status-text ${safeStatus(metric?.status)}`, metric?.value),
+        createTextElement("div", "metric-detail", metric?.detail)
+      );
+      return card;
+    }
+
+    function renderEvidence(item) {
+      const card = document.createElement("article");
+      card.className = "receipt";
+      const top = document.createElement("div");
+      top.className = "receipt-top";
+      const dot = document.createElement("span");
+      dot.className = `dot ${item?.status === "verified" ? "good" : "watch"}`;
+      top.append(dot, createTextElement("span", "", item?.label));
+      card.append(
+        top,
+        createTextElement("div", "receipt-source", item?.source),
+        createTextElement("div", "receipt-detail", item?.detail)
+      );
+      return card;
+    }
+
+    function renderRow(row) {
+      const tr = document.createElement("tr");
+      const values = [row?.label, row?.current, row?.baseline, row?.variance];
+      values.forEach((value, index) => {
+        const td = document.createElement("td");
+        if (index === 3) td.className = `status-text ${safeStatus(row?.status)}`;
+        td.textContent = clampText(value);
+        tr.appendChild(td);
+      });
+      return tr;
+    }
+
+    function render(next) {
+      if (!next || typeof next !== "object") return;
+      snapshot = next;
+      els.eyebrow.textContent = clampText(next.eyebrow);
+      els.title.textContent = clampText(next.title);
+      els.subtitle.textContent = clampText(next.subtitle);
+      els.location.textContent = clampText(next.locationAlias);
+      els.date.textContent = clampText(next.businessDate);
+
+      els.metrics.replaceChildren(...(Array.isArray(next.metrics) ? next.metrics.slice(0, 4).map(renderMetric) : []));
+
+      els.leakDot.className = `dot ${next.leak?.severity === "high" ? "risk" : next.leak?.severity === "medium" ? "watch" : "good"}`;
+      els.leakTitle.textContent = clampText(next.leak?.title);
+      els.leakSummary.textContent = clampText(next.leak?.summary);
+      els.leakImpact.textContent = clampText(next.leak?.dollarImpact);
+      const confidence = Number(next.leak?.confidence);
+      els.leakConfidence.textContent = Number.isFinite(confidence)
+        ? `${Math.round(Math.max(0, Math.min(1, confidence)) * 100)}% confidence`
+        : "Confidence unavailable";
+
+      els.actionTitle.textContent = clampText(next.action?.title);
+      els.actionWhy.textContent = clampText(next.action?.why);
+      els.actionOwner.textContent = clampText(next.action?.ownerRole);
+      els.actionDue.textContent = clampText(next.action?.due);
+      els.actionProof.textContent = clampText(next.action?.proofRequired);
+
+      els.evidence.replaceChildren(...(Array.isArray(next.evidence) ? next.evidence.slice(0, 6).map(renderEvidence) : []));
+      els.rows.replaceChildren(...(Array.isArray(next.rows) ? next.rows.slice(0, 8).map(renderRow) : []));
+
+      els.tabs.forEach((tab) => {
+        tab.setAttribute("aria-selected", String(tab.dataset.view === next.view));
+      });
+    }
+
+    function setBusy(busy, message) {
+      isBusy = busy;
+      els.tabs.forEach((tab) => { tab.disabled = busy; });
+      els.refreshButton.disabled = busy;
+      els.askButton.disabled = busy;
+      if (message) els.status.textContent = message;
+    }
+
+    function rpcNotify(method, params) {
+      window.parent.postMessage({ jsonrpc: "2.0", method, params }, "*");
+    }
+
+    function rpcRequest(method, params) {
+      return new Promise((resolve, reject) => {
+        const id = ++rpcId;
+        pendingRequests.set(id, { resolve, reject });
+        window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, "*");
+      });
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.source !== window.parent) return;
+      const message = event.data;
+      if (!message || message.jsonrpc !== "2.0") return;
+
+      if (message.id !== undefined && pendingRequests.has(message.id)) {
+        const pending = pendingRequests.get(message.id);
+        pendingRequests.delete(message.id);
+        if (message.error) pending.reject(message.error);
+        else pending.resolve(message.result);
+        return;
+      }
+
+      if (message.method === "ui/notifications/tool-result") {
+        const next = message.params?.structuredContent?.snapshot;
+        if (next) render(next);
+      }
+    }, { passive: true });
+
+    async function initializeBridge() {
+      if (!bridgeAvailable) return false;
+      try {
+        await rpcRequest("ui/initialize", {
+          appInfo: { name: "never86-operator-console", version: "0.1.0" },
+          appCapabilities: {},
+          protocolVersion: "2026-01-26",
+        });
+        rpcNotify("ui/notifications/initialized", {});
+        return true;
+      } catch (error) {
+        bridgeAvailable = false;
+        console.error("Never86 bridge initialization failed", error);
+        return false;
+      }
+    }
+
+    const bridgeReady = initializeBridge();
+
+    async function callView(view) {
+      if (isBusy) return;
+      const toolName = toolByView[view];
+      if (!toolName) return;
+
+      const ready = await bridgeReady;
+      if (!ready) {
+        els.status.textContent = "Standalone preview: open this widget inside ChatGPT to load other views.";
+        return;
+      }
+
+      setBusy(true, "Loading the next operator view...");
+      try {
+        const response = await rpcRequest("tools/call", { name: toolName, arguments: {} });
+        const next = response?.structuredContent?.snapshot;
+        if (next) {
+          render(next);
+          els.status.textContent = "View updated from a Never86 read-only MCP tool.";
+        } else {
+          els.status.textContent = "The tool returned no operator snapshot.";
+        }
+      } catch (error) {
+        console.error("Never86 tool call failed", error);
+        els.status.textContent = "Could not load that view. Try again in ChatGPT.";
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    els.tabs.forEach((tab) => {
+      tab.addEventListener("click", () => callView(tab.dataset.view));
+    });
+
+    els.refreshButton.addEventListener("click", () => callView(snapshot.view));
+
+    els.askButton.addEventListener("click", async () => {
+      if (isBusy) return;
+      const ready = await bridgeReady;
+      if (!ready) {
+        els.status.textContent = "Open this preview inside ChatGPT to continue the conversation.";
+        return;
+      }
+      setBusy(true, "Sending this operator question to ChatGPT...");
+      try {
+        const text = clampText(snapshot.promptSuggestion, "Explain this Never86 operator finding.");
+        await rpcRequest("ui/message", {
+          role: "user",
+          content: [{ type: "text", text }],
+        });
+        els.status.textContent = "Sent to the conversation.";
+      } catch (error) {
+        console.error("Never86 ui/message failed", error);
+        els.status.textContent = "Could not send the follow-up message.";
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    bridgeReady.then((ready) => {
+      if (!ready || typeof ResizeObserver !== "function") return;
+      const observer = new ResizeObserver(() => {
+        rpcNotify("ui/notifications/size-changed", {
+          width: document.documentElement.scrollWidth,
+          height: document.documentElement.scrollHeight,
+        });
+      });
+      observer.observe(document.body);
+    });
+
+    const compatibilitySnapshot = window.openai?.toolOutput?.snapshot;
+    render(compatibilitySnapshot || snapshot);
+  </script>
+</body>
+</html>
