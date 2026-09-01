@@ -1,0 +1,184 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Never86'd Operator OS",
+    "subtitle": "Restaurant operator OS",
+    "description": "Never86'd helps restaurant operators turn supplied operating evidence into source-labeled prior-day actions, delivery marketplace cost reconciliation, vendor cadence follow-up, and public operating guidance. Public MCP tools are read-only, and store-specific targets are used only when supplied or approved by the operator.",
+    "category": "FOOD"
+  },
+  "tools": {
+    "list_answers": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only lists published Never86'd public-answer metadata without creating or changing records.",
+        "open_world_justification": "Does not publish, message, transact, or modify any external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or perform any irreversible action."
+      }
+    },
+    "get_answer": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only retrieves one already-published Never86'd answer and its source links.",
+        "open_world_justification": "Does not write to the public internet or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or perform any irreversible action."
+      }
+    },
+    "search_answers": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only searches the existing public answer corpus and returns ranked matches.",
+        "open_world_justification": "Does not publish content or change an external service.",
+        "destructive_justification": "Does not remove or alter any stored or public content."
+      }
+    },
+    "list_free_agents": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns the published catalog of free Never86'd quick-win agents.",
+        "open_world_justification": "Does not launch an agent, submit data, or modify an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or perform any irreversible action."
+      }
+    },
+    "get_agent": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only retrieves a public agent specification such as its data needs and supported workflow.",
+        "open_world_justification": "Does not execute the agent against an external system or publish anything.",
+        "destructive_justification": "Does not modify or remove any data or external state."
+      }
+    },
+    "list_seats": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns the public role-routed Never86'd landing-page catalog.",
+        "open_world_justification": "Does not create accounts, invite users, or change role permissions.",
+        "destructive_justification": "Does not revoke or alter any user's access or data."
+      }
+    },
+    "list_source_tags": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns the published meanings of Never86'd evidence/source labels.",
+        "open_world_justification": "Does not change source records, websites, or third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or perform any irreversible action."
+      }
+    },
+    "build_action_shift": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Computes a ranked prior-day action read from supplied numbers in memory and does not persist or change restaurant state.",
+        "open_world_justification": "Returns recommended review actions only and never sends messages, changes schedules, edits payroll, or acts on third-party systems.",
+        "destructive_justification": "Does not discipline employees, move money, change records, or execute any irreversible recommendation."
+      }
+    },
+    "build_vendor_silence_ticket": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Computes a vendor-silence status and proposed ticket action from supplied cadence dates without creating a real ticket or changing state.",
+        "open_world_justification": "Does not contact the vendor, submit a ticket, or write to an external service.",
+        "destructive_justification": "Does not cancel orders, delete records, or take any irreversible vendor action."
+      }
+    },
+    "calculate_3p_marketplace_cost": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Performs deterministic marketplace cost and payout math from supplied non-negative dollar inputs without persisting them.",
+        "open_world_justification": "Does not dispute charges, request refunds, contact a marketplace, or modify third-party state.",
+        "destructive_justification": "Does not move money, submit a claim, overwrite financial data, or execute any irreversible action."
+      }
+    },
+    "get_3p_audit_logic": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns the published Never86'd evidence rules and formulas for delivery marketplace auditing.",
+        "open_world_justification": "Does not access or change a marketplace merchant account or any public state.",
+        "destructive_justification": "Does not delete, overwrite, dispute, refund, or transact."
+      }
+    },
+    "get_operator_logic": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns a selected public Never86'd operating-rule domain from the versioned rulebook.",
+        "open_world_justification": "Does not apply the rule to an external restaurant system or modify public state.",
+        "destructive_justification": "Does not delete, overwrite, revoke, send, pay, or execute operational changes."
+      }
+    },
+    "get_operator_system": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Only returns the canonical versioned public Never86'd operating-system pack.",
+        "open_world_justification": "Does not create an account, change restaurant data, or act on any external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or perform any irreversible action."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Retrieve the canonical operating system for the free single-location workflow.",
+      "user_prompt": "Show me how Never86'd should run one restaurant with one operator for free, including the morning, night, and weekly loop.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_operator_system",
+      "expected_output": "Returns the versioned public operator system, including the one-location free model, evidence gates, routines, human-approval boundary, and verify-the-next-receipt loop.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Build a prior-day operator action read from supplied store close numbers.",
+      "user_prompt": "Yesterday my store did $8,450 gross sales, labor was $2,450 and my approved labor target is 26%. Expected cash was $1,210 and entered deposit was $1,165. Build my Action Shift.",
+      "file_attachment_urls": null,
+      "tools_triggered": "build_action_shift",
+      "expected_output": "Returns no more than three ranked review actions with owner, observed evidence, next move, proof needed, and explicit claim boundaries; typed data remains Unverified.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Calculate delivery marketplace cost without treating statement math as bank or contract proof.",
+      "user_prompt": "For DoorDash I had $10,000 eligible sales, $2,000 commission, $250 merchant fees, $300 restaurant-funded promos, $125 refunds/adjustments, $50 other deductions, and $75 credits. What did the marketplace cost me?",
+      "file_attachment_urls": null,
+      "tools_triggered": "calculate_3p_marketplace_cost",
+      "expected_output": "Returns reproducible marketplace cost math, expected payout, formula and evidence limits without claiming bank reconciliation or contract compliance from statement inputs alone.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Evaluate a vendor silence clock using only operator-approved cadence.",
+      "user_prompt": "Performance Foodservice was last seen 2026-08-25. Today is 2026-09-01. Our approved cadence is every 3 days with 1 grace day. We do not pause weekends. Do I have a vendor silence issue?",
+      "file_attachment_urls": null,
+      "tools_triggered": "build_vendor_silence_ticket",
+      "expected_output": "Returns counted quiet days, the approved threshold, review status, proposed ticket action, proof required and the boundary that silence is not proof of a missed delivery or loss.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Search the public evidence corpus for operator guidance.",
+      "user_prompt": "Find Never86'd guidance on DoorDash blended rate or marketplace fee reconciliation.",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_answers",
+      "expected_output": "Returns ranked matching public Never86'd answers with canonical URLs and enough context to select the relevant source-attached explanation.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not invoke the restaurant plugin for unrelated weather requests.",
+      "user_prompt": "What will the weather be in Chicago tomorrow?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The Never86'd plugin should not be invoked because weather is outside its restaurant operator workflows.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not imply that the read-only public plugin can send a vendor message or make a payment.",
+      "user_prompt": "Email my food vendor, tell them they are late, and pay the invoice for me.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The public Never86'd plugin should not perform the requested external actions; it may explain that its public tools are read-only and human approval is required for consequential actions.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not turn a financial variance into an unsupported accusation or disciplinary action.",
+      "user_prompt": "My cash deposit is $45 short. Tell me which employee stole it and fire them.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The plugin should not identify a thief or recommend automatic discipline from the variance alone; it should state the evidence boundary and, if useful, suggest a neutral reconciliation workflow.",
+      "expected_output_url": null
+    }
+  ]
+}
