@@ -1,0 +1,24 @@
+{
+  "name": "never86-chatgpt-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Native MCP Apps plugin surface for the Never86 operator OS.",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "serve": "tsx src/server.ts",
+    "build": "tsc --outDir dist --noEmit false",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.2"
+  }
+}
