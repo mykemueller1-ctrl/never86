@@ -11,20 +11,21 @@
 ## Production endpoints
 
 - Website: `https://www.never86.ai`
+- Human-facing MCP install page: `https://www.never86.ai/mcp`
 - Existing compatibility MCP: `https://www.never86.ai/api/mcp`
-- ChatGPT submission MCP: `https://www.never86.ai/mcp`
+- ChatGPT submission MCP: `https://www.never86.ai/mcp/server`
 - Domain challenge: `https://www.never86.ai/.well-known/openai-apps-challenge`
 - Privacy: `https://www.never86.ai/privacy`
 - Terms: `https://www.never86.ai/terms`
 - Support: `https://www.never86.ai/support`
 
-`/mcp` is the standards-facing stateless Streamable HTTP endpoint. It reuses the mature v3 business logic from `/api/mcp`, adds MCP protocol-version negotiation, Origin validation, correct notification acknowledgements, `ping`, and transport-appropriate GET/DELETE behavior.
+`/mcp/server` is the standards-facing stateless Streamable HTTP endpoint. It reuses the mature v3 business logic from `/api/mcp`, adds MCP protocol-version negotiation, Origin validation, correct notification acknowledgements, `ping`, and transport-appropriate GET/DELETE behavior. The existing human-facing `/mcp` page remains unchanged.
 
 ## ChatGPT developer-mode test
 
 1. Deploy this branch to the production-capable Never86'd host or a stable HTTPS preview.
 2. In ChatGPT, enable Developer Mode under **Settings → Apps & Connectors → Advanced settings**.
-3. Create a new MCP app/connection using the deployed `/mcp` URL.
+3. Create a new MCP app/connection using the deployed `/mcp/server` URL.
 4. Refresh the connection after any MCP metadata change.
 5. Run initialization and inspect the 13 advertised tools.
 6. Call each high-value tool with valid and invalid inputs:
@@ -72,7 +73,7 @@ Suggested review fields:
 - Category: `FOOD`
 - Website: `https://www.never86.ai`
 - MCP type: Universal
-- MCP URL: `https://www.never86.ai/mcp`
+- MCP URL: `https://www.never86.ai/mcp/server`
 - Support URL: `https://www.never86.ai/support`
 - Privacy URL: `https://www.never86.ai/privacy`
 - Terms URL: `https://www.never86.ai/terms`
@@ -90,8 +91,8 @@ Import `chatgpt-app-submission.json` where the submission UI supports the Apps S
 ## Release order
 
 1. CI: lint + Vitest + Next production build.
-2. Deploy a stable HTTPS build containing `/mcp`, trust pages, and domain challenge route.
-3. Connect `/mcp` in ChatGPT Developer Mode and run the review cases.
+2. Deploy a stable HTTPS build containing `/mcp/server`, trust pages, and domain challenge route.
+3. Connect `/mcp/server` in ChatGPT Developer Mode and run the review cases.
 4. Set the OpenAI domain challenge token and verify the domain.
 5. Complete verified-publisher / Apps Management permissions in the OpenAI account if not already complete.
 6. Submit for review.
