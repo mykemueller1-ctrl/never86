@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { POST as legacyPost } from '@/app/api/mcp/route';
+import { POST as legacyPost } from '../../api/mcp/route';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
