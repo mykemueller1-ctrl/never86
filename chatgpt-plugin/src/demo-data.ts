@@ -166,7 +166,7 @@ const snapshots: Record<OperatorView, OperatorSnapshot> = {
       { label: "Next truck", value: "Tomorrow", status: "neutral", detail: "Demo supplier schedule" },
     ],
     leak: {
-      title: "Pickles project below service need before the next truck",
+      title: "Pickles are projected below service need before the next truck",
       severity: "high",
       summary: "Current on-hand plus open order is below projected demand, and the item has a recent 86 pattern in the demo history.",
       dollarImpact: "Service-risk flag",
