@@ -1,0 +1,39 @@
+{
+  "name": "never86-operator-os",
+  "version": "3.0.0",
+  "description": "Evidence-first restaurant operator intelligence for prior-day actions, marketplace cost reconciliation, vendor cadence, and source-attached operating guidance.",
+  "author": {
+    "name": "Never86'd",
+    "email": "myke@n86.app",
+    "url": "https://www.never86.ai"
+  },
+  "homepage": "https://www.never86.ai",
+  "repository": "https://github.com/mykemueller1-ctrl/never86",
+  "keywords": [
+    "restaurant",
+    "operator",
+    "operations",
+    "labor",
+    "marketplace",
+    "vendor",
+    "evidence"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Never86'd Operator OS",
+    "shortDescription": "Restaurant operator intelligence",
+    "longDescription": "Turn restaurant operating evidence into source-labeled calculations, a small ranked action queue, and the proof required to verify the next result. One location and one primary operator are the free launch path.",
+    "developerName": "Never86'd",
+    "category": "Food",
+    "capabilities": ["Read"],
+    "websiteURL": "https://www.never86.ai",
+    "privacyPolicyURL": "https://www.never86.ai/privacy",
+    "termsOfServiceURL": "https://www.never86.ai/terms",
+    "defaultPrompt": [
+      "Run my prior-day restaurant Action Shift from these numbers.",
+      "Audit this delivery marketplace statement without guessing.",
+      "Show me the Never86'd operating system for one free location."
+    ],
+    "brandColor": "#0066FF"
+  }
+}
