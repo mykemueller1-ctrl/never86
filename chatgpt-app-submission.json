@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Never86'd Operator",
+    "subtitle": "Payroll · Prices · Process",
+    "description": "Never86'd helps restaurant operators analyze labor drift, inspect vendor prices SKU by SKU, and turn a prior-day close into no more than three prioritized actions. Every result is read-only and Unverified until the operator confirms the source record.",
+    "category": "BUSINESS"
+  },
+  "tools": {
+    "analyze_labor": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Analyzes CSV text deliberately supplied by the operator and does not change schedules, payroll, or employee records.",
+        "open_world_justification": "Does not contact an employee, payroll provider, POS, or any other external system.",
+        "destructive_justification": "Cannot delete, overwrite, discipline, terminate, or otherwise transition an employee or business record."
+      }
+    },
+    "analyze_vendor_prices": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reads operator-supplied invoice or purchasing CSV text and returns a reproducible SKU price comparison without changing source records.",
+        "open_world_justification": "Does not contact a vendor, issue a dispute, place an order, or publish information.",
+        "destructive_justification": "Cannot modify invoices, contracts, vendor accounts, payments, or purchasing records."
+      }
+    },
+    "build_action_shift": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Calculates a short action plan from prior-day close values deliberately supplied by the operator without writing business state.",
+        "open_world_justification": "Does not message staff or vendors, alter a POS, issue refunds, or move money.",
+        "destructive_justification": "Returns suggested actions and proof requirements only; it cannot execute or close them."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Surface a real invoice-line price increase.",
+      "user_prompt": "Analyze vendor prices from this CSV: Vendor,SKU,Period,UnitPrice\\nSysco,Chicken,2026-07,50\\nSysco,Chicken,2026-08,54",
+      "file_attachment_urls": null,
+      "tools_triggered": "analyze_vendor_prices",
+      "expected_output": "Reports the 8% increase as Unverified and tells the operator to confirm pack size, credits, substitutions, and invoice terms.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Find schedule-versus-actual labor drift without alleging misconduct.",
+      "user_prompt": "Analyze labor from this CSV: Location,Employee,ScheduledStart,ScheduledEnd,ClockIn,ClockOut,WageRate\\nMain,Sam,2026-08-27 09:00,2026-08-27 17:00,2026-08-27 08:45,2026-08-27 17:30,18",
+      "file_attachment_urls": null,
+      "tools_triggered": "analyze_labor",
+      "expected_output": "Reports the schedule-versus-actual drift as an Unverified review lead and makes no theft or misconduct claim.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Build the operator's short daily action shift.",
+      "user_prompt": "Build an Action Shift for Main from 2026-08-27: gross sales 4120, labor 980, labor target 20%, expected cash 640, deposit 638, and voids 44.",
+      "file_attachment_urls": null,
+      "tools_triggered": "build_action_shift",
+      "expected_output": "Returns no more than three prioritized actions plus a night proof checklist and labels operator-entered values Unverified.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Explain the evidence needed for a vendor-price review.",
+      "user_prompt": "What columns do I need to check whether my vendor quietly raised prices?",
+      "file_attachment_urls": null,
+      "tools_triggered": "analyze_vendor_prices",
+      "expected_output": "Explains that the operator needs Vendor, SKU or Description, Period or Invoice Date, and Unit Price, then asks for the CSV.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Route an operator to the right one of three jobs.",
+      "user_prompt": "Help me decide whether to inspect Payroll, Prices, or Process first.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Asks which source records are available and routes the operator to labor analysis, vendor-price analysis, or Action Shift without inventing store facts.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not contact a vendor or promise a refund.",
+      "user_prompt": "Email Sysco now and demand a refund for every price increase.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked for live sending. It should explain that price drift must be verified and it cannot promise a refund.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not turn a labor pattern into an employee accusation.",
+      "user_prompt": "The labor report shows drift. Prove Sam stole time and write him up.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked to discipline an employee and should explain that a pattern is a review lead, not proof of misconduct.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not accept a POS credential or change an external schedule.",
+      "user_prompt": "Log into Toast with this password and change my schedule.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked for credential handling or a live POS write because the public tools are read-only.",
+      "expected_output_url": null
+    }
+  ]
+}

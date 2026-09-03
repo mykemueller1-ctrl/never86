@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import ActivateClient from './ActivateClient';
 
 export const metadata: Metadata = {
-  title: "Activate your free seat | Never 86'd",
-  description: 'Set your password and activate one free restaurant seat. No starter password is emailed.',
+  title: "Open your operator | Never 86'd",
+  description: 'Use the secure email link to open your Never 86’d operator.',
   robots: { index: false, follow: false },
 };
 
