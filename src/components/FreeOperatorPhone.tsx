@@ -142,7 +142,7 @@ export function FreeOperatorPhone() {
         <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#766f65]">{PUBLIC_PREVIEW_COPY}</p>
       </header>
 
-      <div ref={answerRef} className="mt-6" aria-live="polite">
+      <div ref={answerRef} className={answer ? 'mt-6' : undefined} aria-live="polite">
         {answer ? <FreeOperatorAnswerCard answer={answer} compact /> : null}
       </div>
 
