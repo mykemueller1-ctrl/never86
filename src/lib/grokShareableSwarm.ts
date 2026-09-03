@@ -51,6 +51,21 @@ export type SwarmConnector = {
   status: HarnessState;
 };
 
+export type FirstPartySeat = {
+  id: string;
+  name: string;
+  templatePath: string;
+  mapsToRole: string;
+  harnessStatus: HarnessState;
+};
+
+export type YoutubeDeskPointer = {
+  taskId: string;
+  config: string;
+  status: HarnessState;
+  installPublicBotdirectoryBots: false;
+};
+
 export type GrokShareableSwarm = {
   taskId: string;
   researchedAt: string;
@@ -66,6 +81,8 @@ export type GrokShareableSwarm = {
   catalogCounts: Record<string, number>;
   sources: { id: string; url: string; kind: string }[];
   recommended: ShareableBot[];
+  firstParty?: FirstPartySeat[];
+  youtubeDesk?: YoutubeDeskPointer;
   team: SwarmSeat[];
   connectors: SwarmConnector[];
   workflows: {

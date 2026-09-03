@@ -5,6 +5,7 @@
 
 export const KEYS_ACCESS_TASK_ID = 'keys-access-env-v1';
 export const XAI_API_BASE_DEFAULT = 'https://api.x.ai/v1';
+export const XAI_MODEL_DEFAULT = 'grok-4.6';
 export const PUBLIC_MCP_URL = 'https://www.never86.ai/api/mcp';
 export const PRIVATE_ORCHESTRATOR_MCP_URL = 'https://www.never86.ai/api/orchestrator/mcp';
 export const KEYS_ACCESS_DOC = 'docs/company/KEYS_ACCESS.md';
@@ -75,6 +76,15 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
     required: false,
     placeholder: 'https://api.x.ai/v1',
     setup: 'Leave unset unless pointing at a documented xAI endpoint.',
+  },
+  {
+    name: 'XAI_MODEL',
+    purpose: 'Override xAI chat-completions model. Defaults to grok-4.6. Not a secret.',
+    surfaces: ['vercel', 'local-env', 'cursor-factory'],
+    kind: 'public',
+    required: false,
+    placeholder: 'grok-4.6',
+    setup: 'Leave unset to use grok-4.6. YouTube desk and other Grok model callers share this default.',
   },
   {
     name: 'NEVER86_ORCHESTRATOR_TOKEN',
@@ -239,6 +249,11 @@ type EnvMap = Record<string, string | undefined>;
 export function xaiApiBase(env: EnvMap = process.env): string {
   const raw = env.XAI_API_BASE?.trim();
   return raw && raw.length > 0 ? raw.replace(/\/$/, '') : XAI_API_BASE_DEFAULT;
+}
+
+export function xaiModel(env: EnvMap = process.env): string {
+  const raw = env.XAI_MODEL?.trim();
+  return raw && raw.length > 0 ? raw : XAI_MODEL_DEFAULT;
 }
 
 export function inspectKeyPresence(

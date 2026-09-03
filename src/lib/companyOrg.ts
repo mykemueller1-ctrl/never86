@@ -1,4 +1,4 @@
-export const COMPANY_ORG_VERSION = '2.0.0';
+export const COMPANY_ORG_VERSION = '2.1.0';
 
 export type DepartmentId = 'sales' | 'gtm' | 'marketing' | 'social' | 'audit' | 'product';
 export type RoleTier = 'founder' | 'department_head' | 'specialist';
@@ -35,6 +35,7 @@ const PLAYBOOK_EARNED_AUTHORITY = 'docs/launch/earned-authority-outreach-pack.md
 const PLAYBOOK_SOCIAL = 'docs/launch/100-statement-social-pack.md';
 const PLAYBOOK_SOCIAL_OS = 'docs/gtm/social-bots/operating-system.md';
 const PLAYBOOK_GROK_SWARM = 'docs/company/grok-bots/WORKFLOW.md';
+const PLAYBOOK_YOUTUBE_DESK = 'docs/company/grok-bots/YOUTUBE_DESK.md';
 
 export const APPROVAL_GATES = [
   'external_email_send',
@@ -74,7 +75,7 @@ export const DEPARTMENTS: Department[] = [
     name: 'Grok Social Command',
     headId: 'social-head',
     mission: 'Run the daily social newsroom across X, LinkedIn, TikTok, Reels, Facebook, and Reddit: listen, draft, repurpose, queue, and learn while Myke remains the release gate.',
-    playbookRefs: [PLAYBOOK_SOCIAL_OS, PLAYBOOK_SOCIAL, PLAYBOOK_HUNTER, 'docs/company/OPERATOR_VOICE.md'],
+    playbookRefs: [PLAYBOOK_SOCIAL_OS, PLAYBOOK_SOCIAL, PLAYBOOK_HUNTER, PLAYBOOK_YOUTUBE_DESK, 'docs/company/OPERATOR_VOICE.md'],
   },
   {
     id: 'audit',
@@ -295,6 +296,90 @@ export const COMPANY_ROLES: CompanyRole[] = [
     outputs: ['daily social board', 'platform assignments', 'approval packet', 'Sentia handoff candidates', 'weekly learning'],
     prohibited: ['auto-posting', 'auto-DM', 'creating separate founder inboxes', 'publishing unsupported claims', 'copying identical captions across platforms'],
     approvalRequired: ['social_post', 'social_reply', 'dm_reply', 'permissioned_case_study_publish'],
+  },
+  {
+    id: 'youtube-hunt',
+    name: 'YouTube Hunt',
+    tier: 'specialist',
+    departmentId: 'social',
+    reportsTo: 'social-head',
+    job: 'Find public operator-pain YouTube videos and comments from the last 72 hours and score them with the hunter ICP rubric. Draft only.',
+    playbookRef: PLAYBOOK_YOUTUBE_DESK,
+    playbookSection: 'YouTube Hunt',
+    mcpFirstCall: ['get_operator_system', 'get_department_playbook', 'get_hunter_standup', 'list_answers'],
+    triggers: ['daily YouTube hunt', '72h operator-pain scan'],
+    outputs: ['scored video/comment finds', 'keep/drop reason', 'draft reply not posted'],
+    prohibited: [
+      'auto-uploading to YouTube',
+      'opening private CTAP or customer files',
+      'posting comments',
+      'installing public botdirectory bots',
+      'requesting portal credentials',
+    ],
+    approvalRequired: ['social_post', 'social_reply'],
+  },
+  {
+    id: 'youtube-script-cutter',
+    name: 'Script Cutter',
+    tier: 'specialist',
+    departmentId: 'social',
+    reportsTo: 'social-head',
+    job: 'Cut 30–45s YouTube Shorts scripts from published never86.ai/answers pages or Owner-1 permissioned proof only.',
+    playbookRef: PLAYBOOK_YOUTUBE_DESK,
+    playbookSection: 'Script Cutter',
+    mcpFirstCall: ['get_operator_system', 'list_answers', 'get_3p_audit_logic'],
+    triggers: ['Channel Producer names a source', 'new published /answers page'],
+    outputs: ['30-45s script', 'on-screen text', 'caption draft', 'AUDIT pin', 'UTM'],
+    prohibited: [
+      'auto-uploading to YouTube',
+      'opening private CTAP or customer files',
+      'using unpublished private numbers',
+      'installing public botdirectory bots',
+      'treating illustrative dollars as customer proof',
+    ],
+    approvalRequired: ['social_post', 'permissioned_case_study_publish'],
+  },
+  {
+    id: 'youtube-answer-film',
+    name: 'Answer Film',
+    tier: 'specialist',
+    departmentId: 'social',
+    reportsTo: 'social-head',
+    job: 'Write one talking-head film brief from exactly one published never86.ai/answers page.',
+    playbookRef: PLAYBOOK_YOUTUBE_DESK,
+    playbookSection: 'Answer Film',
+    mcpFirstCall: ['get_operator_system', 'list_answers', 'get_answer'],
+    triggers: ['Channel Producer assigns one slug'],
+    outputs: ['talking-head brief', 'caption draft', 'AUDIT pin', 'UTM'],
+    prohibited: [
+      'auto-uploading to YouTube',
+      'opening private CTAP or customer files',
+      'stitching two answers into one film',
+      'installing public botdirectory bots',
+      'using private store footage',
+    ],
+    approvalRequired: ['social_post'],
+  },
+  {
+    id: 'youtube-channel-producer',
+    name: 'Channel Producer',
+    tier: 'specialist',
+    departmentId: 'social',
+    reportsTo: 'social-head',
+    job: 'Assemble a weekly 3-video YouTube slate with caption, pinned AUDIT, and tracked UTM to never86.ai/audit. Drafts only until Myke approves.',
+    playbookRef: PLAYBOOK_YOUTUBE_DESK,
+    playbookSection: 'Channel Producer',
+    mcpFirstCall: ['get_operator_system', 'get_department_playbook', 'list_answers'],
+    triggers: ['Monday 9:00 AM America/Chicago slate', 'new Hunt/Cutter/Film drafts ready'],
+    outputs: ['3-video slate', 'captions', 'pinned AUDIT', 'tracked /audit URLs', 'approval card'],
+    prohibited: [
+      'auto-uploading to YouTube',
+      'opening private CTAP or customer files',
+      'publishing without Myke approve: Y on the exact asset',
+      'installing public botdirectory bots',
+      'logging into YouTube Studio',
+    ],
+    approvalRequired: ['social_post'],
   },
   {
     id: 'social-intelligence',
@@ -619,6 +704,7 @@ export function getDepartmentPlaybook(deptId: string) {
     hunterHandoff: 'docs/gtm/hunter-bots/handoff-to-sales.md',
     hunterUtm: 'docs/gtm/hunter-bots/utm-links.md',
     grokShareableSwarm: PLAYBOOK_GROK_SWARM,
+    youtubeDesk: PLAYBOOK_YOUTUBE_DESK,
   };
 }
 
@@ -653,7 +739,12 @@ export function getAllPlaybookRefs(): string[] {
   refs.add(PLAYBOOK_HUNTER_HUNT);
   refs.add(PLAYBOOK_HUNTER_QUERIES);
   refs.add(PLAYBOOK_GROK_SWARM);
+  refs.add(PLAYBOOK_YOUTUBE_DESK);
   refs.add('docs/company/grok-bots/SHAREABLE_CATALOG.md');
   refs.add('docs/company/grok-bots/API_KEYS.md');
+  refs.add('docs/company/grok-bots/templates/youtube-hunt.md');
+  refs.add('docs/company/grok-bots/templates/youtube-script-cutter.md');
+  refs.add('docs/company/grok-bots/templates/youtube-answer-film.md');
+  refs.add('docs/company/grok-bots/templates/youtube-channel-producer.md');
   return [...refs];
 }

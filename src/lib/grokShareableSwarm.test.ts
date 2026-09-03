@@ -55,6 +55,9 @@ describe('grok shareable swarm catalog', () => {
       expect(seat.queue.length).toBeGreaterThan(8);
       expect(seat.stopCondition.length).toBeGreaterThan(8);
     }
+    for (const item of pack.firstParty ?? []) {
+      expect(getRoleById(item.mapsToRole), item.mapsToRole).toBeDefined();
+    }
   });
 
   it('keeps API key names only — never embedded credential material', () => {
@@ -87,12 +90,17 @@ describe('grok shareable swarm catalog', () => {
     expect(summary.nextOwner.toLowerCase()).toContain('myke');
   });
 
-  it('keeps team seats inside the recommended bot ids', () => {
-    const ids = new Set(listRecommendedBots().map((bot) => bot.id));
+  it('keeps team seats inside recommended bot ids or first-party YouTube ids', () => {
+    const pack = getGrokShareableSwarm();
+    const ids = new Set([
+      ...listRecommendedBots().map((bot) => bot.id),
+      ...(pack.firstParty ?? []).map((item) => item.id),
+    ]);
     for (const seat of listSwarmTeam()) {
       for (const borrowed of seat.borrowedFrom) {
         expect(ids.has(borrowed), borrowed).toBe(true);
       }
     }
+    expect(pack.youtubeDesk?.installPublicBotdirectoryBots).toBe(false);
   });
 });

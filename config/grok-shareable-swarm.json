@@ -229,6 +229,42 @@
       "harnessStatus": "drafted"
     }
   ],
+  "firstParty": [
+    {
+      "id": "n86-youtube-hunt",
+      "name": "YouTube Hunt",
+      "templatePath": "docs/company/grok-bots/templates/youtube-hunt.md",
+      "mapsToRole": "youtube-hunt",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "n86-youtube-script-cutter",
+      "name": "Script Cutter",
+      "templatePath": "docs/company/grok-bots/templates/youtube-script-cutter.md",
+      "mapsToRole": "youtube-script-cutter",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "n86-youtube-answer-film",
+      "name": "Answer Film",
+      "templatePath": "docs/company/grok-bots/templates/youtube-answer-film.md",
+      "mapsToRole": "youtube-answer-film",
+      "harnessStatus": "drafted"
+    },
+    {
+      "id": "n86-youtube-channel-producer",
+      "name": "Channel Producer",
+      "templatePath": "docs/company/grok-bots/templates/youtube-channel-producer.md",
+      "mapsToRole": "youtube-channel-producer",
+      "harnessStatus": "drafted"
+    }
+  ],
+  "youtubeDesk": {
+    "taskId": "youtube-desk-swarm-v1",
+    "config": "config/youtube-desk-swarm.json",
+    "status": "drafted",
+    "installPublicBotdirectoryBots": false
+  },
   "team": [
     {
       "seatId": "n86-router",
@@ -289,6 +325,46 @@
       "allowedTools": ["existing X as Myke Grok Bot"],
       "stopCondition": "three creatives + approval card; never publish",
       "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-hunt",
+      "title": "YouTube Hunt",
+      "borrowedFrom": ["n86-youtube-hunt"],
+      "mapsToRole": "youtube-hunt",
+      "queue": "public YouTube operator-pain videos and comments, last 72 hours, ICP score",
+      "allowedTools": ["get_operator_system", "get_hunter_standup", "list_answers"],
+      "stopCondition": "draft scored finds only; no comment posted; no private files",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-script-cutter",
+      "title": "Script Cutter",
+      "borrowedFrom": ["n86-youtube-script-cutter"],
+      "mapsToRole": "youtube-script-cutter",
+      "queue": "30-45s Shorts from published /answers or Owner-1 permissioned proof",
+      "allowedTools": ["get_operator_system", "list_answers", "get_3p_audit_logic"],
+      "stopCondition": "script draft only; no YouTube upload",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-answer-film",
+      "title": "Answer Film",
+      "borrowedFrom": ["n86-youtube-answer-film"],
+      "mapsToRole": "youtube-answer-film",
+      "queue": "talking-head from exactly one never86.ai/answers page",
+      "allowedTools": ["get_operator_system", "list_answers", "get_answer"],
+      "stopCondition": "one page in, one talking-head draft out; no upload",
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-channel-producer",
+      "title": "Channel Producer",
+      "borrowedFrom": ["n86-youtube-channel-producer"],
+      "mapsToRole": "youtube-channel-producer",
+      "queue": "weekly 3-video slate, caption, pinned AUDIT, UTM to never86.ai/audit",
+      "allowedTools": ["get_operator_system", "get_department_playbook", "list_answers"],
+      "stopCondition": "approval card only; Myke publishes; no auto-upload",
+      "harnessStatus": "drafted"
     }
   ],
   "connectors": [
@@ -325,7 +401,7 @@
       "url": "https://api.x.ai/v1",
       "auth": "api-key",
       "secretEnv": ["XAI_API_KEY"],
-      "setup": "Create the key in the xAI console. Store only in approved secret storage. Do not put the key in a shareable bot, chat, or Git. Grok Bot itself is not this API.",
+      "setup": "Create the key in the xAI console. Store only in approved secret storage. Do not put the key in a shareable bot, chat, or Git. Default model grok-4.6 via https://api.x.ai/v1. Grok Bot itself is not this API.",
       "status": "drafted"
     },
     {
@@ -353,6 +429,14 @@
       "schedule": "on demand before adding any x.ai/bot link",
       "ownerSeat": "n86-watchtower",
       "promptRef": "docs/company/grok-bots/WORKFLOW.md",
+      "status": "drafted"
+    },
+    {
+      "id": "youtube-desk-weekly-slate",
+      "title": "YouTube Channel Producer weekly 3-video slate",
+      "schedule": "Monday 9:00 AM America/Chicago",
+      "ownerSeat": "n86-youtube-channel-producer",
+      "promptRef": "docs/company/CURSOR_AUTOMATIONS.md#8-youtube-channel-producer",
       "status": "drafted"
     }
   ]

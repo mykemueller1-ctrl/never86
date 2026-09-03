@@ -16,6 +16,20 @@ Existing Grok Bots (`X as Myke`, LinkedIn, TikTok, Facebook deferred) stay as th
 | Hunter Scanner | Lurk | Hunter Scanner | Public operator pain, 72 hours | Draft replies; humans send |
 | Clip Factory Scout | Socials Short-Form | Short-Form Studio | Daily 7:00 AM CT draft/render | Three creatives + approval card; never publish |
 
+## YouTube desk (first-party — do not borrow a public bot)
+
+Machine source: `config/youtube-desk-swarm.json`. Paste recipes, do not Add a grokbot.dev / bots.new listing. Owner-1 (Myke) is the only private-file door.
+
+| Seat | Company role | Queue | Stop |
+|---|---|---|---|
+| YouTube Hunt | youtube-hunt | Public YouTube videos/comments, 72h, ICP score | Draft finds; no comment posted |
+| Script Cutter | youtube-script-cutter | 30–45s Shorts from published `/answers` or Owner-1 permissioned proof | Script only; no upload |
+| Answer Film | youtube-answer-film | Talking-head from one `never86.ai/answers` page | One page; no private footage |
+| Channel Producer | youtube-channel-producer | Weekly 3-video slate, caption, pinned AUDIT, UTM to `/audit` | Approval card; Myke publishes |
+| Owner-1 | founder / Myke | Private CTAP, customer, employee, mailbox, Drive | YouTube seats never open these files |
+
+Publish gate: **drafts-only**. No auto-upload. Myke approves every publish.
+
 ## How to add a template to the desk (human)
 
 1. Open the `x.ai/bot/...` link from [SHAREABLE_CATALOG.md](SHAREABLE_CATALOG.md).  

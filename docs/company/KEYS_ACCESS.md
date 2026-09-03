@@ -45,10 +45,13 @@ Official env name is `XAI_API_KEY` ([xAI quickstart](https://docs.x.ai/developer
 export XAI_API_KEY="paste-from-console"
 # optional
 export XAI_API_BASE="https://api.x.ai/v1"
+export XAI_MODEL="grok-4.6"
 npm run keys:probe
 ```
 
 The probe calls `GET /v1/models` only. It does not send a chat completion and does not spend a generation. A 200 with a model list is `live-verified`. Missing key is `not-configured`. 401/403 is `unauthorized` — rotate only with new evidence.
+
+Chat completions, when a later job needs them, default to model **`grok-4.6`** at `https://api.x.ai/v1`. Override with public env `XAI_MODEL`. The only secret is `XAI_API_KEY`.
 
 Factory workers that only call public MCP do **not** need this key. Add it when a job must call the Grok model API from the app or a script.
 

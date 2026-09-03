@@ -14,7 +14,7 @@ https://www.never86.ai/audit?utm_source=SOURCE&utm_medium=hunter&utm_campaign=10
 
 | Param | Values |
 |---|---|
-| `utm_source` | `reddit` · `facebook` · `x` · `tiktok` · `linkedin` |
+| `utm_source` | `reddit` · `facebook` · `x` · `tiktok` · `linkedin` · `youtube` |
 | `utm_medium` | `hunter` (human-sent reply) · `organic` (Myke post) |
 | `utm_campaign` | `100_statement_audit` |
 | `utm_content` | `{platform}_{context}_{YYYYMMDD}_{n}` |
@@ -41,6 +41,11 @@ https://www.never86.ai/audit?utm_source=x&utm_medium=hunter&utm_campaign=100_sta
 **TikTok comment (brand account bio often easier — use same utm_content in bio link):**
 ```
 https://www.never86.ai/audit?utm_source=tiktok&utm_medium=hunter&utm_campaign=100_statement_audit&utm_content=tiktok_comment_20260825_1
+```
+
+**YouTube Channel Producer slate (organic, after Myke approve: Y — never auto-upload):**
+```
+https://www.never86.ai/audit?utm_source=youtube&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=youtube_answer_what_never86d_does_20260831_1
 ```
 
 ---

@@ -9,6 +9,7 @@ import {
   PUBLIC_MCP_URL,
   XAI_API_BASE_DEFAULT,
   XAI_API_KEY_NAME,
+  XAI_MODEL_DEFAULT,
   assertNoEmbeddedSecrets,
   catalogPresence,
   inspectKeyPresence,
@@ -17,6 +18,7 @@ import {
   probePublicMcp,
   probeXaiModels,
   xaiApiBase,
+  xaiModel,
 } from './keysAccess';
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -63,6 +65,13 @@ describe('keys access catalog', () => {
   it('defaults the xAI base and ignores blank overrides', () => {
     expect(xaiApiBase({})).toBe(XAI_API_BASE_DEFAULT);
     expect(xaiApiBase({ XAI_API_BASE: '  https://api.x.ai/v1/  ' })).toBe('https://api.x.ai/v1');
+  });
+
+  it('defaults the xAI model to grok-4.6 without treating the name as a secret', () => {
+    expect(XAI_MODEL_DEFAULT).toBe('grok-4.6');
+    expect(xaiModel({})).toBe('grok-4.6');
+    expect(xaiModel({ XAI_MODEL: '  grok-4.6  ' })).toBe('grok-4.6');
+    expect(KEYS_ACCESS_CATALOG.some((item) => item.name === 'XAI_MODEL' && item.kind === 'public')).toBe(true);
   });
 
   it('keeps .env.example and mcp.json free of live secrets and conflict markers', () => {

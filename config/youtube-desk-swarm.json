@@ -1,0 +1,178 @@
+{
+  "taskId": "youtube-desk-swarm-v1",
+  "researchedAt": "2026-08-31",
+  "status": "drafted",
+  "owner": "Grok command hub",
+  "nextOwner": "Myke — paste first-party recipes into Grok Bot desktop; do not publish or upload",
+  "desk": "youtube",
+  "reportsTo": "social-head",
+  "installPublicBotdirectoryBots": false,
+  "xai": {
+    "secretEnv": ["XAI_API_KEY"],
+    "baseUrl": "https://api.x.ai/v1",
+    "modelDefault": "grok-4.6",
+    "modelEnv": "XAI_MODEL",
+    "note": "Optional Grok model API only. Never commit the key. Grok Bot desktop uses the workspace login, not this env."
+  },
+  "privateFileDoor": {
+    "seatId": "owner-1",
+    "title": "Owner-1",
+    "holder": "Myke",
+    "rule": "Owner-1 is the only seat that may open private CTAP, customer, employee, mailbox, or Drive files. YouTube seats stay on public web, published never86.ai/answers, and Owner-1-released public-safe excerpts.",
+    "youtubeSeatsMayOpenPrivateFiles": false
+  },
+  "publishGate": {
+    "mode": "drafts-only",
+    "autoUploadYoutube": false,
+    "autoPost": false,
+    "autoInstallPublicBots": false,
+    "approver": "Myke",
+    "requiredApproval": "social_post",
+    "stopCondition": "Every YouTube publish, upload, pin, or caption change waits for Myke approve: Y on that exact asset."
+  },
+  "icp": {
+    "windowHours": 72,
+    "keepScore": 60,
+    "maxDraftsPerRun": 3,
+    "rubric": [
+      { "signal": "Says they own or run the restaurant (not corporate)", "points": 25 },
+      { "signal": "1–3 locations (indie, not franchise army)", "points": 25 },
+      { "signal": "Named pain: 3P fees, payout, promos, labor %, invoices, prime cost", "points": 20 },
+      { "signal": "Pizza, bar, QSR, full-service indie", "points": 10 },
+      { "signal": "Iowa, Midwest, Victor / On the Line lane", "points": 10 },
+      { "signal": "MarginEdge, R365, 7shifts, Toast, Square mentioned", "points": 10 },
+      { "signal": "Posted or commented in last 72 hours", "points": 10 }
+    ],
+    "drop": [
+      "DoorDash drivers, gig workers, dashers",
+      "Yelp reviewers, customers, food bloggers, mukbang",
+      "40+ unit chains, PE roll-ups, franchise corporate",
+      "Consultants selling software (unless asking for a client)",
+      "Marketplace employees or vendor reps",
+      "Anyone asking for portal passwords or posting full statements"
+    ]
+  },
+  "cta": {
+    "url": "https://www.never86.ai/audit",
+    "pinnedComment": "AUDIT",
+    "utm": {
+      "source": "youtube",
+      "medium": "organic",
+      "campaign": "100_statement_audit",
+      "contentPattern": "youtube_{context}_{YYYYMMDD}_{n}"
+    }
+  },
+  "seats": [
+    {
+      "seatId": "n86-youtube-hunt",
+      "title": "YouTube Hunt",
+      "mapsToRole": "youtube-hunt",
+      "kind": "first-party",
+      "borrowedFrom": [],
+      "templatePath": "docs/company/grok-bots/templates/youtube-hunt.md",
+      "queue": "Public operator-pain YouTube videos and comments from the last 72 hours, scored with the hunter ICP rubric",
+      "allowedTools": ["get_operator_system", "get_company_org", "get_department_playbook", "get_hunter_standup", "list_answers"],
+      "sources": ["public YouTube search", "public video comments"],
+      "stopCondition": "Draft scored finds only. No comments posted. No private files. No botdirectory install.",
+      "publishAllowed": false,
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-script-cutter",
+      "title": "Script Cutter",
+      "mapsToRole": "youtube-script-cutter",
+      "kind": "first-party",
+      "borrowedFrom": [],
+      "templatePath": "docs/company/grok-bots/templates/youtube-script-cutter.md",
+      "queue": "30–45s YouTube Shorts scripts from published never86.ai/answers pages or Owner-1 permissioned proof only",
+      "allowedTools": ["get_operator_system", "list_answers", "get_3p_audit_logic"],
+      "sources": ["https://www.never86.ai/answers", "Owner-1-released permissioned proof"],
+      "durationSeconds": { "min": 30, "max": 45 },
+      "stopCondition": "Script + on-screen text + caption draft only. No upload. No unpublished private numbers.",
+      "publishAllowed": false,
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-answer-film",
+      "title": "Answer Film",
+      "mapsToRole": "youtube-answer-film",
+      "kind": "first-party",
+      "borrowedFrom": [],
+      "templatePath": "docs/company/grok-bots/templates/youtube-answer-film.md",
+      "queue": "One talking-head film from exactly one published never86.ai/answers page",
+      "allowedTools": ["get_operator_system", "list_answers", "get_answer"],
+      "sources": ["one https://www.never86.ai/answers/{slug} page"],
+      "format": "talking-head",
+      "onePageRule": true,
+      "stopCondition": "One page in, one talking-head draft out. No montage of private store footage. No upload.",
+      "publishAllowed": false,
+      "harnessStatus": "drafted"
+    },
+    {
+      "seatId": "n86-youtube-channel-producer",
+      "title": "Channel Producer",
+      "mapsToRole": "youtube-channel-producer",
+      "kind": "first-party",
+      "borrowedFrom": [],
+      "templatePath": "docs/company/grok-bots/templates/youtube-channel-producer.md",
+      "queue": "Weekly 3-video slate with caption, pinned AUDIT, and tracked UTM to never86.ai/audit",
+      "allowedTools": ["get_operator_system", "get_department_playbook", "list_answers"],
+      "weeklySlateSize": 3,
+      "captionRequired": true,
+      "pinnedComment": "AUDIT",
+      "utmRequired": true,
+      "stopCondition": "Slate + approval card only. Myke approves every publish. No auto-upload.",
+      "publishAllowed": false,
+      "harnessStatus": "drafted"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "never86-operator-system",
+      "surface": "Grok Bot Plugins + Cursor MCP",
+      "url": "https://www.never86.ai/api/mcp",
+      "auth": "none-public-readonly",
+      "secretEnv": null,
+      "setup": "Add custom connector Never86'd Operator Intelligence. Call get_operator_system first. No restaurant login.",
+      "status": "live-verified"
+    },
+    {
+      "id": "xai-model-api",
+      "surface": "server-side only if a future worker needs Grok chat completions",
+      "url": "https://api.x.ai/v1",
+      "auth": "api-key",
+      "secretEnv": ["XAI_API_KEY"],
+      "modelDefault": "grok-4.6",
+      "setup": "Create the key in the xAI console. Store only in approved secret storage. Do not put the key in a shareable bot, chat, or Git. Default model grok-4.6.",
+      "status": "drafted"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "youtube-hunt-daily",
+      "title": "YouTube Hunt — 72h public operator pain",
+      "schedule": "Daily 8:00 AM America/Chicago",
+      "ownerSeat": "n86-youtube-hunt",
+      "promptRef": "docs/company/grok-bots/templates/youtube-hunt.md",
+      "status": "drafted"
+    },
+    {
+      "id": "youtube-slate-weekly",
+      "title": "YouTube Channel Producer — weekly 3-video slate",
+      "schedule": "Monday 9:00 AM America/Chicago",
+      "ownerSeat": "n86-youtube-channel-producer",
+      "promptRef": "docs/company/CURSOR_AUTOMATIONS.md#8-youtube-channel-producer",
+      "status": "drafted"
+    }
+  ],
+  "desktopPaste": {
+    "doc": "docs/company/grok-bots/YOUTUBE_DESK.md",
+    "recipes": [
+      "docs/company/grok-bots/templates/youtube-hunt.md",
+      "docs/company/grok-bots/templates/youtube-script-cutter.md",
+      "docs/company/grok-bots/templates/youtube-answer-film.md",
+      "docs/company/grok-bots/templates/youtube-channel-producer.md"
+    ],
+    "rule": "Paste into a first-party Grok Bot workspace. Do not Add a public grokbot.dev / bots.new / ShareGrokBots listing."
+  }
+}

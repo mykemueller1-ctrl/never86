@@ -27,7 +27,7 @@ Do not put any of those in a shareable bot, chat, PR, or this file's examples as
 
 | Need | Env / click | Setup |
 |---|---|---|
-| Optional Grok model API (not Grok Bot) | `XAI_API_KEY` | xAI console → approved secret storage → `https://api.x.ai/v1`. Grok Bot is a separate product. |
+| Optional Grok model API (not Grok Bot) | `XAI_API_KEY` | xAI console → approved secret storage → `https://api.x.ai/v1`. Default model `grok-4.6` (`XAI_MODEL` override is public, not a secret). Grok Bot is a separate product. YouTube desk seats do not need this key unless a later server-side worker calls completions. |
 | grokbot.dev discovery MCP | none | Grok Bot Plugins → `https://mcp.grokbot.dev/mcp`, credentials empty. Tools: `search_directory`, `whats_new`, `get_entry`, `list_collections`. Never auto-install. |
 | Gmail / Calendar / X | Cursor desktop Connect | Myke clicks Connect. Cloud agents cannot finish OAuth. |
 | Composio / Bland / Telnyx (only if a later job needs them) | vendor dashboard | Auth in the vendor UI. Never paste the key into bot chat. |
