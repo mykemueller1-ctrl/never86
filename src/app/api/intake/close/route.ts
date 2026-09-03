@@ -65,6 +65,7 @@ export async function POST(req: Request) {
 
   let persisted = false;
   let closeId: number | null = null;
+  let desk = ingested.desk;
   if (operator?.locationId) {
     try {
       const saved = await recordIntakeAndClose({
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
       });
       persisted = saved.persisted;
       closeId = saved.closeId;
+      desk = saved.desk;
     } catch {
       persisted = false;
     }
@@ -82,7 +84,7 @@ export async function POST(req: Request) {
 
   return NextResponse.json({
     success: true,
-    desk: ingested.desk,
+    desk,
     closeId,
     persisted,
     applySql: persisted ? undefined : 'Apply drizzle/0003_free_seat_intake.sql on Neon to keep the close overnight.',

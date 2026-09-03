@@ -2,7 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { seatCloses, seatIntakeEvents, seatProofs } from '../db/schema';
 import { neonConfigured } from './operatorActivation';
-import type { DeskClose } from './deskClose';
+import { mergeDeskCloses, type DeskClose } from './deskClose';
 import type { PdqReportFamily } from './pdqEodParse';
 import type { IntakeDocument } from './closeIntake';
 import { unattendedRoutineGate, type SuccessfulParse } from './unattendedRoutineGate';
@@ -18,8 +18,8 @@ export async function recordIntakeAndClose(input: {
   locationId: number;
   docs: IntakeDocument[];
   desk: DeskClose;
-}): Promise<{ closeId: number | null; persisted: boolean }> {
-  if (!neonConfigured()) return { closeId: null, persisted: false };
+}): Promise<{ closeId: number | null; persisted: boolean; desk: DeskClose }> {
+  if (!neonConfigured()) return { closeId: null, persisted: false, desk: input.desk };
   try {
     for (const doc of input.docs) {
       const parsed = describeDocumentParse(doc);
@@ -43,7 +43,7 @@ export async function recordIntakeAndClose(input: {
     }
 
     const existing = await db
-      .select({ id: seatCloses.id })
+      .select({ id: seatCloses.id, desk: seatCloses.desk })
       .from(seatCloses)
       .where(
         and(
@@ -54,12 +54,16 @@ export async function recordIntakeAndClose(input: {
       )
       .limit(1);
 
+    const desk = existing[0]?.desk
+      ? mergeDeskCloses(existing[0].desk as DeskClose, input.desk)
+      : input.desk;
+
     if (existing[0]) {
       await db
         .update(seatCloses)
-        .set({ desk: input.desk })
+        .set({ desk })
         .where(eq(seatCloses.id, existing[0].id));
-      return { closeId: existing[0].id, persisted: true };
+      return { closeId: existing[0].id, persisted: true, desk };
     }
 
     const inserted = await db
@@ -68,12 +72,12 @@ export async function recordIntakeAndClose(input: {
         operatorId: input.operatorId,
         locationId: input.locationId,
         businessDate: input.desk.businessDate || '1970-01-01',
-        desk: input.desk,
+        desk,
       })
       .returning({ id: seatCloses.id });
-    return { closeId: inserted[0]?.id ?? null, persisted: true };
+    return { closeId: inserted[0]?.id ?? null, persisted: true, desk };
   } catch (err) {
-    if (tableMissing(err)) return { closeId: null, persisted: false };
+    if (tableMissing(err)) return { closeId: null, persisted: false, desk: input.desk };
     throw err;
   }
 }

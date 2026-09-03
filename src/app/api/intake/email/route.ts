@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ingestCloseDocuments } from '@/lib/deskClose';
+import { describePdqEodPacket } from '@/lib/pdqEodPacket';
 import {
   isPdqEodSender,
   isPdqEodSubject,
@@ -100,6 +101,7 @@ export async function POST(req: Request) {
   }
 
   let persisted = false;
+  let desk = ingested.desk;
   if (operator?.locationId) {
     try {
       const saved = await recordIntakeAndClose({
@@ -109,15 +111,24 @@ export async function POST(req: Request) {
         desk: ingested.desk,
       });
       persisted = saved.persisted;
+      desk = saved.desk;
     } catch {
       persisted = false;
     }
   }
 
+  const packet = describePdqEodPacket({
+    businessDate: desk.businessDate,
+    landed: desk.families,
+  });
+
   return NextResponse.json({
     success: true,
-    businessDate: ingested.desk.businessDate,
-    families: ingested.desk.families,
+    businessDate: desk.businessDate,
+    families: desk.families,
+    missingFamilies: packet.missing,
+    complete: packet.complete,
+    exportPath: packet.exportPath,
     persisted,
   });
 }

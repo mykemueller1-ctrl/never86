@@ -168,8 +168,8 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
         <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED, marginBottom: 8 }}>Forward EOD to</p>
         <p className="font-mono" style={{ fontSize: 14, color: INK }}>{payload?.forwardTo || 'Sign in to see your close address.'}</p>
         <p style={{ fontSize: 13, color: MUTED, marginTop: 8 }}>
-          PDQ already mails ZReport_Summary, Void_Promo_Report, and Hourly_Sales_Report. Filename date is the business date.
-          Extra stores and seats are paid.
+          PDQ scheduled EOD should attach ZReport_Summary, Void_Promo_Report, and Hourly_Sales_Report in one email. Filename date is the business date.
+          A Void-only message is Missing Evidence — export the native Z and Hourly PDFs from PDQ Reports. Do not type dollars. Extra stores and seats are paid.
         </p>
       </div>
 
