@@ -134,7 +134,7 @@ export default function AuditCampaignPage() {
                 <p className="compass-eyebrow">— Request received</p>
                 <h2 className="compass-display mt-4 text-4xl">Now bring the file.</h2>
                 <p className="compass-body mt-4 text-lg">{message}</p>
-                <a href={`mailto:mykemueller1@gmail.com?subject=${emailSubject}`} onClick={() => trackEvent('audit_campaign_mailto_click', { meta: { platform, ...attribution } })} className="btn-primary mt-7 w-full" style={{ background: '#0066ff' }}>Email my statement →</a>
+                <a href={`mailto:hello@never86.ai?subject=${emailSubject}`} onClick={() => trackEvent('audit_campaign_mailto_click', { meta: { platform, ...attribution } })} className="btn-primary mt-7 w-full" style={{ background: '#0066ff' }}>Email my statement →</a>
                 <p className="mt-4 text-xs leading-relaxed text-[#86868b]">Never send portal credentials. Redact private guest, bank, card, tax, and credential data while keeping the statement dates, financial rows, and payout references visible.</p>
               </div>
             ) : (

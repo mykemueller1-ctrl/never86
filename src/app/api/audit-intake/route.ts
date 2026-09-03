@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { captureLead } from '@/lib/leadCapture';
-import { getOwnerEmail, sendAuditIntakeEmail, sendNotification } from '@/lib/email';
-import { escapeHtml } from '@/lib/escapeHtml';
+import {
+  deliverPublicLead,
+  publicLeadHttpStatus,
+} from '@/lib/publicLeadIntake';
 
 const auditIntakeInput = z.object({
   email: z.string().trim().email(),
@@ -16,10 +17,6 @@ const auditIntakeInput = z.object({
   utmCampaign: z.string().trim().max(160).optional(),
   utmContent: z.string().trim().max(160).optional(),
 });
-
-function safeSubjectLabel(value: string): string {
-  return value.replace(/[\r\n]+/g, ' ').trim().slice(0, 160);
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,84 +34,49 @@ export async function POST(req: NextRequest) {
 
     const sourcePage = input.sourcePage ?? req.headers.get('referer') ?? '/audit';
 
-    await captureLead({
+    const result = await deliverPublicLead({
+      kind: 'audit_request',
       email: input.email,
       name: input.name,
       restaurantName: input.restaurantName,
       units,
       role: 'Restaurant operator',
       sourcePage,
-      requestedAgent: 'Marketplace Audit',
-      interestedAgent: `${input.platform} Marketplace Audit`,
-      dataPreference: 'Reply by email with one redacted statement',
-      referrer: req.headers.get('referer') ?? undefined,
-      userAgent: req.headers.get('user-agent') ?? undefined,
-      ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? undefined,
+      platform: input.platform,
       utm: {
         source: input.utmSource,
         medium: input.utmMedium,
         campaign: input.utmCampaign,
+        content: input.utmContent,
       },
     });
 
-    const ownerEmail = getOwnerEmail();
-    const sourceDetails = [
-      input.utmSource && `Source: ${escapeHtml(input.utmSource)}`,
-      input.utmMedium && `Medium: ${escapeHtml(input.utmMedium)}`,
-      input.utmCampaign && `Campaign: ${escapeHtml(input.utmCampaign)}`,
-      input.utmContent && `Content: ${escapeHtml(input.utmContent)}`,
-    ]
-      .filter(Boolean)
-      .join('<br/>');
-
-    const subjectLabel = safeSubjectLabel(
-      input.restaurantName || input.name || input.email
-    );
-
-    const [leadEmail, ownerNotification] = await Promise.allSettled([
-      sendAuditIntakeEmail(input.email, input.name),
-      sendNotification(
-        ownerEmail,
-        `Free audit request · ${subjectLabel}`,
-        `<p><strong>${escapeHtml(input.name || 'A restaurant operator')}</strong> requested a free ${escapeHtml(input.platform)} audit.</p>
-         <p>Email: ${escapeHtml(input.email)}<br/>
-         ${input.restaurantName ? `Restaurant: ${escapeHtml(input.restaurantName)}<br/>` : ''}
-         ${units ? `Units: ${units}<br/>` : ''}
-         Platform: ${escapeHtml(input.platform)}<br/>
-         ${sourceDetails ? `${sourceDetails}<br/>` : ''}
-         Page: ${escapeHtml(sourcePage)}</p>
-         <p><strong>Next move:</strong> Wait for the operator to reply with the redacted statement, then run the audit and return the receipt.</p>`
-      ),
-    ]);
-
-    if (ownerNotification.status === 'rejected') {
-      console.error('Audit owner notification failed:', ownerNotification.reason);
-    }
-
-    const emailSent = leadEmail.status === 'fulfilled';
-    if (!emailSent) {
-      console.error('Audit intake email failed:', leadEmail.reason);
+    if (!result.ok) {
+      return NextResponse.json(
+        { success: false, emailSent: false, error: result.error, code: result.code },
+        { status: publicLeadHttpStatus(result) },
+      );
     }
 
     return NextResponse.json({
       success: true,
-      emailSent,
-      message: emailSent
-        ? 'Check your inbox. Reply to Myke with one redacted marketplace statement.'
-        : 'Your request is in. Email one redacted marketplace statement to mykemueller1@gmail.com.',
+      emailSent: result.operatorEmailed,
+      ownerNotified: result.ownerNotified,
+      persisted: result.persisted,
+      message: result.confirmation,
     });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Check the form and try again.' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error('Audit intake error:', error);
     return NextResponse.json(
       { success: false, error: 'Unable to submit audit request.' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
