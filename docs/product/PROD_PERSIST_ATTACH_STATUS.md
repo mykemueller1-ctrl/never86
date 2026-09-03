@@ -3,7 +3,7 @@
 **Task:** `prod-persist-attach-v1`  
 **State:** **live-verified** on `www.never86.ai`. No deploy-config change. No secret written. Staff login stays fail-closed.
 
-Probed 2026-09-01 ~02:40 UTC by cloud worker `bc-b20d38ab` on `cursor/never86-prod-persist-attach-v1-871d`. Not Myke's computer.
+Re-probed 2026-09-03 ~05:28 UTC by cloud worker `bc-b20d38ab` on `cursor/never86-prod-persist-attach-v1-871d`. First probe 2026-09-01 ~02:40 UTC. Not Myke's computer.
 
 ## What is true
 
@@ -13,11 +13,11 @@ Probed 2026-09-01 ~02:40 UTC by cloud worker `bc-b20d38ab` on `cursor/never86-pr
 | GitHub CI on that SHA | `verify` success run `33442983311` | **tested** |
 | Real Vercel project (CI) | `https://vercel.com/mykes-projects-6f549d7f/never86/5X2TR5EixFY4jn17neLAk14cu2sn` | **deployed** |
 | GitHub Production deployment | id `6190212314`, SHA `c57d5d13`, state `success` (21:46 UTC) | **deployed** |
-| Public route | `GET https://www.never86.ai/api/persist-health` → HTTP 200 `application/json`, `x-matched-path: /api/persist-health` | **live-verified** |
+| Public `www` | `GET https://www.never86.ai/api/persist-health` → HTTP 200 JSON | **live-verified** |
+| Apex + `never86.vercel.app` | same JSON; `release.txt` = `c57d5d13` | **live-verified** |
 | Body shape | keys exactly `{ databaseUrlPresent }` | **live-verified** |
 | Presence boolean | `{ "databaseUrlPresent": true }` | **live-verified** |
-| Apex host | `https://never86.ai/api/persist-health` → 307 to `www` | **live-verified** |
-| Staff login stays closed | `POST /api/staff/login` → 503; body does not contain a connection string | **live-verified** |
+| Staff login stays closed | `POST /api/staff/login` → 503; body has no connection string | **live-verified** |
 
 No URL value was printed, logged, or committed. The health route never echoes `DATABASE_URL`.
 
@@ -32,13 +32,15 @@ No URL value was printed, logged, or committed. The health route never echoes `D
 - Did not set `STAFF_SEAT_LOGIN_ENABLED` (and did not set it `true`).
 - Did not write production env. Cloud agent environment has **no** `DATABASE_URL`, `VERCEL_TOKEN`, or Neon API key. Production already reports `databaseUrlPresent: true`, so no attach was required.
 
-The stale “today it 404s” claim was **false** by the time this worker probed. `#178` had already produced a successful Production deploy on `mykes-projects-6f549d7f/never86`.
+The stale “today it 404s” claim was **false** on both probes. `#178` already produced a successful Production deploy on `mykes-projects-6f549d7f/never86`.
 
 ## Blockers
 
 None for persist-health itself.
 
 If a later job must *change* production env: this cloud agent cannot write Vercel env on the real project (MCP is the hobby `compass` team only; no production Vercel/Neon credential in the agent env). Name the missing env. Do not invent a value.
+
+GitHub `default_branch` is still `recovery-apr12`. Production `release.txt` is `main` @ `c57d5d13`. Do not treat the default branch as the live site. Changing the default branch is a separate human gate.
 
 ## Next owner
 
