@@ -3,7 +3,8 @@
 **When:** 2026-09-03  
 **Branch:** `cursor/never86-youtube-desk-swarm-v1-191d`  
 **Merged:** PR `#179` at `5d429207fd569c4b02c15573e933670a8078bfbd` (2026-09-03 05:56 UTC)  
-**Follow-up:** first weekly slate drafted on this branch (not uploaded)
+**Follow-up PR:** https://github.com/mykemueller1-ctrl/never86/pull/183 (draft) at `10c29a4`  
+**Tests:** Vitest 28/28 on slate + swarm + org + UTM.
 
 ## Honest states
 
