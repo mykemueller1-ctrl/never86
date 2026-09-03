@@ -4,6 +4,7 @@ import {
   deliverPublicLead,
   publicLeadHttpStatus,
 } from '@/lib/publicLeadIntake';
+import { databaseUrlPresent } from '@/lib/persistHealth';
 
 const waitlistInput = z.object({
   email: z.string().email(),
@@ -25,6 +26,8 @@ export async function POST(req: NextRequest) {
     const unitsNum = typeof data.units === 'number' ? data.units : data.units ? Number(data.units) || null : null;
     const sourcePage = data.sourcePage ?? req.headers.get('referer') ?? undefined;
 
+    // Email-first public lead. Neon persist is optional and fail-closed when
+    // DATABASE_URL is missing (see persistHealth.databaseUrlPresent).
     const result = await deliverPublicLead({
       kind: 'waitlist',
       email: data.email,
@@ -50,7 +53,7 @@ export async function POST(req: NextRequest) {
       success: true,
       emailSent: result.operatorEmailed,
       ownerNotified: result.ownerNotified,
-      persisted: result.persisted,
+      persisted: Boolean(result.persisted && databaseUrlPresent()),
       message: result.confirmation,
     });
   } catch (error: unknown) {

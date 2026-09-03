@@ -9,7 +9,7 @@ import {
   sendNotification,
   sendWelcomeEmail,
 } from './email';
-import { neonConfigured } from './operatorActivation';
+import { databaseUrlPresent } from './persistHealth';
 
 export type PublicLeadKind = 'audit_request' | 'waitlist' | 'trial_claim';
 
@@ -123,7 +123,7 @@ export function publicLeadConfirmation(input: PublicLeadInput, operatorEmailed: 
 
 /** Neon waitlist write. Fail-closed when DATABASE_URL is missing. Never fakes a write. */
 export async function persistPublicLeadToNeon(input: PublicLeadInput): Promise<boolean> {
-  if (!neonConfigured()) return false;
+  if (!databaseUrlPresent()) return false;
   try {
     await db.insert(waitlist).values({
       email: input.email.toLowerCase().trim(),
