@@ -19,7 +19,7 @@ export async function sendWelcomeEmail(email: string, name?: string) {
   return getResend().emails.send({
     from: 'Never 86\'d <hello@never86.ai>',
     to: email,
-    subject: 'You\'re on the list — Never 86\'d is coming',
+    subject: 'Your free owner seat is reserved — Never 86\'d',
     html: `
 <!DOCTYPE html>
 <html>
@@ -31,18 +31,19 @@ export async function sendWelcomeEmail(email: string, name?: string) {
       Hey ${firstName},
     </p>
     <p style="color:#ffffff;font-size:16px;line-height:1.6;">
-      You're in. We're building the ops platform that independent restaurant owners actually need —
-      not another tool that makes your tech stack worse.
+      Your free owner seat is reserved. We built Never 86'd for hospitality owners first —
+      not for another bloated stack or another dashboard nobody trusts.
     </p>
     <p style="color:#ffffff;font-size:16px;line-height:1.6;">
-      Never 86'd reads your invoices, processes your Z-reports, and sends you a morning briefing
-      with your real numbers — food cost, prime cost, check average — before you even walk in the door.
+      One location plus seat 1 is free, and seat 1 is the owner seat. When you add seat 2,
+      seat 3, or more people later, those become paid seats.
     </p>
     <p style="color:#ffffff;font-size:16px;line-height:1.6;">
-      No spreadsheets. No manual data entry. No counting inventory on your day off.
+      Never 86'd reads invoices, normalizes Z/POS and 3P proof, and sends the owner the one
+      action that matters before the shift starts.
     </p>
     <p style="color:#b0b0b0;font-size:14px;line-height:1.6;margin-top:32px;">
-      We'll reach out when your spot is ready.<br/>
+      We'll reach out with next steps for your owner seat.<br/>
       — Myke, founder of Never 86'd
     </p>
     <div style="border-top:1px solid #303030;margin-top:40px;padding-top:16px;">

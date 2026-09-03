@@ -12,7 +12,7 @@ const waitlistInput = z.object({
   role: z.string().optional(),
 });
 
-// POST /api/waitlist — Join the waitlist
+// POST /api/waitlist — Reserve an owner seat / join the list
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       .returning();
 
     if (!entry) {
-      return NextResponse.json({ success: true, message: 'Already on the list!' });
+      return NextResponse.json({ success: true, message: 'Your owner seat is already reserved.' });
     }
 
     // Send welcome email
@@ -35,11 +35,11 @@ export async function POST(req: NextRequest) {
     // Notify Myke
     await sendNotification(
       process.env.OWNER_EMAIL || 'myke@n86.app',
-      `New waitlist signup: ${data.name || data.email}`,
-      `<strong>${data.name || 'Someone'}</strong> just joined the Never 86'd waitlist.<br/><br/>
+      `New owner seat signup: ${data.name || data.email}`,
+      `<strong>${data.name || 'Someone'}</strong> just reserved the free owner seat on Never 86&apos;d.<br/><br/>
        Email: ${data.email}<br/>
        ${data.restaurantName ? `Restaurant: ${data.restaurantName}<br/>` : ''}
-       ${data.role ? `Role: ${data.role}` : ''}`
+       ${data.role ? `Role: ${data.role}` : 'Role: owner'}`
     );
 
     // Mark welcome email as sent
@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
       .set({ welcomeEmailSent: true })
       .where(eq(waitlist.id, entry.id));
 
-    return NextResponse.json({ success: true, message: 'You\'re on the list!' });
+    return NextResponse.json({ success: true, message: 'Your free owner seat is reserved.' });
   } catch (error: any) {
     if (error.code === '23505') {
-      return NextResponse.json({ success: true, message: 'Already on the list!' });
+      return NextResponse.json({ success: true, message: 'Your owner seat is already reserved.' });
     }
     console.error('Waitlist error:', error);
     return NextResponse.json(
