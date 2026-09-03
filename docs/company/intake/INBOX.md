@@ -2,13 +2,13 @@
 
 **HQ chat:** [Cursor agents: You talk, I run](https://grok.com/project/d3f103b5-2add-4fc1-9cd7-aabbc6a3484f?chat=3f690a7c-b2e5-4101-be38-89cc8b5df3f6)
 **Mind dump:** `docs/company/MYKE_MIND_DUMP_60_90_DAYS.md`  
-**Last updated:** 2026-08-31 4:50 PM CT
+**Last updated:** 2026-09-03 1:15 AM CT
 
 ## Status
 
 | Job | Status | Intake file |
 |---|---|---|
-| **YouTube desk swarm v1** | **DRAFTED IN PR** | [2026-08-31-youtube-desk-swarm.md](2026-08-31-youtube-desk-swarm.md) — Four first-party draft-only seats + Owner-1 private-file door. No public botdirectory install. No YouTube upload. `XAI_API_KEY` name only, model `grok-4.6`. |
+| **YouTube desk swarm v1** | **MERGED #179 — SLATE DRAFTED** | [2026-08-31-youtube-desk-swarm.md](2026-08-31-youtube-desk-swarm.md) · first slate [../grok-bots/batches/2026-09-03-youtube-slate.md](../grok-bots/batches/2026-09-03-youtube-slate.md). MCP org 2.1.0 live. Desk not pasted. No upload. All assets `approve: N`. |
 | **Command-center specialist swarm v1** | **MERGING NOW** | [2026-08-30-command-center-swarm.md](2026-08-30-command-center-swarm.md) — Store + company specialists, 10 CSV-first free agents, Sample Store One Action Shift, `/action-shift/swarm`. No send, no portal login |
 | **Shareable Grok Bot swarm** | **MERGED #172** | [2026-08-30-grok-shareable-86-swarm.md](2026-08-30-grok-shareable-86-swarm.md) — 15 ranked public bots; no branded 86 operator exists; team/workflow/API notes in `docs/company/grok-bots/`. Not added to the live desk. |
 | **Desktop / Chrome / app standing order** | **DONE** | [2026-08-28-desktop-computer-auth.md](2026-08-28-desktop-computer-auth.md) — Myke authorized app/Chrome/desktop use for owned jobs. Cloud agents still cannot take over local Chrome. Gmail/Calendar/X MCP need one Connect click. No accounts created. |

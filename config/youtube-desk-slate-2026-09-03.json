@@ -1,0 +1,70 @@
+{
+  "taskId": "youtube-desk-swarm-v1",
+  "slateId": "youtube-slate-2026-09-03",
+  "weekOf": "2026-09-03",
+  "status": "drafted",
+  "owner": "Channel Producer",
+  "nextOwner": "Myke — approve or rewrite each asset; do not upload until approve: Y",
+  "publishGate": {
+    "mode": "drafts-only",
+    "autoUploadYoutube": false,
+    "approver": "Myke",
+    "requiredApproval": "social_post"
+  },
+  "privateFileDoor": "owner-1",
+  "huntWindow": {
+    "hours": 72,
+    "from": "2026-09-01",
+    "to": "2026-09-03",
+    "verifiedKeeps": 0,
+    "note": "No public YouTube operator-pain video or comment was verified inside the 72-hour window. Hunt-informed Short uses a published /answers page, not a invented comment thread."
+  },
+  "drops": [
+    {
+      "url": "https://www.youtube.com/watch?v=Gm7AXgpN4Uo",
+      "reason": "Voosh vendor pitch from 2025-03-03 — stale, software seller, recovery claim. Score 0."
+    }
+  ],
+  "videos": [
+    {
+      "n": 1,
+      "seatId": "n86-youtube-hunt",
+      "kind": "hunt-informed-short",
+      "title": "Commission is not the whole 3P bill",
+      "sourceKind": "published-answers",
+      "sourceUrl": "https://www.never86.ai/answers/calculate-true-third-party-delivery-cost",
+      "durationSeconds": 40,
+      "pinnedComment": "AUDIT",
+      "utmContent": "youtube_hunt_3p_cost_20260903_1",
+      "auditUrl": "https://www.never86.ai/audit?utm_source=youtube&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=youtube_hunt_3p_cost_20260903_1",
+      "approve": "N"
+    },
+    {
+      "n": 2,
+      "seatId": "n86-youtube-script-cutter",
+      "kind": "script-cutter-short",
+      "title": "Audit DoorDash without a portal login",
+      "sourceKind": "published-answers",
+      "sourceUrl": "https://www.never86.ai/answers/audit-doordash-fees-without-portal-login",
+      "durationSeconds": 40,
+      "pinnedComment": "AUDIT",
+      "utmContent": "youtube_short_audit_doordash_fees_without_portal_login_20260903_1",
+      "auditUrl": "https://www.never86.ai/audit?utm_source=youtube&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=youtube_short_audit_doordash_fees_without_portal_login_20260903_1",
+      "approve": "N"
+    },
+    {
+      "n": 3,
+      "seatId": "n86-youtube-answer-film",
+      "kind": "answer-film",
+      "title": "What Never86'd does",
+      "sourceKind": "published-answers",
+      "sourceUrl": "https://www.never86.ai/answers/what-never86d-does",
+      "format": "talking-head",
+      "onePageRule": true,
+      "pinnedComment": "AUDIT",
+      "utmContent": "youtube_answer_what_never86d_does_20260903_1",
+      "auditUrl": "https://www.never86.ai/audit?utm_source=youtube&utm_medium=organic&utm_campaign=100_statement_audit&utm_content=youtube_answer_what_never86d_does_20260903_1",
+      "approve": "N"
+    }
+  ]
+}

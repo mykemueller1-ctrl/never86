@@ -1,36 +1,31 @@
 # Harness report — youtube-desk-swarm-v1
 
-**When:** 2026-08-31  
-**From:** Cursor factory worker on `cursor/never86-youtube-desk-swarm-v1-191d`  
-**Commit:** `eb964978b3a59a4e96620e4c5f8ea184c4e7691b`  
-**PR:** https://github.com/mykemueller1-ctrl/never86/pull/179 (draft, unmerged)  
-**Tests:** Vitest 371/371 across `src/lib` (includes YouTube desk, shareable swarm, companyOrg, keysAccess, hunterUtm).  
-**State:** drafted → tested in this PR. Not merged. Not deployed. Not live-verified on the Grok Bot desk.
+**When:** 2026-09-03  
+**Branch:** `cursor/never86-youtube-desk-swarm-v1-191d`  
+**Merged:** PR `#179` at `5d429207fd569c4b02c15573e933670a8078bfbd` (2026-09-03 05:56 UTC)  
+**Follow-up PR:** https://github.com/mykemueller1-ctrl/never86/pull/183 (draft) at `10c29a4`  
+**Tests:** Vitest 28/28 on slate + swarm + org + UTM.
 
-## Outcome
-
-Added a first-party YouTube desk to the Never86 Grok shareable swarm docs/config. Four draft-only seats: YouTube Hunt, Script Cutter, Answer Film, Channel Producer. Owner-1 stays the only private-file door. No public botdirectory bot was installed. No YouTube upload. No secret was written.
-
-## What is harnessed (honest states)
+## Honest states
 
 | Item | State |
 |---|---|
-| YouTube seat map + swarm JSON | drafted → tested in this PR |
-| Four Grok Bot desktop paste recipes | drafted in Git — not pasted into live workspaces |
-| `youtube-hunt` / `youtube-script-cutter` / `youtube-answer-film` / `youtube-channel-producer` org roles | drafted in `companyOrg` — live on MCP only after merge + deploy |
-| Cursor automation §8 weekly slate | drafted in docs |
-| Grok Bot Routine enablement | not live-verified |
-| YouTube upload / pin / caption | blocked — drafts-only publish gate |
-| Public grokbot.dev / bots.new install | not done — forbidden for this desk |
-| `XAI_API_KEY` | not created; name only. Default model `grok-4.6` at `https://api.x.ai/v1` |
-| Public operator MCP | already live-verified |
+| Seat map + swarm JSON | **merged** via `#179` |
+| Company org YouTube roles | **live-verified** on public MCP `2.1.0` (`get_department_playbook` social lists all four seats) |
+| Four Grok Bot desktop paste recipes | drafted in Git — **not pasted** into live workspaces |
+| First 3-video slate | **drafted** `batches/2026-09-03-youtube-slate.md` — all `approve: N` |
+| 72h YouTube Hunt keeps | **0 verified**. Voosh vendor video dropped. Hunt-informed Short uses published `/answers` |
+| YouTube upload / pin / caption | blocked — drafts-only |
+| Public botdirectory install | not done |
+| `XAI_API_KEY` | not created; default model `grok-4.6` |
 
 ## Acceptance
 
 - [x] YouTube seat map in docs
 - [x] No secrets committed
-- [x] Drafts-only publish gate (no auto-upload; Myke approves every publish)
+- [x] Drafts-only publish gate
+- [x] First weekly slate drafted from published `/answers` only
 
 ## Next owner
 
-Myke: paste the four first-party recipes into empty Grok Bot workspaces if wanted. Do not Add public directory bots. Do not upload. Codex: confirm this PR does not claim a live YouTube channel or a committed `XAI_API_KEY`.
+Myke: wake up to one approval card. Mark `approve: Y` on an exact asset before anyone uploads. Paste Grok Bot recipes only if you want the live desk. Codex: do not treat MCP-live roles as a live YouTube channel.

@@ -746,5 +746,6 @@ export function getAllPlaybookRefs(): string[] {
   refs.add('docs/company/grok-bots/templates/youtube-script-cutter.md');
   refs.add('docs/company/grok-bots/templates/youtube-answer-film.md');
   refs.add('docs/company/grok-bots/templates/youtube-channel-producer.md');
+  refs.add('docs/company/grok-bots/batches/2026-09-03-youtube-slate.md');
   return [...refs];
 }
