@@ -84,7 +84,15 @@ function BriefCoachCard({ c, rank }: { c: CoachCard; rank: number }) {
   );
 }
 
-function Shell({ name, children }: { name: string; children: React.ReactNode }) {
+function Shell({
+  name,
+  children,
+  showLegacyLinks = true,
+}: {
+  name: string;
+  children: React.ReactNode;
+  showLegacyLinks?: boolean;
+}) {
   return (
     <main className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <header style={{ borderBottom: `1px solid ${INK}` }}>
@@ -93,8 +101,12 @@ function Shell({ name, children }: { name: string; children: React.ReactNode }) 
             / NEVER 86&apos;D — COMMAND CENTER — {name}
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Manager board</Link>
-            <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Workforce setup</Link>
+            {showLegacyLinks ? (
+              <>
+                <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Manager board</Link>
+                <Link href="/dashboard/setup" className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: BLUE }}>Workforce setup</Link>
+              </>
+            ) : null}
             <SignOutButton />
           </div>
         </div>
@@ -140,7 +152,7 @@ export default async function OperatorDashboard({ operatorId, displayName }: { o
   // Neon free-seat operators (Monday gate) stay on the prior-day desk — no OPS command center.
   if (isFreeSeatOperatorId(operatorId)) {
     return (
-      <Shell name="DESK">
+      <Shell name="OPERATOR" showLegacyLinks={false}>
         <FreeSeatDesk operatorId={operatorId} />
       </Shell>
     );

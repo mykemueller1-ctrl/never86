@@ -25,16 +25,15 @@ export function HumanSiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-[#423e38] lg:flex" aria-label="Primary navigation">
-          <Link href="/delivery-marketplace-reconciliation" className="human-nav-link">How we check</Link>
-          <Link href="/answers" className="human-nav-link">Operator answers</Link>
-          <Link href="/team" className="human-nav-link">The team</Link>
+          <Link href="/#what-it-finds" className="human-nav-link">What it finds</Link>
+          <Link href="/#how-it-works" className="human-nav-link">How it works</Link>
+          <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
-          <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
-          <Link href="/trial" className="human-button human-button-primary text-sm">One seat free →</Link>
+          <Link href="/onboard" className="human-button human-button-primary text-sm">Open with email →</Link>
         </nav>
 
-        <Link href="/trial" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          One seat free →
+        <Link href="/onboard" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
+          Open with email →
         </Link>
       </div>
     </header>
@@ -73,13 +72,12 @@ export function HumanSiteFooter() {
             Built from firsthand operating experience inside independent restaurants and a 28-location, private-equity-backed restaurant group. Every claim stays tied to the evidence in front of us.
           </p>
         </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
-          <Link href="/trial" className="human-nav-link">One seat free</Link>
-          <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
-          <Link href="/team" className="human-nav-link">Team</Link>
-          <Link href="/story" className="human-nav-link">Story</Link>
-          <a href="https://www.tiktok.com/@ontheline515" className="human-nav-link" target="_blank" rel="noreferrer">On the Line 515</a>
-          <a href="mailto:myke@n86.app" className="human-nav-link">Email Myke</a>
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
+          <Link href="/onboard" className="human-nav-link">Open with email</Link>
+          <Link href="/login" className="human-nav-link">Sign in</Link>
+          <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
+          <Link href="/privacy" className="human-nav-link">Privacy</Link>
+          <Link href="/terms" className="human-nav-link">Terms</Link>
         </div>
       </div>
     </footer>

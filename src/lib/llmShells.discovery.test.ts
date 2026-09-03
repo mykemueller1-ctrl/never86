@@ -77,6 +77,6 @@ describe('llm-shells durable status claims', () => {
     expect(pageSource).toContain('Marketplace publication: not submitted');
     expect(pageSource).toContain('Credentials: none claimed');
     expect(pageSource).toContain('READ-ONLY and DRAFT-ONLY: certified in repo');
-    expect(pageSource).toContain('https://grok.com/connectors');
+    expect(pageSource).toContain('https://chatgpt.com');
   });
 });
