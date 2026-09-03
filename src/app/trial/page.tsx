@@ -185,6 +185,7 @@ export default function TrialPage() {
   const [leadSaved, setLeadSaved] = useState(false);
   const [leadSaving, setLeadSaving] = useState(false);
   const [leadError, setLeadError] = useState('');
+  const [leadMessage, setLeadMessage] = useState('');
 
   const [waitlistPos, setWaitlistPos] = useState<string | null>(null);
   const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -318,10 +319,11 @@ export default function TrialPage() {
         body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.success === false) {
         throw new Error(data?.error || `Save failed (HTTP ${res.status})`);
       }
       setLeadSaved(true);
+      setLeadMessage(typeof data?.message === 'string' && data.message ? data.message : 'Myke has the request and will reach out.');
       trackEvent('trial_lead_save_success', { meta: { mode, endpoint } });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Could not save your read';
@@ -1101,7 +1103,7 @@ export default function TrialPage() {
             {leadSaved ? (
               <div className="compass-card text-center">
                 <p className="font-serif text-2xl text-ink-800">You&apos;re saved.</p>
-                <p className="compass-body mt-3">Myke will reach out within 24 hours.</p>
+                <p className="compass-body mt-3">{leadMessage || 'Myke has the request and will reach out.'}</p>
               </div>
             ) : (
               <form onSubmit={saveLead} className="compass-card space-y-3">
