@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { trackEvent } from '@/lib/track';
+import { FreeOperatorAnswerCard } from '@/components/FreeOperatorAnswerCard';
 import {
   BASE_WHAT_I_KNOW,
   FREE_OPERATOR_CHIPS,
@@ -11,9 +11,11 @@ import {
   OWNER_SEAT_EOD,
   PUBLIC_PREVIEW_COPY,
   SAMPLE_LABEL,
+  type FreeOperatorAnswer,
   type FreeOperatorChipId,
   type FreeOperatorMouth,
   type WhatIKnowCard,
+  getFreeOperatorAnswer,
   nameLocalEvidence,
   resolveFreeOperatorAsk,
 } from '@/lib/freeOperatorDemo';
@@ -26,7 +28,6 @@ const MOUTH_LABEL: Record<FreeOperatorMouth, string> = {
 };
 
 export function FreeOperatorPhone() {
-  const router = useRouter();
   const [ask, setAsk] = useState('');
   const [chipId, setChipId] = useState<FreeOperatorChipId | null>(null);
   const [mouth, setMouth] = useState<FreeOperatorMouth>('type');
@@ -34,29 +35,41 @@ export function FreeOperatorPhone() {
   const [localName, setLocalName] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<FreeOperatorAnswer | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
 
   const readyCount = useMemo(() => cards.filter((card) => card.state === 'READY').length, [cards]);
   const needCount = cards.length - readyCount;
 
-  function goAsk(nextAsk: string, nextChip: FreeOperatorChipId | null = chipId) {
+  function goAsk(nextAsk: string, nextChip: FreeOperatorChipId | null = null) {
     const resolved = resolveFreeOperatorAsk(nextAsk, nextChip);
     if (!resolved.ok) {
+      setAnswer(null);
       setFlash(`${resolved.reason} NEEDS: ${resolved.needs}`);
       trackEvent('operator_demo_ask_empty', { pagePath: '/operator', meta: { chip: nextChip } });
       return;
     }
+    const next = getFreeOperatorAnswer(resolved.slug);
+    if (!next) {
+      setAnswer(null);
+      setFlash('That sample card is missing. No close invented.');
+      return;
+    }
+    setChipId(resolved.chipId);
+    setAnswer(next);
     setFlash(null);
     trackEvent('operator_demo_ask', { pagePath: '/operator', meta: { slug: resolved.slug, chip: resolved.chipId } });
-    router.push(`/operator/answers/${resolved.slug}`);
+    queueMicrotask(() => answerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
   function onChip(id: FreeOperatorChipId) {
-    setChipId(id);
     const chip = FREE_OPERATOR_CHIPS.find((row) => row.id === id);
+    setChipId(id);
+    setMouth('type');
     if (chip) setAsk(chip.label);
-    goAsk(FREE_OPERATOR_CHIPS.find((row) => row.id === id)?.label ?? '', id);
+    goAsk(chip?.label ?? '', id);
   }
 
   function onMouth(next: FreeOperatorMouth) {
@@ -95,7 +108,7 @@ export function FreeOperatorPhone() {
       const said = event.results[0]?.[0]?.transcript ?? '';
       setAsk(said);
       setListening(false);
-      goAsk(said, chipId);
+      goAsk(said);
     };
     recognition.onerror = () => {
       setListening(false);
@@ -128,6 +141,10 @@ export function FreeOperatorPhone() {
         </p>
         <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#766f65]">{PUBLIC_PREVIEW_COPY}</p>
       </header>
+
+      <div ref={answerRef} className="mt-6" aria-live="polite">
+        {answer ? <FreeOperatorAnswerCard answer={answer} compact /> : null}
+      </div>
 
       <section aria-labelledby="what-i-know-heading" className="mt-6">
         <div className="flex items-end justify-between gap-3">

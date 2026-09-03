@@ -79,6 +79,13 @@ describe('free operator demo pack', () => {
     const other = resolveFreeOperatorAsk('what is the weather');
     expect(other.ok).toBe(false);
     if (!other.ok) expect(other.reason).toMatch(/does not invent a close/i);
+
+    const typedBeatsChip = resolveFreeOperatorAsk('vendor cadence', 'foh');
+    expect(typedBeatsChip.ok).toBe(true);
+    if (typedBeatsChip.ok) {
+      expect(typedBeatsChip.chipId).toBe('vendor');
+      expect(typedBeatsChip.slug).toBe('vendor-silence');
+    }
   });
 
   it('labels every sample dollar fictional and never claims verified money', () => {
@@ -145,12 +152,24 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     const page = readFileSync(join(ROOT, 'src/app/operator/page.tsx'), 'utf8');
     const answer = readFileSync(join(ROOT, 'src/app/operator/answers/[slug]/page.tsx'), 'utf8');
     const ui = readFileSync(join(ROOT, 'src/components/FreeOperatorPhone.tsx'), 'utf8');
+    const card = readFileSync(join(ROOT, 'src/components/FreeOperatorAnswerCard.tsx'), 'utf8');
     const lib = readFileSync(join(ROOT, 'src/lib/freeOperatorDemo.ts'), 'utf8');
-    for (const source of [page, answer, ui, lib]) {
-      expect(source).not.toMatch(/from ['"]@\/db['"]/);
-      expect(source).not.toMatch(/DATABASE_URL/);
-      expect(source).not.toMatch(/STAFF_SEAT_LOGIN_ENABLED\s*=\s*['"]true['"]/);
+    for (const blob of [page, answer, ui, card, lib]) {
+      expect(blob).not.toMatch(/from ['"]@\/db['"]/);
+      expect(blob).not.toMatch(/DATABASE_URL/);
     }
+    expect(ui).toContain('FreeOperatorAnswerCard');
+    expect(ui).not.toMatch(/router\.push/);
+    expect(ui).toMatch(/goAsk\(ask, chipId\)/);
+    expect(answer).toMatch(/robots:\s*\{\s*index:\s*false/);
+    expect(card).toContain('Coach this tomorrow');
+    expect(card).toContain('Needs');
+
+    const sitemap = readFileSync(join(ROOT, 'src/app/sitemap.ts'), 'utf8');
+    const robots = readFileSync(join(ROOT, 'src/lib/seoAeo.ts'), 'utf8');
+    expect(sitemap).toContain("`${BASE}/operator`");
+    expect(sitemap).not.toMatch(/operator\/answers/);
+    expect(robots).toContain("'/operator/answers/'");
   });
 
   it('leaves staff login fail-closed', async () => {

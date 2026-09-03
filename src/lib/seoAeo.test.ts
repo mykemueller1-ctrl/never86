@@ -79,6 +79,7 @@ describe('robots.txt Allow /api/answers then Disallow /api/', () => {
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/lab');
     expect([...ROBOTS_DISALLOW]).toContain('/action-shift/setup');
     expect([...ROBOTS_DISALLOW]).toContain('/staff/');
+    expect([...ROBOTS_DISALLOW]).toContain('/operator/answers/');
     const doc = robots();
     const rule = Array.isArray(doc.rules) ? doc.rules[0] : doc.rules;
     expect(rule).toBeTruthy();

@@ -6,7 +6,7 @@
  */
 
 export const FREE_OPERATOR_DEMO_ID = 'free-operator-demo-v1';
-export const FREE_OPERATOR_DEMO_STATUS = 'drafted' as const;
+export const FREE_OPERATOR_DEMO_STATUS = 'tested' as const;
 export const SAMPLE_LABEL = 'FICTIONAL / sample-not-verified' as const;
 
 export const FREE_OPERATOR_CHIPS = [
@@ -253,13 +253,12 @@ export function resolveFreeOperatorAsk(
   question: string,
   chipId?: FreeOperatorChipId | null,
 ): ResolveAskResult {
-  if (chipId && FREE_OPERATOR_CHIPS.some((chip) => chip.id === chipId)) {
-    const chip = FREE_OPERATOR_CHIPS.find((row) => row.id === chipId)!;
-    return { ok: true, slug: chip.answerSlug, chipId: chip.id, inventedClose: false };
-  }
-
   const query = normalizeAsk(question);
   if (!query) {
+    if (chipId && FREE_OPERATOR_CHIPS.some((chip) => chip.id === chipId)) {
+      const chip = FREE_OPERATOR_CHIPS.find((row) => row.id === chipId)!;
+      return { ok: true, slug: chip.answerSlug, chipId: chip.id, inventedClose: false };
+    }
     return {
       ok: false,
       reason: 'Ask is empty. The mouth is ready. The close is not.',

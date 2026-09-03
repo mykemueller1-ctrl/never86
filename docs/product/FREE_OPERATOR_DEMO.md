@@ -1,7 +1,7 @@
 # Free operator phone demo
 
 **Task:** `free-operator-demo-productize-v1`  
-**State:** drafted on branch — PR against `main`, not merged.  
+**State:** tested on branch — PR against `main`, not merged.  
 **Founder lock:** 2026-09-03 01:24 CT. Keep the mouth and the cards. Do not invent dollars.
 
 Public surface: `/operator`  
@@ -9,7 +9,7 @@ Sample answers: `/operator/answers/{slug}` — labeled **FICTIONAL / sample-not-
 
 ## What this is
 
-Phone-first ask for the small operator. Talk / type / photo / file. Chips: Front of house, Back of house, Schedule, Vendor. WHAT I KNOW cards stay **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close.
+Phone-first ask for the small operator. Talk / type / photo / file. Chips: Front of house, Back of house, Schedule, Vendor. A chip or typed ask shows the sample card **on this phone**; “Open this card” is optional. WHAT I KNOW cards stay **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close. Sample answer URLs are noindex.
 
 ## What this is not
 
