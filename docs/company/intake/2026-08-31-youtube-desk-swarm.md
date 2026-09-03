@@ -1,7 +1,7 @@
 # Intake — youtube-desk-swarm-v1
 
 **From:** Cursor factory on `cursor/never86-youtube-desk-swarm-v1-191d`  
-**Status:** drafted / tested in PR — not live-desk, not uploaded, not merged, not deployed  
+**Status:** **merged** `#179` (`5d42920`). MCP org 2.1.0 live-verified. First slate drafted 2026-09-03. Not pasted to Grok Bot desk. Not uploaded.  
 **For HQ:** Grok command hub
 
 ## What I added

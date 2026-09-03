@@ -1,9 +1,11 @@
 # YouTube desk — Never86 first-party Grok seats
 
 **Task:** `youtube-desk-swarm-v1`  
-**State:** drafted in Git. Not added to the live Grok Bot desk. Not published. Not uploaded.  
-**Machine source:** `config/youtube-desk-swarm.json`  
-**Shareable swarm pointer:** `config/grok-shareable-swarm.json` → `youtubeDesk`
+**Git:** **merged** to `main` as PR `#179` (`5d42920`).  
+**MCP:** org `2.1.0` YouTube seats **live-verified** on `https://www.never86.ai/api/mcp`.  
+**Desk / upload:** Grok Bot recipes **not pasted**. YouTube **not uploaded**.  
+**First slate:** drafted `docs/company/grok-bots/batches/2026-09-03-youtube-slate.md` — every asset `approve: N`.  
+**Machine source:** `config/youtube-desk-swarm.json`
 
 This is a **first-party** desk. Do **not** install public grokbot.dev / bots.new / ShareGrokBots / Grokyard listings for these seats. Paste the recipes below into empty Grok Bot workspaces.
 
@@ -59,7 +61,8 @@ For each seat:
 | Answer Film | [templates/youtube-answer-film.md](templates/youtube-answer-film.md) |
 | Channel Producer | [templates/youtube-channel-producer.md](templates/youtube-channel-producer.md) |
 
-Cursor factory recipe for the weekly slate: `docs/company/CURSOR_AUTOMATIONS.md` §8.
+Cursor factory recipe for the weekly slate: `docs/company/CURSOR_AUTOMATIONS.md` §8.  
+First drafted slate (not uploaded): [batches/2026-09-03-youtube-slate.md](batches/2026-09-03-youtube-slate.md).
 
 ## MCP first calls
 

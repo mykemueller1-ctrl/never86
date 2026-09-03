@@ -56,8 +56,17 @@ export type YoutubeDeskSwarm = {
   taskId: string;
   researchedAt: string;
   status: HarnessState;
+  gitState?: 'drafted' | 'merged';
+  mergeCommit?: string;
+  mergePr?: number;
+  mcpOrgLiveVerified?: string;
   owner: string;
   nextOwner: string;
+  firstSlate?: {
+    config: string;
+    doc: string;
+    status: HarnessState;
+  };
   desk: 'youtube';
   reportsTo: string;
   installPublicBotdirectoryBots: false;

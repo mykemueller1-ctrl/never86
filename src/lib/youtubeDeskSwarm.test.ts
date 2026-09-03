@@ -106,6 +106,15 @@ describe('youtube desk swarm', () => {
     expect(summary.nextOwner.toLowerCase()).toContain('myke');
   });
 
+  it('records #179 merged and points at the first drafted slate', () => {
+    const pack = getYoutubeDeskSwarm();
+    expect(pack.gitState).toBe('merged');
+    expect(pack.mergePr).toBe(179);
+    expect(pack.mcpOrgLiveVerified).toBe('2.1.0');
+    expect(pack.firstSlate?.config).toBe('config/youtube-desk-slate-2026-09-03.json');
+    expect(pack.firstSlate?.status).toBe('drafted');
+  });
+
   it('is pointed from the shareable swarm map without borrowing public botdirectory ids', () => {
     const shareable = getGrokShareableSwarm();
     expect(shareable.youtubeDesk?.config).toBe(YOUTUBE_DESK_SWARM_PATH);

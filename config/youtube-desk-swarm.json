@@ -2,8 +2,17 @@
   "taskId": "youtube-desk-swarm-v1",
   "researchedAt": "2026-08-31",
   "status": "drafted",
+  "gitState": "merged",
+  "mergeCommit": "5d429207fd569c4b02c15573e933670a8078bfbd",
+  "mergePr": 179,
+  "mcpOrgLiveVerified": "2.1.0",
   "owner": "Grok command hub",
-  "nextOwner": "Myke — paste first-party recipes into Grok Bot desktop; do not publish or upload",
+  "nextOwner": "Myke — approve the 2026-09-03 slate; paste recipes only if you want live Grok Bots; do not upload",
+  "firstSlate": {
+    "config": "config/youtube-desk-slate-2026-09-03.json",
+    "doc": "docs/company/grok-bots/batches/2026-09-03-youtube-slate.md",
+    "status": "drafted"
+  },
   "desk": "youtube",
   "reportsTo": "social-head",
   "installPublicBotdirectoryBots": false,
