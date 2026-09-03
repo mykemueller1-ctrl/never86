@@ -108,6 +108,9 @@ export default function Home() {
               <Link href="/audit" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/audit', label: 'Audit one DoorDash statement' } })}>
                 Audit one DoorDash statement
               </Link>
+              <Link href="/operator" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/operator', label: 'Ask on the phone' } })}>
+                Ask on the phone
+              </Link>
             </div>
             <div className="mt-9 flex flex-wrap items-center gap-4 border-t border-[#d8cec0] pt-5">
               <TeamFaces />

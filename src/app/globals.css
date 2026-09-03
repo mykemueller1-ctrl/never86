@@ -750,6 +750,23 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   transform: translateY(-1px);
 }
 
+/* Phone-first free operator demo — not a dashboard */
+.operator-phone {
+  width: min(28rem, 100%);
+  margin: 0 auto;
+  padding: 1.25rem 1.1rem 11rem;
+}
+.operator-phone-mouth {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin: 1.5rem -0.25rem 0;
+  padding: 0.85rem 0.75rem 1.1rem;
+  border-top: 1px solid #d8cec0;
+  background: rgba(244, 239, 230, 0.96);
+  backdrop-filter: blur(12px);
+}
+
 /* The one rule that separates craft from noise. */
 @media (prefers-reduced-motion: reduce) {
   .n86-hero-enter > *,

@@ -30,6 +30,7 @@ export function HumanSiteHeader() {
           <Link href="/team" className="human-nav-link">The team</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
+          <Link href="/operator" className="human-nav-link">Phone seat</Link>
           <Link href="/trial" className="human-button human-button-primary text-sm">One seat free →</Link>
         </nav>
 
@@ -75,6 +76,7 @@ export function HumanSiteFooter() {
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
           <Link href="/trial" className="human-nav-link">One seat free</Link>
+          <Link href="/operator" className="human-nav-link">Phone seat</Link>
           <Link href="/audit" className="human-nav-link">Free 3P audit</Link>
           <Link href="/team" className="human-nav-link">Team</Link>
           <Link href="/story" className="human-nav-link">Story</Link>

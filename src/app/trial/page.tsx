@@ -449,6 +449,13 @@ export default function TrialPage() {
           </button>
           {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
           <p className="compass-eyebrow-dim mt-6">— Works now with Toast, Square, Clover, and PDQ exports · direct connections to Toast, Lightspeed, and Aloha on the way</p>
+          <p className="mt-4 text-sm text-[#86868b]">
+            Prefer the phone?{' '}
+            <Link href="/operator" className="text-[#0066ff] underline-offset-4 hover:underline">
+              Ask first — talk, type, photo, or file
+            </Link>
+            . Files stay on that phone. Sample answers stay fictional.
+          </p>
         </section>
       )}
 
