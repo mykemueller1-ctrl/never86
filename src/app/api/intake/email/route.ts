@@ -14,6 +14,8 @@ import { inboundOperatorId, isSafeSnsSubscribeUrl, normalizeInboundPayload } fro
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const PDQ_EOD_FAMILY_SET = new Set(['z-summary', 'hourly', 'void-promo'] as const);
+
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -119,7 +121,9 @@ export async function POST(req: Request) {
 
   const packet = describePdqEodPacket({
     businessDate: desk.businessDate,
-    landed: desk.families,
+    landed: desk.families.filter((family): family is 'z-summary' | 'hourly' | 'void-promo' => (
+      PDQ_EOD_FAMILY_SET.has(family as 'z-summary' | 'hourly' | 'void-promo')
+    )),
   });
 
   return NextResponse.json({
