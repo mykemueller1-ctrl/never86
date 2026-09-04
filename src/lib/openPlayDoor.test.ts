@@ -2,23 +2,30 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-describe('open play door', () => {
-  it('ships suck-in HTML with CTAP seat 1 and open play for any operator', () => {
+describe('never86.ai open play front door', () => {
+  it('ships suck-in HTML branded as Never 86\'d with CTAP seat 1', () => {
     const html = readFileSync(resolve('public/demo/action-shift.html'), 'utf8');
+    expect(html).toMatch(/Never 86'd/);
+    expect(html).toMatch(/never86\.ai/);
     expect(html).toMatch(/Seat 1 · Community Tap/);
     expect(html).toMatch(/Any operator · no login/);
-    expect(html).toMatch(/Open play for any operator/);
-    expect(html).toMatch(/No portal passwords/);
+    expect(html).toMatch(/Open play for any operator|Sample shop only/);
     expect(html).not.toMatch(/\bPIN\b/);
-    expect(html).toMatch(/not Community Tap private dollars/);
+    expect(html).toMatch(/canonical" href="https:\/\/www\.never86\.ai\/"/);
+    expect(html).toMatch(/\/product/);
   });
 
-  it('exposes /play as the public Action Shift door', () => {
-    const page = readFileSync(resolve('src/app/play/page.tsx'), 'utf8');
-    expect(page).toMatch(/canonical: 'https:\/\/www\.never86\.ai\/play'/);
-    expect(page).toMatch(/\/demo\/action-shift\.html/);
-    expect(page).toMatch(/Community Tap/);
-    expect(page).toMatch(/\/onboard/);
+  it('rewrites / and /play to the suck-in desk (no iframe page)', () => {
+    const config = readFileSync(resolve('next.config.js'), 'utf8');
+    expect(config).toMatch(/source: '\/'/);
+    expect(config).toMatch(/source: '\/play'/);
+    expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
+  });
+
+  it('keeps the marketing story on /product', () => {
+    const page = readFileSync(resolve('src/app/product/page.tsx'), 'utf8');
+    expect(page).toMatch(/canonical: 'https:\/\/www\.never86\.ai\/product'/);
+    expect(page).toMatch(/HomePage/);
   });
 
   it('marks Community Tap as seat 1 on /action-shift', () => {

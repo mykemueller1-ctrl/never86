@@ -14,6 +14,12 @@ export const metadata: Metadata = {
 
 const PLAY_DOORS = [
   {
+    href: '/',
+    label: 'Open play desk',
+    body: 'never86.ai front door. Pain → POS email/photo → one Action Shift. Community Tap holds seat 1. Any operator can play — no login.',
+    primary: true,
+  },
+  {
     href: '/operator',
     label: 'Owner desk',
     body: 'Phone-first play seat. Ask FOH, BOH, schedule, vendor, merchant. Sample answers only — no invented close.',
@@ -21,20 +27,14 @@ const PLAY_DOORS = [
   },
   {
     href: '/action-shift',
-    label: 'Action Shift',
-    body: 'Yesterday → one next action → night proof. Paste or type numbers. Free owner seat shape.',
-    primary: true,
+    label: 'Action Shift seats',
+    body: 'Yesterday → one next action → night proof. Free owner seat shape + seat map.',
+    primary: false,
   },
   {
     href: '/action-shift/lab',
     label: 'Station seat lab',
     body: 'Wall-doc checklists for owner, FOH, kitchen, bar, server, prep, driver, line, pizza, dish.',
-    primary: false,
-  },
-  {
-    href: '/staff/seats',
-    label: 'Staff seat map',
-    body: 'Synthetic manager/station map. Live issuance stays blocked. Play the layout, not live payroll.',
     primary: false,
   },
 ] as const;
@@ -70,7 +70,7 @@ export default function CommunitiesPage() {
           </Link>
           <nav className="flex items-center gap-2 text-[13px] flex-wrap">
             <Link
-              href="/operator"
+              href="/"
               className="btn-primary"
               style={{ background: '#0066ff' }}
             >
@@ -94,7 +94,7 @@ export default function CommunitiesPage() {
           sample only: no private dollars, PINs, or staff names.
         </p>
         <div className="flex flex-wrap gap-3 mt-8">
-          <Link href="/operator" className="btn-primary" style={{ background: '#0066ff' }}>
+          <Link href="/" className="btn-primary" style={{ background: '#0066ff' }}>
             Start playing →
           </Link>
           <Link

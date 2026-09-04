@@ -43,7 +43,7 @@ export default function Home() {
               Your restaurant already creates the answer. It is buried in labor, invoices, and the daily mess. Never 86&apos;d reads the evidence, explains what changed, and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/play" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/play', label: 'Start playing' } })}>
+              <Link href="/" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/', label: 'Start playing' } })}>
                 Start playing →
               </Link>
               <Link href="/onboard" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Open with email' } })}>
@@ -147,7 +147,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/play" className="human-button human-button-primary">Start playing →</Link>
+            <Link href="/" className="human-button human-button-primary">Start playing →</Link>
             <Link href="/onboard" className="human-button human-button-secondary">Claim free owner seat →</Link>
             <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
             <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>

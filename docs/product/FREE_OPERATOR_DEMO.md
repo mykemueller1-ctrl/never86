@@ -1,11 +1,12 @@
 # Free operator / Owner desk phone demo
 
-**Track:** 1–3 unit Owner desk (`/operator`) · open suck-in play (`/play`)  
+**Track:** 1–3 unit Owner desk (`/operator`) · **never86.ai front door** (`/` + `/play`)  
 **Multi-unit track:** Command Center (`/command-center`) — separate product promise  
 **Founder lock:** Keep the mouth and the cards. Do not invent dollars.
 
 Public surfaces:
-- `/play` — Action Shift suck-in open play (anyone, no login). Sample shop only.
+- `/` and `/play` — Action Shift suck-in open play (anyone, no login). This **is** the never86.ai front door. Sample shop only.
+- `/product` — marketing story (payroll / prices / process) kept off the front door
 - `/operator` — phone-first Owner desk
 - `/onboard` / `/login` — claim or reopen a real free owner seat by email
 - Seat 1 assignment (public): **Community Tap · first store**. No private CTAP dollars, PINs, or staff names on these surfaces.
@@ -16,7 +17,7 @@ Sample answers: `/operator/answers/{slug}` — labeled **FICTIONAL / sample-not-
 
 Phone-first **Owner desk** (`SimpleOwnerDemo`) for the 1–3 unit ICP. Action Shift home, Labor & schedule (Prime Cost Coach evidence), food/beverage trays, ask mouth (talk / type / photo / file). The composer calls `POST /api/ask` and `POST /api/upload`. Questions and answers persist tenant-scoped by `operator_id` with source tags (Neon = D1 equivalent on this stack). Files land in R2 when `R2_*` is configured, otherwise a Neon object fallback. Readiness is live from stored files. Evidence stays **NEED** / **READY**. Named is not a verified close. Sample answer URLs are noindex. Demo restaurant only — no Community Tap private data.
 
-Open play at `/play` uses the same boarding voice: pain → POS email/photo/Drive (no day-one API) → one Action Shift → schedule → vendors → menu.
+Open play at `/` (and `/play`) uses the same boarding voice: pain → POS email/photo/Drive (no day-one API) → one Action Shift → schedule → vendors → menu. No iframe — Next rewrites straight to the HTML desk.
 
 ## What this is not
 
