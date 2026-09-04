@@ -1,27 +1,33 @@
 # Intake — bamba-sales-labor-enterprise-v1
 
-**Status:** drafted · tested in-repo · not merged · not deployed · not live-verified  
+**Status:** drafted · tested in-repo · merge-ready onto `main` that already has #190 · not deployed · not live-verified  
 **Task:** `bamba-sales-labor-enterprise-v1`  
-**Surface:** `/command-center/sales-labor` (reports gate, noindex)
+**Surfaces:** `/command-center/sales-labor` · `/command-center/prime-cost` (reports gate, noindex)
 
-## What this is
+## Lane lock
 
-One Never86 Command Center sales-labor desk for the Taco Bamba Sales Labor Report (MP) v5 Daily parse. Not a new product. Lane C isolation: Bamba tenant memory only.
+This is the bigger Taco Bamba Command Center lane. #190 polish is now on `main` and was merged into this branch with `-X theirs` so this PR does not revert it.
 
-- Daily / WTD / PTD in that order
-- Store and region rollup
-- CY / PY / FCST, checks, catering, avg check, comps, staff meals, voids + evidence
-- Peer-median 1.5× void/comp flags
-- Sheet1 drill-downs: comps servers, staff meals, training meals, void ranking, daypart, ticket times, p-mix
-- Color flags for school / holiday / concert this year, not last
+## Prime-cost terminals
 
-## Agents
+Each roll is its own MVP, skill, and 2–3 sector seats. They read each other. They are not one swarm and not a thousand agents. Router: `prime-cost-router-1`.
 
-Exactly two seats in `config/bamba-sales-labor-agents.json`: `builder-1` and `qa-1`. No 1,000-agent swarm.
+| Terminal | Status | Feeds |
+|---|---|---|
+| Sales | Done — Aug 12 canary 125273.41 | labor, food, menu, liquor, beer |
+| Labor | Open — no labor dollars | food (prime cost) |
+| Food | Open — no count → no food cost | — |
+| Menu | Open — category p-mix only | food, liquor, beer |
+| Liquor | Open — no pour / depletion | — |
+| Beer | Open — no pour / depletion | — |
+| Inventory | Open — no count | food, liquor, beer |
+
+Skills: `skills/prime-cost/*.md`. Contract: `src/lib/primeCostDesks/terminals.ts`.
+Prime cost % stays Open until food and labor are both verified.
 
 ## Hard gates
 
 - No CTap or New American Grill numbers
-- No staff names
-- No merge, deploy, live migration, CRM write, or send
-- Incomplete WTD/PTD stay Open
+- No invented food, liquor, beer, labor, or inventory dollars
+- No merge click from this factory slot (GitHub human gate)
+- No live migration, CRM write, or send
