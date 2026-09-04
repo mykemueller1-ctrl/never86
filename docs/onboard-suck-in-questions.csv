@@ -1,30 +1,26 @@
 wave,trigger_or_missing,llm_ask,captures,we_need,competitor_home,refuse
-0,empty desk,Drop last night's close from the POS — sales summary is fine. No login needed.,sales close,Yes,ME POS / Toast / R365,portal password
-0,DoorDash pain,Got a redacted DoorDash statement? Paste page 1 — we label the math in about a minute.,3P statement,Yes,Never86 door / weak in ME,portal login
-0,typed pain,"What's burning cash or time this week — voids, labor, beef price, or DoorDash?",pain rank,Yes,xC goals / kickoff,—
-1,cutoff,"When does your business day roll — midnight, 3am, or whenever Toast resets?",business-day cutoff,Yes,R365 start of day,—
-1,owner cash,"Who walks the deposit / closes cash — you, GM, or closer?",owner:cash,Yes,tribal (weak in SaaS forms),—
-1,void detail,"Close shows void dollars. Drop the void/comp detail export if you have it — pattern only, no hangings.",void detail,Yes,POS / Void Hunter,staff as thieves
-2,schedule,"Paste this week's schedule — who you posted, in and out. We don't invent the week.",posted schedule,Yes,7shifts,—
-2,stations,How do you run the floor — dish / line / expo / FOH / run? Your words.,station tribal,Yes,7shifts depts/roles,—
-2,punches,Late drift stays Missing until punches. Got a time-clock CSV for yesterday?,punches,Yes,7shifts time clock,—
-2,labor owner,Who owns labor tonight — you or the FOH lead?,owner:labor,Yes,tribal,—
-3,vendor cadence,"Which trucks hit you which days — Sysco Tue/Fri, produce daily, linen Mon?",vendor cadence,Yes,MarketMan suppliers,—
-3,order day,"Which days do you order, separate from when it shows up?",order day,Yes,MarketMan / Load Day,—
-3,invoice route,"Where do invoices land — email, folder, phone pics, or the office spike?",inbox/source route,Yes,ME invoice upload,—
-3,first invoice,Drop one broadliner invoice (photo or PDF). We pull SKU + pack + price — you confirm weird UOMs.,invoice lines,Yes,ME / xC / Ott / MM,—
-3,food owner,"Who owns food cost follow-up — chef, you, or nobody yet?",owner:food,Yes,tribal,—
-4,menu,Paste the menu — prices + what is on the plate. Not a full recipe book yet.,menu,Yes,ME recipes / MM,full recipe book week1
-4,top plates,Name your top 5 money plates. We cost those first when the invoice is in.,recipe priority,Yes,ME top ~30,—
-4,conversion,You buy ground beef in cases — how do you portion it on the plate?,pack/yield,Yes,ME conversions / MM UOM,—
-4,pour,"What is this bar's shot — 1.5, 1.75, 2, or something else? We don't assume.",pour standards,Yes,beverage,invented 1.5oz
+0,empty desk,What problem are you trying to solve? Labor? Cash flow? Or you're just tired of fragmented data sitting here? No worries — we got you. Drop last night's close when you're ready.,pain + sales close,Yes,ME POS / Toast / R365,portal password
+0,cash / DoorDash,"Cash flow / DoorDash? Got a redacted statement — paste page 1, we'll label the math.",3P statement,Yes,Never86 door,portal login
+0,labor pain,"Labor? Cool — drop last night's close, then we'll want a picture of the schedule.",close → schedule,Yes,7shifts path,—
+1,schedule primary,Can you take a picture of the schedules? That way we know how many people are on and we'll see if labor is drifting — labor's one of the biggest things right now.,schedule photo,Yes,7shifts,—
+1,cutoff,"When does your day roll — midnight, 3am, Toast reset?",business-day cutoff,Yes,R365 start of day,—
+1,owner cash,"Who walks the deposit — you, GM, or closer?",owner:cash,Yes,tribal,—
+2,labor cards / roles,"You gave us a schedule — do you have labor cards, or is it shift / role specific?",stations + seat shape,Yes,7shifts depts/roles,—
+2,stations,How do you run it — dish / line / expo / FOH / run?,tribal headcount,Yes,7shifts,—
+2,punches,Late drift stays Missing until punches. Got yesterday's time clock?,punches,Yes,7shifts time clock,—
+3,broadliners,"Do you use Performance, Sysco?",vendor names,Yes,MarketMan / ME,—
+3,cadence,Cool — how many times a week do those main trucks hit you?,vendor cadence,Yes,MarketMan suppliers,—
+3,locals,Any local vendors too?,local vendors,Yes,MarketMan,—
+3,email path,"So you don't have to keep taking pictures — do they email you the invoice or the order automatically? If so, where does that land?",inbox/source route,Yes,ME invoice upload,portal password day1
+3,drive later,When you're ready we can watch that inbox/Drive so you're not photographing every ticket — still no portal passwords.,Later convenience,Later,ME / Ottimate EDI,day1 OAuth hard sell
+3,first invoice,Drop one invoice (photo is fine). We pull SKU + pack + price.,invoice lines,Yes,ME / xC / Ott / MM,—
+4,menu,Can we get a picture of your menu? We'll show where plate costs are drifting and point the cheaper house when the invoice's in — you shouldn't sit there doing SKUs by hand.,menu,Yes,ME recipes / MM,full recipe book week1
+4,chaos bribe,Recipes suck in today's world. The one thing we're good at is figuring out the chaos for you.,trust / bribe,Yes,vs ME recipe module,—
+4,top plates,Name your top money plates — we cost those first.,recipe priority,Yes,ME top ~30,—
+4,pour,"What's this bar's shot — 1.5, 1.75, 2, or something else? We don't assume.",pour standards,Yes,beverage,invented 1.5oz
 5,count,"No count → no food cost. Got last period count sheet, even top 20?",count,If food-cost claimed,ME inventory / R365,fake food cost %
-5,count layout,Walk-in / dry / bar — how do you walk the count?,storage tribal,If food-cost claimed,ME count sheets,—
 6,3P statement,Fees stay Estimated until the finalized statement is in. Drop it redacted.,3P fees,Yes,Never86,portal password
-6,payout,POS ≠ payout. Got the payout ID week that matches the statement?,payout ladder,When claiming cash,recon tools,—
-6,deposit,Bank deposit amount/date only — not the full account number.,cash receipt,When claiming cash,ME Bill Pay (they want full bank),routing/account #
-7,labor target,What is your labor % target — not a textbook number?,operator target,Yes,ME budgets / 7s labor %,industry benchmark silently
-7,food target,Food target you actually manage to?,operator target,Yes,ME budgets,—
-7,exception,"Any night we should ignore — holiday, catering blowout, remodel?",exception handling,Yes,ME forecast edit,—
+6,deposit,Bank deposit amount/date only — not the full account number.,cash receipt,When claiming cash,ME Bill Pay,routing/account #
+7,labor target,What is your labor % target — not a textbook number?,operator target,Yes,ME budgets,industry benchmark silently
 8,seat2,Want the GM on the same morning loop? That is a paid seat — owner seat stays free.,paid seat,Later,ME invite team,—
 8,GL,We do not replace your accountant GL or MarginEdge bill pay. We assign the next action.,boundary,Later,R365 / ME accounting,day1 COA

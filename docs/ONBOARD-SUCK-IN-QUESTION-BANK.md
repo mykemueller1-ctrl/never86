@@ -9,6 +9,38 @@
 
 ---
 
+## Myke canonical voice (2026-09-04) — use this first
+
+Founder dictation. This overrides generic “LLM ask” lines below when they conflict.
+
+### Open (Wave 0)
+> What problem are you trying to solve? Labor issue? Cash flow? Or you’re just tired of fragmented data and sitting here guessing? No worries — we got you.
+
+Then: drop last night’s close **or** the statement that matches the pain.
+
+### After first action from the close (Wave 1 → labor)
+> Can you take a picture of the schedules? That way we know how many people are on, and we’ll see if labor is drifting — right now in restaurants, labor’s one of the biggest things.
+
+### After schedule lands (Wave 2)
+> You gave us a schedule — do you have labor cards, or is it shift / role specific? How *this* shop runs the seats.
+
+### Trucks / vendors (Wave 3)
+> Do you use Performance, Sysco? Cool — how many times a week do those main trucks hit you? Any local vendors too?  
+> Also, so you don’t have to keep taking pictures: do they email you the invoice or the order automatically? If so, where does that land?  
+> *(Product note: remember the folder/inbox as source route first. “Connect the Drive” is later convenience — not a password day-one. Share receipts / forward, don’t take portal logins.)*
+
+### Menu / SKU chaos (Wave 4)
+> Can we get a picture of your menu so we can show you where the plate costs are drifting — and point the cheaper house when the invoice’s in? You shouldn’t sit there doing SKUs by hand. Recipes suck in today’s world. The one thing we’re good at is figuring out the chaos for you.
+
+### Tone locks
+- Pain first. Not “welcome to onboarding.”
+- Ask for a **picture** when that’s how owners actually live.
+- Labor next after the close — because that’s the industry bleed.
+- Vendors = name the broadliners out loud (Performance / Sysco), then locals, then email path.
+- Bribe = we handle the chaos (SKU drift / cheaper house), not “complete your recipe module.”
+
+---
+
 ## 0. How to use this
 
 | Column | Meaning |
@@ -201,54 +233,55 @@ No count → no food cost. Invoice ≠ COGS. POS ≠ payout. Punch ≠ schedule.
 
 Voice: short. Concrete. Iowa plain. After a win. One ask. Offer paste/photo/forward. Never “please complete your implementation worksheet.”
 
-### Wave 0 — first box (no account)
+### Wave 0 — first box (no account) — Myke voice
 
 | Trigger | LLM ask | Captures |
 |---|---|---|
-| Empty desk | “Drop last night’s close from the POS — sales summary is fine. No login needed.” | Sales family |
-| DoorDash pain | “Got a redacted DoorDash statement? Paste page 1 — we’ll label the math in about a minute.” | 3P family |
-| They type pain | “What’s burning cash or time this week — voids, labor, beef price, or DoorDash?” | Pain / rank |
+| Empty desk | “What problem are you trying to solve? Labor? Cash flow? Or you’re just tired of fragmented data sitting here? No worries — we got you. Drop last night’s close when you’re ready.” | Pain + sales family |
+| Cash / DoorDash pain | “Cash flow / DoorDash? Got a redacted statement — paste page 1, we’ll label the math.” | 3P family |
+| Labor pain | “Labor? Cool — drop last night’s close, then we’ll want a picture of the schedule.” | Close → schedule path |
 
-### Wave 1 — after first close lands
+### Wave 1 — after first action from the close — Myke voice
 
 | Missing chip | LLM ask | Memory candidate |
 |---|---|---|
-| Cutoff | “When does *your* business day roll — midnight, 3am, or whenever Toast resets?” | business-day cutoff |
-| Owner cash | “Who walks the deposit / closes cash — you, GM, or closer?” | owner:cash |
-| Void detail | “Close shows void dollars. Drop the void/comp detail export if you’ve got it — pattern only, no hangings.” | — |
+| **Schedule (primary)** | “Can you take a picture of the schedules? That way we know how many people are on and we’ll see if labor is drifting — labor’s one of the biggest things right now.” | schedule source |
+| Cutoff | “When does *your* day roll — midnight, 3am, Toast reset?” | business-day cutoff |
+| Owner cash | “Who walks the deposit — you, GM, or closer?” | owner:cash |
+| Void detail | “Close shows void dollars. Got the void/comp detail? Pattern only — nobody’s getting hung.” | — |
 | Proof | “Tonight’s proof is the next close. Verbal yes doesn’t close it.” | proof habit |
 
-### Wave 2 — schedule / labor (7shifts map, our way)
+### Wave 2 — after schedule lands — Myke voice
 
 | Missing | LLM ask | Captures |
 |---|---|---|
-| Schedule | “Paste this week’s schedule — who you *posted*, in and out. We don’t invent the week.” | stations, posted times |
-| Stations | “How do *you* run the floor — dish / line / expo / FOH / run? Your words.” | tribal headcount shape |
-| Punches | “Late drift stays Missing until punches. Got a time-clock CSV for yesterday?” | early/late OT |
-| OT rules | “Do you flag OT after 8 daily, 40 weekly, or both?” | Later / Estimated |
+| Labor cards / roles | “You gave us a schedule — do you have labor cards, or is it shift / role specific?” | stations + seat shape |
+| Stations | “How do *you* run it — dish / line / expo / FOH / run?” | tribal headcount |
+| Punches | “Late drift stays Missing until punches. Got yesterday’s time clock?” | early/late OT |
 | Labor owner | “Who owns labor tonight — you or the FOH lead?” | owner:labor |
 
-### Wave 3 — vendors / invoices (ME + MarketMan map)
+### Wave 3 — trucks / vendors — Myke voice
 
 | Missing | LLM ask | Captures |
 |---|---|---|
-| Cadence | “Which trucks hit you which days — Sysco Tue/Fri, produce daily, linen Mon?” | vendor cadence |
-| Order ≠ delivery | “Which days do you *order*, separate from when it shows up?” | order day |
-| Cutoff | “What’s the order cutoff — noon for next-day truck?” | vendor exception |
-| Source route | “Where do invoices land — email, folder, phone pics, or the office spike?” | inbox/source route |
-| First invoice | “Drop one broadliner invoice (photo or PDF). We’ll pull SKU + pack + price — you confirm the weird UOMs.” | invoice lines |
-| Food owner | “Who owns food cost follow-up — chef, you, or nobody yet?” | owner:food |
-| Silence | “If a truck’s quiet past cadence, who do we draft the text to — never auto-send.” | owner + service draft |
+| Broadliners | “Do you use Performance, Sysco?” | vendor names |
+| Cadence | “Cool — how many times a week do those main trucks hit you?” | vendor cadence |
+| Locals | “Any local vendors too?” | local vendors |
+| Email path | “So you don’t have to keep taking pictures — do they email you the invoice or the order automatically? If so, where does that land?” | inbox/source route |
+| Drive later | “When you’re ready we can watch that inbox/Drive so you’re not photographing every ticket — still no portal passwords.” | Later convenience |
+| First invoice | “Drop one invoice (photo is fine). We’ll pull SKU + pack + price.” | invoice lines |
+| Food owner | “Who owns food follow-up — chef, you, or nobody yet?” | owner:food |
 
-### Wave 4 — menu / recipe / pour (ME recipes + MM, progressive)
+### Wave 4 — menu / SKU chaos — Myke voice
 
 | Missing | LLM ask | Captures |
 |---|---|---|
-| Menu | “Paste the menu — prices + what’s on the plate. Not a full recipe book yet.” | menu |
-| Top movers | “Name your top 5 money plates. We’ll cost those first when the invoice’s in.” | recipe priority |
-| Conversion | “You buy ground beef in cases — how do you portion it on the plate?” | pack/yield mapping |
+| Menu | “Can we get a picture of your menu? We’ll show where plate costs are drifting and point the cheaper house when the invoice’s in — you shouldn’t sit there doing SKUs by hand.” | menu |
+| Chaos bribe | “Recipes suck in today’s world. The one thing we’re good at is figuring out the chaos for you.” | trust / bribe |
+| Top movers | “Name your top money plates — we cost those first.” | recipe priority |
+| Conversion | “You buy that beef in cases — how does it hit the plate?” | pack/yield mapping |
 | Pour | “What’s *this* bar’s shot — 1.5, 1.75, 2, or something else? We don’t assume.” | pour standards |
-| SKU drift | “Beef moved on the last two invoices. Switch house or raise the plate — your call. We don’t invent the save.” | action + proof |
+| SKU drift | “Vendor moved. Switch house or raise the plate — your call. We don’t invent the save.” | action + proof |
 
 ### Wave 5 — counts / food cost (ME inventory honesty)
 
@@ -320,12 +353,14 @@ Voice: short. Concrete. Iowa plain. After a win. One ask. Offer paste/photo/forw
 
 ---
 
-## 8. One-screen demo script (use this)
+## 8. One-screen demo script (Myke voice)
 
-> “SaaS wanted POS connect, accounting connect, invoice flood, recipe book, two inventories, and a weekly coach call.  
-> You drop last night’s close. Here’s one move.  
-> Left side still wants: void detail → this week’s schedule → one invoice → who owns food.  
-> Answer one. We remember it *after you approve*. We don’t take your portal password. One seat’s free.”
+> “What problem are you trying to solve — labor, cash flow, or fragmented data? No worries, we got you.  
+> Drop last night’s close. Here’s one move.  
+> Can you take a picture of the schedules? We’ll see if labor’s drifting.  
+> Performance / Sysco — how many times a week? Locals too? Do they email the invoice — where?  
+> Picture of the menu — we handle the SKU chaos; recipes suck.  
+> We don’t take portal passwords. One seat’s free.”
 
 ---
 
