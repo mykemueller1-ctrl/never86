@@ -10,7 +10,7 @@ Logic lives in the MCP, not in ten chats.
 | Cursor autopilot | .cursor/environment.json (merged 2026-08-24) |
 | GTM job | GitHub issue #122 |
 | Command drill-downs | `docs/COMMAND_DRILLDOWN.md` + `docs/TWO_TRACKS.md` (Action Shift ≠ Bamba Command) |
-| 1–5 owner close pack | End-of-day from the POS — not “Z report.” Sales, promos, Void Hunter, SKU drift (beef up → switch vendor or raise the plate). Try-it: `public/demo/action-shift.html` |
+| 1–5 owner desk | ChatGPT-simple: one chat, one prompt. Left: Menu, Labor (FOH / BOH / Delivery / Dish), Schedules. Later: order guides, invoices. Try-it: `public/demo/action-shift.html` |
 
 ## Repos (do not spawn more)
 - never86 — this one. Cursor ran here 2026-08-24. Default `recovery-apr12` is the thin email-only launch; live www.never86.ai Command/Audit routes match `main`.

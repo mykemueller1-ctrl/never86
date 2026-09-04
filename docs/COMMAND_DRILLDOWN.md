@@ -4,7 +4,7 @@
 **Date:** 2026-09-04  
 **Name lock:** The LLM plug-and-play desk for the **1-to-1 through 1-to-5 unit owner is Action Shift.** Command is the same loop when the group is bigger. Do not sell that owner a “Command Center.”  
 **Quality bar:** same as the 1P–3P / Audit path — honest labels, no vapor, no invented dollars.  
-**Try-it on this branch:** `/demo/action-shift.html` — owner seat, one plug, left-rail “you’re missing this.” `/demo/command.html` redirects here.
+**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Labor roles, Schedules. `/demo/command.html` redirects here.
 
 ---
 
@@ -83,32 +83,44 @@ The live answer page already says this: [A restaurant command center without ano
 
 ### The rock (how Action Shift should feel)
 
-Same as Claude / ChatGPT / Grok — **and** a dumb game: one next hole, fill the bar, don’t wander off.
+**ChatGPT / Grok simple.** One chat. One prompt. Then suck them in. The last desk was too much — no chip wall, no 0/3 meter, no four-tile dashboard on first paint.
 
 | Surface | Job |
 |---|---|
-| **The box** | Drop or one-tap a sample. Automate the read. He will not type a novel. |
-| **Left rail** | Open holes + a blue “next” chip. Progress 0/3, 1/3, 2/3. Count never fills the bar (no fake food cost). |
-| **Coach bar** | Operator voice. Hustler, a little lazy, not stupid. Not a robot. Not Myke. Every owner is different. |
-| **The suck-in** | The missing chip is the next prompt. “Close is in. Void reasons next.” Same hook as an LLM suggested follow-up. |
-| **The receipt** | One miss → line → you (owner seat) → due tonight. LLM ranks. Human sends. |
+| **The box** | One composer. Type, paste, or drop. Enter sends. That’s the whole job. |
+| **Left menu** | Things they already know: **Menu, Labor, Schedules.** Labor breaks into **role cards**: Front of house, Back of house, Delivery, Dishwasher. We learn every seat in that shop **before** we talk numbers to the 1–5 owner. |
+| **The suck-in** | After one reply, one or two follow-up pills — same as an LLM suggested prompt. Menu → price + what’s in it. Schedules → they already write these; **later** we auto-fill so they stop. Order guides and invoices stay under **Later**. |
+| **The receipt** | One chat bubble, not a dashboard. Close pack (sales, promos, Void Hunter, SKU drift) lives *inside* that bubble when a close lands. |
 
-Voice rules for the 1–5 desk: short, salty, concrete. No “leverage the platform.” No assuming Fort Dodge, PDQ, or that they swear like Myke — the *job* is the same (too busy / too lazy to close the loop), the *person* is not you. See `docs/TWO_TRACKS.md` so Bamba/Rik never lands on this screen.
+Voice: short. Concrete. Not a robot. Not Myke. See `docs/TWO_TRACKS.md`.
 
-**Do not sell “Z report” as the product noun.** Ask for an **end-of-day / last night’s close from their POS.** Some machines print a Z. We still want the close.
+**Do not sell “Z report” as the product noun.** Ask for last night’s close from the POS.
 
-### The close pack (what a 1–5 owner actually wants)
+### Shop rooms (left) vs later
 
-No CTO. No CFO watching numbers 24/7. That is why the left rail nags the next file.
+| Room | What they already know | Honesty |
+|---|---|---|
+| **Menu** | What they charge. What’s in the plate. | Placeholder until they paste a menu. Recipe / order guide later. |
+| **Labor** | Roles, not a labor %. | Role cards first. **No invented labor $.** |
+| **Front of house** | Floor: server, host, bar — their names. | Learn the seat before we talk. |
+| **Back of house** | Line, prep, expo. | Same. |
+| **Delivery** | Drivers. In-house or 3P. | Same. Fees stay Estimated until a statement. |
+| **Dishwasher** | Dish is a role. | Same. |
+| **Schedules** | The week they already posted. | We **do not** auto-write schedules today. Later that’s the time-save. No invented hours. |
+| **Order guides / Invoices** | Later. | Invoice unlocks SKU drift. Invoice ≠ COGS. |
+
+### The close pack (inside the chat, not a dashboard)
+
+No CTO. No CFO watching numbers 24/7. After a close lands, one bubble can name:
 
 | Tile | What it is | Honesty |
 |---|---|---|
 | **Sales** | What last night did. Net, mix, 1P%. | Verified when it is on the close. Sample pizza $ on the try-it. |
-| **Promos** | Comps / discounts on that same close. Route the fat ones. | Verified as a line on the close. Do not invent a promo save. |
-| **Void Hunter** | Already built. Void $ vs this house’s median. | Verified sample void $. Reasons still a hole. Pattern, not a hanging. |
-| **SKU drift** | Ground beef went up → order that beef from the other vendor, **or** raise the plate because of menu price + cost + recipe. | Missing until an invoice lands. **Estimated** as invoice vs last buy. **Not food cost %.** Invoice ≠ COGS. Not enterprise / suit-world variance math. |
+| **Promos** | Comps / discounts on that same close. | Verified as a line on the close. Do not invent a promo save. |
+| **Void Hunter** | Already built. Void $ vs this house’s median. | Verified sample void $. Pattern, not a hanging. |
+| **SKU drift** | Ground beef went up → other vendor **or** raise the plate (price + cost + recipe). | Missing until menu + invoice. **Not food cost %.** |
 
-This is already how `actionShift.missingEvidence[]` works. **Action Shift’s public face is that rail.** The CEO/CFO/COO Command long-scroll is Track B.
+**Action Shift’s public face is the chat.** The CEO/CFO/COO Command long-scroll is Track B.
 
 ---
 
@@ -165,7 +177,7 @@ Live probes (2026-09-03, this run):
 - Wired Thanx / Marqii / Looker / EONR (scaffolds in `agents/`, not Command UI).
 - `never86-command-center-v2` and `taco-bamba-command-center` as GitHub repos (see §6).
 
-**Now on this branch (static, sample only):** `public/demo/action-shift.html` — Action Shift owner desk. LLM rock + left-rail missing chips. Not wired to ops DB. Not Bamba. `public/demo/command.html` redirects here so nobody sells the owner a Command logo by accident.
+**Now on this branch (static, sample only):** `public/demo/action-shift.html` — one chat, one prompt. Left menu is the shop (Menu, Labor roles, Schedules). Not wired to ops DB. Not Bamba. `public/demo/command.html` redirects here.
 
 ---
 
@@ -174,7 +186,7 @@ Live probes (2026-09-03, this run):
 Tell it like an LLM close, not like a BI tool.
 
 0. **Plug.** One box. Paste or drop. No account for the sample desk.
-1. **Left rail names the hole.** “You’re missing last night’s close.” “You’re missing the DoorDash statement — fees stay Estimated.” “You’re missing the void reason log.” “No invoice → no SKU drift.” “No count → no food cost.” Each chip is a coach, not a status widget.
+1. **Left menu is the shop.** Menu, Labor (FOH / BOH / Delivery / Dish), Schedules. Order guides and invoices stay Later. Follow-up pills suck them to the next room.
 2. **Network miss.** After a close lands: the group number that is off. One miss. Ranked. Source-tagged.
 3. **Shop.** Which unit is carrying it. Compare to the network’s own median — not a national benchmark you don’t have.
 4. **Statement / close line.** The actual line. If it isn’t on the close or a statement, the chip stays Missing and the rail asks for it.
@@ -301,23 +313,24 @@ STACK-MAP still lists `never86-command-center-v2` as private. If those trees onl
 
 **Do not build:** mailbox ingest, ChatGPT app, live Bamba reconnect, fake savings, auto-mail, a new repo.
 
-**Shipped on this branch (static HTML):** `public/demo/action-shift.html` — gamified owner desk. `public/demo/command.html` redirects so a 1–5 owner never lands on a Command logo.
+**Shipped on this branch (static HTML):** `public/demo/action-shift.html` — ChatGPT-simple owner chat. `public/demo/command.html` redirects so a 1–5 owner never lands on a Command logo.
 
-Sample Downtown voids / 1P% / 3P fee range come from the fictional pizza numbers already on `/demo/3p-fee-finder`. The desk asks for an **end-of-day from the POS**, not a “Z report.” Close pack: sales, promos, Void Hunter, SKU drift. Invoice unlocks SKU drift in operator English (beef went up → switch vendor or raise the plate). Count chip refuses to invent food cost. SKU drift is not food cost. Coach copy is operator-salty, not a SaaS wizard.
+Sample Downtown voids come from the fictional pizza numbers already on `/demo/3p-fee-finder` — and only after they send a close. We do not auto-write schedules. We do not invent labor $. Role cards are how we learn the shop.
 
 **Next slice on `main`:**
 
-1. Put this desk on `/action-shift` (or `/demo/action-shift`) with the same rail driven by `actionShift.missingEvidence`.
+1. Put this desk on `/action-shift` (or `/demo/action-shift`) as one chat driven by `actionShift`.
 2. Do **not** paste this voice onto gated `/command-center` / Bamba.
 3. Paid FOH / BOH manager seats stay later. Owner seat stays free.
+4. Auto-fill schedules is later. Do not ship that as working.
 
 The suck-in order (safe):
 
-1. Missing end-of-day close → plug close → sales + promos + Void Hunter $ (sample).
-2. Missing void reason log → still no verdict.
-3. Missing vendor invoice → SKU drift stays Missing. After invoice: switch the house or raise the plate. No invented save.
-4. Missing DoorDash statement → 3P revenue Verified, fees Estimated.
-5. Missing count → food cost stays Missing. Stop. SKU drift ≠ food cost.
+1. One prompt — close, menu, labor role, or schedule.
+2. One reply. One or two follow-up pills.
+3. Menu (price + plate) before order guide / invoice.
+4. Roles before labor $. Schedule paste before any auto-write (auto-write is not built).
+5. Missing count → food cost stays Missing. SKU drift ≠ food cost.
 
 ---
 
@@ -328,14 +341,14 @@ Sections only. No dollars invented in the room.
 1. **Promise.** Find the leak. Assign the fix. Keep the receipt. **Action Shift** is the 1–5 owner desk. Command is later.
 2. **Who it’s for.** Hustler 1–5 unit owner. Knows they should close the loop. Won’t. We automate the read and gamify the next file. Not Myke. Not Rik. Not Bamba.
 3. **What it is not.** Another dashboard. Not R365. Not Voosh portal login. Not a fee calculator.
-4. **The rock.** One drop box, like every LLM. Left rail chips say “you’re missing this.” That chip is the next paste.
-5. **The game.** 0/3 → 1/3 → 2/3 files. Next chip is always one thing. Demo: `/demo/action-shift.html`.
+4. **The rock.** One chat, one prompt — ChatGPT / Grok. Left menu: Menu, Labor, Schedules.
+5. **The suck-in.** Follow-up pills. Role cards (FOH / BOH / Delivery / Dish) before numbers. Demo: `/demo/action-shift.html`.
 6. **1P–3P as one miss type.** Mix from POS is Verified. Take-rate dollars are Estimated until the statement or written rate card is in. `/audit` remains the Google door for one statement.
 7. **Honesty pills.** Verified / Estimated / Unverified / Missing. Incomplete week stays Open.
 8. **What we will not say.** Guaranteed recovery. Named thieves. Bamba or CTAP private figures. “We saved you $X” without a proof object.
 9. **Proof of method.** `/audit` + `/demo/action-shift.html`. Gated Command / Bamba stay off this pitch.
 10. **Seat math.** Owner seat free. FOH manager and BOH manager paid later. Extra shops paid.
-11. **Ask.** Drop last night’s close. Watch sales / promos / Void Hunter land. That’s the hook.
+11. **Ask.** One box. Or tap Labor and name a role. That’s the hook.
 
 ### Math that is safe to say in the room
 
@@ -357,7 +370,7 @@ Sections only. No dollars invented in the room.
 
 ## 9. Suggested talk track (no numbers)
 
-“You’re the owner who knows you should do this and still won’t open the email. Action Shift is the free owner seat. Drop last night’s close from the POS — not a Z-report pitch. Sales, promos, Void Hunter come off that file. SKU drift is simple: beef went up, buy from the other guy or raise the burger. MarginEdge invoices you. We name tonight’s move. You’re not Myke. You’re not Rik. Command is a later building. We don’t invent food cost. We don’t mail your guys.”
+“One chat. Like ChatGPT. Left side is your shop: menu, labor, schedules. We learn dishwasher and the floor before we talk numbers. Later we write the schedule so you don’t. Later you drop the order guide and the invoice. Tonight just talk. We don’t invent food cost. We don’t mail your guys. Command is a later building.”
 
 ---
 
