@@ -292,7 +292,10 @@
       document.body.addEventListener("click", (e) => {
         const t = e.target.closest("[data-room]");
         if (!t) return;
-        if (t.classList.contains("new")) threads.home = [];
+        if (t.classList.contains("new")) {
+          threads.home = [];
+          known.close = known.menu = known.schedule = known.punches = false;
+        }
         openRoom(t.dataset.room);
       });
       document.getElementById("send").addEventListener("click", () => send());
