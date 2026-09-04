@@ -96,7 +96,18 @@ export function buildSystemMisses(stores: SalesLaborStoreRow[]): SalesLaborSyste
       pushMiss(misses, row, 'catering', `${row.store} catering share is the leak to work first`, 'catering share', cateringShare, 1);
     }
   }
-  return misses.sort((a, b) => (b.metricValue ?? 0) - (a.metricValue ?? 0));
+  const rank: Record<SalesLaborSystemMiss['kind'], number> = {
+    void: 0,
+    comp: 1,
+    catering: 2,
+    'sales-vs-fcst': 3,
+    'sales-vs-py': 4,
+  };
+  return misses.sort((a, b) => {
+    const kindDelta = rank[a.kind] - rank[b.kind];
+    if (kindDelta !== 0) return kindDelta;
+    return (b.metricValue ?? 0) - (a.metricValue ?? 0);
+  });
 }
 
 export function buildDrillPaths(misses: SalesLaborSystemMiss[]): SalesLaborDrillPath[] {

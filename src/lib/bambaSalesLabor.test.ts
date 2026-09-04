@@ -93,6 +93,8 @@ describe('bamba sales-labor contract', () => {
       'Landmark void line',
       `${landmarkVoid?.owner} · due ${landmarkVoid?.dueDate}`,
     ]);
+    expect(desk.misses[0]?.store).toBe('Landmark');
+    expect(desk.misses[0]?.kind).toBe('void');
     expect(desk.memory.provider).toBe('zep-graphiti');
     expect(desk.memory.mcp).toBe('agentmemory');
     expect(desk.completeness).toBe('done');
