@@ -29,6 +29,7 @@ export function HumanSiteHeader() {
           <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
           <Link href="/play" className="human-nav-link">Play</Link>
           <Link href="/operator" className="human-nav-link">Owner desk</Link>
+          <Link href="/communities" className="human-nav-link">Communities</Link>
           <Link href="/pricing" className="human-nav-link">Pricing</Link>
           <Link href="/command-center" className="human-nav-link">Command Center</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
@@ -79,6 +80,7 @@ export function HumanSiteFooter() {
           <Link href="/play" className="human-nav-link">Start playing</Link>
           <Link href="/onboard" className="human-nav-link">Open with email</Link>
           <Link href="/operator" className="human-nav-link">Owner desk</Link>
+          <Link href="/communities" className="human-nav-link">Communities</Link>
           <Link href="/command-center" className="human-nav-link">Command Center</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
