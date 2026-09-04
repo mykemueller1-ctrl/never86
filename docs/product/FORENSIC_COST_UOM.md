@@ -39,6 +39,17 @@ pourCostPct = beverageCogs$ / beverageSales$          # needs counts + sales
 
 Kegs (TTB barrel = 31 US gal): half 15.5 · quarter 7.75 · sixth ≈ 5.1667.
 
+## Drink recipe path (per unit)
+
+```
+ask_pour_standards → operator picks 1.5 / 1.75 / 2 / custom per category
+declare_pour_standards → human approves memory
+analyze_recipe_cost mode=drink_recipe + house_pour_lines + ingredients
+drinkCost = Σ (housePourFlOz_or_recipeSpecificFlOz × costPerFlOz)
+```
+
+Unit A can be 1.5 shot / 1.75 mixed. Unit B can be 2 / 2. Same drink name ≠ same ounces.
+
 ## Food recipe path
 
 ```

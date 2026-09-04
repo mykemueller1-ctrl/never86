@@ -136,7 +136,7 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
     never: SPECIALIST_NEVER,
     evidenceNotes: [
       'EP cost = AP cost / yield. Missing yield is Missing Evidence.',
-      'Drink recipes: ask house pour per unit before cost-per-pour.',
+      'Drink recipes: ask each unit 1.5 / 1.75 / 2 / custom before mode=drink_recipe. Never assume.',
       'Contribution margin $ beats food-cost % alone for menu decisions.',
       'Prime cost needs disclosed labor basis (wages-only vs loaded).',
     ],

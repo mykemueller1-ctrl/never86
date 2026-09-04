@@ -186,4 +186,63 @@ describe('public MCP route', () => {
     expect(text).toContain('review leads');
     expect(text).toContain('"employees": 1');
   });
+
+  it('costs drink recipes from per-unit house pour — blocks until asked', async () => {
+    const blocked = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 20,
+        method: 'tools/call',
+        params: {
+          name: 'analyze_recipe_cost',
+          arguments: {
+            mode: 'drink_recipe',
+            store_id: 'unit-a',
+            house_pour_lines: [],
+            ingredients: [
+              { name: 'well vodka', pourCategory: 'mixed_drink_liquor', epUnitCost: 0.4 },
+            ],
+          },
+        },
+      }),
+    }));
+    const blockedBody = await blocked.json();
+    expect(blockedBody.result.isError).toBe(true);
+    expect(blockedBody.result.content[0].text).toMatch(/1\.5|1\.75|2/);
+
+    const priced = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 21,
+        method: 'tools/call',
+        params: {
+          name: 'analyze_recipe_cost',
+          arguments: {
+            mode: 'drink_recipe',
+            store_id: 'unit-b',
+            house_pour_lines: [
+              { category: 'mixed_drink_liquor', pour_spec_fl_oz: 1.75 },
+              { category: 'spirit_shot', pour_spec_fl_oz: 1.5 },
+              { category: 'wine_glass', pour_spec_fl_oz: 5 },
+              { category: 'draft_pour', pour_spec_fl_oz: 16 },
+            ],
+            ingredients: [
+              { name: 'well vodka', pourCategory: 'mixed_drink_liquor', epUnitCost: 0.5 },
+              { name: 'soda', pourSource: 'fixed', epQty: 4, epUnitCost: 0.02 },
+            ],
+          },
+        },
+      }),
+    }));
+    const pricedBody = await priced.json();
+    const text = pricedBody.result.content[0].text as string;
+    expect(pricedBody.result.isError).toBeFalsy();
+    expect(text).toContain('"kind": "drink_recipe"');
+    expect(text).toContain('"epQty": 1.75');
+    expect(text).toMatch(/house pour/i);
+  });
 });

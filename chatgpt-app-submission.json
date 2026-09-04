@@ -159,9 +159,9 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Calculates Unverified plate cost or food COGS from merchant-supplied EP lines and inventory dollars without writing recipes.",
+        "read_only_justification": "Calculates Unverified plate or drink cost, or food COGS, from merchant-supplied EP lines, house pours, and inventory dollars without writing recipes.",
         "open_world_justification": "Does not contact vendors or rewrite menu engineering systems.",
-        "destructive_justification": "Cannot invent yield, treat an invoice as COGS, or close a week without a count."
+        "destructive_justification": "Cannot invent yield or house pour (1.5/1.75/2), treat an invoice as COGS, or close a week without a count."
       }
     },
     "analyze_vendor_prices": {

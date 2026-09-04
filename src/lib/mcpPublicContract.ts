@@ -245,17 +245,44 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'analyze_recipe_cost',
     description:
-      'Cost a plate from edible-portion ingredient lines, or compute EP unit cost / food COGS / food-cost % when counts and sales share scope. Returns Unverified math; never invents yield, case pack, or treats an invoice as COGS.',
+      'Cost a plate (mode=recipe) or a drink (mode=drink_recipe). Drink recipes pull liquor/wine/draft fl oz from THIS unit’s house pour (ask_pour_standards → declare_pour_standards) — never assume 1.5 / 1.75 / 2. Also EP unit cost / food COGS / food-cost % when counts and sales share scope. Unverified math; never invents yield or treats an invoice as COGS.',
     inputSchema: {
       type: 'object',
       properties: {
         mode: {
           type: 'string',
-          enum: ['recipe', 'ep_unit_cost', 'food_cogs', 'food_cost_pct', 'contribution', 'knowledge'],
+          enum: ['recipe', 'drink_recipe', 'ep_unit_cost', 'food_cogs', 'food_cost_pct', 'contribution', 'knowledge'],
+        },
+        store_id: {
+          type: 'string',
+          description: 'Required for drink_recipe. Pour standards are per unit.',
+        },
+        location_id: { type: 'string' },
+        house_pour_lines: {
+          type: 'array',
+          description:
+            'For drink_recipe: operator-declared pour lines for THIS unit (from declare_pour_standards). Empty → Missing Evidence + ask.',
+          items: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0, maximum: 32 },
+              label: { type: 'string' },
+              measure_method: { type: 'string' },
+              approved_by: { type: 'string' },
+              source: { type: 'string' },
+            },
+            required: ['category', 'pour_spec_fl_oz'],
+            additionalProperties: false,
+          },
         },
         ingredients: {
           type: 'array',
-          description: 'For mode=recipe: [{name?, epQty, epUnitCost}, ...]',
+          description:
+            'recipe: [{name?, epQty, epUnitCost}]. drink_recipe: liquor lines use pourCategory + house pour; fixed/recipe_specific need epQty.',
           items: {
             type: 'object',
             properties: {
@@ -263,8 +290,16 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
               name: { type: 'string' },
               epQty: { type: 'number', minimum: 0 },
               epUnitCost: { type: 'number', minimum: 0 },
+              pourCategory: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pourSource: {
+                type: 'string',
+                enum: ['house', 'recipe_specific', 'fixed'],
+                description: 'house (default with pourCategory) uses unit pourSpec; recipe_specific needs explicit epQty; fixed = syrup/juice.',
+              },
             },
-            required: ['epQty', 'epUnitCost'],
             additionalProperties: false,
           },
         },

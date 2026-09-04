@@ -23,12 +23,14 @@ import {
   type PourCategory,
 } from '@/lib/operatorPourStandards';
 import {
+  calculateDrinkRecipeCost,
   calculateEpUnitCost,
   calculateRecipeCost,
   contributionMargin,
   foodCogs,
   foodCostPct,
   recipeCostKnowledgePack,
+  type DrinkRecipeIngredient,
   type RecipeIngredient,
 } from '@/lib/recipeCost';
 import {
@@ -320,6 +322,50 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             ...result,
           });
         }
+        if (mode === 'drink_recipe') {
+          const rawHouse = Array.isArray(args.house_pour_lines) ? args.house_pour_lines : [];
+          const housePourLines: HousePourLine[] = rawHouse.map((row) => {
+            const r = row as Record<string, unknown>;
+            return {
+              category: r.category as PourCategory,
+              pourSpecFlOz: Number(r.pour_spec_fl_oz),
+              label: typeof r.label === 'string' ? r.label : undefined,
+              measureMethod: typeof r.measure_method === 'string' ? r.measure_method : undefined,
+              approvedBy: typeof r.approved_by === 'string' ? r.approved_by : undefined,
+              source: typeof r.source === 'string' ? r.source : undefined,
+            };
+          });
+          const ingredients = Array.isArray(args.ingredients)
+            ? (args.ingredients as DrinkRecipeIngredient[]).map((row) => {
+                const r = row as DrinkRecipeIngredient & {
+                  pour_category?: PourCategory;
+                  pour_source?: DrinkRecipeIngredient['pourSource'];
+                  ep_qty?: number;
+                  ep_unit_cost?: number;
+                };
+                return {
+                  id: r.id,
+                  name: r.name,
+                  pourCategory: r.pourCategory ?? r.pour_category,
+                  pourSource: r.pourSource ?? r.pour_source,
+                  epQty: r.epQty ?? r.ep_qty,
+                  epUnitCost: Number(r.epUnitCost ?? r.ep_unit_cost),
+                };
+              })
+            : [];
+          const result = calculateDrinkRecipeCost({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            locationId: typeof args.location_id === 'string' ? args.location_id : null,
+            housePourLines,
+            ingredients,
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning:
+              'Unverified drink cost. Liquor ounces came from THIS unit’s house pour (or an explicit recipe-specific fl oz) — never a Never86 default.',
+            ...result,
+          });
+        }
         if (mode === 'ep_unit_cost') {
           const result = calculateEpUnitCost(Number(args.ap_unit_cost), Number(args.yield_fraction));
           if (!result.ok) return textResult(req.id, result, true);
@@ -355,7 +401,7 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           {
             ok: false,
             error:
-              'analyze_recipe_cost requires mode: recipe | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
+              'analyze_recipe_cost requires mode: recipe | drink_recipe | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
           },
           true,
         );
