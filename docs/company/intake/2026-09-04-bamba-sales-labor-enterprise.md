@@ -4,6 +4,18 @@
 **Task:** `bamba-sales-labor-enterprise-v1`  
 **Surface:** `/command-center/sales-labor` (reports gate, noindex)
 
+## Lane lock — do not mix
+
+This is the **bigger** Taco Bamba Command Center desk. Other agents stay on their own branches. Do not cherry-pick, rebase onto, or merge them into this PR.
+
+| Lane | PR | Branch | What it is |
+|---|---|---|---|
+| **This desk (bigger)** | [#189](https://github.com/mykemueller1-ctrl/never86/pull/189) | `cursor/never86-bamba-sales-labor-enterprise-v1-44d9` | Gated enterprise Sales · Labor desk. Bamba tenant only. |
+| Smaller map / public try-it | [#188](https://github.com/mykemueller1-ctrl/never86/pull/188) | `cursor/command-drilldown-brief-1509` | Docs + `/demo/command` fictional pizza sample. No live Bamba reconnect. |
+| Overlay on this desk | [#190](https://github.com/mykemueller1-ctrl/never86/pull/190) | `cursor/never86-bamba-ui-polish-swarm-v1-ffe8` | Polish / Graphiti / 12-job swarm copied on top of #189. Not this PR. |
+
+#189 does not own `/demo/command`, `docs/COMMAND_DRILLDOWN.md`, Graphiti, or a 12-job swarm.
+
 ## What this is
 
 One Never86 Command Center sales-labor desk for the Taco Bamba Sales Labor Report (MP) v5 Daily parse. Not a new product. Lane C isolation: Bamba tenant memory only.
