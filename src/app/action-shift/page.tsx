@@ -13,9 +13,10 @@ type Seat = {
 };
 
 // Free plan = one owner seat for the 1–3 unit ICP.
+// Community Tap is seat 1 (first assigned store). Open play is for any operator.
 // Seats 2–3 are paid expansion. Multi-unit Command Center is a separate build.
 const SEATS: Seat[] = [
-  { n: 1, role: 'Owner-operator', status: 'free', name: 'You · this store · 1–3 unit ICP' },
+  { n: 1, role: 'Owner-operator', status: 'free', name: 'Community Tap · first store · assigned' },
   { n: 2, role: 'Manager / GM', status: 'invite', name: 'Paid seat · one manager login' },
   { n: 3, role: 'Kitchen / FOH / driver stations', status: 'invite', name: 'Paid seat · templates under manager' },
 ];
@@ -94,10 +95,34 @@ export default function ActionShiftDeskPage() {
           Never 86&apos;d
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#a8b5ac]">
-          Yesterday&apos;s numbers → one next action → night proof. Seat 1 is the owner and free. Seats 2 and 3 are paid when you expand the team.
+          Yesterday&apos;s numbers → one next action → night proof. Seat 1 is free. Community Tap is the first assigned store. Any operator can open play now — no password.
         </p>
 
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/play"
+            className="rounded-md bg-[#c4a35a] px-4 py-2.5 text-sm font-medium text-[#0c1210] hover:bg-[#d4b56a]"
+          >
+            Start playing →
+          </Link>
+          <Link
+            href="/onboard"
+            className="rounded-md border border-white/15 px-4 py-2.5 text-sm font-medium text-[#e8ebe6] hover:border-white/30"
+          >
+            Claim your free seat →
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-md border border-white/15 px-4 py-2.5 text-sm font-medium text-[#e8ebe6] hover:border-white/30"
+          >
+            Sign in with email →
+          </Link>
+        </div>
+
         <nav className="mt-8 flex flex-wrap gap-4 text-sm text-[#c5d0c8]">
+          <Link href="/play" className="underline-offset-4 hover:underline">
+            Open play
+          </Link>
           <a href="#desk" className="underline-offset-4 hover:underline">
             Desk
           </a>
@@ -143,7 +168,10 @@ export default function ActionShiftDeskPage() {
             ))}
           </ul>
           <p className="mt-3 text-xs text-[#7a8a80]">
-            Claim the free owner seat with email, then open the manager seat as synthetic proof.{' '}
+            Community Tap holds seat 1. Open play is live for any operator on a sample shop (no private CTAP numbers). Claim your own free owner seat with email when you want a real login.{' '}
+            <Link href="/play" className="text-[#c4a35a] underline-offset-4 hover:underline">
+              Start playing →
+            </Link>{' '}
             <Link href="/onboard" className="text-[#c4a35a] underline-offset-4 hover:underline">
               Claim owner seat →
             </Link>{' '}

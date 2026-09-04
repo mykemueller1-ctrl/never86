@@ -43,18 +43,18 @@ export default function Home() {
               Your restaurant already creates the answer. It is buried in labor, invoices, and the daily mess. Never 86&apos;d reads the evidence, explains what changed, and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Open with email' } })}>
-                Open with your email →
+              <Link href="/play" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/play', label: 'Start playing' } })}>
+                Start playing →
               </Link>
-              <Link href="/llm-shells" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/llm-shells', label: 'Try in ChatGPT' } })}>
-                Try it in ChatGPT
+              <Link href="/onboard" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Open with email' } })}>
+                Claim your free seat
               </Link>
               <Link href="/operator" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/operator', label: 'Ask on the phone' } })}>
                 Ask on the phone
               </Link>
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              1–3 unit operators · no card · no password · seat 1 owner free
+              Open now · Community Tap seat 1 · any operator can play · no card · no password
             </p>
           </div>
 
@@ -147,7 +147,8 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/onboard" className="human-button human-button-primary">Claim free owner seat →</Link>
+            <Link href="/play" className="human-button human-button-primary">Start playing →</Link>
+            <Link href="/onboard" className="human-button human-button-secondary">Claim free owner seat →</Link>
             <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
             <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
