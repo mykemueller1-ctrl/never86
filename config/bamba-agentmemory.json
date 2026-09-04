@@ -1,0 +1,11 @@
+{
+  "mcp": "agentmemory",
+  "serverName": "bamba-agentmemory",
+  "provider": "zep-graphiti",
+  "tenantId": "bamba",
+  "groupId": "bamba",
+  "isolation": "Zep Graphiti group_id=bamba. Facts carry validity windows. Bamba never bleeds to other tenants.",
+  "liveWrite": false,
+  "sharedBy": ["cursor-builder", "grok-swarm"],
+  "tools": ["remember_fact", "recall_facts", "list_validity_windows"]
+}

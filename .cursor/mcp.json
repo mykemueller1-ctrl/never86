@@ -2,6 +2,14 @@
   "mcpServers": {
     "never86-operator-system": {
       "url": "https://www.never86.ai/api/mcp"
+    },
+    "bamba-agentmemory": {
+      "command": "node",
+      "args": ["scripts/bamba-agentmemory-mcp.mjs"],
+      "env": {
+        "AGENTMEMORY_TENANT": "bamba",
+        "ZEP_GRAPHITI_GROUP_ID": "bamba"
+      }
     }
   }
 }
