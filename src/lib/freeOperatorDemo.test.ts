@@ -128,7 +128,7 @@ describe('free operator demo pack', () => {
   it('keeps Prime Cost Coach evidence NEED or READY only', () => {
     expect(OWNER_PRIME_COST_EVIDENCE).toHaveLength(3);
     expect(OWNER_PRIME_COST_EVIDENCE.every((row) => row.state === 'NEED' || row.state === 'READY')).toBe(true);
-    expect(OWNER_PRIME_COST_EVIDENCE.filter((row) => row.state === 'READY').map((row) => row.id)).toEqual(['schedule']);
+    expect(OWNER_PRIME_COST_EVIDENCE.filter((row) => row.state === 'READY')).toEqual([]);
     expect(OWNER_DESK_TRAY.map((row) => row.id)).toEqual(['action', 'food', 'labor', 'pop', 'beer', 'liquor']);
   });
 
@@ -163,14 +163,13 @@ describe('free operator demo pack', () => {
     expect(review.dollarClaim).toBe('none');
   });
 
-  it('keeps Forward-EOD on the owner seat and files on this phone', () => {
+  it('keeps Forward-EOD on the owner seat and warns against private CTAP data', () => {
     expect(OWNER_SEAT_EOD.surface).toBe('owner-seat');
     expect(OWNER_SEAT_EOD.notThisDemo).toBe(true);
     expect(OWNER_SEAT_EOD.copy).toMatch(/close\+\{seat\}@inbound\.never86\.ai/);
     expect(OWNER_SEAT_EOD.copy).toMatch(/not this public preview/i);
-    expect(PUBLIC_PREVIEW_COPY).toMatch(/Preview only/i);
-    expect(PUBLIC_PREVIEW_COPY).toMatch(/private restaurant data/i);
-    expect(PUBLIC_PREVIEW_COPY).toMatch(/Production V2/i);
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/source tags/i);
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/private CTAP/i);
   });
 
   it('keeps CTap staff names, pars, and live Z dollars out of public demo copy', () => {
@@ -202,6 +201,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     const ui = readFileSync(join(ROOT, 'src/components/FreeOperatorPhone.tsx'), 'utf8');
     const card = readFileSync(join(ROOT, 'src/components/FreeOperatorAnswerCard.tsx'), 'utf8');
     const lib = readFileSync(join(ROOT, 'src/lib/freeOperatorDemo.ts'), 'utf8');
+    const css = readFileSync(join(ROOT, 'src/app/globals.css'), 'utf8');
+    const deskStart = css.indexOf('/* Owner desk');
+    const deskCss = deskStart >= 0 ? css.slice(deskStart) : '';
     for (const blob of [page, answer, ui, card, lib]) {
       expect(blob).not.toMatch(/from ['"]@\/db['"]/);
       expect(blob).not.toMatch(/DATABASE_URL/);
@@ -209,10 +211,19 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('FreeOperatorAnswerCard');
     expect(ui).toContain('owner-desk');
     expect(ui).toContain('Prime Cost Coach');
+    expect(ui).toContain('/api/ask');
+    expect(ui).toContain('/api/upload');
     expect(ui).not.toMatch(/router\.push/);
-    expect(ui).toMatch(/goAsk\(ask\)/);
+    expect(ui).toMatch(/goAsk\(ask/);
     expect(ui).toMatch(/Demo restaurant/);
     expect(ui).not.toMatch(/Community Tap/);
+    expect(ui).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
+    expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
+    expect(deskCss).toMatch(/#0066ff/);
+    expect(deskCss).toMatch(/#003bb5/);
+    expect(deskCss).not.toMatch(/#e66b27|#fff5f0|#faf6|#fffaf2|#fffdf9|#ffe4d4/);
+    expect(page).toContain('SimpleOwnerDemo');
+    expect(page).toContain('owner-desk-page');
     expect(answer).toMatch(/robots:\s*\{\s*index:\s*false/);
     expect(card).toContain('Coach this tomorrow');
     expect(card).toContain('Needs');

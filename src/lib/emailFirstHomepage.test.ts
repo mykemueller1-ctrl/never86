@@ -55,5 +55,6 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
     expect(shell).not.toMatch(/href="\/play"[^>]*human-nav-link">Play/);
     expect(shell).not.toMatch(/human-nav-link">Owner desk/);
     expect(shell).toMatch(/href="\/login"/);
+    expect(shell).toMatch(/href="\/communities"/);
   });
 });

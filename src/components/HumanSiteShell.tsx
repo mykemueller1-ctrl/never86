@@ -30,6 +30,7 @@ export function HumanSiteHeader() {
           <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
           <Link href="/pricing" className="human-nav-link">Pricing</Link>
           <Link href="/command-center" className="human-nav-link">Command Center</Link>
+          <Link href="/communities" className="human-nav-link">Communities</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/onboard" className="human-button human-button-primary text-sm">Claim the free owner seat →</Link>
         </nav>
@@ -78,6 +79,7 @@ export function HumanSiteFooter() {
           <Link href="/onboard" className="human-nav-link">Claim the free owner seat</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/#demo" className="human-nav-link">Demo</Link>
+          <Link href="/communities" className="human-nav-link">Communities</Link>
           <Link href="/command-center" className="human-nav-link">Command Center</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
           <Link href="/privacy" className="human-nav-link">Privacy</Link>

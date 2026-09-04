@@ -66,12 +66,12 @@ export const BASE_WHAT_I_KNOW: readonly WhatIKnowCard[] = [
     id: 'mouth',
     title: 'Ask mouth',
     state: 'READY',
-    reason: 'Talk, type, photo, or file. Files stay on this phone.',
+    reason: 'Talk, type, photo, or file. Asks and files persist on this seat.',
   },
 ];
 
 export const PUBLIC_PREVIEW_COPY =
-  "Preview only—don't add private restaurant data here yet. Production V2 keeps original files private.";
+  "Seat-scoped preview. Do not add private CTAP staff, PINs, or live dollars. Uploads and asks persist with source tags.";
 
 export const OWNER_SEAT_EOD = {
   surface: 'owner-seat' as const,
@@ -95,8 +95,8 @@ export const OWNER_PRIME_COST_EVIDENCE: readonly PrimeCostEvidence[] = [
     short: 'Schedule',
     title: 'Weekly schedule',
     icon: '☰',
-    state: 'READY',
-    reason: 'I know who was planned.',
+    state: 'NEED',
+    reason: 'Weekly schedule is missing until a schedule file lands for this seat.',
   },
   {
     id: 'hourly',

@@ -14,7 +14,7 @@ Sample answers: `/operator/answers/{slug}` — labeled **FICTIONAL / sample-not-
 
 ## What this is
 
-Phone-first **Owner desk** for the 1–3 unit ICP. Action Shift home, Labor & schedule (Prime Cost Coach evidence), food/beverage trays, ask mouth (talk / type / photo / file). Ask routing covers FOH, BOH, Schedule, Vendor, and Merchant. Sample cards stay on this phone. Evidence stays **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close. Sample answer URLs are noindex. Demo restaurant only — no Community Tap private data.
+Phone-first **Owner desk** (`SimpleOwnerDemo`) for the 1–3 unit ICP. Action Shift home, Labor & schedule (Prime Cost Coach evidence), food/beverage trays, ask mouth (talk / type / photo / file). The composer calls `POST /api/ask` and `POST /api/upload`. Questions and answers persist tenant-scoped by `operator_id` with source tags (Neon = D1 equivalent on this stack). Files land in R2 when `R2_*` is configured, otherwise a Neon object fallback. Readiness is live from stored files. Evidence stays **NEED** / **READY**. Named is not a verified close. Sample answer URLs are noindex. Demo restaurant only — no Community Tap private data.
 
 Open play at `/play` uses the same boarding voice: pain → POS email/photo/Drive (no day-one API) → one Action Shift → schedule → vendors → menu.
 
