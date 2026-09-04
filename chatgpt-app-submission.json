@@ -116,6 +116,30 @@
         "destructive_justification": "Cannot invent pour cost as verified, accuse theft, or alter inventory counts."
       }
     },
+    "convert_uom": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Converts verified package sizes and pour specs into portion units without writing inventory or inventing pack size.",
+        "open_world_justification": "Does not contact distributors, scales, or POS systems.",
+        "destructive_justification": "Cannot invent pourSpec, keg size, or case conversion, or alter stock counts."
+      }
+    },
+    "analyze_recipe_cost": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Calculates Unverified plate cost or food COGS from merchant-supplied EP lines and inventory dollars without writing recipes.",
+        "open_world_justification": "Does not contact vendors or rewrite menu engineering systems.",
+        "destructive_justification": "Cannot invent yield, treat an invoice as COGS, or close a week without a count."
+      }
+    },
     "analyze_vendor_prices": {
       "annotations": {
         "readOnlyHint": true,
@@ -155,7 +179,7 @@
       "user_prompt": "List the Never86 specialists and the labor specialist's one job.",
       "file_attachment_urls": null,
       "tools_triggered": "list_specialists",
-      "expected_output": "Lists labor, beverage, food-invoice, human-coach, design-qa, and truth-qa with one job each and no private store data.",
+      "expected_output": "Lists labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, and truth-qa with one job each and no private store data.",
       "expected_output_url": null
     },
     {

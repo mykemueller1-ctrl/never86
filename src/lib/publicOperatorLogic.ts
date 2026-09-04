@@ -3,6 +3,8 @@ import {
   type MarketplaceCostInputs,
 } from './marketplaceCost';
 import { NEVER86_OPERATOR_SYSTEM } from './operatorSystem';
+import { recipeCostKnowledgePack } from './recipeCost';
+import { uomKnowledgePack } from './uomConvert';
 
 export const PUBLIC_LOGIC_DOMAINS = [
   'all',
@@ -25,6 +27,9 @@ export const PUBLIC_LOGIC_DOMAINS = [
   'vendor-drift',
   'beverage',
   'product-mix-pars',
+  'uom-cost',
+  'recipe-cost',
+  'forensic-pnl',
 ] as const;
 
 export type PublicLogicDomain = (typeof PUBLIC_LOGIC_DOMAINS)[number];
@@ -267,8 +272,14 @@ const beverage = {
     shrinkPct: 'shrinkUnits / inventoryConsumed',
     revenueLost: 'shrinkUnits * unitPrice only when unit price is supplied',
     bcs: 'clamp(round(100 - shrinkPct / 0.30 * 100), 0, 100)',
+    bottleFlOz: 'packageMl / 29.5735295625',
+    poursPerPackage: '(unitsPerPackage * unitFlOz) / pourSpecFlOz',
+    costPerPour: 'packageCost / poursPerPackage when pack size and pourSpec are verified',
+    pourCostPct: 'beverageCogs$ / beverageSales$ when counts + purchases + sales share scope',
   },
-  boundary: 'This is a pour-vs-inventory heuristic. Transfers, waste, unit/pack mismatch, comps, recipes, and count timing can explain it.',
+  boundary:
+    'This is a pour-vs-inventory heuristic. Transfers, waste, unit/pack mismatch, comps, recipes, and count timing can explain it. Fluid oz ≠ weight oz. Missing pourSpec or keg size is Missing Evidence.',
+  relatedDomains: ['uom-cost', 'vendor-drift'],
 };
 
 const productMixPars = {
@@ -295,6 +306,50 @@ const productMixPars = {
   ],
 };
 
+const uomCost = uomKnowledgePack();
+
+const recipeCostLogic = recipeCostKnowledgePack();
+
+const forensicPnl = {
+  purpose:
+    'Define restaurant P&L and prime-cost language for independent 1–3 unit operators without inventing store dollars.',
+  stack: [
+    'Sales (food / beverage / other — disclose voids and comps policy)',
+    '− COGS → gross profit',
+    '− Labor (disclose wages-only vs loaded benefits)',
+    '− Controllable operating expenses → controllable income',
+    '− Occupancy / non-controllable / non-operating → net',
+  ],
+  primeCostVariants: {
+    commonOps: 'foodAndBevCogs + laborWages',
+    usarLeaning: 'totalCostOfSales + payrollAndEmployeeBenefits',
+    foodOnlyPlusLabor: 'foodCogs + labor — not full F&B prime; disclose',
+  },
+  signalLadder: {
+    posOrZ: 'What the restaurant recorded.',
+    marketplaceStatement: 'Platform deductions and reported payout math.',
+    payoutBatch: 'Transfer timing/composition, not bank-cleared cash.',
+    bankDeposit: 'Cash received — not why POS or 3P calculated that way.',
+  },
+  investigationLadder: [
+    'Evidence — same store, period, cutoff, UoM, complete count, invoices bridged, sales denominator',
+    'Math — purchases vs inventory change; theoretical vs actual; mix shift; vendor drift >5%',
+    'Owner — one role owns the next proof object',
+    'Proof — credit memo, recount, corrected map, night close receipt',
+  ],
+  truthGates: [
+    'POS ≠ payout',
+    'Invoice ≠ COGS',
+    'No count → no food or beverage cost',
+    'Incomplete week stays Open',
+    'Unverified until source confirmed',
+    'Never name people as thieves',
+    'Never guarantee recovery',
+    '$0 clean only when scope is complete — else Missing Evidence',
+  ],
+  relatedDomains: ['recipe-cost', 'uom-cost', 'beverage', 'vendor-drift', 'invoices-daily-prime', 'marketplace-3p'],
+};
+
 export const PUBLIC_OPERATOR_LOGIC = {
   evidence,
   'action-shift': actionShift,
@@ -315,6 +370,9 @@ export const PUBLIC_OPERATOR_LOGIC = {
   'vendor-drift': vendorDrift,
   beverage,
   'product-mix-pars': productMixPars,
+  'uom-cost': uomCost,
+  'recipe-cost': recipeCostLogic,
+  'forensic-pnl': forensicPnl,
 } as const;
 
 export function getPublicOperatorLogic(domain: PublicLogicDomain) {

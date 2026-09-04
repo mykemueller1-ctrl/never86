@@ -7,6 +7,7 @@ export type SpecialistId =
   | 'labor'
   | 'beverage'
   | 'food-invoice'
+  | 'recipe-cost'
   | 'human-coach'
   | 'design-qa'
   | 'truth-qa';
@@ -67,11 +68,12 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
     job: 'Compare draft/package/credits/price changes from operator-provided beverage CSV; stop when count or invoice scope is missing.',
     seats: ['source-collector', 'margin-analyst', 'operator-coach'],
     ownsStages: ['capture', 'parse', 'truth-gate', 'decide'],
-    logicDomains: ['beverage', 'vendor-drift', 'evidence'],
+    logicDomains: ['beverage', 'vendor-drift', 'uom-cost', 'evidence'],
     publicTools: [
       'get_operator_system',
       'list_agent_jobs',
       'get_operator_logic',
+      'convert_uom',
       'analyze_beverage',
       'analyze_vendor_prices',
       'list_answers',
@@ -83,6 +85,7 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
       'No count → no beverage cost claim.',
       'Quiet vendor is follow-up, not a missed truck.',
       'Tray: pop / beer / liquor — one category ask at a time.',
+      'Fluid oz ≠ weight oz. Missing pourSpec or keg size is Missing Evidence.',
     ],
   },
   {
@@ -91,12 +94,13 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
     job: 'Surface invoice price drift and count gaps; never convert an invoice photo into COGS without a count.',
     seats: ['source-collector', 'margin-analyst', 'operator-coach'],
     ownsStages: ['capture', 'parse', 'truth-gate', 'decide'],
-    logicDomains: ['invoices-daily-prime', 'vendor-drift', 'product-mix-pars', 'evidence'],
+    logicDomains: ['invoices-daily-prime', 'vendor-drift', 'product-mix-pars', 'recipe-cost', 'evidence'],
     publicTools: [
       'get_operator_system',
       'list_agent_jobs',
       'get_operator_logic',
       'analyze_vendor_prices',
+      'analyze_recipe_cost',
       'list_answers',
     ],
     promptUri: 'never86://prompts/specialist_brief?specialist_id=food-invoice',
@@ -105,6 +109,30 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
     evidenceNotes: [
       'Invoice ≠ COGS. No count → no food cost.',
       'Price drift >5% between periods is Unverified until pack size/credits confirmed.',
+    ],
+  },
+  {
+    id: 'recipe-cost',
+    name: 'Recipe · plate · UoM',
+    job: 'Convert verified pack/pour/yield into plate cost and theoretical usage; refuse invented case packs or pourSpecs.',
+    seats: ['source-collector', 'margin-analyst', 'operator-coach', 'proof-verifier'],
+    ownsStages: ['parse', 'truth-gate', 'normalize', 'decide'],
+    logicDomains: ['recipe-cost', 'uom-cost', 'forensic-pnl', 'product-mix-pars', 'evidence'],
+    publicTools: [
+      'get_operator_system',
+      'list_agent_jobs',
+      'get_operator_logic',
+      'convert_uom',
+      'analyze_recipe_cost',
+      'list_answers',
+    ],
+    promptUri: 'never86://prompts/specialist_brief?specialist_id=recipe-cost',
+    resourceUri: 'never86://specialist/recipe-cost',
+    never: SPECIALIST_NEVER,
+    evidenceNotes: [
+      'EP cost = AP cost / yield. Missing yield is Missing Evidence.',
+      'Contribution margin $ beats food-cost % alone for menu decisions.',
+      'Prime cost needs disclosed labor basis (wages-only vs loaded).',
     ],
   },
   {
@@ -153,7 +181,7 @@ export const SPECIALIST_PACKS: readonly SpecialistPack[] = [
     job: 'Block unsupported math, theft language, guaranteed recovery, food-cost-without-count, and incomplete-week closes.',
     seats: ['product-head'],
     ownsStages: ['truth-gate'],
-    logicDomains: ['evidence', 'safety', 'marketplace-3p'],
+    logicDomains: ['evidence', 'safety', 'marketplace-3p', 'forensic-pnl', 'uom-cost', 'recipe-cost'],
     publicTools: [
       'get_operator_system',
       'get_operator_logic',

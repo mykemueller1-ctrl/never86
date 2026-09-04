@@ -27,7 +27,7 @@ describe('public MCP route', () => {
     }
   });
 
-  it('exposes knowledge tools first, then Payroll / Prices / Process / beverage analysis', () => {
+  it('exposes knowledge tools first, then Payroll / Prices / Process / beverage / UoM / recipe analysis', () => {
     expect(MCP_PUBLIC_TOOLS.map((tool) => tool.name)).toEqual([
       'get_operator_system',
       'get_operator_logic',
@@ -38,6 +38,8 @@ describe('public MCP route', () => {
       'list_specialists',
       'analyze_labor',
       'analyze_beverage',
+      'convert_uom',
+      'analyze_recipe_cost',
       'analyze_vendor_prices',
       'build_action_shift',
     ]);

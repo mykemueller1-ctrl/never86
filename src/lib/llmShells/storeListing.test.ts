@@ -59,6 +59,8 @@ describe('store listing packet', () => {
       'list_specialists',
       'analyze_labor',
       'analyze_beverage',
+      'convert_uom',
+      'analyze_recipe_cost',
       'analyze_vendor_prices',
       'build_action_shift',
     ]);

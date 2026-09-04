@@ -111,7 +111,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'list_specialists',
     description:
-      'List domain specialists (labor, beverage, food-invoice, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
+      'List domain specialists (labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
     inputSchema: emptyObjectSchema,
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
@@ -151,6 +151,75 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         },
       },
       required: ['csv'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'convert_uom',
+    description:
+      'Convert verified restaurant package sizes into pour/portion units (bottle mL → fl oz, keg gal → fl oz, pours per package, cost per pour). Refuses invented pack size or pourSpec. Fluid ounce ≠ weight ounce.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        op: {
+          type: 'string',
+          enum: ['bottle_fl_oz', 'keg_fl_oz', 'pours_per_package', 'cost_per_pour', 'volume', 'mass', 'knowledge'],
+          description: 'Conversion operation. Use knowledge for the full UoM pack.',
+        },
+        package_ml: { type: 'number', exclusiveMinimum: 0 },
+        keg_gal: { type: 'number', exclusiveMinimum: 0 },
+        units_per_package: { type: 'number', exclusiveMinimum: 0 },
+        unit_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        package_cost: { type: 'number', minimum: 0 },
+        pours_per_package: { type: 'number', exclusiveMinimum: 0 },
+        amount: { type: 'number', minimum: 0 },
+        from: { type: 'string', description: 'Volume: ml|l|flOz|gal. Mass: g|kg|ozAv|lb.' },
+        to: { type: 'string' },
+      },
+      required: ['op'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'analyze_recipe_cost',
+    description:
+      'Cost a plate from edible-portion ingredient lines, or compute EP unit cost / food COGS / food-cost % when counts and sales share scope. Returns Unverified math; never invents yield, case pack, or treats an invoice as COGS.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mode: {
+          type: 'string',
+          enum: ['recipe', 'ep_unit_cost', 'food_cogs', 'food_cost_pct', 'contribution', 'knowledge'],
+        },
+        ingredients: {
+          type: 'array',
+          description: 'For mode=recipe: [{name?, epQty, epUnitCost}, ...]',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              epQty: { type: 'number', minimum: 0 },
+              epUnitCost: { type: 'number', minimum: 0 },
+            },
+            required: ['epQty', 'epUnitCost'],
+            additionalProperties: false,
+          },
+        },
+        ap_unit_cost: { type: 'number', minimum: 0 },
+        yield_fraction: { type: 'number', exclusiveMinimum: 0 },
+        beginning_inventory: { type: 'number', minimum: 0 },
+        purchases: { type: 'number', minimum: 0 },
+        ending_inventory: { type: 'number', minimum: 0 },
+        food_cogs: { type: 'number' },
+        food_sales: { type: 'number', exclusiveMinimum: 0 },
+        menu_price: { type: 'number', exclusiveMinimum: 0 },
+        recipe_cost: { type: 'number', minimum: 0 },
+      },
+      required: ['mode'],
       additionalProperties: false,
     },
     annotations: MCP_READ_ONLY_ANNOTATIONS,
@@ -225,6 +294,8 @@ export const MCP_KNOWLEDGE_TOOL_NAMES = [...KNOWLEDGE_TOOL_NAMES];
 export const MCP_ANALYSIS_TOOL_NAMES = [
   'analyze_labor',
   'analyze_beverage',
+  'convert_uom',
+  'analyze_recipe_cost',
   'analyze_vendor_prices',
   'build_action_shift',
 ] as const;

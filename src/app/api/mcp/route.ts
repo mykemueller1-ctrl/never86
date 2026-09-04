@@ -16,6 +16,26 @@ import {
 import { runBeverageCostScore } from '@/lib/beverageScoreCsv';
 import { runLaborDrift } from '@/lib/laborDriftCsv';
 import {
+  calculateEpUnitCost,
+  calculateRecipeCost,
+  contributionMargin,
+  foodCogs,
+  foodCostPct,
+  recipeCostKnowledgePack,
+  type RecipeIngredient,
+} from '@/lib/recipeCost';
+import {
+  bottleFlOzFromMl,
+  convertMass,
+  convertVolume,
+  costPerPour,
+  kegFlOz,
+  poursPerPackage,
+  uomKnowledgePack,
+  type MassUnit,
+  type VolumeUnit,
+} from '@/lib/uomConvert';
+import {
   MCP_PUBLIC_ENDPOINT,
   MCP_PUBLIC_PROTOCOL,
   MCP_PUBLIC_SERVER_INFO,
@@ -157,6 +177,120 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             'No count → no beverage-cost claim. Patterns are review leads only. Confirm transfers, waste, pack size, comps, and recipe before disputing.',
           report,
         });
+      }
+
+      if (name === 'convert_uom') {
+        const op = typeof args.op === 'string' ? args.op : '';
+        if (op === 'knowledge') {
+          return textResult(req.id, { evidenceState: 'Verified', pack: uomKnowledgePack() });
+        }
+        if (op === 'bottle_fl_oz') {
+          const result = bottleFlOzFromMl(Number(args.package_ml));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'keg_fl_oz') {
+          const result = kegFlOz(Number(args.keg_gal));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'pours_per_package') {
+          const result = poursPerPackage({
+            unitsPerPackage: Number(args.units_per_package),
+            unitFlOz: Number(args.unit_fl_oz),
+            pourSpecFlOz: Number(args.pour_spec_fl_oz),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'cost_per_pour') {
+          const result = costPerPour({
+            packageCost: Number(args.package_cost),
+            poursPerPackage: Number(args.pours_per_package),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'volume') {
+          const from = args.from as VolumeUnit;
+          const to = args.to as VolumeUnit;
+          const result = convertVolume(Number(args.amount), from, to);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', from, to, ...result });
+        }
+        if (op === 'mass') {
+          const from = args.from as MassUnit;
+          const to = args.to as MassUnit;
+          const result = convertMass(Number(args.amount), from, to);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', from, to, ...result });
+        }
+        return textResult(
+          req.id,
+          {
+            ok: false,
+            error:
+              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | knowledge',
+          },
+          true,
+        );
+      }
+
+      if (name === 'analyze_recipe_cost') {
+        const mode = typeof args.mode === 'string' ? args.mode : '';
+        if (mode === 'knowledge') {
+          return textResult(req.id, { evidenceState: 'Verified', pack: recipeCostKnowledgePack() });
+        }
+        if (mode === 'recipe') {
+          const ingredients = Array.isArray(args.ingredients)
+            ? (args.ingredients as RecipeIngredient[])
+            : [];
+          const result = calculateRecipeCost(ingredients);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Unverified plate cost. Confirm EP units, yield, and recipe map before disputing.',
+            ...result,
+          });
+        }
+        if (mode === 'ep_unit_cost') {
+          const result = calculateEpUnitCost(Number(args.ap_unit_cost), Number(args.yield_fraction));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (mode === 'food_cogs') {
+          const result = foodCogs({
+            beginningInventory: Number(args.beginning_inventory),
+            purchases: Number(args.purchases),
+            endingInventory: Number(args.ending_inventory),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Invoice ≠ COGS. This uses operator-supplied inventory dollars only.',
+            ...result,
+          });
+        }
+        if (mode === 'food_cost_pct') {
+          const result = foodCostPct(Number(args.food_cogs), Number(args.food_sales));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'No count → no food cost. Same-scope sales required.',
+            ...result,
+          });
+        }
+        if (mode === 'contribution') {
+          const result = contributionMargin(Number(args.menu_price), Number(args.recipe_cost));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        return textResult(
+          req.id,
+          {
+            ok: false,
+            error:
+              'analyze_recipe_cost requires mode: recipe | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
+          },
+          true,
+        );
       }
 
       if (name === 'analyze_vendor_prices') {
