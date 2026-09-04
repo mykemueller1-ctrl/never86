@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { HumanSiteFooter, HumanSiteHeader } from '@/components/HumanSiteShell';
+import { HOME_DEMO_VIDEO_URL, homeDemoVideoReady } from '@/lib/homeDemo';
 import { trackEvent } from '@/lib/track';
 
 const PILLARS = [
@@ -43,18 +44,18 @@ export default function Home() {
               Your restaurant already creates the answer. It is buried in labor, invoices, and the daily mess. Never 86&apos;d reads the evidence, explains what changed, and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/play" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/play', label: 'Start playing' } })}>
-                Start playing →
+              <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>
+                Claim the free owner seat →
               </Link>
-              <Link href="/onboard" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Open with email' } })}>
-                Claim your free seat
-              </Link>
-              <Link href="/operator" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/operator', label: 'Ask on the phone' } })}>
-                Ask on the phone
+              <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'Watch the recorded demo' } })}>
+                Watch the recorded demo
               </Link>
             </div>
-            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Open now · Community Tap seat 1 · any operator can play · no card · no password
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#514b43]">
+              Watch the recorded demo, then give your email. Seat 1 is free for one store. No card. No password.
+            </p>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
+              Email capture · magic link · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
             </p>
           </div>
 
@@ -105,9 +106,9 @@ export default function Home() {
           </h2>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
-              ['1', 'Open with email', 'Click the secure link. No password, card, or onboarding interview.'],
-              ['2', 'Bring one real thing', 'An invoice, labor report, schedule, close, photo, or plain-English question.'],
-              ['3', 'Get a receipt-backed move', 'See what changed, why it matters, what to do next, and what proves the fix.'],
+              ['1', 'Watch the recorded demo', 'See the loop: find the leak, assign the fix, keep the receipt. No sandbox required to start.'],
+              ['2', 'Give your email', 'Claim the free owner seat. We send a magic link. No password, card, or onboarding interview.'],
+              ['3', 'Get a receipt-backed move', 'Bring one real thing. See what changed, why it matters, what to do next, and what proves the fix.'],
             ].map(([number, title, copy]) => (
               <article key={number} className="rounded-2xl border border-[#33455c] bg-[#111b27] p-6">
                 <p className="font-mono text-xs font-bold text-[#81aefc]">{number}</p>
@@ -117,9 +118,54 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/onboard" className="human-button human-button-light">Open Never 86&apos;d →</Link>
-            <Link href="/llm-shells" className="human-button border border-[#5f7591] text-white hover:border-white">Find it in ChatGPT →</Link>
+            <Link href="/onboard" className="human-button human-button-light">Claim the free owner seat →</Link>
+            <Link href="/#demo" className="human-button border border-[#5f7591] text-white hover:border-white">Watch the recorded demo</Link>
           </div>
+        </div>
+      </section>
+
+      <section id="demo" className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+          <div>
+            <p className="human-kicker">Recorded demo</p>
+            <h2 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
+              Watch the recorded demo.
+              <span className="block italic text-[#005de8]">Then give your email.</span>
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#514b43]">
+              Strangers do not need a sandbox. Watch the recorded demo, then claim the free owner seat with your email. The magic link is the door.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
+              <Link href="/login" className="human-button human-button-secondary">Already have a seat? Sign in</Link>
+            </div>
+          </div>
+
+          {homeDemoVideoReady(HOME_DEMO_VIDEO_URL) ? (
+            <div className="human-receipt-card border-[#005de8] bg-[#fffdf8] p-4 md:p-5">
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                src={HOME_DEMO_VIDEO_URL}
+                className="aspect-video w-full rounded-xl bg-[#111b27]"
+              >
+                Your browser cannot play this recorded demo. Claim the free owner seat with email instead.
+              </video>
+            </div>
+          ) : (
+            <div className="human-receipt-card border-[#005de8] bg-[#fffdf8] p-7 md:p-9">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-[#005de8]">Demo placeholder</p>
+              <div className="mt-6 flex aspect-video items-center justify-center rounded-xl border border-dashed border-[#005de8] bg-[#f1f6ff] px-6 text-center">
+                <p className="max-w-sm text-sm leading-relaxed text-[#514b43]">
+                  The hosted recorded demo is not on this page yet. No fake player. Watch it here when the URL is set — until then, give your email and claim the free owner seat.
+                </p>
+              </div>
+              <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#766f65]">
+                Watch the recorded demo, then give your email
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -147,9 +193,8 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/play" className="human-button human-button-primary">Start playing →</Link>
-            <Link href="/onboard" className="human-button human-button-secondary">Claim free owner seat →</Link>
-            <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
+            <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
+            <Link href="/#demo" className="human-button human-button-secondary">Watch the recorded demo</Link>
             <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
             <Link href="/command-center" className="human-button human-button-secondary">Multi-unit Command Center →</Link>
