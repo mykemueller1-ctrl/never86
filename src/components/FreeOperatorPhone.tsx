@@ -57,28 +57,31 @@ export function FreeOperatorPhone() {
   const readyCount = useMemo(() => evidence.filter((row) => row.state === 'READY').length, [evidence]);
   const coachReady = readyCount >= 2;
 
-  useEffect(() => {
-    void loadReadiness();
-  }, []);
-
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
     setEvidence(next.evidence.map((row) => ({ ...row })));
   }
 
-  async function loadReadiness() {
-    try {
-      const res = await fetch('/api/operator/readiness', { method: 'GET' });
-      const body = (await res.json()) as { success?: boolean; readiness?: SimpleOwnerReadiness; error?: string };
-      if (!res.ok || !body.success) {
-        setFlash(body.error ?? 'Readiness is not live yet. Persist may be unconfigured.');
-        return;
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch('/api/operator/readiness', { method: 'GET' });
+        const body = (await res.json()) as { success?: boolean; readiness?: SimpleOwnerReadiness; error?: string };
+        if (cancelled) return;
+        if (!res.ok || !body.success) {
+          setFlash(body.error ?? 'Readiness is not live yet. Persist may be unconfigured.');
+          return;
+        }
+        applyReadiness(body.readiness);
+      } catch {
+        if (!cancelled) setFlash('Readiness could not load. Try again.');
       }
-      applyReadiness(body.readiness);
-    } catch {
-      setFlash('Readiness could not load. Try again.');
-    }
-  }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function goAsk(nextAsk: string, mouth: FreeOperatorMouth = 'type') {
     setBusy(true);

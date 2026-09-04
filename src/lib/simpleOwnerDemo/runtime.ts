@@ -9,9 +9,11 @@ import { createMemoryRepository, createNeonBlobWriter, createNeonRepository } fr
 import { createSimpleOwnerDemoService, type SimpleOwnerDemoService } from './service';
 
 let testOverride: SimpleOwnerDemoService | null = null;
+let defaultService: ReturnType<typeof createDefaultSimpleOwnerDemoService> | null = null;
 
 export function setSimpleOwnerDemoServiceForTests(service: SimpleOwnerDemoService | null): void {
   testOverride = service;
+  if (service) defaultService = null;
 }
 
 export function createDefaultSimpleOwnerDemoService(
@@ -56,7 +58,10 @@ export function getSimpleOwnerDemoService(
   env: Record<string, string | undefined> = process.env,
 ): SimpleOwnerDemoService | { ok: false; status: number; error: string; code: string } {
   if (testOverride) return testOverride;
-  return createDefaultSimpleOwnerDemoService(env);
+  if (!defaultService) {
+    defaultService = createDefaultSimpleOwnerDemoService(env);
+  }
+  return defaultService;
 }
 
 export function isServiceError(
