@@ -118,7 +118,7 @@ export function handleGetSpecialist(idRaw?: unknown) {
   if (typeof idRaw !== 'string' || !idRaw.trim()) {
     return {
       ok: false as const,
-      error: 'Pass specialist_id (labor, beverage, food-invoice, human-coach, design-qa, truth-qa).',
+      error: 'Pass specialist_id (labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, truth-qa).',
     };
   }
   const pack = getSpecialist(idRaw.trim());
@@ -148,7 +148,7 @@ export const MCP_PROMPTS = [
     arguments: [
       {
         name: 'specialist_id',
-        description: 'labor | beverage | food-invoice | human-coach | design-qa | truth-qa',
+        description: 'labor | beverage | food-invoice | recipe-cost | human-coach | design-qa | truth-qa',
         required: true,
       },
     ],
@@ -189,7 +189,7 @@ export function getMcpPrompt(
     if (!brief) {
       return {
         ok: false,
-        error: 'Pass specialist_id: labor | beverage | food-invoice | human-coach | design-qa | truth-qa',
+        error: 'Pass specialist_id: labor | beverage | food-invoice | recipe-cost | human-coach | design-qa | truth-qa',
       };
     }
     return { ok: true, text: brief };

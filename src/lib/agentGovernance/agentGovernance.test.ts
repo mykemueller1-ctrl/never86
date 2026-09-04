@@ -25,17 +25,19 @@ describe('agent governance registry', () => {
     expect(orchestrationRule()).toMatch(/store-scoped memory/i);
   });
 
-  it('exposes six domain specialists with one job each', () => {
+  it('exposes seven domain specialists with one job each', () => {
     const packs = listSpecialists();
     expect(packs.map((p) => p.id)).toEqual([
       'labor',
       'beverage',
       'food-invoice',
+      'recipe-cost',
       'human-coach',
       'design-qa',
       'truth-qa',
     ]);
     expect(getSpecialist('labor')?.publicTools).toContain('analyze_labor');
+    expect(getSpecialist('recipe-cost')?.publicTools).toContain('convert_uom');
     expect(specialistBriefPrompt('truth-qa')).toMatch(/NEVER/);
   });
 });

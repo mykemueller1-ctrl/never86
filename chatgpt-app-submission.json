@@ -116,6 +116,54 @@
         "destructive_justification": "Cannot invent pour cost as verified, accuse theft, or alter inventory counts."
       }
     },
+    "convert_uom": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Converts verified package sizes and pour specs into portion units without writing inventory or inventing pack size.",
+        "open_world_justification": "Does not contact distributors, scales, or POS systems.",
+        "destructive_justification": "Cannot invent pourSpec, keg size, or case conversion, or alter stock counts."
+      }
+    },
+    "ask_pour_standards": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns interview questions for this unit's house pour sizes without writing memory or inventing ounces.",
+        "open_world_justification": "Does not contact bars, POS systems, or distributors.",
+        "destructive_justification": "Cannot set pour policy or assume 1.5 / 1.75 / 2 oz for any store."
+      }
+    },
+    "declare_pour_standards": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Validates operator-answered pour lines and returns a Memory Curator proposal; it does not auto-approve memory.",
+        "open_world_justification": "Does not message staff or alter POS buttons.",
+        "destructive_justification": "Cannot write store memory without a human approver."
+      }
+    },
+    "analyze_recipe_cost": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Calculates Unverified plate or drink cost, or food COGS, from merchant-supplied EP lines, house pours, and inventory dollars without writing recipes.",
+        "open_world_justification": "Does not contact vendors or rewrite menu engineering systems.",
+        "destructive_justification": "Cannot invent yield or house pour (1.5/1.75/2), treat an invoice as COGS, or close a week without a count."
+      }
+    },
     "analyze_vendor_prices": {
       "annotations": {
         "readOnlyHint": true,
@@ -155,7 +203,7 @@
       "user_prompt": "List the Never86 specialists and the labor specialist's one job.",
       "file_attachment_urls": null,
       "tools_triggered": "list_specialists",
-      "expected_output": "Lists labor, beverage, food-invoice, human-coach, design-qa, and truth-qa with one job each and no private store data.",
+      "expected_output": "Lists labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, and truth-qa with one job each and no private store data.",
       "expected_output_url": null
     },
     {

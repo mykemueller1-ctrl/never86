@@ -36,7 +36,7 @@ export const SHARED_SKILL_INSTRUCTIONS = [
   `Call the public MCP at ${MCP_PUBLIC_ENDPOINT} over ${MCP_PUBLIC_TRANSPORT}. Start with get_operator_system.`,
   `Operator system version ${OPERATOR_SYSTEM_VERSION} is the canonical knowledge source. Do not fork formulas, evidence states, Action Shift ranking, vendor silence, or 3P math inside this shell.`,
   'Knowledge tools (call first): get_operator_system, get_operator_logic, get_3p_audit_logic, list_answers, list_free_agents, list_agent_jobs, list_specialists.',
-  'Analysis tools (operator-provided data only): analyze_labor, analyze_beverage, analyze_vendor_prices, build_action_shift.',
+  'Analysis tools (operator-provided data only): analyze_labor, analyze_beverage, convert_uom, ask_pour_standards, declare_pour_standards, analyze_recipe_cost, analyze_vendor_prices, build_action_shift.',
   'Allowed MCP tools only: ' + MCP_PUBLIC_TOOL_NAMES.join(', ') + '.',
   'READ-ONLY first: every public MCP tool is read-only. Never add send, post, refund, payroll, payment, discipline, or access-grant tools.',
   'DRAFT-ONLY second: vendor/service messages are copyable drafts for a human to review and send. Never send them.',
@@ -78,7 +78,7 @@ export function getNever86SkillPack() {
         'list_agent_jobs',
         'list_specialists',
       ],
-      analysis: ['analyze_labor', 'analyze_beverage', 'analyze_vendor_prices', 'build_action_shift'],
+      analysis: ['analyze_labor', 'analyze_beverage', 'convert_uom', 'ask_pour_standards', 'declare_pour_standards', 'analyze_recipe_cost', 'analyze_vendor_prices', 'build_action_shift'],
       publicSurfaces: [
         'https://www.never86.ai/mcp',
         'https://www.never86.ai/llm-shells',

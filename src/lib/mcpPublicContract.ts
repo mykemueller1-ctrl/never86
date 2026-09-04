@@ -111,7 +111,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'list_specialists',
     description:
-      'List domain specialists (labor, beverage, food-invoice, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
+      'List domain specialists (labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
     inputSchema: emptyObjectSchema,
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
@@ -151,6 +151,169 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         },
       },
       required: ['csv'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'convert_uom',
+    description:
+      'Convert verified restaurant package sizes into pour/portion units (bottle mL → fl oz, keg gal → fl oz, pours per package, cost per pour). Refuses invented pack size or pourSpec. Fluid ounce ≠ weight ounce. House pour ounces come from ask_pour_standards / declare_pour_standards — never assume 1.5.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        op: {
+          type: 'string',
+          enum: ['bottle_fl_oz', 'keg_fl_oz', 'pours_per_package', 'cost_per_pour', 'volume', 'mass', 'knowledge'],
+          description: 'Conversion operation. Use knowledge for the full UoM pack.',
+        },
+        package_ml: { type: 'number', exclusiveMinimum: 0 },
+        keg_gal: { type: 'number', exclusiveMinimum: 0 },
+        units_per_package: { type: 'number', exclusiveMinimum: 0 },
+        unit_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        pour_spec_fl_oz: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'House pour in fl oz from THIS unit (1.5, 1.75, 2, or custom). Required for pours_per_package — never invent.',
+        },
+        package_cost: { type: 'number', minimum: 0 },
+        pours_per_package: { type: 'number', exclusiveMinimum: 0 },
+        amount: { type: 'number', minimum: 0 },
+        from: { type: 'string', description: 'Volume: ml|l|flOz|gal. Mass: g|kg|ozAv|lb.' },
+        to: { type: 'string' },
+      },
+      required: ['op'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'ask_pour_standards',
+    description:
+      'Interview pack for THIS restaurant unit’s drink pour sizes. Returns questions and choice menus (1.5 / 1.75 / 2 oz, etc.). Does not invent a house pour. Call before costing drink recipes.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store_id: { type: 'string', description: 'Store / unit id. Pour standards are per unit.' },
+        location_id: { type: 'string', description: 'Optional bar / location within the store.' },
+        categories: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+          },
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'declare_pour_standards',
+    description:
+      'Validate operator-answered house pour lines for one unit (e.g. shot 1.5, mixed 1.75, wine 5). Returns Missing Evidence for unanswered categories. Does not write memory — returns a Memory Curator proposal for human approve.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store_id: { type: 'string' },
+        location_id: { type: 'string' },
+        lines: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0, maximum: 32 },
+              label: { type: 'string' },
+              measure_method: { type: 'string' },
+              approved_by: { type: 'string' },
+              source: { type: 'string' },
+            },
+            required: ['category', 'pour_spec_fl_oz'],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ['store_id', 'lines'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'analyze_recipe_cost',
+    description:
+      'Cost a plate (mode=recipe) or a drink (mode=drink_recipe). Drink recipes pull liquor/wine/draft fl oz from THIS unit’s house pour (ask_pour_standards → declare_pour_standards) — never assume 1.5 / 1.75 / 2. Also EP unit cost / food COGS / food-cost % when counts and sales share scope. Unverified math; never invents yield or treats an invoice as COGS.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mode: {
+          type: 'string',
+          enum: ['recipe', 'drink_recipe', 'ep_unit_cost', 'food_cogs', 'food_cost_pct', 'contribution', 'knowledge'],
+        },
+        store_id: {
+          type: 'string',
+          description: 'Required for drink_recipe. Pour standards are per unit.',
+        },
+        location_id: { type: 'string' },
+        house_pour_lines: {
+          type: 'array',
+          description:
+            'For drink_recipe: operator-declared pour lines for THIS unit (from declare_pour_standards). Empty → Missing Evidence + ask.',
+          items: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0, maximum: 32 },
+              label: { type: 'string' },
+              measure_method: { type: 'string' },
+              approved_by: { type: 'string' },
+              source: { type: 'string' },
+            },
+            required: ['category', 'pour_spec_fl_oz'],
+            additionalProperties: false,
+          },
+        },
+        ingredients: {
+          type: 'array',
+          description:
+            'recipe: [{name?, epQty, epUnitCost}]. drink_recipe: liquor lines use pourCategory + house pour; fixed/recipe_specific need epQty.',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              epQty: { type: 'number', minimum: 0 },
+              epUnitCost: { type: 'number', minimum: 0 },
+              pourCategory: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pourSource: {
+                type: 'string',
+                enum: ['house', 'recipe_specific', 'fixed'],
+                description: 'house (default with pourCategory) uses unit pourSpec; recipe_specific needs explicit epQty; fixed = syrup/juice.',
+              },
+            },
+            additionalProperties: false,
+          },
+        },
+        ap_unit_cost: { type: 'number', minimum: 0 },
+        yield_fraction: { type: 'number', exclusiveMinimum: 0 },
+        beginning_inventory: { type: 'number', minimum: 0 },
+        purchases: { type: 'number', minimum: 0 },
+        ending_inventory: { type: 'number', minimum: 0 },
+        food_cogs: { type: 'number' },
+        food_sales: { type: 'number', exclusiveMinimum: 0 },
+        menu_price: { type: 'number', exclusiveMinimum: 0 },
+        recipe_cost: { type: 'number', minimum: 0 },
+      },
+      required: ['mode'],
       additionalProperties: false,
     },
     annotations: MCP_READ_ONLY_ANNOTATIONS,
@@ -225,6 +388,10 @@ export const MCP_KNOWLEDGE_TOOL_NAMES = [...KNOWLEDGE_TOOL_NAMES];
 export const MCP_ANALYSIS_TOOL_NAMES = [
   'analyze_labor',
   'analyze_beverage',
+  'convert_uom',
+  'ask_pour_standards',
+  'declare_pour_standards',
+  'analyze_recipe_cost',
   'analyze_vendor_prices',
   'build_action_shift',
 ] as const;

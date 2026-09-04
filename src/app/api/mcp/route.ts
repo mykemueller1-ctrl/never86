@@ -16,6 +16,35 @@ import {
 import { runBeverageCostScore } from '@/lib/beverageScoreCsv';
 import { runLaborDrift } from '@/lib/laborDriftCsv';
 import {
+  askPourStandards,
+  declarePourStandards,
+  proposePourStandardsMemory,
+  type HousePourLine,
+  type PourCategory,
+} from '@/lib/operatorPourStandards';
+import {
+  calculateDrinkRecipeCost,
+  calculateEpUnitCost,
+  calculateRecipeCost,
+  contributionMargin,
+  foodCogs,
+  foodCostPct,
+  recipeCostKnowledgePack,
+  type DrinkRecipeIngredient,
+  type RecipeIngredient,
+} from '@/lib/recipeCost';
+import {
+  bottleFlOzFromMl,
+  convertMass,
+  convertVolume,
+  costPerPour,
+  kegFlOz,
+  poursPerPackage,
+  uomKnowledgePack,
+  type MassUnit,
+  type VolumeUnit,
+} from '@/lib/uomConvert';
+import {
   MCP_PUBLIC_ENDPOINT,
   MCP_PUBLIC_PROTOCOL,
   MCP_PUBLIC_SERVER_INFO,
@@ -157,6 +186,225 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             'No count → no beverage-cost claim. Patterns are review leads only. Confirm transfers, waste, pack size, comps, and recipe before disputing.',
           report,
         });
+      }
+
+      if (name === 'convert_uom') {
+        const op = typeof args.op === 'string' ? args.op : '';
+        if (op === 'knowledge') {
+          return textResult(req.id, { evidenceState: 'Verified', pack: uomKnowledgePack() });
+        }
+        if (op === 'bottle_fl_oz') {
+          const result = bottleFlOzFromMl(Number(args.package_ml));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'keg_fl_oz') {
+          const result = kegFlOz(Number(args.keg_gal));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'pours_per_package') {
+          if (args.pour_spec_fl_oz === undefined) {
+            return textResult(
+              req.id,
+              {
+                ok: false,
+                invented: false,
+                evidenceState: 'Missing Evidence',
+                error:
+                  'pours_per_package needs pour_spec_fl_oz from THIS unit. Call ask_pour_standards first — do not assume 1.5, 1.75, or 2 oz.',
+              },
+              true,
+            );
+          }
+          const result = poursPerPackage({
+            unitsPerPackage: Number(args.units_per_package),
+            unitFlOz: Number(args.unit_fl_oz),
+            pourSpecFlOz: Number(args.pour_spec_fl_oz),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'cost_per_pour') {
+          const result = costPerPour({
+            packageCost: Number(args.package_cost),
+            poursPerPackage: Number(args.pours_per_package),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (op === 'volume') {
+          const from = args.from as VolumeUnit;
+          const to = args.to as VolumeUnit;
+          const result = convertVolume(Number(args.amount), from, to);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', from, to, ...result });
+        }
+        if (op === 'mass') {
+          const from = args.from as MassUnit;
+          const to = args.to as MassUnit;
+          const result = convertMass(Number(args.amount), from, to);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', from, to, ...result });
+        }
+        return textResult(
+          req.id,
+          {
+            ok: false,
+            error:
+              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | knowledge',
+          },
+          true,
+        );
+      }
+
+      if (name === 'ask_pour_standards') {
+        const categories = Array.isArray(args.categories)
+          ? (args.categories as PourCategory[])
+          : undefined;
+        return textResult(req.id, {
+          warning:
+            'Ask THESE questions at this unit. Choice menus are options — not defaults. Do not invent 1.5 / 1.75 / 2 oz.',
+          ...askPourStandards({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            locationId: typeof args.location_id === 'string' ? args.location_id : null,
+            categories,
+          }),
+        });
+      }
+
+      if (name === 'declare_pour_standards') {
+        const rawLines = Array.isArray(args.lines) ? args.lines : [];
+        const lines: HousePourLine[] = rawLines.map((row) => {
+          const r = row as Record<string, unknown>;
+          return {
+            category: r.category as PourCategory,
+            pourSpecFlOz: Number(r.pour_spec_fl_oz),
+            label: typeof r.label === 'string' ? r.label : undefined,
+            measureMethod: typeof r.measure_method === 'string' ? r.measure_method : undefined,
+            approvedBy: typeof r.approved_by === 'string' ? r.approved_by : undefined,
+            source: typeof r.source === 'string' ? r.source : undefined,
+          };
+        });
+        const declared = declarePourStandards({
+          storeId: typeof args.store_id === 'string' ? args.store_id : '',
+          locationId: typeof args.location_id === 'string' ? args.location_id : null,
+          lines,
+        });
+        if ('ok' in declared && declared.ok === false) {
+          return textResult(req.id, declared, true);
+        }
+        if (!('status' in declared)) {
+          return textResult(req.id, { ok: false, error: 'declare_pour_standards failed' }, true);
+        }
+        const memoryProposal = proposePourStandardsMemory(declared);
+        return textResult(req.id, {
+          warning:
+            'House pours stay Unverified until a human approves the Memory Curator proposal. LLM ranks; human sends/approves.',
+          standards: declared,
+          memoryProposal,
+        });
+      }
+
+      if (name === 'analyze_recipe_cost') {
+        const mode = typeof args.mode === 'string' ? args.mode : '';
+        if (mode === 'knowledge') {
+          return textResult(req.id, { evidenceState: 'Verified', pack: recipeCostKnowledgePack() });
+        }
+        if (mode === 'recipe') {
+          const ingredients = Array.isArray(args.ingredients)
+            ? (args.ingredients as RecipeIngredient[])
+            : [];
+          const result = calculateRecipeCost(ingredients);
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Unverified plate cost. Confirm EP units, yield, and recipe map before disputing.',
+            ...result,
+          });
+        }
+        if (mode === 'drink_recipe') {
+          const rawHouse = Array.isArray(args.house_pour_lines) ? args.house_pour_lines : [];
+          const housePourLines: HousePourLine[] = rawHouse.map((row) => {
+            const r = row as Record<string, unknown>;
+            return {
+              category: r.category as PourCategory,
+              pourSpecFlOz: Number(r.pour_spec_fl_oz),
+              label: typeof r.label === 'string' ? r.label : undefined,
+              measureMethod: typeof r.measure_method === 'string' ? r.measure_method : undefined,
+              approvedBy: typeof r.approved_by === 'string' ? r.approved_by : undefined,
+              source: typeof r.source === 'string' ? r.source : undefined,
+            };
+          });
+          const ingredients = Array.isArray(args.ingredients)
+            ? (args.ingredients as DrinkRecipeIngredient[]).map((row) => {
+                const r = row as DrinkRecipeIngredient & {
+                  pour_category?: PourCategory;
+                  pour_source?: DrinkRecipeIngredient['pourSource'];
+                  ep_qty?: number;
+                  ep_unit_cost?: number;
+                };
+                return {
+                  id: r.id,
+                  name: r.name,
+                  pourCategory: r.pourCategory ?? r.pour_category,
+                  pourSource: r.pourSource ?? r.pour_source,
+                  epQty: r.epQty ?? r.ep_qty,
+                  epUnitCost: Number(r.epUnitCost ?? r.ep_unit_cost),
+                };
+              })
+            : [];
+          const result = calculateDrinkRecipeCost({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            locationId: typeof args.location_id === 'string' ? args.location_id : null,
+            housePourLines,
+            ingredients,
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning:
+              'Unverified drink cost. Liquor ounces came from THIS unit’s house pour (or an explicit recipe-specific fl oz) — never a Never86 default.',
+            ...result,
+          });
+        }
+        if (mode === 'ep_unit_cost') {
+          const result = calculateEpUnitCost(Number(args.ap_unit_cost), Number(args.yield_fraction));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        if (mode === 'food_cogs') {
+          const result = foodCogs({
+            beginningInventory: Number(args.beginning_inventory),
+            purchases: Number(args.purchases),
+            endingInventory: Number(args.ending_inventory),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Invoice ≠ COGS. This uses operator-supplied inventory dollars only.',
+            ...result,
+          });
+        }
+        if (mode === 'food_cost_pct') {
+          const result = foodCostPct(Number(args.food_cogs), Number(args.food_sales));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'No count → no food cost. Same-scope sales required.',
+            ...result,
+          });
+        }
+        if (mode === 'contribution') {
+          const result = contributionMargin(Number(args.menu_price), Number(args.recipe_cost));
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, { evidenceState: 'Unverified', ...result });
+        }
+        return textResult(
+          req.id,
+          {
+            ok: false,
+            error:
+              'analyze_recipe_cost requires mode: recipe | drink_recipe | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
+          },
+          true,
+        );
       }
 
       if (name === 'analyze_vendor_prices') {
