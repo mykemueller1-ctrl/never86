@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Action Shift — owner seat · Never 86'd</title>
+    <meta name="description" content="One free owner seat. Drop last night’s POS close. Sales, promos, Void Hunter, SKU drift. Sample shop only." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --paper: #f3efe4;
+        --ink: #1a1712;
+        --muted: #5c564b;
+        --line: #d9d0bc;
+        --chip: #fffdf6;
+        --miss: #c2410c;
+        --have: #15803d;
+        --est: #b45309;
+        --go: #1d4ed8;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Source Sans 3", system-ui, sans-serif; }
+      .wrap { min-height: 100vh; display: grid; grid-template-columns: 300px 1fr; }
+      @media (max-width: 840px) { .wrap { grid-template-columns: 1fr; } }
+      .rail { padding: 20px 16px 28px; background: #ebe4d4; border-right: 1px solid var(--line); }
+      .brand { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+      .mark { width: 24px; height: 24px; border-radius: 6px; background: #1e40af; color: #f6f3ec; font: 700 11px/24px "IBM Plex Mono", monospace; text-align: center; }
+      .kicker { font: 600 10px/1 "IBM Plex Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+      .blurb { margin: 0 0 12px; font-size: 13px; color: var(--muted); line-height: 1.4; }
+      .meter { background: #ddd4c0; border-radius: 999px; height: 8px; overflow: hidden; margin: 8px 0 6px; }
+      .meter > i { display: block; height: 100%; width: 0; background: #1e40af; transition: width 0.25s; }
+      .holes { font: 600 12px/1.3 "IBM Plex Mono", monospace; }
+      .stack { display: flex; flex-direction: column; gap: 8px; }
+      .chip {
+        display: grid; grid-template-columns: 16px 1fr auto; gap: 8px; align-items: start;
+        width: 100%; border: 1px solid var(--line); background: var(--chip); border-radius: 12px;
+        padding: 9px 10px; text-align: left; cursor: pointer; font: inherit; color: inherit;
+      }
+      .chip.next { outline: 2px solid #1d4ed8; }
+      .chip.miss { background: #fff7ed; border-color: #fdba74; }
+      .chip.have { background: #ecfdf3; border-color: #86efac; }
+      .chip.est { background: #fff7ed; border-color: #fdba74; }
+      .dot { width: 8px; height: 8px; border-radius: 99px; margin-top: 5px; background: #c4b8a2; }
+      .miss .dot { background: var(--miss); }
+      .have .dot { background: var(--have); }
+      .est .dot { background: var(--est); }
+      .chip b { display: block; font-size: 13px; }
+      .chip small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; line-height: 1.35; }
+      .tag { font: 600 9px/1 "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border-radius: 999px; background: #efe8d8; }
+      .fine { font-size: 11px; color: var(--muted); line-height: 1.4; }
+      .stage { padding: 22px 26px 48px; max-width: 820px; }
+      .banner { font-size: 12px; background: #efe8d8; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; color: var(--muted); }
+      h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: clamp(30px, 5vw, 46px); margin: 14px 0 6px; letter-spacing: -0.03em; }
+      .lede { color: var(--muted); font-size: 16px; max-width: 40rem; margin: 0 0 16px; }
+      .coachbar {
+        background: #1c1914; color: #f6f3ec; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px;
+        font-size: 15px; line-height: 1.4;
+      }
+      .coachbar strong { color: #93c5fd; }
+      .composer { border: 1px dashed #c9bda6; background: #fffdf6; border-radius: 18px; padding: 14px; }
+      .composer.hot { border-color: var(--go); background: #eff4ff; }
+      textarea { width: 100%; min-height: 80px; border: 0; background: transparent; font: inherit; outline: none; resize: vertical; }
+      .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+      button.plug, label.plug { border: 0; background: #1c1914; color: #f6f3ec; border-radius: 999px; padding: 8px 14px; font: 700 13px inherit; cursor: pointer; }
+      button.ghost { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 8px 12px; font: 700 13px inherit; cursor: pointer; }
+      .hint { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+      .receipt { margin-top: 18px; }
+      .card { background: #fffdf6; border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+      .card h2 { margin: 0 0 8px; font-size: 18px; }
+      .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+      .pill { font: 600 10px/1 "IBM Plex Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 7px; border-radius: 999px; background: #efe8d8; }
+      .pill.v { background: #dcfce7; color: var(--have); }
+      .pill.e { background: #ffedd5; color: var(--est); }
+      .pill.m { background: #ffedd5; color: var(--miss); }
+      .line { font-family: "IBM Plex Mono", monospace; font-size: 13px; margin: 0 0 5px; }
+      .pack { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 4px; }
+      @media (max-width: 640px) { .pack { grid-template-columns: 1fr; } }
+      .tile { background: #f7f3e8; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+      .tile h3 { margin: 0 0 6px; font-size: 15px; }
+      .tile p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="rail">
+        <div class="brand">
+          <div class="mark">A</div>
+          <div><strong>Action Shift</strong><br /><span style="color:var(--muted);font-size:12px">Owner seat · free · sample</span></div>
+        </div>
+        <p class="kicker">Tonight’s run</p>
+        <div class="meter" aria-hidden="true"><i id="bar"></i></div>
+        <p class="holes" id="holes">0 of 3 locked. You’re still empty.</p>
+        <p class="blurb">No CTO. No CFO watching this 24/7. Drop last night’s close from the POS. We read sales, promos, voids. Invoice unlocks SKU drift — the beef went up, switch the house or raise the plate.</p>
+        <p class="kicker">Still open</p>
+        <div class="stack" id="missing-stack"></div>
+        <p class="kicker">Locked in</p>
+        <div class="stack" id="have-stack"></div>
+        <p class="fine">Sample shop — not your shop, not Bamba, not Myke’s bar. Your POS might print “Z.” We still ask for the end-of-day close. Count stays Missing until you actually count. We don’t invent food cost. SKU drift is not food cost.</p>
+      </aside>
+      <main class="stage">
+        <p class="banner">1–5 unit owner desk. Not Command Center. Not a 16-unit chef group. One free owner seat. FOH / BOH manager seats come later, and those aren’t free.</p>
+        <h1>End-of-day from your POS.</h1>
+        <p class="lede">Not a “Z report” pitch. Last night’s close. Sales, promos, Void Hunter. Then SKU drift when the invoice lands — ground beef went up, so you buy from the other guy or you raise the burger.</p>
+        <div class="coachbar" id="coachbar">You’re empty. <strong>Drop last night’s close.</strong> Don’t think. Don’t “I’ll do it Sunday.”</div>
+        <div class="composer" id="composer">
+          <textarea id="paste" placeholder="Paste the close, or hit the black button. We read it."></textarea>
+          <div class="row">
+            <button class="plug" type="button" data-plug="eod">Drop last night’s close</button>
+            <button class="ghost" type="button" data-plug="invoice">Vendor invoice</button>
+            <button class="ghost" type="button" data-plug="voidlog">Void reasons</button>
+            <button class="ghost" type="button" data-plug="statement">DoorDash statement</button>
+            <label class="plug" style="background:#3f3a32">My file<input id="file" type="file" accept=".txt,.csv,.pdf,.png,.jpg" hidden /></label>
+          </div>
+          <p class="hint" id="hint">We read it. You don’t rebuild a spreadsheet. Verbal “yeah I checked” does not close it.</p>
+        </div>
+        <section class="receipt" id="receipt" aria-live="polite"></section>
+      </main>
+    </div>
+    <script>
+      const ITEMS = {
+        eod: {
+          title: "End-of-day from the POS",
+          miss: "Last night’s close. Sales, promos, voids live here. Call it a Z if your machine does — we still want the close.",
+          have: "Close is in. That’s the easy one.",
+        },
+        invoice: {
+          title: "Vendor invoice (SKU drift)",
+          miss: "No invoice, no drift. We will not guess that beef moved.",
+          have: "Invoice in. Drift is a buy-or-price move, not a food-cost %.",
+        },
+        voidlog: {
+          title: "Void reasons",
+          miss: "Void dollars without reasons is just a vibe. Get the codes.",
+          have: "Reasons in. Pattern, not a hanging. You decide.",
+        },
+        statement: {
+          title: "DoorDash / 3P statement",
+          miss: "Fees are a guess until this lands. You hate guesses on payday.",
+          have: "Statement in. Take rate still Estimated until the contract row matches.",
+        },
+        count: {
+          title: "Count (food cost)",
+          miss: "You’re not counting tonight. Fine. Then we don’t fake food cost. Period.",
+          have: "Count in.",
+        },
+      };
+
+      const state = { eod: false, invoice: false, voidlog: false, statement: false, count: false };
+      const WIN = ["eod", "voidlog", "invoice"];
+
+      function nextHole() {
+        return WIN.find((id) => !state[id]) || null;
+      }
+
+      function score() {
+        return WIN.filter((id) => state[id]).length;
+      }
+
+      function coachLine() {
+        const n = nextHole();
+        if (!state.eod) return "You’re empty. <strong>Drop last night’s close.</strong> Don’t think. Don’t “I’ll do it Sunday.”";
+        if (n === "voidlog") return "Close is in. Sales and promos are up. <strong>Void reasons next</strong> or Void Hunter is just a scary number.";
+        if (n === "invoice") return "Two down. <strong>Drop a vendor invoice</strong> or SKU drift stays Missing. We don’t invent that the beef moved.";
+        return "Three files in. That’s a close. Count’s still Missing — we will not invent prime cost to high-five you.";
+      }
+
+      function tagFor(id) {
+        if (id === "statement" && state.statement) return { cls: "est", tag: "Estimated" };
+        if (id === "invoice" && state.invoice) return { cls: "est", tag: "Estimated" };
+        if (id === "count") return { cls: "miss", tag: "Missing" };
+        if (state[id]) return { cls: "have", tag: "Locked" };
+        return { cls: "miss", tag: "Open" };
+      }
+
+      function renderRail() {
+        const miss = document.getElementById("missing-stack");
+        const have = document.getElementById("have-stack");
+        miss.innerHTML = "";
+        have.innerHTML = "";
+        const nxt = nextHole();
+        document.getElementById("bar").style.width = (score() / WIN.length) * 100 + "%";
+        document.getElementById("holes").textContent =
+          score() === 0
+            ? "0 of 3 locked. You’re still empty."
+            : score() + " of 3 locked. " + (nxt ? "Don’t wander off." : "That’s tonight. Stop.");
+        document.getElementById("coachbar").innerHTML = coachLine();
+        for (const id of ["eod", "voidlog", "invoice", "statement", "count"]) {
+          const item = ITEMS[id];
+          const { cls, tag } = tagFor(id);
+          const filled = state[id] && id !== "count";
+          const btn = document.createElement("button");
+          btn.className = "chip " + cls + (id === nxt ? " next" : "");
+          btn.type = "button";
+          btn.dataset.plug = id;
+          btn.innerHTML = `<span class="dot"></span><span><b>${item.title}</b><small>${filled ? item.have : item.miss}</small></span><span class="tag">${tag}</span>`;
+          (filled ? have : miss).appendChild(btn);
+        }
+      }
+
+      function closePack() {
+        return `
+          <div class="pack">
+            <div class="tile">
+              <h3>Sales</h3>
+              <p class="line">Downtown net $980,000 · sample</p>
+              <p>What last night did. 1P digital 28% vs a 50% target you can change. <span class="pill v">Verified · sample</span></p>
+            </div>
+            <div class="tile">
+              <h3>Promos</h3>
+              <p>Comps and discounts on the close. Route the fat ones through a manager. We don’t invent a promo save. <span class="pill v">Verified · line on the close</span></p>
+            </div>
+            <div class="tile">
+              <h3>Void Hunter</h3>
+              <p class="line">$12,200 voids on $980,000 net. House median 0.51%.</p>
+              <p>${state.voidlog
+                ? "Reasons are in. Read the ugly ones tonight. We don’t call your guy a thief."
+                : "That’s the scare. <strong>Hit void reasons</strong> or you’re staring at a number."} <span class="pill v">Verified · sample void $</span></p>
+            </div>
+            <div class="tile">
+              <h3>SKU drift</h3>
+              ${state.invoice
+                ? `<p>Ground beef went up. Order that beef from the other house, or raise the burger — menu price, cost, recipe. That’s it. Not food cost. Not suit-world variance. <span class="pill e">Estimated · invoice vs last buy</span></p>`
+                : `<p>We will not guess the beef moved. <strong>Drop a vendor invoice.</strong> Invoice ≠ COGS. This is a buy-or-price move. <span class="pill m">Missing</span></p>`}
+            </div>
+          </div>`;
+      }
+
+      function receiptHtml() {
+        const bits = [];
+        if (state.eod) {
+          bits.push(`
+            <div class="card">
+              <p class="kicker">Tonight · sample shop</p>
+              <h2>Last night’s close. The pack a small operator actually wants.</h2>
+              <div class="meta">
+                <span class="pill v">Verified · sample close</span>
+                <span class="pill">Owner seat · you</span>
+                <span class="pill">Due · before you leave</span>
+              </div>
+              <p>No CTO. No CFO on this all day. Sales, promos, Void Hunter from the close. SKU drift waits on the invoice.</p>
+              ${closePack()}
+            </div>`);
+        }
+        if (state.invoice && !state.eod) {
+          bits.push(`
+            <div class="card">
+              <p class="kicker">SKU drift · sample</p>
+              <h2>Invoice’s in. Still need last night’s close.</h2>
+              <p>Beef story needs both sides: what you paid, and what you sold. Drop the close.</p>
+            </div>`);
+        }
+        if (state.statement) {
+          bits.push(`
+            <div class="card">
+              <p class="kicker">Payday math · sample</p>
+              <h2>3P take is still a range. Don’t tattoo it.</h2>
+              <div class="meta">
+                <span class="pill v">Verified · 3P revenue $1,020,000</span>
+                <span class="pill e">Estimated · $204k–$255k at 20–25%</span>
+              </div>
+              <p class="line">Revenue × take rate. Contract % only if you’ve got it in writing.</p>
+              <p>This is the DoorDash door inside Action Shift. Not recovered cash. Not MarginEdge. One move: keep or fight the line.</p>
+            </div>`);
+        }
+        if (!state.eod && !state.statement && !state.invoice) {
+          bits.push(`<div class="card"><h2>Nothing in yet.</h2><p>You’re the hustler who knows this matters and still won’t open the email. Hit the black button. We do the reading.</p></div>`);
+        }
+        if (state.count) {
+          bits.push(`<div class="card"><h2>Still no food cost.</h2><p>Naming a file “count” doesn’t count the walk-in. Invoice ≠ COGS. SKU drift is not food cost. Bar doesn’t fill. That’s the honesty.</p><span class="pill">Missing</span></div>`);
+        }
+        return bits.join("");
+      }
+
+      function hintFor(id) {
+        if (id === "eod") return "Close is in. Sales and promos are up. Void reasons next — or drop the invoice if the beef is the hole.";
+        if (id === "voidlog") return "Reasons in. Pattern only. You still run the talk.";
+        if (id === "invoice") return "Invoice in. SKU drift = switch the vendor or raise the plate. Not a food-cost %. We didn’t invent a save.";
+        if (id === "statement") return "Statement in. Fees stay Estimated. That’s not us being cute. That’s the math.";
+        if (id === "count") return "Yeah, no. We will not fake a food cost so you feel done.";
+        return "Locked.";
+      }
+
+      function plug(id) {
+        if (id === "count") state.count = true;
+        else if (ITEMS[id]) state[id] = true;
+        document.getElementById("hint").textContent = hintFor(id);
+        renderRail();
+        document.getElementById("receipt").innerHTML = receiptHtml();
+      }
+
+      renderRail();
+      document.body.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-plug]");
+        if (t) plug(t.dataset.plug);
+      });
+      const box = document.getElementById("composer");
+      const paste = document.getElementById("paste");
+      paste.addEventListener("input", () => {
+        const v = paste.value.toLowerCase();
+        if (v.includes("void") && v.includes("reason")) plug("voidlog");
+        else if (v.includes("invoice") || v.includes("sysco") || v.includes("ground beef") || v.includes("vendor")) plug("invoice");
+        else if (v.includes("net sales") || v.includes("end of day") || v.includes("end-of-day") || v.includes("close") || v.includes("z report")) plug("eod");
+        if (v.includes("doordash") || v.includes("payout")) plug("statement");
+      });
+      ["dragenter", "dragover"].forEach((ev) =>
+        box.addEventListener(ev, (e) => {
+          e.preventDefault();
+          box.classList.add("hot");
+        })
+      );
+      ["dragleave", "drop"].forEach((ev) =>
+        box.addEventListener(ev, (e) => {
+          e.preventDefault();
+          box.classList.remove("hot");
+        })
+      );
+      function plugFromName(name) {
+        if (/reason|void/i.test(name)) plug("voidlog");
+        else if (/invoice|sysco|us.foods|vendor|beef/i.test(name)) plug("invoice");
+        else if (/dash|uber|grub|payout|statement/i.test(name)) plug("statement");
+        else plug("eod");
+      }
+      box.addEventListener("drop", (e) => {
+        const name = (e.dataTransfer.files[0] && e.dataTransfer.files[0].name) || "drop.txt";
+        paste.value = "Dropped: " + name;
+        plugFromName(name);
+      });
+      document.getElementById("file").addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        paste.value = "Chose: " + f.name;
+        plugFromName(f.name);
+      });
+    </script>
+  </body>
+</html>
