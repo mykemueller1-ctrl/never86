@@ -91,15 +91,28 @@ export function parseFilenameBusinessDate(filename: string): string | null {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+function familyHits(hay: string): PdqReportFamily[] {
+  const hits: PdqReportFamily[] = [];
+  if (hay.includes('zreport_summary') || hay.includes('z report')) hits.push('z-summary');
+  if (hay.includes('hourly_sales') || hay.includes('hourly sales')) hits.push('hourly');
+  if (hay.includes('void_promo') || hay.includes('void promo')) hits.push('void-promo');
+  return hits;
+}
+
 export function detectPdqFamily(filename: string, text = ''): PdqReportFamily {
-  const hay = `${filename}\n${text}`.toLowerCase();
-  if (hay.includes('zreport_summary') || hay.includes('z report') || hay.includes('end of day')) {
+  const fromFile = familyHits(filename.toLowerCase());
+  if (fromFile.length === 1) return fromFile[0];
+  if (fromFile.length > 1) return 'unknown';
+
+  const fromText = familyHits(text.toLowerCase());
+  if (fromText.length === 1) return fromText[0];
+  if (fromText.length > 1) return 'unknown';
+
+  const textHay = text.toLowerCase();
+  if (/\bz report\b/.test(textHay) || (/\bend of day\b/.test(textHay) && /subtotal|menu category/i.test(text))) {
     return 'z-summary';
   }
-  if (hay.includes('hourly_sales') || hay.includes('hourly sales')) return 'hourly';
-  if (hay.includes('void_promo') || hay.includes('void promo') || hay.includes('# voids')) {
-    return 'void-promo';
-  }
+  if (/# voids/i.test(text) && !/hourly sales|z report/i.test(textHay)) return 'void-promo';
   return 'unknown';
 }
 
