@@ -4,7 +4,9 @@ import {
   costFountainBib,
   costFountainCupPour,
   declareCupService,
+  estimateLiquidFillFromIcePack,
   fountainBibKnowledgePack,
+  splitCupLiquid,
   walkFountainSpiritDrink,
 } from './fountainBibCost';
 
@@ -15,8 +17,24 @@ describe('fountainBibCost', () => {
     expect(ask.evidenceState).toBe('Missing Evidence');
     expect(ask.ask.some((q) => q.id === 'mix_ratio')).toBe(true);
     expect(ask.ask.some((q) => q.id === 'liquid_fill')).toBe(true);
+    expect(ask.ask.some((q) => q.id === 'ice_pack')).toBe(true);
     expect(ask.mixRatioChoiceMenu.some((r) => r.id === '5+1')).toBe(true);
-    expect(ask.onboardingScript.join(' ')).toMatch(/Hawkeye|Pepsi|5\+1/i);
+    expect(ask.liquidFillChoiceMenuFlOz9oz).toContain(5);
+    expect(ask.onboardingScript.join(' ')).toMatch(/Hawkeye|Pepsi|5\+1|~5 oz/i);
+  });
+
+  it('estimates ~5.4 oz liquid for a 9 oz cup with heavy ice — matches ~5 oz operator guess', () => {
+    const heavy = estimateLiquidFillFromIcePack({ cupMarkedFlOz: 9, icePack: 'heavy' });
+    expect(heavy.ok).toBe(true);
+    if (!heavy.ok) return;
+    expect(heavy.evidenceState).toBe('Estimated');
+    expect(heavy.liquidFillFlOz).toBeCloseTo(5.4, 6);
+    expect(heavy.note).toMatch(/~5 oz/);
+
+    const split = splitCupLiquid({ liquidFillFlOz: 5, spiritFlOz: 2 });
+    expect(split.ok).toBe(true);
+    if (!split.ok) return;
+    expect(split.sodaFlOz).toBe(3);
   });
 
   it('turns a 5-gal Pepsi BIB at operator-declared 5+1 into finished fl oz + cost/oz', () => {
@@ -57,12 +75,12 @@ describe('fountainBibCost', () => {
 
     const ok = declareCupService({
       cupMarkedFlOz: 9,
-      liquidFillFlOz: 5.5,
-      iceNote: 'ice + straw',
+      liquidFillFlOz: 5,
+      iceNote: 'ice + straw · operator ~5 oz guess',
     });
     expect(ok.ok).toBe(true);
     if (!ok.ok) return;
-    expect(ok.iceDisplacementFlOz).toBeCloseTo(3.5, 6);
+    expect(ok.iceDisplacementFlOz).toBeCloseTo(4, 6);
   });
 
   it('costs Pepsi in a vodka-Pepsi after house pour and liquid fill are declared', () => {
@@ -74,13 +92,13 @@ describe('fountainBibCost', () => {
         syrupParts: 1,
         productLabel: 'Pepsi',
       },
-      cup: { cupMarkedFlOz: 9, liquidFillFlOz: 6, iceNote: 'ice + straw' },
-      spiritFlOz: 1.5,
+      cup: { cupMarkedFlOz: 9, liquidFillFlOz: 5, iceNote: 'ice + straw' },
+      spiritFlOz: 2,
     });
     expect(pour.ok).toBe(true);
     if (!pour.ok) return;
-    expect(pour.sodaFlOz).toBeCloseTo(4.5, 6);
-    expect(pour.sodaCost).toBeCloseTo(4.5 * (60 / 3840), 10);
+    expect(pour.sodaFlOz).toBeCloseTo(3, 6);
+    expect(pour.sodaCost).toBeCloseTo(3 * (60 / 3840), 10);
   });
 
   it('walks Hawkeye + Pepsi as ask-first, then costs when answers exist', () => {
@@ -99,19 +117,20 @@ describe('fountainBibCost', () => {
       waterParts: 5,
       syrupParts: 1,
       cupMarkedFlOz: 9,
-      liquidFillFlOz: 6,
-      spiritPourFlOz: 1.5,
+      liquidFillFlOz: 5,
+      spiritPourFlOz: 2,
       spiritCostPerFlOz: 0.2,
     });
     expect(costed.phase).toBe('costed');
     if (!costed.cost) throw new Error('expected cost');
-    expect(costed.cost.spiritFlOz).toBe(1.5);
-    expect(costed.cost.spiritCost).toBeCloseTo(0.3, 6);
-    expect(costed.cost.sodaFlOz).toBeCloseTo(4.5, 6);
-    expect(costed.cost.recipeCost).toBeCloseTo(0.3 + 4.5 * (60 / 3840), 8);
+    expect(costed.cost.spiritFlOz).toBe(2);
+    expect(costed.cost.spiritCost).toBeCloseTo(0.4, 6);
+    expect(costed.cost.sodaFlOz).toBeCloseTo(3, 6);
+    expect(costed.cost.recipeCost).toBeCloseTo(0.4 + 3 * (60 / 3840), 8);
 
     const pack = fountainBibKnowledgePack();
     expect(pack.exampleWalkthrough.recipe).toMatch(/Hawkeye.*Pepsi/i);
-    expect(pack.truthGates.join(' ')).toMatch(/Cup mark ≠ liquid fill|liquid fill/i);
+    expect(pack.iceResearch.nineOzHeavyIceApproxLiquidFlOz).toBeCloseTo(5.4, 6);
+    expect(pack.truthGates.join(' ')).toMatch(/~5 oz liquid|Cup mark ≠ liquid fill/i);
   });
 });

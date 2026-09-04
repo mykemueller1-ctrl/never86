@@ -72,6 +72,9 @@ drinkCost = spiritCost + sodaCost
 Worked interview: Pepsi 5-gal BIB on the gun · 9 oz cup with ice + straw · Hawkeye vodka.  
 Ask mix ratio on the valve card. Ask liquid fill after ice — marked 9 ≠ 9 oz of Pepsi.
 
+**Ice research (interview band, not a silent default):** catering/bar ice pack ≈ light 15% / medium 25% / heavy 40%.  
+9 oz × heavy ≈ **5.4 oz liquid**. Operator **~5 oz** with **~2 oz liquor** → **~3 oz Pepsi** is in-band. Prefer a measured fill when you can.
+
 ## Food recipe path
 
 ```
