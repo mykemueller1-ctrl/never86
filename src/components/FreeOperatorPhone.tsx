@@ -337,7 +337,7 @@ export function FreeOperatorPhone() {
         </section>
       ) : null}
 
-      <div ref={answerRef} className={answer ? 'mt-5' : undefined} aria-live="polite">
+      <div ref={answerRef} className={answer ? 'mt-5 scroll-mt-24' : undefined} aria-live="polite">
         {answer ? <FreeOperatorAnswerCard answer={answer} compact /> : null}
       </div>
 
@@ -362,6 +362,12 @@ export function FreeOperatorPhone() {
               id="owner-desk-ask"
               value={ask}
               onChange={(event) => setAsk(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  goAsk(ask);
+                }
+              }}
               rows={2}
               placeholder={listening ? 'Listening…' : "Ask what's happening in your restaurant..."}
               className="owner-desk-ask"
