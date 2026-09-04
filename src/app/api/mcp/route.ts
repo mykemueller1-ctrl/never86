@@ -45,6 +45,14 @@ import {
   type VolumeUnit,
 } from '@/lib/uomConvert';
 import {
+  askFountainBibStandards,
+  costFountainBib,
+  costFountainCupPour,
+  declareCupService,
+  fountainBibKnowledgePack,
+  walkFountainSpiritDrink,
+} from '@/lib/fountainBibCost';
+import {
   MCP_PUBLIC_ENDPOINT,
   MCP_PUBLIC_PROTOCOL,
   MCP_PUBLIC_SERVER_INFO,
@@ -191,7 +199,11 @@ async function handle(req: JsonRpcReq): Promise<Response> {
       if (name === 'convert_uom') {
         const op = typeof args.op === 'string' ? args.op : '';
         if (op === 'knowledge') {
-          return textResult(req.id, { evidenceState: 'Verified', pack: uomKnowledgePack() });
+          return textResult(req.id, {
+            evidenceState: 'Verified',
+            pack: uomKnowledgePack(),
+            fountain: fountainBibKnowledgePack(),
+          });
         }
         if (op === 'bottle_fl_oz') {
           const result = bottleFlOzFromMl(Number(args.package_ml));
@@ -247,12 +259,60 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           if (!result.ok) return textResult(req.id, result, true);
           return textResult(req.id, { evidenceState: 'Unverified', from, to, ...result });
         }
+        if (op === 'fountain_bib') {
+          const result = costFountainBib({
+            syrupGal: Number(args.syrup_gal),
+            bibCost: Number(args.bib_cost),
+            waterParts: Number(args.water_parts),
+            syrupParts: Number(args.syrup_parts),
+            productLabel: typeof args.product_label === 'string' ? args.product_label : undefined,
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Unverified. Mix ratio and BIB $ must come from THIS unit — never invent 5+1.',
+            ...result,
+          });
+        }
+        if (op === 'cup_service') {
+          const result = declareCupService({
+            cupMarkedFlOz: Number(args.cup_marked_fl_oz),
+            liquidFillFlOz: Number(args.liquid_fill_fl_oz),
+            iceNote: typeof args.ice_note === 'string' ? args.ice_note : undefined,
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Unverified. Cup mark ≠ liquid fill when ice and straw are present.',
+            ...result,
+          });
+        }
+        if (op === 'fountain_cup_pour') {
+          const result = costFountainCupPour({
+            bib: {
+              syrupGal: Number(args.syrup_gal),
+              bibCost: Number(args.bib_cost),
+              waterParts: Number(args.water_parts),
+              syrupParts: Number(args.syrup_parts),
+              productLabel: typeof args.product_label === 'string' ? args.product_label : undefined,
+            },
+            cup: {
+              cupMarkedFlOz: Number(args.cup_marked_fl_oz),
+              liquidFillFlOz: Number(args.liquid_fill_fl_oz),
+              iceNote: typeof args.ice_note === 'string' ? args.ice_note : undefined,
+            },
+            spiritFlOz: args.spirit_fl_oz === undefined ? undefined : Number(args.spirit_fl_oz),
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning: 'Unverified fountain cup pour. Ask mix ratio + liquid fill before trusting the $.',
+            ...result,
+          });
+        }
         return textResult(
           req.id,
           {
             ok: false,
             error:
-              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | knowledge',
+              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | fountain_bib | cup_service | fountain_cup_pour | knowledge',
           },
           true,
         );
@@ -306,10 +366,25 @@ async function handle(req: JsonRpcReq): Promise<Response> {
         });
       }
 
+      if (name === 'ask_fountain_standards') {
+        return textResult(req.id, {
+          warning:
+            'Ask THESE fountain questions at this unit. Mix-ratio choice menus are options — not defaults. Do not invent 5+1 or cup liquid fill.',
+          ...askFountainBibStandards({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            productHint: typeof args.product_hint === 'string' ? args.product_hint : undefined,
+          }),
+        });
+      }
+
       if (name === 'analyze_recipe_cost') {
         const mode = typeof args.mode === 'string' ? args.mode : '';
         if (mode === 'knowledge') {
-          return textResult(req.id, { evidenceState: 'Verified', pack: recipeCostKnowledgePack() });
+          return textResult(req.id, {
+            evidenceState: 'Verified',
+            pack: recipeCostKnowledgePack(),
+            fountain: fountainBibKnowledgePack(),
+          });
         }
         if (mode === 'recipe') {
           const ingredients = Array.isArray(args.ingredients)
@@ -366,6 +441,34 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             ...result,
           });
         }
+        if (mode === 'fountain_spirit_drink') {
+          const walked = walkFountainSpiritDrink({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            sodaLabel: typeof args.soda_label === 'string' ? args.soda_label : undefined,
+            spiritLabel: typeof args.spirit_label === 'string' ? args.spirit_label : undefined,
+            syrupGal: args.syrup_gal === undefined ? undefined : Number(args.syrup_gal),
+            bibCost: args.bib_cost === undefined ? undefined : Number(args.bib_cost),
+            waterParts: args.water_parts === undefined ? undefined : Number(args.water_parts),
+            syrupParts: args.syrup_parts === undefined ? undefined : Number(args.syrup_parts),
+            cupMarkedFlOz: args.cup_marked_fl_oz === undefined ? undefined : Number(args.cup_marked_fl_oz),
+            liquidFillFlOz: args.liquid_fill_fl_oz === undefined ? undefined : Number(args.liquid_fill_fl_oz),
+            spiritPourFlOz: args.spirit_pour_fl_oz === undefined ? undefined : Number(args.spirit_pour_fl_oz),
+            spiritCostPerFlOz:
+              args.spirit_cost_per_fl_oz === undefined ? undefined : Number(args.spirit_cost_per_fl_oz),
+          });
+          if (walked.phase === 'ask') {
+            return textResult(req.id, {
+              warning:
+                'Missing Evidence. Walk the operator: Pepsi BIB size + $, gun mix ratio, cup liquid after ice, Hawkeye house pour — then re-call.',
+              ...walked,
+            });
+          }
+          return textResult(req.id, {
+            warning:
+              'Unverified fountain+spirit drink cost. Mix ratio, ice fill, and house pour came from THIS unit’s answers — never Never86 defaults.',
+            ...walked,
+          });
+        }
         if (mode === 'ep_unit_cost') {
           const result = calculateEpUnitCost(Number(args.ap_unit_cost), Number(args.yield_fraction));
           if (!result.ok) return textResult(req.id, result, true);
@@ -401,7 +504,7 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           {
             ok: false,
             error:
-              'analyze_recipe_cost requires mode: recipe | drink_recipe | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
+              'analyze_recipe_cost requires mode: recipe | drink_recipe | fountain_spirit_drink | ep_unit_cost | food_cogs | food_cost_pct | contribution | knowledge',
           },
           true,
         );

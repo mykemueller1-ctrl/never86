@@ -62,6 +62,7 @@ describe('store listing packet', () => {
       'convert_uom',
       'ask_pour_standards',
       'declare_pour_standards',
+      'ask_fountain_standards',
       'analyze_recipe_cost',
       'analyze_vendor_prices',
       'build_action_shift',

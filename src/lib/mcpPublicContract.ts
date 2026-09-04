@@ -164,8 +164,20 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
       properties: {
         op: {
           type: 'string',
-          enum: ['bottle_fl_oz', 'keg_fl_oz', 'pours_per_package', 'cost_per_pour', 'volume', 'mass', 'knowledge'],
-          description: 'Conversion operation. Use knowledge for the full UoM pack.',
+          enum: [
+            'bottle_fl_oz',
+            'keg_fl_oz',
+            'pours_per_package',
+            'cost_per_pour',
+            'volume',
+            'mass',
+            'fountain_bib',
+            'cup_service',
+            'fountain_cup_pour',
+            'knowledge',
+          ],
+          description:
+            'Conversion operation. Use knowledge for the full UoM pack. Fountain BIB ops need operator-declared mix ratio + cup liquid fill — never invent 5+1 or ice fill.',
         },
         package_ml: { type: 'number', exclusiveMinimum: 0 },
         keg_gal: { type: 'number', exclusiveMinimum: 0 },
@@ -181,6 +193,35 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         amount: { type: 'number', minimum: 0 },
         from: { type: 'string', description: 'Volume: ml|l|flOz|gal. Mass: g|kg|ozAv|lb.' },
         to: { type: 'string' },
+        syrup_gal: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Fountain BIB syrup gallons (e.g. 5). Not finished beverage gallons.',
+        },
+        bib_cost: { type: 'number', minimum: 0, description: 'Invoice/landed $ for THIS BIB (syrup only).' },
+        water_parts: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Operator-declared water parts in mix ratio (e.g. 5 for 5+1). Never invent.',
+        },
+        syrup_parts: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Operator-declared syrup parts in mix ratio (usually 1).',
+        },
+        product_label: { type: 'string' },
+        cup_marked_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        liquid_fill_fl_oz: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Liquid fl oz after ice + straw. Cup mark alone is not enough.',
+        },
+        ice_note: { type: 'string' },
+        spirit_fl_oz: {
+          type: 'number',
+          minimum: 0,
+          description: 'House spirit pour already in the cup — reduces soda fill.',
+        },
       },
       required: ['op'],
       additionalProperties: false,
@@ -243,15 +284,41 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
   {
+    name: 'ask_fountain_standards',
+    description:
+      'Interview pack for fountain / bag-in-box gun soda at THIS unit: BIB syrup gallons, invoice $, mix ratio (e.g. 5+1 — ask, never invent), cup mark, and liquid fill after ice + straw. Call before costing Pepsi-gun recipes.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store_id: { type: 'string', description: 'Store / unit id. Fountain standards are per unit.' },
+        product_hint: {
+          type: 'string',
+          description: 'Gun product label if known (e.g. Pepsi).',
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
     name: 'analyze_recipe_cost',
     description:
-      'Cost a plate (mode=recipe) or a drink (mode=drink_recipe). Drink recipes pull liquor/wine/draft fl oz from THIS unit’s house pour (ask_pour_standards → declare_pour_standards) — never assume 1.5 / 1.75 / 2. Also EP unit cost / food COGS / food-cost % when counts and sales share scope. Unverified math; never invents yield or treats an invoice as COGS.',
+      'Cost a plate (mode=recipe), a liquor drink (mode=drink_recipe), or a fountain+spirit drink (mode=fountain_spirit_drink). Drink recipes pull liquor fl oz from THIS unit’s house pour; fountain soda needs BIB mix ratio + cup liquid fill after ice — never assume 1.5 / 1.75 / 2 or 5+1. Also EP unit cost / food COGS / food-cost % when counts and sales share scope. Unverified math; never invents yield or treats an invoice as COGS.',
     inputSchema: {
       type: 'object',
       properties: {
         mode: {
           type: 'string',
-          enum: ['recipe', 'drink_recipe', 'ep_unit_cost', 'food_cogs', 'food_cost_pct', 'contribution', 'knowledge'],
+          enum: [
+            'recipe',
+            'drink_recipe',
+            'fountain_spirit_drink',
+            'ep_unit_cost',
+            'food_cogs',
+            'food_cost_pct',
+            'contribution',
+            'knowledge',
+          ],
         },
         store_id: {
           type: 'string',
@@ -312,6 +379,28 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         food_sales: { type: 'number', exclusiveMinimum: 0 },
         menu_price: { type: 'number', exclusiveMinimum: 0 },
         recipe_cost: { type: 'number', minimum: 0 },
+        soda_label: { type: 'string', description: 'For fountain_spirit_drink (e.g. Pepsi).' },
+        spirit_label: { type: 'string', description: 'For fountain_spirit_drink (e.g. Hawkeye vodka).' },
+        syrup_gal: { type: 'number', exclusiveMinimum: 0, description: 'BIB syrup gallons (e.g. 5).' },
+        bib_cost: { type: 'number', minimum: 0, description: 'Invoice/landed $ for THIS BIB.' },
+        water_parts: { type: 'number', exclusiveMinimum: 0, description: 'Declared water parts (e.g. 5 for 5+1).' },
+        syrup_parts: { type: 'number', exclusiveMinimum: 0, description: 'Declared syrup parts (usually 1).' },
+        cup_marked_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        liquid_fill_fl_oz: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Liquid fl oz after ice + straw — not the cup mark alone.',
+        },
+        spirit_pour_fl_oz: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'THIS unit’s mixed-drink liquor pour for the spirit line.',
+        },
+        spirit_cost_per_fl_oz: {
+          type: 'number',
+          minimum: 0,
+          description: 'Spirit cost per fl oz after bottle pack conversion.',
+        },
       },
       required: ['mode'],
       additionalProperties: false,
@@ -391,6 +480,7 @@ export const MCP_ANALYSIS_TOOL_NAMES = [
   'convert_uom',
   'ask_pour_standards',
   'declare_pour_standards',
+  'ask_fountain_standards',
   'analyze_recipe_cost',
   'analyze_vendor_prices',
   'build_action_shift',
