@@ -36,7 +36,7 @@ describe('store listing packet', () => {
     expect(blob).not.toMatch(/listed in GPT Store|published to Claude directory|featured on Grok/i);
   });
 
-  it('keeps the ChatGPT submission packet on the current v1 shape', () => {
+  it('keeps the ChatGPT submission packet aligned to the public MCP tool set', () => {
     const submission = JSON.parse(
       readFileSync(join(process.cwd(), 'chatgpt-app-submission.json'), 'utf8'),
     );
@@ -46,11 +46,19 @@ describe('store listing packet', () => {
     expect(submission.schema_version).toBe(1);
     expect(submission.app_info).toMatchObject({
       display_name: "Never86'd Operator",
-      subtitle: 'Payroll · Prices · Process',
+      subtitle: 'Specialists · Payroll · Prices · Process',
       category: 'BUSINESS',
     });
     expect(Object.keys(submission.tools)).toEqual([
+      'get_operator_system',
+      'get_operator_logic',
+      'get_3p_audit_logic',
+      'list_answers',
+      'list_free_agents',
+      'list_agent_jobs',
+      'list_specialists',
       'analyze_labor',
+      'analyze_beverage',
       'analyze_vendor_prices',
       'build_action_shift',
     ]);

@@ -1,4 +1,9 @@
 import { buildActionShift, type ActionShiftInput, type ActionShiftResult } from '../actionShift';
+import {
+  approveMemoryAtom,
+  proposeMemoryAtom,
+  type ProposeMemoryAtomInput,
+} from '../agentGovernance/storeMemory';
 import { NEVER86_OPERATOR_SYSTEM } from '../operatorSystem';
 import type { AgentRunRecord, FileDefense, StoreSpecialistOutput } from './types';
 
@@ -101,18 +106,60 @@ export function verifyProof(shift: ActionShiftResult | null): StoreSpecialistOut
   );
 }
 
-export function curateMemory(approved: boolean, approver?: string): StoreSpecialistOutput {
+export function curateMemory(
+  approved: boolean,
+  approver?: string,
+  proposals: ProposeMemoryAtomInput[] = [],
+): StoreSpecialistOutput {
+  const who = approver?.trim();
+  if (!approved || !who) {
+    return specialist(
+      'memory-curator',
+      'idle',
+      'No store memory written. A model guess is not memory. Human approval is required.',
+      {
+        records: [],
+        pendingApprovals:
+          proposals.length > 0
+            ? proposals.map((row) => `Pending: ${row.memoryType} — ${row.rawRule.slice(0, 80)}`)
+            : ['No tribal rule proposed on this first sample run.'],
+      },
+    );
+  }
+
+  const records: Array<Record<string, unknown>> = [];
+  const errors: string[] = [];
+  for (const proposal of proposals) {
+    const proposed = proposeMemoryAtom(proposal);
+    if (!proposed.ok) {
+      errors.push(`${proposal.memoryType}: ${proposed.error}`);
+      continue;
+    }
+    const approvedAtom = approveMemoryAtom(proposed.atom.id, who);
+    if (!approvedAtom.ok) {
+      errors.push(`${proposal.memoryType}: ${approvedAtom.error}`);
+      continue;
+    }
+    records.push({
+      id: approvedAtom.atom.id,
+      scope: 'store',
+      storeId: approvedAtom.atom.storeId,
+      memoryType: approvedAtom.atom.memoryType,
+      approver: approvedAtom.atom.approver,
+      version: approvedAtom.atom.version,
+      supersededBy: approvedAtom.atom.supersededBy,
+    });
+  }
+
   return specialist(
     'memory-curator',
-    approved ? 'ran' : 'idle',
-    approved
-      ? `Versioned store rule recorded by ${approver}.`
-      : 'No store memory written. A model guess is not memory. Human approval is required.',
+    records.length > 0 ? 'ran' : 'idle',
+    records.length > 0
+      ? `Versioned store rule(s) recorded by ${who}.`
+      : 'Human approved the curator, but no allowed memory atom was written.',
     {
-      records: approved && approver
-        ? [{ scope: 'store', approver, version: 1, supersededBy: null }]
-        : [],
-      pendingApprovals: approved ? [] : ['No tribal rule proposed on this first sample run.'],
+      records,
+      pendingApprovals: errors,
     },
   );
 }
