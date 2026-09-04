@@ -1,15 +1,22 @@
 # Free operator / Owner desk phone demo
 
-**Track:** 1–3 unit Owner desk (`/operator`)  
+**Track:** 1–3 unit Owner desk (`/operator`) · open suck-in play (`/play`)  
 **Multi-unit track:** Command Center (`/command-center`) — separate product promise  
 **Founder lock:** Keep the mouth and the cards. Do not invent dollars.
 
-Public surface: `/operator`  
+Public surfaces:
+- `/play` — Action Shift suck-in open play (anyone, no login). Sample shop only.
+- `/operator` — phone-first Owner desk
+- `/onboard` / `/login` — claim or reopen a real free owner seat by email
+- Seat 1 assignment (public): **Community Tap · first store**. No private CTAP dollars, PINs, or staff names on these surfaces.
+
 Sample answers: `/operator/answers/{slug}` — labeled **FICTIONAL / sample-not-verified**.
 
 ## What this is
 
 Phone-first **Owner desk** for the 1–3 unit ICP. Action Shift home, Labor & schedule (Prime Cost Coach evidence), food/beverage trays, ask mouth (talk / type / photo / file). Ask routing covers FOH, BOH, Schedule, Vendor, and Merchant. Sample cards stay on this phone. Evidence stays **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close. Sample answer URLs are noindex. Demo restaurant only — no Community Tap private data.
+
+Open play at `/play` uses the same boarding voice: pain → POS email/photo/Drive (no day-one API) → one Action Shift → schedule → vendors → menu.
 
 ## What this is not
 
