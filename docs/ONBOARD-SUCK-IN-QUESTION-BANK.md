@@ -18,6 +18,11 @@ Founder dictation. This overrides generic “LLM ask” lines below when they co
 
 Then: drop last night’s close **or** the statement that matches the pain.
 
+### POS email first — not integration (Wave 0.5) — LOCK
+> We don’t need to integrate yet. Where does your POS email the nightly reports — sales, labor, voids? Forward that email, take a picture of it, or drop the download / Drive file. We’ll do the hard work.
+
+**Why:** Space pain #1 is the integration wall (Toast API fees, 4–6 week partner setups, syncs that never finish). Capture path = **email / photo / Drive** → parse. OAuth/API = later convenience only. No portal passwords.
+
 ### After first action from the close (Wave 1 → labor)
 > Can you take a picture of the schedules? That way we know how many people are on, and we’ll see if labor is drifting — right now in restaurants, labor’s one of the biggest things.
 
@@ -237,9 +242,10 @@ Voice: short. Concrete. Iowa plain. After a win. One ask. Offer paste/photo/forw
 
 | Trigger | LLM ask | Captures |
 |---|---|---|
-| Empty desk | “What problem are you trying to solve? Labor? Cash flow? Or you’re just tired of fragmented data sitting here? No worries — we got you. Drop last night’s close when you’re ready.” | Pain + sales family |
-| Cash / DoorDash pain | “Cash flow / DoorDash? Got a redacted statement — paste page 1, we’ll label the math.” | 3P family |
-| Labor pain | “Labor? Cool — drop last night’s close, then we’ll want a picture of the schedule.” | Close → schedule path |
+| Empty desk | “What problem are you trying to solve? Labor? Cash flow? Or you’re just tired of fragmented data sitting here? No worries — we got you.” | Pain |
+| POS path (primary) | “We don’t need to integrate yet. Where does your POS email the nightly reports — sales, labor, voids? Forward it, photo it, or drop the Drive/download. We’ll do the hard work.” | inbox/source route + close |
+| Cash / DoorDash pain | “Cash flow / DoorDash? Got a redacted statement — paste page 1, we’ll label the math.” | 3P statement |
+| Labor pain | “Labor? Cool — drop last night’s close (email/photo is fine), then we’ll want a picture of the schedule.” | Close → schedule path |
 
 ### Wave 1 — after first action from the close — Myke voice
 
@@ -355,12 +361,13 @@ Voice: short. Concrete. Iowa plain. After a win. One ask. Offer paste/photo/forw
 
 ## 8. One-screen demo script (Myke voice)
 
-> “What problem are you trying to solve — labor, cash flow, or fragmented data? No worries, we got you.  
-> Drop last night’s close. Here’s one move.  
-> Can you take a picture of the schedules? We’ll see if labor’s drifting.  
-> Performance / Sysco — how many times a week? Locals too? Do they email the invoice — where?  
-> Picture of the menu — we handle the SKU chaos; recipes suck.  
-> We don’t take portal passwords. One seat’s free.”
+> “What problem — labor, cash flow, or fragmented data? No worries, we got you.  
+> We don’t integrate day one. Where does the POS email the reports? Forward, photo, or Drive.  
+> Here’s one move from last night.  
+> Picture of the schedules — labor drift.  
+> Performance / Sysco — how often? Locals? Invoice email where?  
+> Picture of the menu — we handle the SKU chaos.  
+> No portal passwords. One seat’s free.”
 
 ---
 

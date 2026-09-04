@@ -1,5 +1,6 @@
 wave,trigger_or_missing,llm_ask,captures,we_need,competitor_home,refuse
-0,empty desk,What problem are you trying to solve? Labor? Cash flow? Or you're just tired of fragmented data sitting here? No worries — we got you. Drop last night's close when you're ready.,pain + sales close,Yes,ME POS / Toast / R365,portal password
+0,empty desk,What problem are you trying to solve? Labor? Cash flow? Or you're just tired of fragmented data sitting here? No worries — we got you.,pain,Yes,ME POS / Toast / R365,portal password
+0,POS email first,"We don't need to integrate yet. Where does your POS email the nightly reports — sales, labor, voids? Forward it, photo it, or drop the Drive/download. We'll do the hard work.",inbox/source route + close,Yes,Toast API fee / MarketMan 4-6wk / broken syncs,portal password / day1 OAuth
 0,cash / DoorDash,"Cash flow / DoorDash? Got a redacted statement — paste page 1, we'll label the math.",3P statement,Yes,Never86 door,portal login
 0,labor pain,"Labor? Cool — drop last night's close, then we'll want a picture of the schedule.",close → schedule,Yes,7shifts path,—
 1,schedule primary,Can you take a picture of the schedules? That way we know how many people are on and we'll see if labor is drifting — labor's one of the biggest things right now.,schedule photo,Yes,7shifts,—
