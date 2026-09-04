@@ -363,6 +363,8 @@ Sections only. No dollars invented in the room.
 | Promo / discount / comp lines on the close | Verified when on the POS close | Pattern. Manager-approve the fat ones. Do not invent a promo save. |
 | SKU drift (vendor up → switch house or raise the plate from recipe + cost) | Missing until invoice; then Estimated | Invoice vs last buy. **Not food cost %.** Invoice ≠ COGS. Not enterprise variance. |
 | Food cost / prime cost | Missing / Unverified | No count → no food cost. Invoice ≠ COGS. SKU drift ≠ food cost. |
+| Labor $ / role cost | Missing until close + schedule + role | Role cards first. No invented labor $. |
+| Auto-written schedule | Not built | They paste the week they already posted. Later we fill it. No invented hours. |
 | Payout vs POS | Unverified until both sides | POS ≠ payout. Need finalized payout ID + bank. |
 | Action Shift cash/labor/payout lines | Unverified observations | Operator-supplied targets only. Proof object required. |
 
