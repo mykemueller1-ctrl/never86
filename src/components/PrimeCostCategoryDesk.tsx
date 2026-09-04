@@ -26,7 +26,8 @@ export function PrimeCostCategoryDesk({ board, desk }: { board: PrimeCostBoard; 
         <p className="mb-2 text-[12px] font-semibold uppercase tracking-widest text-ink-500">
           {board.tenantLabel} · {desk.category} · {desk.businessDate} · {desk.completeness}
         </p>
-        <h1 className="display mb-3 text-4xl md:text-6xl">{desk.title} desk.</h1>
+        <h1 className="display mb-3 text-4xl md:text-6xl">{desk.title} terminal.</h1>
+        <p className="mb-3 max-w-2xl text-ink-800">{desk.mvp}</p>
         <p className="mb-8 max-w-2xl text-ink-600">{desk.gate}</p>
 
         <section className="mb-10 grid gap-4 md:grid-cols-2">
@@ -37,6 +38,56 @@ export function PrimeCostCategoryDesk({ board, desk }: { board: PrimeCostBoard; 
               <p className="mt-2 text-sm text-ink-600">{kpi.note}</p>
             </div>
           ))}
+        </section>
+
+        <section className="mb-6 card p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-500">Skill · {desk.skill.skillId}</h2>
+          <p className="mt-2 text-sm text-ink-600">{desk.skill.path}</p>
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-700">
+            {desk.skill.gates.map((gate) => (
+              <li key={gate}>{gate}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mb-6 grid gap-4 md:grid-cols-2">
+          <div className="card p-5">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-500">Reads</h2>
+            <p className="mt-2 text-sm text-ink-700">
+              {desk.dependsOn.length
+                ? desk.dependsOn.map((id) => (
+                    <Link key={id} href={id === 'sales' ? '/command-center/sales-labor' : `${PRIME_COST_HUB_PATH}/${id}`} className="mr-2 underline">
+                      {id}
+                    </Link>
+                  ))
+                : 'none'}
+            </p>
+          </div>
+          <div className="card p-5">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-500">Feeds</h2>
+            <p className="mt-2 text-sm text-ink-700">
+              {desk.feeds.length
+                ? desk.feeds.map((id) => (
+                    <Link key={id} href={id === 'sales' ? '/command-center/sales-labor' : `${PRIME_COST_HUB_PATH}/${id}`} className="mr-2 underline">
+                      {id}
+                    </Link>
+                  ))
+                : 'none'}
+            </p>
+          </div>
+        </section>
+
+        <section className="mb-6 card p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-500">Sector seats</h2>
+          <ul className="mt-3 space-y-3 text-sm text-ink-700">
+            {desk.subAgents.map((seat) => (
+              <li key={seat.seatId}>
+                <p className="font-semibold">{seat.seatId} · {seat.role}</p>
+                <p>{seat.queue}</p>
+                <p className="text-ink-500">{seat.knowledge} · {seat.stopCondition}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="card p-5">

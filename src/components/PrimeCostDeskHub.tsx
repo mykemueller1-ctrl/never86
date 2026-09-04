@@ -43,7 +43,10 @@ export function PrimeCostDeskHub({ board }: { board: PrimeCostBoard }) {
         </p>
         <h1 className="display mb-3 text-4xl md:text-6xl">Prime cost desks.</h1>
         <p className="mb-4 max-w-2xl text-ink-600">{board.isolation}</p>
-        <p className="mb-10 max-w-2xl text-sm text-ink-600">{board.primeCostPct.note}</p>
+        <p className="mb-4 max-w-2xl text-sm text-ink-600">{board.primeCostPct.note}</p>
+        <p className="mb-10 max-w-2xl text-sm text-ink-600">
+          Router {board.router.seatId} sends each fact to one terminal. Each terminal is its own MVP and skill.
+        </p>
 
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {board.desks.map((desk) => (
@@ -51,9 +54,10 @@ export function PrimeCostDeskHub({ board }: { board: PrimeCostBoard }) {
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">
                 {desk.completeness} · {desk.kpis[0]?.evidence}
               </p>
-              <h2 className="mt-2 text-2xl font-semibold">{desk.title}</h2>
+              <h2 className="mt-2 text-2xl font-semibold">{desk.title} terminal</h2>
               <p className="mt-3 text-2xl font-bold tabular-nums">{formatKpi(desk)}</p>
-              <p className="mt-2 text-sm text-ink-600">{desk.gate}</p>
+              <p className="mt-2 text-sm text-ink-600">{desk.mvp}</p>
+              <p className="mt-2 text-xs text-ink-500">{desk.subAgents.length} sector seats · skill {desk.skill.skillId}</p>
             </Link>
           ))}
         </section>

@@ -8,19 +8,21 @@
 
 This is the bigger Taco Bamba Command Center lane. #190 polish is now on `main` and was merged into this branch with `-X theirs` so this PR does not revert it.
 
-## Prime-cost desks
+## Prime-cost terminals
 
-Not a new product. Same Lane C Bamba tenant. Still two seats (`builder-1`, `qa-1`). No 1,000-agent swarm.
+Each roll is its own MVP, skill, and 2–3 sector seats. They read each other. They are not one swarm and not a thousand agents. Router: `prime-cost-router-1`.
 
-| Desk | Status |
-|---|---|
-| Sales | Done — Aug 12 Daily canary 125273.41 |
-| Labor | Open — no Bamba labor dollars |
-| Food | Open — no count → no food cost. Invoice ≠ COGS |
-| Liquor | Open — no pour log / depletion |
-| Beer | Open — no pour log / depletion |
-| Inventory | Open — no count |
+| Terminal | Status | Feeds |
+|---|---|---|
+| Sales | Done — Aug 12 canary 125273.41 | labor, food, menu, liquor, beer |
+| Labor | Open — no labor dollars | food (prime cost) |
+| Food | Open — no count → no food cost | — |
+| Menu | Open — category p-mix only | food, liquor, beer |
+| Liquor | Open — no pour / depletion | — |
+| Beer | Open — no pour / depletion | — |
+| Inventory | Open — no count | food, liquor, beer |
 
+Skills: `skills/prime-cost/*.md`. Contract: `src/lib/primeCostDesks/terminals.ts`.
 Prime cost % stays Open until food and labor are both verified.
 
 ## Hard gates
