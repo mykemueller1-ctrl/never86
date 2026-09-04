@@ -1,0 +1,19 @@
+section,scenario,metric,value_usd,tag,notes
+operator_sub_annual,MarginEdge_1loc,subscription,4200,Verified,$350/loc/mo × 12; marginedge.com/pricing
+operator_sub_annual,MarginEdge_3loc,subscription,12600,Verified,$350 × 3 × 12
+operator_sub_annual,MarginEdge_5loc,subscription,21000,Verified,$350 × 5 × 12
+operator_sub_annual,Never86_ActionShift_seat1,subscription,0,Verified,never86.ai/pricing Seat 1 free
+operator_sub_annual,Never86_Owner_Charter,subscription,2388,Verified,$199/mo × 12 Charter first 100
+operator_sub_annual,Never86_Command_1loc,subscription,5988,Verified,$499/loc/mo × 12 multi-unit track
+operator_onboard,MarginEdge_package_mid,onboarding_fee,1250,Unverified,Secondary writeups $750–$2000; not on ME public page
+operator_onboard,MarketMan,onboarding_fee,500,Community-reported,Vendor FAQ / roundups
+operator_onboard,R365_PS_low,onboarding_fee,2000,Community-reported,Partner/operator ranges $2k–$10k+
+operator_onboard,R365_PS_high,onboarding_fee,10000,Community-reported,
+operator_onboard,Never86_seat1,onboarding_fee,0,Verified,Email/upload; no POS API required
+soft_cost,SaaS_setup_low,owner_hours_cost,2000,Estimated,40h × $50/hr assumption
+soft_cost,SaaS_setup_high,owner_hours_cost,4000,Estimated,80h × $50/hr assumption
+soft_cost,Never86_first_90d,owner_hours_cost,900,Estimated,~18h × $50 over 90 days habit
+company_cs,classic_per_store,cs_delivery,1125,Estimated,15h × $75 loaded
+company_cs,never86_per_store,cs_delivery,75,Estimated,1h × $75 approvals/edge
+company_cs,classic_1000_stores,cs_delivery,1125000,Estimated,1000 × 15 × 75
+company_cs,never86_1000_stores,cs_delivery,75000,Estimated,1000 × 1 × 75

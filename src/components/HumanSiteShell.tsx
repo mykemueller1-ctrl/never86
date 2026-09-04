@@ -27,17 +27,17 @@ export function HumanSiteHeader() {
         <nav className="hidden items-center gap-6 text-sm text-[#423e38] lg:flex" aria-label="Primary navigation">
           <Link href="/#what-it-finds" className="human-nav-link">What it finds</Link>
           <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
+          <Link href="/play" className="human-nav-link">Play</Link>
           <Link href="/operator" className="human-nav-link">Owner desk</Link>
           <Link href="/communities" className="human-nav-link">Communities</Link>
           <Link href="/pricing" className="human-nav-link">Pricing</Link>
           <Link href="/command-center" className="human-nav-link">Command Center</Link>
-          <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
-          <Link href="/onboard" className="human-button human-button-primary text-sm">Claim owner seat →</Link>
+          <Link href="/play" className="human-button human-button-primary text-sm">Start playing →</Link>
         </nav>
 
-        <Link href="/onboard" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          Claim owner seat →
+        <Link href="/play" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
+          Start playing →
         </Link>
       </div>
     </header>
@@ -77,6 +77,7 @@ export function HumanSiteFooter() {
           </p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
+          <Link href="/play" className="human-nav-link">Start playing</Link>
           <Link href="/onboard" className="human-nav-link">Open with email</Link>
           <Link href="/operator" className="human-nav-link">Owner desk</Link>
           <Link href="/communities" className="human-nav-link">Communities</Link>
