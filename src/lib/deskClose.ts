@@ -1,6 +1,14 @@
 import { buildActionShift, type ActionShiftAction, type ActionShiftResult } from './actionShift';
 import { scanInjection, scanIntakeSecrets, type IntakeChannel, type IntakeDocument } from './closeIntake';
 import {
+  hourlyHasFields,
+  landedPdqEodFamilies,
+  voidPromoHasFields,
+  zSummaryHasFields,
+  buildIncompletePdqPacketActionShift,
+  describePdqEodPacket,
+} from './pdqEodPacket';
+import {
   parsePdqNativeText,
   type HourlyRow,
   type MoneyEvidence,
@@ -85,17 +93,18 @@ export function buildDeskFromPdqParts(input: {
   injectionSuspected?: boolean;
 }): DeskClose {
   const missingEvidence: string[] = [];
-  const z = input.z;
-  const hourly = input.hourly;
-  const voids = input.voids;
+  const z = input.z && zSummaryHasFields(input.z) ? input.z : undefined;
+  const hourly = input.hourly && hourlyHasFields(input.hourly) ? input.hourly : undefined;
+  const voids = input.voids && voidPromoHasFields(input.voids) ? input.voids : undefined;
   const families: DeskClose['families'] = [];
   if (z) families.push('z-summary');
   if (hourly) families.push('hourly');
   if (voids) families.push('void-promo');
-
-  if (!z) missingEvidence.push('PDQ ZReport_Summary for the same store and business date.');
-  if (!hourly) missingEvidence.push('PDQ Hourly_Sales_Report for the same business date.');
-  if (!voids) missingEvidence.push('PDQ Void_Promo_Report for the same business date.');
+  const packet = describePdqEodPacket({
+    businessDate: z?.businessDate || hourly?.businessDate || voids?.businessDate || null,
+    landed: landedPdqEodFamilies({ z, hourly, voids }),
+  });
+  missingEvidence.push(...packet.missingEvidence);
 
   const food = z?.mix.food ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Food' };
   const beer = z?.mix.beer ?? { value: null, state: 'missing-evidence' as const, sourceLabel: 'Beer' };
@@ -147,6 +156,12 @@ export function buildDeskFromPdqParts(input: {
     else actionShiftError = built.error;
   } else {
     actionShiftError = 'No net sales on the Z. Missing Evidence — not a $0 night.';
+    actionShift = buildIncompletePdqPacketActionShift({
+      store: input.store || z?.store || 'Unspecified store',
+      businessDate: packet.businessDate,
+      landed: packet.landed,
+      missing: packet.missing,
+    });
   }
 
   const uniqueMissing = [...new Set([
@@ -252,9 +267,9 @@ export function ingestCloseDocuments(
     if (secret) return { ok: false, error: secret.error, status: 400 };
     if (scanInjection(doc.text)) injectionSuspected = true;
     const parsed = parsePdqNativeText(doc.text, doc.filename || '');
-    if (parsed.family === 'z-summary') z = parsed;
-    else if (parsed.family === 'hourly') hourly = parsed;
-    else if (parsed.family === 'void-promo') voids = parsed;
+    if (parsed.family === 'z-summary' && zSummaryHasFields(parsed)) z = parsed;
+    else if (parsed.family === 'hourly' && hourlyHasFields(parsed)) hourly = parsed;
+    else if (parsed.family === 'void-promo' && voidPromoHasFields(parsed)) voids = parsed;
     else if (looksLikeVendorSilence(doc.text, doc.filename || '')) silenceDocs.push(doc);
     else if (looksLikeTheoreticalUsage(doc.text, doc.filename || '')) usageDocs.push(doc);
     else if (looksLikePurchaseOrder(doc.text, doc.filename || '')) poDocs.push(doc);
@@ -350,6 +365,56 @@ export function ingestCloseDocuments(
     if (desk.actionShift) desk.actionShiftError = null;
   }
   return { ok: true, desk };
+}
+
+const PDQ_FAMILIES = new Set(['z-summary', 'hourly', 'void-promo']);
+
+function preferStore(next: string, prior: string): string {
+  if (next && next !== 'Unspecified store') return next;
+  if (prior && prior !== 'Unspecified store') return prior;
+  return next || prior || 'Unspecified store';
+}
+
+/** Same-date sibling EOD emails merge; a Void-only night must not wipe a later Z. */
+export function mergeDeskCloses(prior: DeskClose, next: DeskClose): DeskClose {
+  const families = [...new Set([...prior.families, ...next.families])] as DeskClose['families'];
+  const has = (family: DeskClose['families'][number], desk: DeskClose) => desk.families.includes(family);
+  const zDesk = has('z-summary', next) ? next : has('z-summary', prior) ? prior : next;
+  const hourlyDesk = has('hourly', next) ? next : has('hourly', prior) ? prior : next;
+  const voidDesk = has('void-promo', next) ? next : has('void-promo', prior) ? prior : next;
+  const landed = families.filter((family): family is 'z-summary' | 'hourly' | 'void-promo' => PDQ_FAMILIES.has(family));
+  const businessDate = next.businessDate || prior.businessDate;
+  const packet = describePdqEodPacket({ businessDate, landed });
+  const salesReady = has('z-summary', zDesk) && zDesk.sales.value != null && zDesk.sales.value > 0;
+  const fieldMissing = [
+    ...(has('z-summary', zDesk) ? zDesk.missingEvidence : []),
+    ...(has('hourly', hourlyDesk) ? hourlyDesk.missingEvidence : []),
+    ...(has('void-promo', voidDesk) ? voidDesk.missingEvidence : []),
+  ].filter((line) => !/ZReport_Summary|Hourly_Sales_Report|Void_Promo_Report|PDQ scheduled EOD/i.test(line));
+
+  return {
+    store: preferStore(next.store, prior.store),
+    businessDate,
+    channel: next.channel === 'email' || prior.channel === 'email' ? 'email' : next.channel,
+    families,
+    injectionSuspected: prior.injectionSuspected || next.injectionSuspected,
+    sales: zDesk.sales,
+    mix: zDesk.mix,
+    labor: zDesk.labor,
+    cash: zDesk.cash,
+    hourlyPeak: hourlyDesk.hourlyPeak,
+    voids: has('void-promo', voidDesk) ? voidDesk.voids : zDesk.voids,
+    missingEvidence: [...new Set([...packet.missingEvidence, ...fieldMissing])],
+    actionShift: salesReady
+      ? zDesk.actionShift
+      : buildIncompletePdqPacketActionShift({
+        store: preferStore(next.store, prior.store),
+        businessDate,
+        landed,
+        missing: packet.missing,
+      }),
+    actionShiftError: salesReady ? zDesk.actionShiftError : 'No net sales on the Z. Missing Evidence — not a $0 night.',
+  };
 }
 
 export const PROOF_KINDS = [

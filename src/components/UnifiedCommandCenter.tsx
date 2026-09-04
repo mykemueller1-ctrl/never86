@@ -152,6 +152,8 @@ function Shell({ children }: { children: React.ReactNode }) {
             {NAV.map((t) => (
               <a key={t.id} href={`#${t.id}`} className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">{t.label}</a>
             ))}
+            <Link href="/command-center/prime-cost" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">Prime cost</Link>
+            <Link href="/command-center/sales-labor" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">Sales · Labor</Link>
             <Link href="/admin/never86" className="px-3 py-1.5 rounded-full text-ink-800 hover:bg-black/[0.04] font-medium ml-2">Admin</Link>
           </nav>
         </div>

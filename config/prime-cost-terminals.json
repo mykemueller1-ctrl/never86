@@ -1,0 +1,17 @@
+{
+  "taskId": "bamba-sales-labor-enterprise-v1",
+  "product": "command-center-prime-cost-terminals",
+  "notANewProduct": true,
+  "inventThousandAgents": false,
+  "router": "prime-cost-router-1",
+  "terminals": ["sales", "labor", "food", "menu", "liquor", "beer", "inventory"],
+  "maxSubAgentsPerTerminal": 3,
+  "maxSubAgents": 21,
+  "sharedGates": [
+    "POS ≠ payout",
+    "Invoice ≠ COGS",
+    "No count → no food cost",
+    "Incomplete week stays Open",
+    "Lane C Bamba memory only"
+  ]
+}

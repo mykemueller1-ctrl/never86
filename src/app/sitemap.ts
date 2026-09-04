@@ -47,6 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/demo/rate-card-audit`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/agents`,  lastModified: now, changeFrequency: 'weekly', priority: 0.97 },
     { url: `${BASE}/trial`,   lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/operator`, lastModified: now, changeFrequency: 'weekly', priority: 0.96 },
     { url: `${BASE}/connect`, lastModified: now, changeFrequency: 'weekly', priority: 0.98 },
     { url: `${BASE}/pricing`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/install`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },

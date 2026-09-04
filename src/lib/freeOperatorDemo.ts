@@ -14,6 +14,7 @@ export const FREE_OPERATOR_CHIPS = [
   { id: 'boh', label: 'Back of house', answerSlug: 'boh-invoice' },
   { id: 'schedule', label: 'Schedule', answerSlug: 'schedule-labor' },
   { id: 'vendor', label: 'Vendor', answerSlug: 'vendor-silence' },
+  { id: 'merchant', label: 'Merchant', answerSlug: 'merchant-account' },
 ] as const;
 
 export type FreeOperatorChipId = (typeof FREE_OPERATOR_CHIPS)[number]['id'];
@@ -56,6 +57,12 @@ export const BASE_WHAT_I_KNOW: readonly WhatIKnowCard[] = [
     reason: 'Missing cadence is Missing Evidence — not $0 and not a missed truck.',
   },
   {
+    id: 'merchant-paper',
+    title: 'Merchant paper',
+    state: 'NEED',
+    reason: 'No rate invented. A free terminal is not a merchant agreement.',
+  },
+  {
     id: 'mouth',
     title: 'Ask mouth',
     state: 'READY',
@@ -70,7 +77,7 @@ export const OWNER_SEAT_EOD = {
   surface: 'owner-seat' as const,
   notThisDemo: true,
   copy:
-    'Owner seat — not this public preview — forwards PDQ Z + Hourly + Void to close+{seat}@inbound.never86.ai. This phone does not issue a seat address and does not read your inbox.',
+    'Owner seat — not this public preview — forwards PDQ Z + Hourly + Void to close+{seat}@inbound.never86.ai. This phone does not issue a seat address, does not take a merchant account, and does not read your inbox.',
 };
 
 export type PrimeCostEvidence = {
@@ -302,6 +309,23 @@ export const FREE_OPERATOR_ANSWERS: readonly FreeOperatorAnswer[] = [
     sampleDollars: 'none-verified',
     verifiedClose: false,
   },
+  {
+    slug: 'merchant-account',
+    chipId: 'merchant',
+    headline: 'A free terminal is a processing contract. This phone does not take a merchant account.',
+    facts: [
+      'Merchant chip names the processor and the paper, not a person.',
+      'This preview does not process cards and does not replace the till. $0 verified — FICTIONAL / sample-not-verified.',
+      'A promised rate without the agreement is Unverified, not a leak. A marketplace merchant-fee line is a statement job, not a new processor.',
+    ],
+    coachTomorrow:
+      'Bring the merchant agreement and one processing statement for the same days. Do not switch processors from this preview.',
+    needs:
+      'Current merchant agreement or rate confirmation plus one processing statement. Missing paper is Missing Evidence.',
+    sampleLabel: SAMPLE_LABEL,
+    sampleDollars: 'none-verified',
+    verifiedClose: false,
+  },
 ];
 
 export function getFreeOperatorAnswer(slug: string): FreeOperatorAnswer | null {
@@ -319,6 +343,7 @@ const CHIP_HINTS: Record<FreeOperatorChipId, readonly string[]> = {
   boh: ['back of house', 'boh', 'invoice', 'food cost', 'prep', 'count', 'cogs'],
   schedule: ['schedule', 'labor', 'hours', 'clock', 'overtime', 'shift'],
   vendor: ['vendor', 'silence', 'truck', 'cadence', 'delivery', 'sysco', 'us foods'],
+  merchant: ['merchant', 'processing', 'card rate', 'interchange', 'terminal', 'free pos', 'merchant account', 'iso'],
 };
 
 export type ResolveAskResult =
@@ -342,7 +367,7 @@ export function resolveFreeOperatorAsk(
     return {
       ok: false,
       reason: 'Ask is empty. The mouth is ready. The close is not.',
-      needs: 'Talk, type, or tap Front of house / Back of house / Schedule / Vendor.',
+      needs: 'Talk, type, or tap Front of house / Back of house / Schedule / Vendor / Merchant.',
       inventedClose: false,
     };
   }
@@ -361,8 +386,8 @@ export function resolveFreeOperatorAsk(
   if (!best) {
     return {
       ok: false,
-      reason: 'This preview answers FOH, BOH, Schedule, or Vendor. It does not invent a close or a dollar.',
-      needs: 'Tap a chip or name voids, an invoice, the schedule, or a vendor cadence.',
+      reason: 'This preview answers FOH, BOH, Schedule, Vendor, or Merchant. It does not invent a close or a dollar.',
+      needs: 'Tap a chip or name voids, an invoice, the schedule, a vendor cadence, or the merchant paper.',
       inventedClose: false,
     };
   }

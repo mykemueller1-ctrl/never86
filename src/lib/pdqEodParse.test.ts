@@ -19,6 +19,7 @@ describe('PDQ filename business date', () => {
     expect(parseFilenameBusinessDate('8-24-2026 ZReport_Summary Sample Kitchen.pdf')).toBe('2026-08-24');
     expect(parseFilenameBusinessDate('8-24-2026 Void_Promo_Report Sample Kitchen.pdf')).toBe('2026-08-24');
     expect(parseFilenameBusinessDate('8-24-2026 Hourly_Sales_Report Sample Kitchen.pdf')).toBe('2026-08-24');
+    expect(parseFilenameBusinessDate('9-2-2026 ZReport_Summary Sample Kitchen.pdf')).toBe('2026-09-02');
   });
 });
 
@@ -27,6 +28,18 @@ describe('PDQ family detection', () => {
     expect(detectPdqFamily('8-24-2026 ZReport_Summary Sample.pdf')).toBe('z-summary');
     expect(detectPdqFamily('8-24-2026 Hourly_Sales_Report Sample.pdf')).toBe('hourly');
     expect(detectPdqFamily('8-24-2026 Void_Promo_Report Sample.pdf')).toBe('void-promo');
+  });
+
+  it('does not treat an EOD cover letter that lists all three names as a Z', () => {
+    expect(detectPdqFamily(
+      'EOD Reports Generated From Sample Kitchen',
+      [
+        'EOD Reports Generated From Sample Kitchen',
+        '9-2-2026 ZReport_Summary Sample Kitchen.pdf',
+        '9-2-2026 Hourly_Sales_Report Sample Kitchen.pdf',
+        '9-2-2026 Void_Promo_Report Sample Kitchen.pdf',
+      ].join('\n'),
+    )).toBe('unknown');
   });
 });
 

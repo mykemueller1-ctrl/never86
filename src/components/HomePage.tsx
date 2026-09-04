@@ -49,6 +49,9 @@ export default function Home() {
               <Link href="/llm-shells" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/llm-shells', label: 'Try in ChatGPT' } })}>
                 Try it in ChatGPT
               </Link>
+              <Link href="/operator" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/operator', label: 'Ask on the phone' } })}>
+                Ask on the phone
+              </Link>
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
               1–3 unit operators · no card · no password · seat 1 owner free
@@ -148,6 +151,7 @@ export default function Home() {
             <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
             <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
+            <Link href="/command-center" className="human-button human-button-secondary">Multi-unit Command Center →</Link>
           </div>
         </div>
       </section>

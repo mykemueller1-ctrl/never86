@@ -9,10 +9,12 @@ This is a Never 86'd Inc. publisher job. Do not claim listed until Published.
 
 | Directory | Path | Status |
 |---|---|---|
-| ChatGPT Plugin Directory | https://platform.openai.com/plugins → Create → With MCP | **not submitted** |
+| ChatGPT Plugin Directory | https://platform.openai.com/plugins → Create → With MCP | **packet ready · not submitted** |
 | Claude Connectors Directory | https://claude.ai/admin-settings/directory/submissions/new | **not submitted** · needs Team/Enterprise |
 | Grok featured catalog | none | no public submit form |
 | Gemini consumer connectors | none | partnership-only |
+
+Filing packet: `chatgpt-app-submission.json` + `/store-listing`. Tools include knowledge (`get_operator_system`, `list_specialists`, …) and analysis (`analyze_labor`, `analyze_beverage`, `analyze_vendor_prices`, `build_action_shift`). Still a human publisher click — do not claim Published.
 
 ## Publisher form fields
 

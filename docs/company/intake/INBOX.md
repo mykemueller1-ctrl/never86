@@ -2,7 +2,7 @@
 
 **HQ chat:** [Cursor agents: You talk, I run](https://grok.com/project/d3f103b5-2add-4fc1-9cd7-aabbc6a3484f?chat=3f690a7c-b2e5-4101-be38-89cc8b5df3f6)
 **Mind dump:** `docs/company/MYKE_MIND_DUMP_60_90_DAYS.md`  
-**Last updated:** 2026-09-03 1:15 AM CT
+**Last updated:** 2026-09-03 6:15 AM CT
 
 ## Status
 
@@ -36,6 +36,7 @@
 | **Cursor chats scan** | DONE · Esteban SENT synced | [2026-08-24-cursor-chats-scan.md](2026-08-24-cursor-chats-scan.md) |
 | **#122 GTM (home/trial/for)** | **LIVE on site — issue still open** | Home has one-seat + `/trial` + `/audit`. Issue `#122` not closed |
 | **#118 Monday gate / free seat** | **SAFE BRANCH ONLY — SECURITY CORRECTION REQUIRED** | PR `#127`; CI + Vercel preview green; included at `88997ff`; before production fix raw-token fail-open, IP/login throttles, HTML escaping, atomic token consumption, and Neon→OPS same-email fallback; no production deploy proof |
+| **PDQ EOD 9/2 Community Pizza** | **VOID ONLY — Z + HOURLY MISSING EVIDENCE** | [2026-09-02-pdq-eod-gap.md](2026-09-02-pdq-eod-gap.md) — email should attach Z + Hourly + Void. 9/2 Gmail from pdqreports landed Void_Promo only. No invented dollars. Export native Z/Hourly from PDQ Reports, then forward/merge. MIME attachment + same-date merge drafted on this branch; not merged/deployed/live-verified |
 | **PDQ close intake / proof desk** | **MERGED TO SAFE BRANCH** | PR `#131` merged onto `codex/action-shift-122-safe` at `a827298` (26 Aug 17:09 UTC). Not production. Prior intake/proof security list still applies before any prod deploy. Dirty `#130` closed without merge at 1:15 PM CT; do not reopen |
 | **Vendor silence clock** | **MERGED TO SAFE BRANCH** | PR `#134` merged onto `codex/action-shift-122-safe` at `f92f89d` (26 Aug 17:37 UTC). Safe-branch HEAD. Not production |
 | **Neon apply + unattended gate** | **MERGED TO SAFE BRANCH ONLY** | `#138` merged at `27d637b51c45922643b62f123569a0da9c5e1db5`; `#135`/`#137` are closed as superseded. No production deploy or verified live Neon apply |

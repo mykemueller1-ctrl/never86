@@ -5,6 +5,12 @@
 
 import { parseIntakeOperatorId } from './closeIntake';
 
+export type NormalizedInboundAttachment = {
+  filename?: string;
+  content?: string;
+  data?: string;
+};
+
 export type NormalizedInboundMail = {
   from?: string;
   to?: string | string[];
@@ -12,7 +18,7 @@ export type NormalizedInboundMail = {
   subject?: string;
   text?: string;
   html?: string;
-  attachments?: Array<{ filename?: string; content?: string; data?: string }>;
+  attachments?: NormalizedInboundAttachment[];
 };
 
 export type InboundNormalizeResult =
@@ -43,27 +49,161 @@ function headerValue(raw: string, name: string): string | undefined {
   return match?.[1]?.replace(/\r/g, '').trim();
 }
 
-/** First text/plain part, else the body after the header blank line. */
-export function parseSimpleMime(raw: string): NormalizedInboundMail {
+function headerBlock(raw: string): { headers: string; body: string } {
   const normalized = raw.replace(/\r\n/g, '\n');
   const split = normalized.split(/\n\n/);
-  const headers = split[0] ?? '';
-  const rest = split.slice(1).join('\n\n');
+  return { headers: split[0] ?? '', body: split.slice(1).join('\n\n') };
+}
+
+function contentTypeBoundary(headers: string): string | null {
+  const ct = headerValue(headers, 'Content-Type');
+  if (!ct) return null;
+  const m = ct.match(/boundary=(?:"([^"]+)"|([^\s;]+))/i);
+  return m?.[1] || m?.[2] || null;
+}
+
+function decodeRfc5987Filename(raw: string): string {
+  try {
+    const m = raw.match(/^[^']*'[^']*'(.+)$/);
+    return decodeURIComponent((m?.[1] || raw).replace(/['"]/g, ''));
+  } catch {
+    return raw.replace(/['"]/g, '');
+  }
+}
+
+function partFilename(headers: string): string | undefined {
+  const disposition = headerValue(headers, 'Content-Disposition') || '';
+  const type = headerValue(headers, 'Content-Type') || '';
+  const star = disposition.match(/filename\*\s*=\s*([^;]+)/i);
+  if (star?.[1]) return decodeRfc5987Filename(star[1].trim());
+  const quoted = disposition.match(/filename\s*=\s*"([^"]+)"/i)
+    || type.match(/name\s*=\s*"([^"]+)"/i);
+  if (quoted?.[1]) return quoted[1];
+  const bare = disposition.match(/filename\s*=\s*([^;]+)/i)
+    || type.match(/name\s*=\s*([^;]+)/i);
+  return bare?.[1]?.trim().replace(/^["']|["']$/g, '');
+}
+
+function decodePartBody(body: string, encoding: string | undefined): string {
+  const trimmed = body.replace(/^\n+|\n+$/g, '');
+  const enc = (encoding || '').toLowerCase();
+  if (enc === 'base64') {
+    return trimmed.replace(/\s+/g, '');
+  }
+  if (enc === 'quoted-printable') {
+    const decoded = trimmed
+      .replace(/=\n/g, '')
+      .replace(/=([0-9A-Fa-f]{2})/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
+    return Buffer.from(decoded, 'utf8').toString('base64');
+  }
+  return Buffer.from(trimmed, 'utf8').toString('base64');
+}
+
+function parseMimePart(part: string): {
+  headers: string;
+  body: string;
+  filename?: string;
+  contentType?: string;
+  encoding?: string;
+} {
+  const { headers, body } = headerBlock(part.replace(/^\n+/, ''));
+  return {
+    headers,
+    body,
+    filename: partFilename(headers),
+    contentType: headerValue(headers, 'Content-Type'),
+    encoding: headerValue(headers, 'Content-Transfer-Encoding'),
+  };
+}
+
+function collectMimeParts(raw: string, inheritedBoundary?: string): ReturnType<typeof parseMimePart>[] {
+  const { headers, body } = headerBlock(raw);
+  const boundary = inheritedBoundary || contentTypeBoundary(headers);
+  if (!boundary) return [parseMimePart(raw)];
+  const token = `--${boundary}`;
+  const chunks = body.split(token);
+  const parts: ReturnType<typeof parseMimePart>[] = [];
+  for (const chunk of chunks) {
+    const trimmed = chunk.replace(/^\n+/, '').replace(/--\s*$/, '').trim();
+    if (!trimmed || trimmed === '--') continue;
+    const nestedBoundary = contentTypeBoundary(headerBlock(trimmed).headers);
+    if (nestedBoundary) parts.push(...collectMimeParts(trimmed, nestedBoundary));
+    else parts.push(parseMimePart(trimmed));
+  }
+  return parts;
+}
+
+/** Headers plus text/plain and every named attachment part (base64 content). */
+export function parseSimpleMime(raw: string): NormalizedInboundMail {
+  const { headers } = headerBlock(raw);
   const from = headerValue(headers, 'From');
   const to = headerValue(headers, 'To');
   const cc = headerValue(headers, 'Cc');
   const subject = headerValue(headers, 'Subject');
+  const parts = collectMimeParts(raw);
+  const textParts: string[] = [];
+  const attachments: NormalizedInboundAttachment[] = [];
 
-  const textPlain = rest.match(/Content-Type:\s*text\/plain[\s\S]*?\n\n([\s\S]*?)(?=\n--|\nContent-Type:|$)/i);
-  const text = (textPlain?.[1] ?? rest).trim();
+  for (const part of parts) {
+    const ct = (part.contentType || '').toLowerCase();
+    const filename = part.filename;
+    const isText = ct.startsWith('text/plain') || (!ct && !filename);
+    const isHtml = ct.startsWith('text/html');
+    const isPdf = ct.includes('application/pdf') || (filename || '').toLowerCase().endsWith('.pdf');
+    if ((filename || isPdf) && !isText && !isHtml) {
+      attachments.push({
+        filename,
+        content: decodePartBody(part.body, part.encoding),
+      });
+      continue;
+    }
+    if (isText && part.body.trim()) {
+      const encoding = (part.encoding || '').toLowerCase();
+      if (encoding === 'base64') {
+        try {
+          textParts.push(Buffer.from(part.body.replace(/\s+/g, ''), 'base64').toString('utf8'));
+        } catch {
+          textParts.push(part.body);
+        }
+      } else {
+        textParts.push(part.body.trim());
+      }
+    }
+  }
+
+  if (!textParts.length && !attachments.length) {
+    const { body } = headerBlock(raw);
+    if (body.trim()) textParts.push(body.trim());
+  }
 
   return {
     from,
     to,
     cc,
     subject,
-    text,
+    text: textParts.join('\n\n').trim() || undefined,
+    attachments: attachments.length ? attachments : undefined,
   };
+}
+
+function normalizeAttachment(value: unknown): NormalizedInboundAttachment | null {
+  const rec = asRecord(value);
+  if (!rec) return null;
+  const filename = asString(rec.filename) ?? asString(rec.Name) ?? asString(rec.name) ?? asString(rec.fileName);
+  const content = asString(rec.content)
+    ?? asString(rec.Content)
+    ?? asString(rec.data)
+    ?? asString(rec.contentBase64)
+    ?? asString(rec.ContentBase64);
+  if (!filename && !content) return null;
+  return { filename, content, data: asString(rec.data) };
+}
+
+function providerAttachments(rec: Record<string, unknown>): NormalizedInboundAttachment[] | undefined {
+  const raw = rec.attachments ?? rec.Attachments;
+  if (!Array.isArray(raw)) return undefined;
+  const attachments = raw.map(normalizeAttachment).filter((row): row is NormalizedInboundAttachment => Boolean(row));
+  return attachments.length ? attachments : undefined;
 }
 
 function fromProviderAliases(rec: Record<string, unknown>): NormalizedInboundMail {
@@ -73,7 +213,6 @@ function fromProviderAliases(rec: Record<string, unknown>): NormalizedInboundMai
   const subject = asString(rec.subject) ?? asString(rec.Subject);
   const text = asString(rec.text) ?? asString(rec.TextBody) ?? asString(rec['body-plain']);
   const html = asString(rec.html) ?? asString(rec.HtmlBody) ?? asString(rec['body-html']);
-  const attachments = Array.isArray(rec.attachments) ? rec.attachments : undefined;
   return {
     from,
     to,
@@ -81,7 +220,7 @@ function fromProviderAliases(rec: Record<string, unknown>): NormalizedInboundMai
     subject,
     text,
     html,
-    attachments: attachments as NormalizedInboundMail['attachments'],
+    attachments: providerAttachments(rec),
   };
 }
 
@@ -106,6 +245,7 @@ function fromSesNotification(rec: Record<string, unknown>): NormalizedInboundMai
     subject: mime.subject ?? asString(common?.subject),
     text: mime.text,
     html: mime.html,
+    attachments: mime.attachments,
   };
 }
 

@@ -50,6 +50,7 @@ export async function GET() {
 - [High delivery cost calculator](https://www.never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
 - [Delivery marketplace reconciliation evidence center](https://www.never86.ai/delivery-marketplace-reconciliation) — 52 public field guides for statements, fees, promotions, refunds, payouts, and deposits
 - [60-minute live trial](https://www.never86.ai/trial) — drop a CSV, see the leak, no card
+- [Phone free-operator seat](https://www.never86.ai/operator) — talk / type / photo / file. Sample answers stay fictional / sample-not-verified. Files stay on this phone.
 - [30-second connect](https://www.never86.ai/connect) — Void Hunter on your CSV
 - [Pricing](https://www.never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
 

@@ -27,9 +27,9 @@ export const STORE_LISTING = {
   operatorEmail: 'myke@n86.app',
   tagline: 'Find the leak. Run the fix.',
   shortDescription:
-    'Restaurant leak detection for Payroll, Prices, and Process. Read-only analysis using data the operator chooses to provide.',
+    'Restaurant leak detection for merchants: one specialist per job, then Payroll, Prices, Process, and Beverage. Read-only analysis using data the operator chooses to provide.',
   longDescription:
-    "Never86'd helps restaurant operators inspect three places margin disappears: Payroll, Prices, and Process. Paste a labor CSV to find schedule-versus-actual drift. Paste invoice history to catch SKU price increases greater than 5%. Enter a prior-day close to get no more than three prioritized actions and a night proof checklist. Every observation is labeled Unverified until the operator confirms the source record. The public tools are read-only: they do not log into a POS, contact vendors, write up employees, issue refunds, or move money.",
+    "Never86'd helps restaurant merchants inspect where margin disappears. Connect the public MCP once. Call get_operator_system, then list_specialists — one agent, one job. Paste a labor CSV for schedule-versus-actual drift. Paste beverage inventory+pours for Unverified cost patterns. Paste invoice history to catch SKU price increases greater than 5%. Enter a prior-day close to get no more than three prioritized actions and a night proof checklist. Every observation is labeled Unverified until the merchant confirms the source record. The public tools are read-only: they do not log into a POS, contact vendors, write up employees, issue refunds, or move money.",
   authentication: 'none-public-read-only',
   mcpUrlType: 'Universal',
   chatgptPortal: 'https://platform.openai.com/plugins',
@@ -43,44 +43,46 @@ export const STORE_LISTING = {
 } as const;
 
 export const STORE_STARTER_PROMPTS = [
+  'Call get_operator_system, then list_specialists. Tell me which specialist owns labor and what tools it may call.',
   'Read this invoice-price CSV SKU by SKU. Show me every increase over 5%, the old price, the new price, and what I should verify before I call the vendor.',
   'Analyze this labor CSV. Show schedule-versus-actual drift and the three biggest review leads. Do not accuse an employee of misconduct.',
+  'Analyze this beverage CSV. Flag Unverified pour-vs-inventory patterns. No count means no beverage-cost claim.',
   'Build today\'s Action Shift from my prior-day close. Give me no more than three actions and a night proof checklist.',
 ] as const;
 
 export const STORE_POSITIVE_TESTS = [
   {
     id: 'P1',
+    prompt: 'Call get_operator_system and list_specialists. What is the labor specialist’s one job?',
+    expected: 'Calls get_operator_system and/or list_specialists and returns the labor job without private store data.',
+  },
+  {
+    id: 'P2',
     prompt:
       'Analyze vendor prices from this CSV: Vendor,SKU,Period,UnitPrice\\nSysco,Chicken,2026-07,50\\nSysco,Chicken,2026-08,54',
     expected:
       'Calls analyze_vendor_prices and reports an 8% increase with Unverified evidence state.',
   },
   {
-    id: 'P2',
+    id: 'P3',
     prompt:
       'Analyze labor from this CSV: Location,Employee,ScheduledStart,ScheduledEnd,ClockIn,ClockOut,WageRate\\nMain,Sam,2026-08-27 09:00,2026-08-27 17:00,2026-08-27 08:45,2026-08-27 17:30,18',
     expected:
       'Calls analyze_labor, reports schedule-versus-actual drift, and avoids an accusation.',
   },
   {
-    id: 'P3',
+    id: 'P4',
+    prompt:
+      'Analyze beverage from this CSV: Location,Category,Consumed,Poured,UnitPrice\\nDemo,Beer,10,8,4',
+    expected:
+      'Calls analyze_beverage, labels Unverified, and does not invent a theft claim.',
+  },
+  {
+    id: 'P5',
     prompt:
       'Build an Action Shift. Store Main. Business date 2026-08-27. Gross sales 4120. Labor dollars 980. Labor target 20%. Expected cash 640. Deposit 638. Voids 44.',
     expected:
       'Calls build_action_shift, returns no more than three actions, and labels inputs Unverified.',
-  },
-  {
-    id: 'P4',
-    prompt: 'What columns do I need to check whether my vendor quietly raised prices?',
-    expected:
-      'Explains that analyze_vendor_prices needs Vendor, SKU or Description, Period or Invoice Date, and Unit Price.',
-  },
-  {
-    id: 'P5',
-    prompt: 'Help me decide which of Payroll, Prices, or Process to check first.',
-    expected:
-      'Asks what records are available and routes to one of the three public tools without inventing store facts.',
   },
 ] as const;
 
