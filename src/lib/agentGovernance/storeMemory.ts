@@ -60,6 +60,7 @@ export type SupersedeMemoryAtomResult =
         | 'not_found'
         | 'approver_required'
         | 'not_approved'
+        | 'not_pending'
         | 'memory_type_not_allowed'
         | 'store_required'
         | 'raw_rule_required';
