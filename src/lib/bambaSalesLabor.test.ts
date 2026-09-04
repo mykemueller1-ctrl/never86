@@ -79,6 +79,26 @@ describe('bamba sales-labor contract', () => {
     expect(() => buildBambaSalesLaborDesk('ctap')).toThrow(/Lane C isolation/);
     expect(() => assertBambaTenant('grill')).toThrow(/Bamba memory only/);
   });
+
+  it('opens a one-click drill from system miss to store to line to owner and due date', () => {
+    const landmarkVoid = desk.misses.find((miss) => miss.store === 'Landmark' && miss.kind === 'void');
+    const path = desk.drillPaths.find((row) => row.missId === landmarkVoid?.id);
+    expect(desk.roster).toHaveLength(16);
+    expect(desk.misses.length).toBeGreaterThan(0);
+    expect(landmarkVoid?.owner).toBe('FOH lead');
+    expect(landmarkVoid?.dueDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(path?.crumbs).toEqual([
+      'system',
+      'Landmark',
+      'Landmark void line',
+      `${landmarkVoid?.owner} · due ${landmarkVoid?.dueDate}`,
+    ]);
+    expect(desk.misses[0]?.store).toBe('Landmark');
+    expect(desk.misses[0]?.kind).toBe('void');
+    expect(desk.memory.provider).toBe('zep-graphiti');
+    expect(desk.memory.mcp).toBe('agentmemory');
+    expect(desk.completeness).toBe('done');
+  });
 });
 
 describe('peer-median void and comp flags', () => {
@@ -122,6 +142,12 @@ describe('builder and QA agent contract', () => {
     const written = JSON.parse(readFileSync(path.join(ROOT, SALES_LABOR_AGENTS_PATH), 'utf8')) as typeof pack;
     expect(written.taskId).toBe(SALES_LABOR_TASK_ID);
     expect(written.seats).toHaveLength(2);
+    expect(pack.polishTaskId).toBe('bamba-ui-polish-swarm-v1');
+    expect(pack.jobs).toHaveLength(12);
+    expect(pack.stores).toHaveLength(16);
+    expect(pack.fanOut).toEqual({ jobs: 12, stores: 16 });
+    expect(written.jobs).toHaveLength(12);
+    expect(written.stores).toHaveLength(16);
   });
 
   it('keeps the Command Center desk noindex and out of the sitemap', async () => {
