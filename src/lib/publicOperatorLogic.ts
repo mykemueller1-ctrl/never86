@@ -5,6 +5,7 @@ import {
 import { NEVER86_OPERATOR_SYSTEM } from './operatorSystem';
 import { recipeCostKnowledgePack } from './recipeCost';
 import { pourStandardsKnowledgePack } from './operatorPourStandards';
+import { fountainBibKnowledgePack } from './fountainBibCost';
 import { uomKnowledgePack } from './uomConvert';
 
 export const PUBLIC_LOGIC_DOMAINS = [
@@ -32,6 +33,7 @@ export const PUBLIC_LOGIC_DOMAINS = [
   'recipe-cost',
   'forensic-pnl',
   'pour-standards',
+  'fountain-bib',
 ] as const;
 
 export type PublicLogicDomain = (typeof PUBLIC_LOGIC_DOMAINS)[number];
@@ -314,6 +316,8 @@ const recipeCostLogic = recipeCostKnowledgePack();
 
 const pourStandards = pourStandardsKnowledgePack();
 
+const fountainBib = fountainBibKnowledgePack();
+
 const forensicPnl = {
   purpose:
     'Define restaurant P&L and prime-cost language for independent 1–3 unit operators without inventing store dollars.',
@@ -377,6 +381,7 @@ export const PUBLIC_OPERATOR_LOGIC = {
   'uom-cost': uomCost,
   'recipe-cost': recipeCostLogic,
   'pour-standards': pourStandards,
+  'fountain-bib': fountainBib,
   'forensic-pnl': forensicPnl,
 } as const;
 

@@ -152,6 +152,18 @@
         "destructive_justification": "Cannot write store memory without a human approver."
       }
     },
+    "ask_fountain_standards": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns interview questions for fountain BIB mix ratio and cup liquid fill without inventing 5+1 or ice displacement.",
+        "open_world_justification": "Does not contact fountain valves, distributors, or POS.",
+        "destructive_justification": "Cannot set gun mix ratio or assume cup liquid equals marked ounces."
+      }
+    },
     "analyze_recipe_cost": {
       "annotations": {
         "readOnlyHint": true,
@@ -161,7 +173,7 @@
       "justifications": {
         "read_only_justification": "Calculates Unverified plate or drink cost, or food COGS, from merchant-supplied EP lines, house pours, and inventory dollars without writing recipes.",
         "open_world_justification": "Does not contact vendors or rewrite menu engineering systems.",
-        "destructive_justification": "Cannot invent yield or house pour (1.5/1.75/2), treat an invoice as COGS, or close a week without a count."
+        "destructive_justification": "Cannot invent yield, house pour (1.5/1.75/2), fountain mix ratio (5+1), or ice fill; cannot treat an invoice as COGS or close a week without a count."
       }
     },
     "analyze_vendor_prices": {

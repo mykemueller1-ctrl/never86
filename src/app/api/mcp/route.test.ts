@@ -41,6 +41,7 @@ describe('public MCP route', () => {
       'convert_uom',
       'ask_pour_standards',
       'declare_pour_standards',
+      'ask_fountain_standards',
       'analyze_recipe_cost',
       'analyze_vendor_prices',
       'build_action_shift',
@@ -244,5 +245,60 @@ describe('public MCP route', () => {
     expect(text).toContain('"kind": "drink_recipe"');
     expect(text).toContain('"epQty": 1.75');
     expect(text).toMatch(/house pour/i);
+  });
+
+  it('walks Pepsi gun + Hawkeye as ask-first, then costs after BIB ratio + cup liquid + pour', async () => {
+    const asking = await POST(
+      new NextRequest('http://localhost/api/mcp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 30,
+          method: 'tools/call',
+          params: {
+            name: 'analyze_recipe_cost',
+            arguments: { mode: 'fountain_spirit_drink', store_id: 'unit-a', soda_label: 'Pepsi' },
+          },
+        }),
+      }),
+    );
+    const askingBody = await asking.json();
+    expect(askingBody.result.content[0].text).toMatch(/Missing Evidence|mix ratio|liquid/i);
+
+    const costed = await POST(
+      new NextRequest('http://localhost/api/mcp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 31,
+          method: 'tools/call',
+          params: {
+            name: 'analyze_recipe_cost',
+            arguments: {
+              mode: 'fountain_spirit_drink',
+              store_id: 'unit-a',
+              soda_label: 'Pepsi',
+              spirit_label: 'Hawkeye vodka',
+              syrup_gal: 5,
+              bib_cost: 60,
+              water_parts: 5,
+              syrup_parts: 1,
+              cup_marked_fl_oz: 9,
+              liquid_fill_fl_oz: 6,
+              spirit_pour_fl_oz: 1.5,
+              spirit_cost_per_fl_oz: 0.2,
+            },
+          },
+        }),
+      }),
+    );
+    const costedBody = await costed.json();
+    const text = costedBody.result.content[0].text as string;
+    expect(costedBody.result.isError).toBeFalsy();
+    expect(text).toContain('"phase": "costed"');
+    expect(text).toContain('"sodaFlOz": 4.5');
+    expect(text).toMatch(/Pepsi|Hawkeye/i);
   });
 });

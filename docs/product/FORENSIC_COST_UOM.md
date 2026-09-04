@@ -1,9 +1,9 @@
 # Forensic cost · UoM · vendors · pour · recipe · P&L
 
-**Branch track:** `cursor/forensic-cost-uom-vendors-b9cf`  
-**MCP:** call `get_operator_system` → `get_operator_logic` with domains `uom-cost`, `recipe-cost`, `forensic-pnl`, `beverage`, `vendor-drift`, `invoices-daily-prime`  
-**Code:** `src/lib/uomConvert.ts`, `src/lib/recipeCost.ts`  
-**Analysis tools:** `convert_uom`, `analyze_recipe_cost` (Unverified; read-only)
+**Branch track:** `cursor/fountain-bib-cup-recipe-b9cf`  
+**MCP:** call `get_operator_system` → `get_operator_logic` with domains `uom-cost`, `recipe-cost`, `pour-standards`, `fountain-bib`, `forensic-pnl`, `beverage`, `vendor-drift`  
+**Code:** `src/lib/uomConvert.ts`, `src/lib/recipeCost.ts`, `src/lib/operatorPourStandards.ts`, `src/lib/fountainBibCost.ts`  
+**Analysis tools:** `convert_uom`, `ask_pour_standards`, `declare_pour_standards`, `ask_fountain_standards`, `analyze_recipe_cost` (Unverified; read-only)
 
 ## Contract
 
@@ -49,6 +49,28 @@ drinkCost = Σ (housePourFlOz_or_recipeSpecificFlOz × costPerFlOz)
 ```
 
 Unit A can be 1.5 shot / 1.75 mixed. Unit B can be 2 / 2. Same drink name ≠ same ounces.
+
+## Fountain BIB + cup (Pepsi on the gun)
+
+```
+ask_fountain_standards → BIB syrup gal + invoice $ + mix ratio + cup mark + liquid after ice
+ask_pour_standards → Hawkeye mixed-drink liquor pour
+analyze_recipe_cost mode=fountain_spirit_drink
+```
+
+Formulas (operator answers only — never invent 5+1 or ice fill):
+
+```
+finishedGal = syrupGal × (waterParts/syrupParts + 1)
+finishedFlOz = finishedGal × 128
+costPerFinishedFlOz = bibCost / finishedFlOz
+sodaFlOz = liquidFillFlOz − spiritFlOz
+sodaCost = sodaFlOz × costPerFinishedFlOz
+drinkCost = spiritCost + sodaCost
+```
+
+Worked interview: Pepsi 5-gal BIB on the gun · 9 oz cup with ice + straw · Hawkeye vodka.  
+Ask mix ratio on the valve card. Ask liquid fill after ice — marked 9 ≠ 9 oz of Pepsi.
 
 ## Food recipe path
 
