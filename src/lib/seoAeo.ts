@@ -55,7 +55,7 @@ export const HOME_OPERATOR_AGENTS = [
 /** Allow public answer/MCP JSON; then Disallow the rest of /api/. Order matters for first-match crawlers. */
 export const ROBOTS_ALLOW = ['/', '/api/answers', '/api/mcp', '/api/quick-wins'] as const;
 /** Do not Disallow /llm-shells: crawlers must fetch the page to honor noindex after #141 advertised it. */
-export const ROBOTS_DISALLOW = ['/admin/', '/reports/', '/command-center/', '/tools/', '/action-shift/lab', '/action-shift/setup', '/staff/', '/api/'] as const;
+export const ROBOTS_DISALLOW = ['/admin/', '/reports/', '/command-center/', '/tools/', '/action-shift/lab', '/action-shift/setup', '/staff/', '/operator/answers/', '/api/'] as const;
 
 export function answerCanonicalUrl(slug: string): string {
   return `${WWW}/answers/${slug}`;

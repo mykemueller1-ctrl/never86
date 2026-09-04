@@ -4,11 +4,12 @@ import { Track } from '@/components/Track';
 import { TrackedLink } from '@/components/TrackedLink';
 
 export function RolePage({ spec }: { spec: RoleSpec }) {
-  // #122 / CURSOR-GTM: /for/owner (and seats) land on free /trial, not full onboard.
-  const seatHref = '/trial';
-  const seatLabel = spec.slug === 'owner' ? 'Claim one free seat' : 'Start free seat';
-  const secondaryHref = spec.slug === 'owner' ? '/audit' : spec.freeAgents[0].href;
-  const secondaryLabel = spec.slug === 'owner' ? 'Audit one DoorDash statement' : `Try ${spec.freeAgents[0].name}`;
+  // 1–3 unit ICP: owner claims the free seat through email-only onboard.
+  // Multi-unit Command Center stays off this path.
+  const seatHref = spec.slug === 'owner' ? '/onboard' : '/trial';
+  const seatLabel = spec.slug === 'owner' ? 'Claim free owner seat' : 'Start free seat';
+  const secondaryHref = spec.slug === 'owner' ? '/pricing' : spec.freeAgents[0].href;
+  const secondaryLabel = spec.slug === 'owner' ? 'See 1–3 unit pricing' : `Try ${spec.freeAgents[0].name}`;
 
   return (
     <main className="compass min-h-screen">

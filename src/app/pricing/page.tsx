@@ -4,11 +4,13 @@ import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: "Pricing · Never 86'd",
-  description: 'One-store Action Shift is free. Owner $199/mo. Command $499/location. Enterprise custom.',
+  description:
+    '1–3 unit ICP: one owner seat free. Owner $199/mo for independents. Multi-unit Command Center is a separate build.',
   alternates: { canonical: 'https://www.never86.ai/pricing' },
   openGraph: {
     title: "Never 86'd · Pricing",
-    description: 'One-store Action Shift is free. Owner $199/mo. Command $499/location. Enterprise custom.',
+    description:
+      '1–3 unit ICP: one owner seat free. Owner $199/mo for independents. Multi-unit Command Center is a separate build.',
     url: 'https://www.never86.ai/pricing',
   },
 };
@@ -16,29 +18,31 @@ export const metadata: Metadata = {
 const TIERS = [
   {
     name: 'Action Shift · Beta',
-    tag: '1 store · 1 login',
+    tag: '1–3 unit ICP · seat 1 free',
     price: 'Free',
-    blurb: 'Forward or upload yesterday\'s close. Get one morning move and one night proof check.',
+    blurb:
+      'For independent operators. Claim the owner seat, forward or upload yesterday\'s close, and get one morning move plus night proof.',
     features: [
-      'One store and one operator login',
+      'Seat 1 = owner · free for one store and one login',
+      'Seats 2–3 (GM / station) unlock as paid expansion',
       'Up to 3 ranked, evidence-backed actions',
-      'Missing proof named — no invented certainty',
-      'Email or file onboarding — no POS API key required',
+      'Email-only onboarding — no POS API key required',
     ],
-    cta: { label: 'Start my free store →', href: '/onboard' },
+    cta: { label: 'Claim free owner seat →', href: '/onboard' },
     accent: false,
   },
   {
     name: "Never 86'd Owner",
-    tag: '1–2 location independents',
+    tag: '1–3 location independents',
     price: '$199/mo',
-    blurb: 'A ranked Morning Brief from your own numbers: where margin leaked, who owns the fix, what happens next. Charter rate for the first 100 operators · 30-day refund.',
+    blurb:
+      'The paid 1–3 unit operator plan. Morning Brief from your own numbers: where margin leaked, who owns the fix, what happens next. Charter rate for the first 100 operators · 30-day refund.',
     features: [
-      'The Morning Brief, every day, from your own register',
-      'Food cost every day, plus your prime cost trend over 30/60/90 days',
-      'Cheapest-price compare across your vendors (PFG vs Sysco vs Nicholas & Co)',
+      'Everything in Action Shift for your owner seat',
+      'Add seat 2 and seat 3 when the GM or station lead needs the workflow',
+      'Food cost every day, plus prime cost trend over 30/60/90 days',
+      'Vendor price compare across the invoices you already get',
       'One plain fix per leak — what to do, not just what broke',
-      'Per-name alerts (email + text)',
       '90 days of history · your data walled off from every other operator',
     ],
     cta: { label: 'Become a Charter Operator →', href: '/onboard' },
@@ -46,9 +50,10 @@ const TIERS = [
   },
   {
     name: "Never 86'd Command",
-    tag: '3–9 location groups',
+    tag: 'Multi-unit ICP · separate build',
     price: '$499/location/mo',
-    blurb: 'The whole-group view. Every store next to the others — roll up to the top or drill into one. Entry: a three-location, 90-day paid pilot.',
+    blurb:
+      'Different product track. Group rollup, role desks, and multi-store comparison — not the 1–3 unit owner-seat path.',
     features: [
       'Everything in Owner, for every store',
       'Every store compared against the rest of your group',
@@ -57,7 +62,7 @@ const TIERS = [
       'Unlimited history',
       'Dedicated onboarding call with Myke',
     ],
-    cta: { label: 'Start a three-store pilot →', href: '/onboard' },
+    cta: { label: 'Talk multi-unit Command →', href: 'mailto:myke@n86.app?subject=Multi-unit%20Command%20Center' },
     accent: false,
   },
   {
@@ -87,7 +92,11 @@ const FAQS = [
   },
   {
     q: 'How does the free trial work?',
-    a: 'The founding beta includes one store and one operator login. Forward or upload the prior-day close and Never 86\'d returns up to three morning actions plus a night proof check. Additional stores, seats, and role controls come with paid expansion.',
+    a: 'The 1–3 unit beta starts with one store and the owner seat free. Forward or upload the prior-day close and Never 86\'d returns up to three morning actions plus a night proof check. Seat 2, seat 3, extra stores, and role controls are paid expansion. Multi-unit Command Center is a separate build.',
+  },
+  {
+    q: 'Is this the multi-unit Command Center?',
+    a: 'No. This pricing page leads with the 1–3 unit operator ICP: owner seat first. Command Center is the multi-unit track for groups that need rollups across more stores and roles.',
   },
   {
     q: 'What about data security?',
@@ -119,10 +128,10 @@ export default function PricingPage() {
       <section className="max-w-5xl mx-auto px-6 pt-12 md:pt-16 pb-12">
         <p className="compass-eyebrow mb-6">— Pricing</p>
         <h1 className="compass-display text-5xl md:text-7xl mb-6">
-          Owner $199. <em>A Morning Brief from your own numbers.</em>
+          1–3 unit ICP. <em>Owner seat free. Then pay for seats.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl">
-          Built by an operator. Priced like one. Start with one store and one operator login free: one morning decision, one night proof check. Owner is for 1–2 location independents; Command for 3–9 location groups; Enterprise for 10+ multi-brand.
+          Built by an operator. Priced like one. Start with one store and the owner seat free: one morning decision, one night proof check. Owner is for 1–3 location independents. Command Center is the separate multi-unit build. Enterprise is 10+ multi-brand.
         </p>
         <p className="compass-body text-lg md:text-xl max-w-2xl mt-4">
           The proof behind the price: in a working design pilot with a 16-unit chef-led group, this tool analyzed <span className="text-ink-800 font-semibold">545,677 orders</span> — $15.72M checked to the cent — and surfaced an estimated $1.81M of annual leak, every figure labeled. <span className="font-serif italic text-ink-600">(If we don&apos;t find you money, don&apos;t buy.)</span>
