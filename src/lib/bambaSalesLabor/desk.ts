@@ -5,7 +5,12 @@ import {
   BAMBA_AUG12_SYSTEM_CY_SALES,
 } from './fixtureAug12Daily';
 import { cents, flagAgainstPeerMedian, peerMedian, rate, VOID_FLAG_RULE } from './flags';
+import { createBambaGraphitiMemory } from './graphitiMemory';
+import { attachPolishViews } from './polish';
+import { BAMBA_STORE_ROSTER } from './roster';
+import { applySwarmToDesk, runBambaSwarm } from './swarm';
 import { assertBambaMemory, assertBambaTenant, BAMBA_LANE, BAMBA_MEMORY_BOUNDARY, BAMBA_TENANT_LABEL } from './tenant';
+import type { BambaSwarmJobId } from './types';
 import {
   SALES_LABOR_BUSINESS_DATE,
   SALES_LABOR_PERIODS,
@@ -188,7 +193,10 @@ function buildDrillDowns(inputs: readonly SalesLaborStoreInput[]) {
   };
 }
 
-export function buildBambaSalesLaborDesk(tenantId: string = SALES_LABOR_TENANT_ID): SalesLaborDesk {
+export function buildBambaSalesLaborDesk(
+  tenantId: string = SALES_LABOR_TENANT_ID,
+  options: { killJobIds?: readonly BambaSwarmJobId[] } = {},
+): SalesLaborDesk {
   assertBambaTenant(tenantId);
   const inputs = BAMBA_AUG12_DAILY_STORES;
   assertBambaMemory({ tenantId, inputs, flags: BAMBA_AUG12_CALENDAR_FLAGS, drill: BAMBA_AUG12_DRILL_SOURCE });
@@ -200,7 +208,8 @@ export function buildBambaSalesLaborDesk(tenantId: string = SALES_LABOR_TENANT_I
     );
   }
 
-  const desk: SalesLaborDesk = {
+  const memory = createBambaGraphitiMemory();
+  const draft: SalesLaborDesk = {
     tenantId: SALES_LABOR_TENANT_ID,
     tenantLabel: BAMBA_TENANT_LABEL,
     lane: BAMBA_LANE,
@@ -214,7 +223,14 @@ export function buildBambaSalesLaborDesk(tenantId: string = SALES_LABOR_TENANT_I
     },
     calendarFlags: [...BAMBA_AUG12_CALENDAR_FLAGS],
     drillDowns: buildDrillDowns(inputs),
+    roster: BAMBA_STORE_ROSTER,
+    misses: [],
+    drillPaths: [],
+    swarm: runBambaSwarm(options),
+    memory: memory.snapshot(),
+    completeness: 'open',
   };
+  const desk = applySwarmToDesk(attachPolishViews(draft), draft.swarm);
   assertBambaMemory(desk);
   return desk;
 }
