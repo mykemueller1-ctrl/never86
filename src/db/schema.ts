@@ -686,3 +686,53 @@ export type SeatCredential = typeof seatCredentials.$inferSelect;
 export type SeatIntakeEvent = typeof seatIntakeEvents.$inferSelect;
 export type SeatClose = typeof seatCloses.$inferSelect;
 export type SeatProof = typeof seatProofs.$inferSelect;
+
+// ── Simple Owner Demo (Neon = D1 equivalent in this repo) ──
+// Drafted schema. Live apply stays a human gate. Routes ensure-if-missing only.
+
+export const simpleOwnerUploads = pgTable('simple_owner_uploads', {
+  id: text('id').primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  filename: text('filename').notNull(),
+  contentType: text('content_type').notNull(),
+  byteLength: integer('byte_length').notNull(),
+  evidenceKind: text('evidence_kind').notNull(),
+  sourceTags: jsonb('source_tags').$type<{ tag: string; source: string }[]>().default([]).notNull(),
+  objectKey: text('object_key').notNull(),
+  storageBackend: text('storage_backend').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('simple_owner_uploads_operator_idx').on(table.operatorId),
+]);
+
+export const simpleOwnerAsks = pgTable('simple_owner_asks', {
+  id: text('id').primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  question: text('question').notNull(),
+  tray: text('tray').notNull(),
+  mouth: text('mouth').notNull(),
+  slug: text('slug'),
+  headline: text('headline').notNull(),
+  facts: jsonb('facts').$type<string[]>().default([]).notNull(),
+  coachTomorrow: text('coach_tomorrow').notNull(),
+  needs: text('needs').notNull(),
+  sourceTags: jsonb('source_tags').$type<{ tag: string; source: string }[]>().default([]).notNull(),
+  inventedClose: boolean('invented_close').default(false).notNull(),
+  sampleDollars: text('sample_dollars').default('none-verified').notNull(),
+  verifiedClose: boolean('verified_close').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('simple_owner_asks_operator_idx').on(table.operatorId),
+]);
+
+export const simpleOwnerBlobs = pgTable('simple_owner_blobs', {
+  objectKey: text('object_key').primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  contentType: text('content_type').notNull(),
+  payloadB64: text('payload_b64').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type SimpleOwnerUpload = typeof simpleOwnerUploads.$inferSelect;
+export type SimpleOwnerAsk = typeof simpleOwnerAsks.$inferSelect;
+export type SimpleOwnerBlob = typeof simpleOwnerBlobs.$inferSelect;

@@ -30,7 +30,7 @@ export default async function OperatorAnswerPage({ params }: { params: Params })
   if (!answer) notFound();
 
   return (
-    <main className="human-page min-h-screen">
+    <main className="owner-desk-page min-h-screen">
       <div className="operator-phone">
         <FreeOperatorAnswerCard answer={answer} />
       </div>
