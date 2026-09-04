@@ -7,41 +7,48 @@ import {
 } from '@/lib/ctapLabPack';
 
 export const metadata: Metadata = {
-  title: "Communities — Community Tap lab door | Never 86'd",
+  title: "Communities — open play seat for every operator | Never 86'd",
   description:
-    'Public-safe Community Tap door: one free owner seat, station seats, Action Shift lab templates, and operator login. No private numbers, PINs, or staff names.',
+    'Any operator can open this community play seat now: owner desk, Action Shift, and station-seat lab templates. One location free. No private numbers, PINs, or staff names.',
 };
 
-const DOORS = [
+const PLAY_DOORS = [
   {
-    href: '/login',
-    label: 'Operator login',
-    body: 'Email-only link. Opens your workspace — no password, no portal login.',
+    href: '/operator',
+    label: 'Owner desk',
+    body: 'Phone-first play seat. Ask FOH, BOH, schedule, vendor, merchant. Sample answers only — no invented close.',
+    primary: true,
+  },
+  {
+    href: '/action-shift',
+    label: 'Action Shift',
+    body: 'Yesterday → one next action → night proof. Paste or type numbers. Free owner seat shape.',
     primary: true,
   },
   {
     href: '/action-shift/lab',
-    label: 'CTap lab templates',
-    body: 'Station checklists from the wall docs. Templates only — not live payroll.',
+    label: 'Station seat lab',
+    body: 'Wall-doc checklists for owner, FOH, kitchen, bar, server, prep, driver, line, pizza, dish.',
     primary: false,
   },
   {
     href: '/staff/seats',
-    label: 'Staff seats',
-    body: 'Manager-first seat map on synthetic fixtures. Live issuance stays blocked.',
+    label: 'Staff seat map',
+    body: 'Synthetic manager/station map. Live issuance stays blocked. Play the layout, not live payroll.',
     primary: false,
   },
+] as const;
+
+const KEEP_DOORS = [
   {
     href: '/trial',
-    label: 'Free owner seat',
-    body: 'One location + one seat free. Extra seats and locations are paid.',
-    primary: false,
+    label: 'Claim your free owner seat',
+    body: 'Same play loop, but your email keeps the seat. One location free. Extra seats paid.',
   },
   {
-    href: '/people',
-    label: 'People platform',
-    body: 'Shift Pulse and crew tools. Product 02 — waitlist, not live roster.',
-    primary: false,
+    href: '/login',
+    label: 'Operator login',
+    body: 'Email-only link when you want memory and return visits. No password. No portal login.',
   },
 ] as const;
 
@@ -58,54 +65,69 @@ export default function CommunitiesPage() {
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86&apos;d <span className="italic text-ink-600">· communities</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">One location · one seat free · receipt attached</p>
+              <p className="compass-eyebrow-dim mt-2">Open play seat · every operator · one location free</p>
             </span>
           </Link>
-          <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/login" className="btn-primary" style={{ background: '#0066ff' }}>
-              Sign in →
+          <nav className="flex items-center gap-2 text-[13px] flex-wrap">
+            <Link
+              href="/operator"
+              className="btn-primary"
+              style={{ background: '#0066ff' }}
+            >
+              Play now →
+            </Link>
+            <Link href="/login" className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>
+              Sign in
             </Link>
           </nav>
         </div>
       </div>
 
-      <section className="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-10">
-        <p className="compass-eyebrow mb-4">— Reference community</p>
+      <section className="max-w-3xl mx-auto px-6 pt-14 md:pt-20 pb-10">
+        <p className="compass-eyebrow mb-4">— Open to every operator</p>
         <h1 className="compass-display text-5xl md:text-6xl mb-4">
-          Community Tap <em>lab</em>
+          Play the community <em>seat</em>
         </h1>
-        <p className="compass-body text-[16px] md:text-[17px]" style={{ color: '#6e6e73', maxWidth: 540 }}>
-          Fort Dodge proof store for Never 86&apos;d. Public door only — station seats and schedule rules.
-          No private dollars, PINs, staff names, or live credentials on this page.
+        <p className="compass-body text-[16px] md:text-[17px]" style={{ color: '#6e6e73', maxWidth: 560 }}>
+          Same shape we run in the Community Tap lab — owner desk, Action Shift, station seats —
+          opened for any restaurant operator right now. No invite code. No portal password. Public-safe
+          sample only: no private dollars, PINs, or staff names.
         </p>
         <div className="flex flex-wrap gap-3 mt-8">
-          <Link href="/login" className="btn-primary" style={{ background: '#0066ff' }}>
-            Open operator login →
+          <Link href="/operator" className="btn-primary" style={{ background: '#0066ff' }}>
+            Start playing →
           </Link>
           <Link
-            href="/action-shift/lab"
+            href="/action-shift"
             className="btn-secondary"
             style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}
           >
-            See lab templates
+            Run Action Shift
+          </Link>
+          <Link
+            href="/trial"
+            className="btn-secondary"
+            style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}
+          >
+            Keep a free seat
           </Link>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto px-6 pb-14">
         <div className="compass-card">
-          <p className="compass-card-label">Status</p>
+          <p className="compass-card-label">What you get</p>
           <p className="font-serif text-[22px] text-ink-800 mt-1">
-            Lab pack · {CTAP_LAB_PACK_STATUS}
+            Shared play community · lab pack {CTAP_LAB_PACK_STATUS}
           </p>
           <p className="text-[14px] mt-2" style={{ color: '#86868b' }}>
-            Owner seat is the free seat. Manager and station seats are paid expansions. Staff live issuance
-            is blocked until an approved activation migration ships.
+            Play first. Claim the free owner seat when you want the loop to remember you. Manager and
+            station seats stay paid expansions. Staff live issuance stays blocked.
           </p>
           <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-5 border-t border-[#e8e8ed]">
             <div>
-              <dt className="compass-card-label">Locations shown</dt>
-              <dd className="font-serif text-[28px] text-ink-800 mt-1">1</dd>
+              <dt className="compass-card-label">Login to play</dt>
+              <dd className="font-serif text-[28px] text-ink-800 mt-1">No</dd>
             </div>
             <div>
               <dt className="compass-card-label">Station seats</dt>
@@ -120,8 +142,30 @@ export default function CommunitiesPage() {
       </section>
 
       <section className="max-w-3xl mx-auto px-6 pb-14">
+        <p className="compass-eyebrow mb-3">— Play doors</p>
+        <h2 className="compass-display text-3xl mb-6">Go in and try it</h2>
+        <div className="space-y-3">
+          {PLAY_DOORS.map((door) => (
+            <Link
+              key={door.href}
+              href={door.href}
+              className="block compass-card hover:border-[#0066ff] transition-colors"
+            >
+              <p className="font-serif text-[20px] text-ink-800">
+                {door.label}
+                {door.primary ? <span className="italic text-ink-600"> · open now</span> : null}
+              </p>
+              <p className="text-[14px] mt-1" style={{ color: '#86868b' }}>
+                {door.body}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-6 pb-14">
         <p className="compass-eyebrow mb-3">— Station seats</p>
-        <h2 className="compass-display text-3xl mb-6">Who works the floor map</h2>
+        <h2 className="compass-display text-3xl mb-6">Floor map every operator can open</h2>
         <ul className="space-y-3">
           {CTAP_LAB_STATION_SEATS.map((seat) => (
             <li
@@ -136,24 +180,28 @@ export default function CommunitiesPage() {
           ))}
         </ul>
         <p className="text-[13px] mt-4" style={{ color: '#86868b' }}>
-          Titles only. Not a live roster. POS ≠ payout. Incomplete week stays Open.
+          Titles and stations only. Not a live roster. POS ≠ payout. Incomplete week stays Open.
         </p>
+        <Link
+          href="/action-shift/lab"
+          className="inline-block mt-5 text-[14px] underline"
+          style={{ color: '#0066ff' }}
+        >
+          Open the full station checklist lab →
+        </Link>
       </section>
 
       <section className="max-w-3xl mx-auto px-6 pb-20">
-        <p className="compass-eyebrow mb-3">— Doors</p>
-        <h2 className="compass-display text-3xl mb-6">Where to go next</h2>
+        <p className="compass-eyebrow mb-3">— Keep it</p>
+        <h2 className="compass-display text-3xl mb-6">When you want your own seat</h2>
         <div className="space-y-3">
-          {DOORS.map((door) => (
+          {KEEP_DOORS.map((door) => (
             <Link
               key={door.href}
               href={door.href}
               className="block compass-card hover:border-[#0066ff] transition-colors"
             >
-              <p className="font-serif text-[20px] text-ink-800">
-                {door.label}
-                {door.primary ? <span className="italic text-ink-600"> · start here</span> : null}
-              </p>
+              <p className="font-serif text-[20px] text-ink-800">{door.label}</p>
               <p className="text-[14px] mt-1" style={{ color: '#86868b' }}>
                 {door.body}
               </p>
