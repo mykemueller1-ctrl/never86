@@ -3,7 +3,8 @@
 **For:** Myke (sales story + product path)  
 **Date:** 2026-09-03  
 **Quality bar:** same as the 1P–3P / Audit path already done with Codex — honest labels, no vapor, no invented dollars.  
-**Status of this file:** map of what is in git and on the live site. Not a deploy. Not a savings claim.
+**Status of this file:** map of what is in git and on the live site, plus the LLM-style Command desk Myke asked for next. Not a deploy. Not a savings claim.  
+**Try-it on this branch:** `/demo/command.html` — plug-and-play box + left-rail “you’re missing this” chips. Sample pizza group only.
 
 ---
 
@@ -26,9 +27,20 @@ Public MCP (`https://www.never86.ai/api/mcp`, Operator System v3.1.0) currently 
 
 ---
 
-## 1. Product placement — Audit → Action Shift → Command
+## 1. Who we play for — then Audit → Action Shift → Command
 
-Same loop. Different seat count.
+**Do not forget the little guy again.** SaaS sold integrations and onboarding lifts the 1–2 unit owner cannot staff. They are burnt. Never 86'd is the brand that gives **one location + one seat free** and makes that seat so easy they get a quick win and stay — the same hook every LLM uses.
+
+| Frame | How to say it | Honesty |
+|---|---|---|
+| **ICP Myke named** | The independent owner who will not pay another $299+/mo tax for a portal, an implementer, and a six-week onboard. | Founder ICP. `$199` Charter / free seat is the product offer already on brand pages. |
+| **“~400k under $299”** | Sales name for that pile of US independents. | **Unverified as a census.** Do not put “400,000 stores” on a public page as a counted fact. Use “the independents SaaS priced out.” |
+| **“100,000 stores / I’m in the game”** | Founder stance: one owner who actually uses LLMs, building the brand they were never sold. | **Not a scale claim.** We have not onboarded 100k shops. Do not say we did. |
+| **LLM comfort** | Operators are being trained on ChatGPT / Claude / Grok *now*. Jump in as the first operator OS that feels like that, not like R365. | Familiar pattern. Not “we shipped a ChatGPT store app to production.” |
+
+**ChatGPT door (exists, gated):** `https://action-shift-operator.never86-d-9722.chatgpt.site/` — Action Shift operator shell on ChatGPT Sites. Probe 2026-09-04: **401, “Sign in with ChatGPT.”** That is the comfortable seat for the owner already living in ChatGPT. It is not a public try-it and not a claim we invented a new ChatGPT app. Public rock stays `/audit` + the sample desk on this branch.
+
+Same loop. Different seat count. The **first** seat is the forgotten owner. Command is the same desk when they have a handful of shops — not the homepage.
 
 ```
 capture → parse → truth-gate → normalize → decide (formulas first)
@@ -39,20 +51,34 @@ capture → parse → truth-gate → normalize → decide (formulas first)
 |---|---|---|---|
 | **Audit** | Google door. Owner fighting DoorDash. | One redacted statement → labeled math in ~60 seconds. | Live `/audit` (200). Codex 1P–3P / 3P-acquisition path. |
 | **Action Shift** | One location + one free seat. | Yesterday → one next action → night proof. | Live `/action-shift` on main; public-safe demo repo `never86-action-shift-live`. |
-| **Command** | Multi-unit ICP (about 3–50 shops). | **The same next-action loop, ranked across shops.** Not another dashboard. | Gated `/command-center` (307 → `/reports/login`). No public click-through try-it yet. |
+| **Command** | Same owner, 3–50 shops later. | **The same next-action loop, ranked across shops.** Not another dashboard. | Gated `/command-center` (307 → `/reports/login`). Sample LLM desk: `/demo/command.html` on this branch. |
 
-Owner (1–2 shops) is Action Shift. Command is the group seat: one network miss, one shop, one line, one owner, one due. Extra seats / locations are paid. One location + one seat stays free.
+The forgotten owner (1 shop) is Action Shift. Command is the group seat: one network miss, one shop, one line, one owner, one due. Extra seats / locations are paid. **One location + one seat stays free and has to hook.** If the free seat is heavy, we became SaaS.
 
-**What Command is not**
+**What this is not**
 
 - Not R365’s GL.
 - Not MarginEdge per-location invoices.
 - Not Voosh (no merchant-portal login).
 - Not a fee calculator pretending to be the company.
 - Not a mailbox ingest product.
-- Not a ChatGPT app.
+- Not “we forgot the little guy, Command is only 16-unit chef groups.”
+- Not a new ChatGPT app we invent in this PR. **It should feel like an LLM** (drop one thing, get coached on the next hole). The ChatGPT Site above is the familiar door for people already signed in there.
 
 The live answer page already says this: [A restaurant command center without another dashboard](https://www.never86.ai/answers/restaurant-command-center-without-another-dashboard). Operating unit = the **exception**, not a chart wall.
+
+### The rock (how Command should feel)
+
+Same as Claude / ChatGPT / Grok: one plug. No setup. No portal password.
+
+| Surface | Job |
+|---|---|
+| **The box** | Drop or paste a Z, a statement, a void log. That’s the rock. |
+| **Left rail** | Small chips: “You’re missing last night’s Z.” “Fees stay Estimated until the statement is here.” “No count → no food cost.” |
+| **The suck-in** | The missing chip *is* the next prompt. Operators don’t hunt a dashboard. They plug the hole the rail named. |
+| **The receipt** | One miss → shop → line → owner → due. LLM ranks. Human sends. |
+
+This is already how Action Shift names `missingEvidence[]` and how the swarm truth-gate returns `missingEvidence` instead of guessing. Command’s public face should be that rail, not the CEO/CFO/COO long-scroll.
 
 ---
 
@@ -103,30 +129,33 @@ Live probes (2026-09-03, this run):
 
 ### Missing (not in this repo as a working click-through)
 
-- Network miss → shop → **statement / Z line** → owner → **due** as one demoable path.
+- Network miss → shop → **statement / Z line** → owner → **due** wired into gated `/command-center` (the live long-scroll still has no left rail).
 - Store-level Command URL (`/command-center/store/[id]` or hash pane).
-- Public `/demo/command` at the same quality as `/audit` / `/demo/3p-fee-finder`.
 - Command MCP tool.
 - Wired Thanx / Marqii / Looker / EONR (scaffolds in `agents/`, not Command UI).
 - `never86-command-center-v2` and `taco-bamba-command-center` as GitHub repos (see §6).
+
+**Now on this branch (static, sample only):** `public/demo/command.html` — the LLM rock + left-rail missing chips. Not wired to ops DB. Not Bamba.
 
 ---
 
 ## 3. Intended drill-down — operator language
 
-Tell it like a close, not like a BI tool.
+Tell it like an LLM close, not like a BI tool.
 
-1. **Network miss.** The group number that is off: voids above the pack, first-party digital below the house, catering under the median, 3P fee load up. One miss. Ranked. Source-tagged.
-2. **Shop.** Which unit is carrying it. Compare to the network’s own median — not a national benchmark you don’t have.
-3. **Statement / Z line.** The actual line: void dollars and event count, 1P% of digital, 3P revenue (not “fees” until the take rate is written), catering dollars, labor $ ÷ net for that week. If the line isn’t on a Z or a statement, it stays Missing.
-4. **Owner.** The seat that can move it tonight or this week: Store GM, Area Director, COO — from the escalation tier already in `coachCards.ts`. LLM ranks. Human sends. No auto-mail.
-5. **Due.** When proof is due: tonight (Action Shift), this week (void log + reason codes), next period (re-check). Verbal yes does not close. Attach the object (void log, deposit slip, payout ID, invoice).
+0. **Plug.** One box. Paste or drop. No account for the sample desk.
+1. **Left rail names the hole.** “You’re missing last night’s Z.” “You’re missing the DoorDash statement — fees stay Estimated.” “You’re missing the void reason log.” “No count → no food cost.” Each chip is a coach, not a status widget.
+2. **Network miss.** After a Z lands: the group number that is off. One miss. Ranked. Source-tagged.
+3. **Shop.** Which unit is carrying it. Compare to the network’s own median — not a national benchmark you don’t have.
+4. **Statement / Z line.** The actual line. If it isn’t on a Z or a statement, the chip stays Missing and the rail asks for it.
+5. **Owner.** Store GM / Area / COO from `coachCards.ts`. LLM ranks. Human sends.
+6. **Due + proof.** Tonight / this week / next period. Verbal yes does not close. The next missing chip *is* the proof object.
 
-**1P–3P is already one miss type, not the whole product.** Codex already built the Google door: paste a DoorDash statement on `/audit`. Command reuses that honesty on a group: “this shop’s digital is mostly 3P” is Verified mix from Toast; “this is what they take” is Estimated until the statement / rate card is in.
+**1P–3P is already one miss type, not the whole product.** `/audit` is the Google door. Command’s left rail should *pull* the same statement: “Fees are Estimated — drop the finalized payout.”
 
 **What the operator should hear in a demo**
 
-> “Sixteen shops, one miss. This shop is above the house on voids. Here’s the line. Here’s the GM. Here’s this week’s proof. We don’t call it theft. We don’t invent the year-one save. If the week isn’t complete, it stays Open.”
+> “SaaS wanted a six-week onboard. You drop last night. The left side already said the Z was missing. Now it wants the void reasons. You own tonight. We don’t invent the save. We don’t mail anyone. One seat is free. That’s Never 86'd.”
 
 ---
 
@@ -165,6 +194,7 @@ Tell it like a close, not like a BI tool.
 | `docs/STACK-MAP.md` | Lists `never86-command-center-v2` as a private repo. **GitHub cannot resolve that repo under this account.** |
 | `MYCHAEL_LOGIC_OS_ARCHITECTURE.md` | operator → brand → concept → store schema (additive). No UI. |
 | `src/` | Waitlist / Z / invoice / briefing stubs only. **No Command routes.** |
+| `public/demo/command.html` | LLM-style Command try-it: composer + left-rail missing chips. Sample only. |
 
 ### Sample / labeled datasets (keep them separate)
 
@@ -240,21 +270,22 @@ STACK-MAP still lists `never86-command-center-v2` as private. If those trees onl
 
 **Do not build:** mailbox ingest, ChatGPT app, live Bamba reconnect, fake savings, auto-mail, a new repo.
 
-**Build one public-safe click-through on `main`:** `/demo/command` (noindex, sample banner).
+**Shipped on this branch (static HTML):** `public/demo/command.html`
 
-Reuse only what already exists:
+That *is* the smallest Command try-it: one plug box + left-rail missing chips. Sample Downtown voids / 1P% / 3P fee range come from the same fictional 5-unit pizza numbers already on `/demo/3p-fee-finder` (`demoData.ts`). Count chip refuses to invent food cost.
 
-1. **Network miss** — compose `DEMO_VOID_HUNTER` + `DEMO_THREE_P` (already public). One ranked miss: e.g. “Downtown voids above the house” *or* “Downtown first-party digital below 50%.”
-2. **Shop** — click the store row (the missing piece on today’s tables).
-3. **Line** — show the measured cells for that shop only: void $, void rate vs sample median, 1P%, 3P revenue. Tag Verified (sample) vs Estimated (fee = revenue × 20–25%).
-4. **Owner + due** — run `buildCoachCards` on a hand-built sample exception (`void_excess` or `first_party_below_network`). Add an explicit `due` (`tonight` / `this week` / `next period`) copied from the playbook sentence that is already there.
-5. **Proof** — one line: “Void reason log” or “DoorDash finalized payout + this shop’s Toast 3P $.” `verbalYesCloses: false`.
+**Next slice on `main` (when you want it live next to `/audit`):**
 
-Ship rule: if `/demo/3p-fee-finder` can stay up with a sample banner, `/demo/command` can too. No ops DB. No operator 3. No Bamba name.
+1. Move this rail to `/demo/command` in the full app (noindex, sample banner).
+2. Drive chips from `actionShift.missingEvidence` + source-tag registry — not hardcoded copy.
+3. Then, only then, put the same left rail on gated `/command-center` so the long-scroll dies as the first impression.
 
-**Even smaller if you want a one-PR slice:** make rows on the existing `/demo/void-hunter` and `/demo/3p-fee-finder` open a shop pane (owner + due + line). Same math, less chrome.
+The suck-in order (safe):
 
-Then, and only then, point gated `/command-center` store rows at the same pane component with live `getCommandCenterData` / `getVoidFindings`. That is the design-partner path, not the Google door.
+1. Missing Z → plug Z → Verified sample miss (shop + line + owner + due).
+2. Missing void reason log → still no verdict.
+3. Missing DoorDash statement → 3P revenue Verified, fees Estimated.
+4. Missing count → food cost stays Missing. Stop.
 
 ---
 
@@ -263,15 +294,16 @@ Then, and only then, point gated `/command-center` store rows at the same pane c
 Sections only. No dollars invented in the room.
 
 1. **Promise.** Find the leak. Assign the fix. Keep the receipt. Same loop as Action Shift; Command is the group seat.
-2. **Who it’s for.** 3–50 shop ICP. Chef-led / multi-unit. Not a 200-unit BI replacement.
+2. **Who it’s for.** First: the independent owner SaaS priced out (under another $299 tool). One free seat. Then: the same desk at 3–50 shops. Not a 200-unit BI replacement. Not “we forgot the little guy.”
 3. **What it is not.** Another dashboard. Not R365. Not Voosh portal login. Not a fee calculator.
-4. **The five clicks.** Network miss → shop → statement/Z line → owner → due. Demo on sample data first.
-5. **1P–3P as one miss type.** Mix from POS is Verified. Take-rate dollars are Estimated until the statement or written rate card is in. `/audit` remains the Google door for one statement.
-6. **Honesty pills.** Verified / Estimated / Unverified / Missing. Incomplete week stays Open.
-7. **What we will not say.** Guaranteed recovery. Named thieves. Bamba or CTAP private figures. “We saved you $X” without a proof object.
-8. **Proof of method (not a case-study claim).** Public `/demo/void-hunter` + `/demo/3p-fee-finder` today; `/demo/command` next. Design-partner Command stays gated.
-9. **Seat math.** One location + one seat free. Extra shops / seats paid. Free seat goes past MarginEdge (Action Shift), not a fake Command.
-10. **Ask.** Walk one sample miss in five clicks. If they want their shops, they paste files — no portal password.
+4. **The rock.** One drop box, like every LLM. Left rail chips say “you’re missing this.” That chip is the next paste.
+5. **The ladder.** Miss → shop → line → owner → due. Demo on sample data first (`/demo/command.html`).
+6. **1P–3P as one miss type.** Mix from POS is Verified. Take-rate dollars are Estimated until the statement or written rate card is in. `/audit` remains the Google door for one statement.
+7. **Honesty pills.** Verified / Estimated / Unverified / Missing. Incomplete week stays Open.
+8. **What we will not say.** Guaranteed recovery. Named thieves. Bamba or CTAP private figures. “We saved you $X” without a proof object.
+9. **Proof of method.** `/audit` + `/demo/command.html` (this branch) + `/demo/3p-fee-finder`. Gated Command stays gated.
+10. **Seat math.** One location + one seat free. Extra shops / seats paid.
+11. **Ask.** Plug the sample Z. Watch the left rail ask for the void log. That’s the product.
 
 ### Math that is safe to say in the room
 
@@ -291,7 +323,7 @@ Sections only. No dollars invented in the room.
 
 ## 9. Suggested talk track (no numbers)
 
-“Audit is the DoorDash door — one statement, labeled math. Action Shift is last night at one shop — one action, night proof. Command is that same close across the group. We don’t add a dashboard. We rank one miss, open the shop, show the line, name the owner, set the due. If we don’t have the line, we say Missing. If the fee isn’t on a statement, we say Estimated. We never mail the GM for you.”
+“SaaS forgot the owner who won’t pay $299 and six weeks of onboarding. Never 86'd is that owner’s brand. One seat free. It feels like ChatGPT because that’s what they’re already being trained on. You drop last night. The left side names the hole. You get one win tonight. Command is the same desk when you have more shops. We never invent food cost. We never mail anyone for you.”
 
 ---
 
@@ -300,5 +332,7 @@ Sections only. No dollars invented in the room.
 - Issue #175 — Command Center Next 10 Moves (move 10 = multi-unit desk).
 - Issue #122 — GTM / SEO (3P answers + OS pages; do not duplicate the command-center answer).
 - Live answer: `/answers/restaurant-command-center-without-another-dashboard`
+- ChatGPT Action Shift site (401 sign-in): `https://action-shift-operator.never86-d-9722.chatgpt.site/`
 - Swarm PR #174 — CSV-first, no send.
 - This file: `docs/COMMAND_DRILLDOWN.md`
+- LLM-style try-it (this branch): `public/demo/command.html`
