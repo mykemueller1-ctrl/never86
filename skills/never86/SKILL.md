@@ -14,8 +14,8 @@ metadata:
 This file is a thin pointer. The Never86 OAuth/MCP backend owns restaurant logic, tools, auth, tenant scope, side-effect gates, and audit.
 
 1. Connect to `https://www.never86.ai/api/mcp`.
-2. Call `get_operator_system` first, then `list_agent_jobs` (one agent · one job).
-3. Use only the public read-only tools listed by `tools/list` (knowledge + analysis).
+2. Call `get_operator_system` first, then `list_specialists` (one agent · one job).
+3. Use only the public read-only tools listed by `tools/list` (knowledge + analysis). Optional: `prompts/get` → `specialist_brief`.
 4. Do not reimplement Action Shift, 3P formulas, vendor silence, or evidence states in this skill.
 5. Typed values stay Unverified. Missing Evidence is not $0. Do not invent facts.
 6. A verbal yes does not close an action. Escalate overdue unverified manager-checklist steps to the manager seat as Missing Evidence — not theft.

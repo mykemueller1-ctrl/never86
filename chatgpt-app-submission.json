@@ -3,11 +3,95 @@
   "schema_version": 1,
   "app_info": {
     "display_name": "Never86'd Operator",
-    "subtitle": "Payroll · Prices · Process",
-    "description": "Never86'd helps restaurant operators analyze labor drift, inspect vendor prices SKU by SKU, and turn a prior-day close into no more than three prioritized actions. Every result is read-only and Unverified until the operator confirms the source record.",
+    "subtitle": "Specialists · Payroll · Prices · Process",
+    "description": "Never86'd helps restaurant merchants find leaks with one agent per job. Call get_operator_system and list_specialists first. Then analyze labor, beverage, or vendor prices from operator-supplied CSVs, or build an Action Shift from a prior-day close. Every result is read-only and Unverified until the merchant confirms the source. No portal passwords. No auto-mail. No theft claims.",
     "category": "BUSINESS"
   },
   "tools": {
+    "get_operator_system": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns the public Never86 operator system pack only. No tenant data and no writes.",
+        "open_world_justification": "Does not contact merchants, vendors, POS systems, or third-party portals.",
+        "destructive_justification": "Cannot modify store rules, employee records, or any business state."
+      }
+    },
+    "get_operator_logic": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns a public rulebook domain. No store-private memory and no writes.",
+        "open_world_justification": "Does not fetch live merchant statements or log into marketplaces.",
+        "destructive_justification": "Cannot change formulas, targets, or operational records."
+      }
+    },
+    "get_3p_audit_logic": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns public marketplace 3P audit rules only.",
+        "open_world_justification": "Does not open DoorDash, Uber Eats, or Grubhub merchant portals.",
+        "destructive_justification": "Cannot dispute payouts, issue refunds, or alter statement records."
+      }
+    },
+    "list_answers": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Lists published public AEO answers. No private restaurant data.",
+        "open_world_justification": "Does not scrape merchant portals or third-party admin pages.",
+        "destructive_justification": "Cannot edit, unpublish, or delete answers."
+      }
+    },
+    "list_free_agents": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Lists the public free-agent catalog only.",
+        "open_world_justification": "Does not run agents against live merchant accounts.",
+        "destructive_justification": "Cannot enable, disable, or bill seats."
+      }
+    },
+    "list_agent_jobs": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns the one-agent-one-job governance registry.",
+        "open_world_justification": "Does not spawn live workers or contact external systems.",
+        "destructive_justification": "Cannot hire, fire, or reassign store staff."
+      }
+    },
+    "list_specialists": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Lists domain specialists and allowed tools for discovery.",
+        "open_world_justification": "Does not invoke specialists against live merchant data by itself.",
+        "destructive_justification": "Cannot grant access or change merchant configuration."
+      }
+    },
     "analyze_labor": {
       "annotations": {
         "readOnlyHint": true,
@@ -15,9 +99,21 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Analyzes CSV text deliberately supplied by the operator and does not change schedules, payroll, or employee records.",
+        "read_only_justification": "Analyzes CSV text deliberately supplied by the merchant and does not change schedules, payroll, or employee records.",
         "open_world_justification": "Does not contact an employee, payroll provider, POS, or any other external system.",
         "destructive_justification": "Cannot delete, overwrite, discipline, terminate, or otherwise transition an employee or business record."
+      }
+    },
+    "analyze_beverage": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Analyzes merchant-supplied beverage CSV text and returns Unverified review leads without writing inventory.",
+        "open_world_justification": "Does not contact distributors, change par levels, or open bar POS systems.",
+        "destructive_justification": "Cannot invent pour cost as verified, accuse theft, or alter inventory counts."
       }
     },
     "analyze_vendor_prices": {
@@ -27,7 +123,7 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Reads operator-supplied invoice or purchasing CSV text and returns a reproducible SKU price comparison without changing source records.",
+        "read_only_justification": "Reads merchant-supplied invoice or purchasing CSV text and returns a reproducible SKU price comparison without changing source records.",
         "open_world_justification": "Does not contact a vendor, issue a dispute, place an order, or publish information.",
         "destructive_justification": "Cannot modify invoices, contracts, vendor accounts, payments, or purchasing records."
       }
@@ -39,7 +135,7 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Calculates a short action plan from prior-day close values deliberately supplied by the operator without writing business state.",
+        "read_only_justification": "Calculates a short action plan from prior-day close values deliberately supplied by the merchant without writing business state.",
         "open_world_justification": "Does not message staff or vendors, alter a POS, issue refunds, or move money.",
         "destructive_justification": "Returns suggested actions and proof requirements only; it cannot execute or close them."
       }
@@ -47,11 +143,27 @@
   },
   "test_cases": [
     {
+      "description": "Load the operator system before inventing math.",
+      "user_prompt": "Call get_operator_system and tell me the promise and the assign-stage rule.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_operator_system",
+      "expected_output": "Returns Find the leak. Assign the fix. Keep the receipt. and the rule that actions are normally one and never more than three.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Discover one-agent-one-job specialists.",
+      "user_prompt": "List the Never86 specialists and the labor specialist's one job.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_specialists",
+      "expected_output": "Lists labor, beverage, food-invoice, human-coach, design-qa, and truth-qa with one job each and no private store data.",
+      "expected_output_url": null
+    },
+    {
       "description": "Surface a real invoice-line price increase.",
       "user_prompt": "Analyze vendor prices from this CSV: Vendor,SKU,Period,UnitPrice\\nSysco,Chicken,2026-07,50\\nSysco,Chicken,2026-08,54",
       "file_attachment_urls": null,
       "tools_triggered": "analyze_vendor_prices",
-      "expected_output": "Reports the 8% increase as Unverified and tells the operator to confirm pack size, credits, substitutions, and invoice terms.",
+      "expected_output": "Reports the 8% increase as Unverified and tells the merchant to confirm pack size, credits, substitutions, and invoice terms.",
       "expected_output_url": null
     },
     {
@@ -63,27 +175,11 @@
       "expected_output_url": null
     },
     {
-      "description": "Build the operator's short daily action shift.",
+      "description": "Build the merchant's short daily action shift.",
       "user_prompt": "Build an Action Shift for Main from 2026-08-27: gross sales 4120, labor 980, labor target 20%, expected cash 640, deposit 638, and voids 44.",
       "file_attachment_urls": null,
       "tools_triggered": "build_action_shift",
-      "expected_output": "Returns no more than three prioritized actions plus a night proof checklist and labels operator-entered values Unverified.",
-      "expected_output_url": null
-    },
-    {
-      "description": "Explain the evidence needed for a vendor-price review.",
-      "user_prompt": "What columns do I need to check whether my vendor quietly raised prices?",
-      "file_attachment_urls": null,
-      "tools_triggered": "analyze_vendor_prices",
-      "expected_output": "Explains that the operator needs Vendor, SKU or Description, Period or Invoice Date, and Unit Price, then asks for the CSV.",
-      "expected_output_url": null
-    },
-    {
-      "description": "Route an operator to the right one of three jobs.",
-      "user_prompt": "Help me decide whether to inspect Payroll, Prices, or Process first.",
-      "file_attachment_urls": null,
-      "tools_triggered": null,
-      "expected_output": "Asks which source records are available and routes the operator to labor analysis, vendor-price analysis, or Action Shift without inventing store facts.",
+      "expected_output": "Returns no more than three prioritized actions plus a night proof checklist and labels merchant-entered values Unverified.",
       "expected_output_url": null
     }
   ],
