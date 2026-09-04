@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildActionShift, type ActionShiftInput } from '@/lib/actionShift';
+import {
+  handleGet3pAuditLogic,
+  handleGetOperatorLogic,
+  handleGetOperatorSystem,
+  handleListAgentJobs,
+  handleListAnswers,
+  handleListFreeAgents,
+} from '@/lib/agentGovernance/knowledge';
 import { runLaborDrift } from '@/lib/laborDriftCsv';
 import {
   MCP_PUBLIC_ENDPOINT,
@@ -13,9 +21,9 @@ import { runVendorDrift } from '@/lib/vendorDriftCsv';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Public, read-only MCP server. It accepts only data the operator deliberately
-// sends in a tool call. It never reads tenant records, sends messages, or makes
-// financial, employment, or vendor decisions.
+// Public, read-only MCP server. Knowledge tools return public packs only.
+// Analysis tools accept only data the operator deliberately sends in a tool call.
+// It never reads tenant records, sends messages, or makes financial, employment, or vendor decisions.
 
 type JsonRpcReq = {
   jsonrpc: '2.0';
@@ -69,6 +77,27 @@ async function handle(req: JsonRpcReq): Promise<Response> {
     case 'tools/call': {
       const name = (req.params as { name?: string })?.name;
       const args = (req.params as { arguments?: Record<string, unknown> })?.arguments ?? {};
+
+      if (name === 'get_operator_system') {
+        return textResult(req.id, handleGetOperatorSystem());
+      }
+      if (name === 'get_operator_logic') {
+        const result = handleGetOperatorLogic(args.domain);
+        if (!result.ok) return textResult(req.id, result.error, true);
+        return textResult(req.id, result);
+      }
+      if (name === 'get_3p_audit_logic') {
+        return textResult(req.id, handleGet3pAuditLogic());
+      }
+      if (name === 'list_answers') {
+        return textResult(req.id, await handleListAnswers(args.limit));
+      }
+      if (name === 'list_free_agents') {
+        return textResult(req.id, handleListFreeAgents());
+      }
+      if (name === 'list_agent_jobs') {
+        return textResult(req.id, handleListAgentJobs(args.team));
+      }
 
       if (name === 'analyze_labor') {
         const input = operatorCsv(args);
@@ -150,14 +179,16 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    protocol: 'mcp',
-    transport: MCP_PUBLIC_TRANSPORT,
+    name: MCP_PUBLIC_SERVER_INFO.name,
+    version: MCP_PUBLIC_SERVER_INFO.version,
+    description: MCP_PUBLIC_SERVER_INFO.description,
     endpoint: MCP_PUBLIC_ENDPOINT,
-    server: MCP_PUBLIC_SERVER_INFO,
+    transport: MCP_PUBLIC_TRANSPORT,
+    protocol: MCP_PUBLIC_PROTOCOL,
     tools: MCP_PUBLIC_TOOLS.map((tool) => ({
       name: tool.name,
       description: tool.description,
+      readOnly: true,
     })),
-    docs: 'https://www.never86.ai/mcp',
   });
 }

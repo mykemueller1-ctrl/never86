@@ -27,12 +27,54 @@ describe('public MCP route', () => {
     }
   });
 
-  it('exposes only Payroll, Prices, and Process tools', () => {
+  it('exposes knowledge tools first, then Payroll / Prices / Process analysis', () => {
     expect(MCP_PUBLIC_TOOLS.map((tool) => tool.name)).toEqual([
+      'get_operator_system',
+      'get_operator_logic',
+      'get_3p_audit_logic',
+      'list_answers',
+      'list_free_agents',
+      'list_agent_jobs',
       'analyze_labor',
       'analyze_vendor_prices',
       'build_action_shift',
     ]);
+  });
+
+  it('returns the operator system from get_operator_system', async () => {
+    const response = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'tools/call',
+        params: { name: 'get_operator_system', arguments: {} },
+      }),
+    }));
+    const body = await response.json();
+    const text = body.result.content[0].text as string;
+    expect(text).toContain('"version"');
+    expect(text).toContain('Find the leak. Assign the fix. Keep the receipt.');
+    expect(text).toContain('Memory Curator');
+  });
+
+  it('lists one-agent-one-job registry without private store data', async () => {
+    const response = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 11,
+        method: 'tools/call',
+        params: { name: 'list_agent_jobs', arguments: { team: 'store' } },
+      }),
+    }));
+    const body = await response.json();
+    const text = body.result.content[0].text as string;
+    expect(text).toContain('store-chief-of-staff');
+    expect(text).toContain('memory-curator');
+    expect(text).not.toMatch(/karlee|sturtz|\$1,000\.00/i);
   });
 
   it('analyzes operator-provided vendor pricing as Unverified', async () => {

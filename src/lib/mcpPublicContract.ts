@@ -1,4 +1,6 @@
+import { PUBLIC_LOGIC_DOMAINS } from './publicOperatorLogic';
 import { OPERATOR_SYSTEM_VERSION } from './operatorSystem';
+import { KNOWLEDGE_TOOL_NAMES } from './agentGovernance/knowledge';
 
 export const MCP_PUBLIC_ENDPOINT = 'https://www.never86.ai/api/mcp';
 export const MCP_PUBLIC_TRANSPORT = 'http+json-rpc-2.0';
@@ -22,10 +24,90 @@ export const MCP_PUBLIC_SERVER_INFO = {
   name: 'never86',
   version: OPERATOR_SYSTEM_VERSION,
   description:
-    "Never 86'd finds restaurant leaks in Payroll, Prices, and Process. It analyzes operator-provided data, labels it Unverified, and returns read-only evidence and next actions.",
+    "Never 86'd finds restaurant leaks in Payroll, Prices, and Process. Knowledge tools return the public operator system; analysis tools label operator-provided data Unverified and stay read-only.",
 } as const;
 
+const emptyObjectSchema = {
+  type: 'object',
+  properties: {},
+  additionalProperties: false,
+} as const;
+
+/** Knowledge first (call get_operator_system), then Payroll / Prices / Process analysis. */
 export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
+  {
+    name: 'get_operator_system',
+    description:
+      'Return the versioned public Never86 operator OS pack (loop, routines, agents, truth gates, safety, private-store boundary). Call first.',
+    inputSchema: emptyObjectSchema,
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'get_operator_logic',
+    description:
+      'Fetch one public Never86 rulebook domain, or the full public logic bundle when domain is omitted or "all".',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        domain: {
+          type: 'string',
+          enum: [...PUBLIC_LOGIC_DOMAINS],
+          description: 'Optional. Defaults to "all". Prefer a single domain unless the whole public bundle is needed.',
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'get_3p_audit_logic',
+    description:
+      'Return public marketplace 3P audit rules: evidence ladder, formulas, DoorDash mappings, claim boundaries, and payout tolerance.',
+    inputSchema: emptyObjectSchema,
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'list_answers',
+    description:
+      'List published public AEO answers (slug, title, question, audience, URL). No private store data.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          description: 'Optional max rows. Omit to return the full published catalog.',
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'list_free_agents',
+    description:
+      'List CSV-runnable free agents (slug, name, seat, headline, catches, sample signal, public URLs). Catalog only.',
+    inputSchema: emptyObjectSchema,
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'list_agent_jobs',
+    description:
+      'List the public one-agent-one-job governance registry: store team, company roles, and free agents — each with a single job string.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        team: {
+          type: 'string',
+          enum: ['all', 'store', 'company', 'free-agent'],
+          description: 'Optional filter. Defaults to "all".',
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
   {
     name: 'analyze_labor',
     description:
@@ -110,6 +192,14 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
 ];
 
 export const MCP_PUBLIC_TOOL_NAMES = MCP_PUBLIC_TOOLS.map((tool) => tool.name);
+
+export const MCP_KNOWLEDGE_TOOL_NAMES = [...KNOWLEDGE_TOOL_NAMES];
+
+export const MCP_ANALYSIS_TOOL_NAMES = [
+  'analyze_labor',
+  'analyze_vendor_prices',
+  'build_action_shift',
+] as const;
 
 export function assertAllPublicToolsReadOnly(
   tools: readonly McpPublicTool[] = MCP_PUBLIC_TOOLS,

@@ -4,6 +4,8 @@
 
 **Command card:** [`ONE_SPOT.md`](ONE_SPOT.md) — Myke talks in Grok; Grok routes; Cursor and Grok Bots execute; Codex watches. Shared state: [`CHATGPT_HANDOFF.md`](intake/CHATGPT_HANDOFF.md).
 
+**Code governance wire:** [`AGENT_ORCHESTRATION.md`](AGENT_ORCHESTRATION.md) — one agent · one job; public MCP knowledge tools; store memory propose/approve (no mega-agent, no formula forks).
+
 **Permanent brief (locked 24 Aug 2026):** [`OPERATING_CONTEXT.md`](OPERATING_CONTEXT.md) — who we are, pricing scale play, 3P wedge, Store OS, HQ split, standing orders. **Do not invent, dilute, or soft-pedal.**
 
 
