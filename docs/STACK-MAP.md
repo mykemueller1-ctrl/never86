@@ -9,13 +9,16 @@ Logic lives in the MCP, not in ten chats.
 | This repo | mykemueller1-ctrl/never86 |
 | Cursor autopilot | .cursor/environment.json (merged 2026-08-24) |
 | GTM job | GitHub issue #122 |
+| Command drill-downs | `docs/COMMAND_DRILLDOWN.md` + `docs/TWO_TRACKS.md` (Action Shift ≠ Bamba Command) |
+| 1–5 owner desk | ChatGPT-simple. Left: Menu, Schedules. Labor cards + labor report spawn from the schedule (posted in/out, headcount, late only with a punch). Try-it: `public/demo/action-shift.html` |
 
 ## Repos (do not spawn more)
-- never86 — this one. Cursor ran here 2026-08-24.
+- never86 — this one. Cursor ran here 2026-08-24. Default `recovery-apr12` is the thin email-only launch; live www.never86.ai Command/Audit routes match `main`.
 - Never-86d — older public
 - never86d-beta-ctap — private shop beta. Not public marketing.
 - never86-action-shift-live — demo
-- never86-command-center-v2 — private
+- never86-command-center-v2 — listed historically as private. **Not resolvable on this GitHub account** (2026-09-03). Treat as a Mac folder until the source is in git. See `docs/COMMAND_DRILLDOWN.md`.
+- taco-bamba-command-center — same: not on this GitHub account. Mac-only if it still exists. Do not publish the customer name.
 - Agent-ctap-marketing — shop marketing, not brand OS
 - polar-reef-scarlet-crisp — empty 2026-08-25. Ignore unless it becomes production.
 - pilot-green-cinder-harbor — Grok Build shop desk. Not never86.ai.
