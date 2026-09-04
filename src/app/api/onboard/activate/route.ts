@@ -13,10 +13,9 @@ export const dynamic = 'force-dynamic';
 
 const bodySchema = z.object({
   token: z.string().min(10),
-  password: z.string().min(10),
 });
 
-// POST /api/onboard/activate — consume token, create one operator + one location + one credential.
+// POST /api/onboard/activate — consume one email link, create or open the operator seat.
 export async function POST(req: Request) {
   try {
     const json = await req.json();
@@ -31,7 +30,6 @@ export async function POST(req: Request) {
 
     const result = await activateOperatorSeat({
       rawToken: data.token,
-      password: data.password,
     });
 
     if (!result.ok) {
@@ -54,12 +52,7 @@ export async function POST(req: Request) {
     res.cookies.set(OPERATOR_COOKIE, session, OPERATOR_COOKIE_OPTS);
     return res;
   } catch (err: unknown) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: 'Password must be at least 10 characters.' },
-        { status: 400 },
-      );
-    }
+    if (err instanceof z.ZodError) return NextResponse.json({ success: false, error: 'Invalid sign-in link.' }, { status: 400 });
     return NextResponse.json({ success: false, error: 'Activation failed.' }, { status: 500 });
   }
 }
