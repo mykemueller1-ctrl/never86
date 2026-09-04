@@ -1,0 +1,67 @@
+{
+  "taskId": "bamba-sales-labor-enterprise-v1",
+  "polishTaskId": "bamba-ui-polish-swarm-v1",
+  "product": "command-center-desk",
+  "notANewProduct": true,
+  "inventThousandAgents": false,
+  "seats": [
+    {
+      "seatId": "builder-1",
+      "role": "builder",
+      "queue": "Typed contract, one React Command Center desk, Aug 12 Daily fixture, peer-median flags.",
+      "stopCondition": "Green isolated PR with Daily/WTD/PTD desk and acceptance fixtures. No merge, deploy, or live write.",
+      "publishAllowed": false,
+      "mergeAllowed": false,
+      "productionWriteAllowed": false
+    },
+    {
+      "seatId": "qa-1",
+      "role": "qa",
+      "queue": "Prove canary 125273.41, Landmark highest Daily void rate, 1.5× peer-median flags, Lane C isolation.",
+      "stopCondition": "Acceptance tests fail or a foreign-tenant token appears. QA cannot approve production release.",
+      "publishAllowed": false,
+      "mergeAllowed": false,
+      "productionWriteAllowed": false
+    }
+  ],
+  "jobs": [
+    { "jobId": "ingest", "label": "Ingest the Aug 12 Daily parse into Lane C memory.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "hygiene", "label": "Hygiene pass — refuse foreign-tenant tokens before rollup.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "sales-vs-py-fcst", "label": "Sales versus prior year and forecast.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "traffic-avg-check", "label": "Traffic, checks, and average check.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "catering-leak", "label": "Catering leak with owner and due date.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "void-hunter", "label": "Void hunter against this pull peer median.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "comp-staff-meal", "label": "Comp and staff-meal stations.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "ticket-time", "label": "Ticket times by daypart.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "pmix", "label": "Product mix from Sheet1.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "labor", "label": "Labor slot for the same 16 stores.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "coach-card", "label": "Coach card — one action. Human sends.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." },
+    { "jobId": "qa-retest", "label": "QA retest of the Aug 12 canary.", "fansTo": "16-stores", "stopCondition": "Killed or failed jobs leave the desk incomplete, never done." }
+  ],
+  "stores": [
+    "Ballston",
+    "Shirlington",
+    "City Ridge",
+    "Landmark",
+    "Fair Lakes",
+    "Fairfax at University Mall",
+    "Reston",
+    "Tysons",
+    "Mosaic",
+    "One Loudoun",
+    "Kingstowne",
+    "Pentagon Row",
+    "Falls Church",
+    "Springfield",
+    "Ashburn",
+    "Gainesville"
+  ],
+  "fanOut": { "jobs": 12, "stores": 16 },
+  "acceptance": {
+    "dailySystemCySales": 125273.41,
+    "highestDailyVoidRateStore": "Landmark",
+    "voidFlagRule": "peer-median-1.5x",
+    "periodOrder": ["daily", "wtd", "ptd"],
+    "foreignTenantsForbidden": ["CTap", "Community Tap", "New American Grill", "Grill cash"]
+  }
+}

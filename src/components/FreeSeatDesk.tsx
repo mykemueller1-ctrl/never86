@@ -54,6 +54,7 @@ type PriceResult = {
 
 type DeskPayload = {
   restaurantName: string | null;
+  forwardTo?: string;
   desk: DeskClose | null;
   closeId: number | null;
 };
@@ -97,6 +98,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
   const [mode, setMode] = useState<Mode>('payroll');
   const [restaurantName, setRestaurantName] = useState('Your restaurant');
+  const [forwardTo, setForwardTo] = useState<string | null>(null);
   const [processDesk, setProcessDesk] = useState<DeskClose | null>(null);
   const [closeId, setCloseId] = useState<number | null>(null);
   const [labor, setLabor] = useState<LaborResult | null>(null);
@@ -112,6 +114,7 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
       .then((data: DeskPayload & { success?: boolean }) => {
         if (!data.success) return;
         if (data.restaurantName) setRestaurantName(data.restaurantName);
+        if (data.forwardTo) setForwardTo(data.forwardTo);
         setProcessDesk(data.desk);
         setCloseId(data.closeId);
       })
@@ -271,6 +274,14 @@ export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
 
         {mode === 'process' ? (
           <form onSubmit={runProcess} className="mt-5 space-y-3">
+            <div style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 14 }}>
+              <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED, marginBottom: 8 }}>Forward EOD to</p>
+              <p className="font-mono" style={{ fontSize: 14, color: INK }}>{forwardTo || 'Sign in to see your close address.'}</p>
+              <p style={{ fontSize: 13, color: MUTED, marginTop: 8 }}>
+                PDQ scheduled EOD should attach ZReport_Summary, Void_Promo_Report, and Hourly_Sales_Report in one email. Filename date is the business date.
+                A Void-only message is Missing Evidence — export the native Z and Hourly PDFs from PDQ Reports. Do not type dollars.
+              </p>
+            </div>
             <textarea
               value={processText}
               onChange={(event) => setProcessText(event.target.value)}
