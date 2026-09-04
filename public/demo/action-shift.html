@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Action Shift — owner seat · Never 86'd</title>
-    <meta name="description" content="One chat. One prompt. Menu and Schedules. Labor comes off the schedule. Sample shop only." />
+    <meta name="description" content="Pain first. POS email/photo — no day-one API. One action. Schedule photo. Vendors. Menu. Sample shop only." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -19,30 +19,49 @@
         --bubble: #fffdf8;
         --mine: #1c1914;
         --go: #1d4ed8;
+        --miss: #9a3412;
+        --miss-bg: #fff7ed;
+        --ok: #166534;
+        --ok-bg: #ecfdf5;
       }
       * { box-sizing: border-box; }
       html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink); font-family: "Source Sans 3", system-ui, sans-serif; }
       .app { height: 100vh; display: grid; grid-template-columns: 248px 1fr; }
-      @media (max-width: 760px) { .app { grid-template-columns: 1fr; } .rail { display: none; } .rail.open { display: block; } }
+      @media (max-width: 760px) { .app { grid-template-columns: 1fr; } .rail { display: none; } }
       .rail { background: var(--rail); border-right: 1px solid var(--line); padding: 16px 12px 24px; overflow: auto; }
       .brand { display: flex; align-items: center; gap: 8px; padding: 4px 8px 14px; }
       .mark { width: 22px; height: 22px; border-radius: 6px; background: #1e40af; color: #f6f3ec; font: 700 11px/22px "IBM Plex Mono", monospace; text-align: center; }
-      .new { width: 100%; border: 1px solid var(--line); background: #fffdf8; border-radius: 10px; padding: 8px 10px; font: 600 13px inherit; cursor: pointer; text-align: left; margin-bottom: 16px; }
+      .new { width: 100%; border: 1px solid var(--line); background: #fffdf8; border-radius: 10px; padding: 8px 10px; font: 600 13px inherit; cursor: pointer; text-align: left; margin-bottom: 12px; }
       .sec { font: 600 10px/1 "IBM Plex Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 8px 10px 4px; }
       .nav { width: 100%; border: 0; background: transparent; border-radius: 10px; padding: 8px 10px; font: 600 14px inherit; color: inherit; text-align: left; cursor: pointer; }
       .nav:hover, .nav.on { background: #fffdf8; }
       .nav small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; margin-top: 1px; }
+      .nav .pill { display: inline-block; font: 600 9px/1 "IBM Plex Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 6px; border-radius: 999px; margin-top: 4px; }
+      .pill.miss { background: var(--miss-bg); color: var(--miss); }
+      .pill.ok { background: var(--ok-bg); color: var(--ok); }
       .roles { padding: 0 0 4px 12px; }
       .nav.dim { color: var(--muted); font-weight: 500; }
-      .stage { display: grid; grid-template-rows: 1fr auto; min-width: 0; }
+      .stage { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; }
+      .missbar { border-bottom: 1px solid var(--line); background: #fffdf8; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .missbar .lab { font: 600 10px/1 "IBM Plex Mono", monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+      .chip { border: 1px solid var(--line); background: var(--miss-bg); color: var(--miss); border-radius: 999px; padding: 5px 10px; font: 600 12px inherit; cursor: pointer; }
+      .chip.got { background: var(--ok-bg); color: var(--ok); border-color: #bbf7d0; cursor: default; }
       .thread { overflow: auto; padding: 28px 20px 28px; min-height: 0; }
-      .empty { max-width: 560px; margin: 12vh auto 0; text-align: center; }
-      .empty h1 { font-weight: 600; font-size: clamp(26px, 4vw, 36px); margin: 0 0 8px; letter-spacing: -0.03em; }
-      .empty p { color: var(--muted); margin: 0; }
+      .empty { max-width: 600px; margin: 8vh auto 0; text-align: center; }
+      .empty h1 { font-weight: 600; font-size: clamp(24px, 4vw, 34px); margin: 0 0 10px; letter-spacing: -0.03em; }
+      .empty p { color: var(--muted); margin: 0 0 16px; line-height: 1.45; }
+      .pain { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+      .pain button { border: 1px solid var(--line); background: #fffdf8; border-radius: 12px; padding: 10px 14px; font: 600 14px inherit; cursor: pointer; text-align: left; max-width: 180px; }
+      .pain button span { display: block; font-weight: 400; color: var(--muted); font-size: 12px; margin-top: 2px; }
       .msg { max-width: 680px; margin: 0 auto 14px; }
       .msg .who { font: 600 11px/1 "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
       .msg .body { background: var(--bubble); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; line-height: 1.45; }
       .msg.me .body { background: var(--mine); color: #f6f3ec; border-color: var(--mine); }
+      .pack { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+      @media (max-width: 560px) { .pack { grid-template-columns: 1fr; } }
+      .tile { border: 1px solid var(--line); background: #f7f3e8; border-radius: 12px; padding: 10px; text-align: left; }
+      .tile b { display: block; font-size: 13px; }
+      .tile span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
       .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
       @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
       .card { border: 1px solid var(--line); background: #f7f3e8; border-radius: 12px; padding: 10px; text-align: left; cursor: pointer; font: inherit; }
@@ -67,75 +86,64 @@
           <div class="mark">A</div>
           <div><strong>Action Shift</strong><br /><span style="color:var(--muted);font-size:12px">Owner seat · free</span></div>
         </div>
-        <button class="new" type="button" data-room="home">New chat</button>
+        <button class="new" type="button" data-act="reset">New chat</button>
         <p class="sec">The shop</p>
-        <button class="nav" type="button" data-room="menu">Menu<small>What you charge. What’s in it.</small></button>
-        <button class="nav" type="button" data-room="schedules">Schedules<small>Labor lives here. Posted in / posted out.</small></button>
+        <button class="nav" type="button" data-room="menu" id="nav-menu">Menu<small>Picture · plate drift / cheaper house</small></button>
+        <button class="nav" type="button" data-room="schedules" id="nav-schedules">Schedules<small>Photo the week. Labor lives here.</small></button>
         <div class="roles">
-          <button class="nav dim" type="button" data-room="cards">Labor cards</button>
-          <button class="nav dim" type="button" data-room="report">Labor report</button>
+          <button class="nav dim" type="button" data-room="cards" id="nav-cards">Labor cards</button>
+          <button class="nav dim" type="button" data-room="report" id="nav-report">Labor report</button>
         </div>
         <p class="sec">Later</p>
-        <button class="nav dim" type="button" data-room="guides">Order guides</button>
-        <button class="nav dim" type="button" data-room="invoices">Invoices</button>
+        <button class="nav dim" type="button" data-room="vendors" id="nav-vendors">Vendors<small>Performance / Sysco · email path</small></button>
+        <button class="nav dim" type="button" data-room="invoices" id="nav-invoices">Invoices<small>Photo or forward — not a portal</small></button>
       </aside>
       <main class="stage">
+        <div class="missbar" id="missbar" hidden></div>
         <div class="thread" id="thread"></div>
         <div class="dock">
           <div class="follows" id="follows"></div>
           <div class="box" id="box">
-            <textarea id="prompt" rows="2" placeholder="Drop last night’s close, or pick Menu / Schedules."></textarea>
+            <textarea id="prompt" rows="2" placeholder="Labor? Cash? Fragmented data? Or drop the POS email / close…"></textarea>
             <div class="bar">
-              <span id="hint">One box. Like ChatGPT. We read it.</span>
+              <span id="hint">No day-one API. Email / photo / Drive. We do the hard work.</span>
               <div>
-                <label class="file">File<input id="file" type="file" accept=".txt,.csv,.pdf,.png,.jpg" hidden /></label>
+                <label class="file">File<input id="file" type="file" accept=".txt,.csv,.pdf,.png,.jpg,.jpeg,.webp" hidden /></label>
                 <button class="send" type="button" id="send">Send</button>
               </div>
             </div>
           </div>
-          <p class="fine">Sample shop — not yours, not Bamba. We don’t invent food cost, labor $, or late hours. Invoice ≠ COGS. Punch ≠ schedule.</p>
+          <p class="fine">Sample shop — not yours, not Bamba. No portal passwords. Invoice ≠ COGS. Punch ≠ schedule. Incomplete stays Missing.</p>
         </div>
       </main>
     </div>
     <script>
-      const POSITIONS = {
-        foh: { title: "Front of house", posted: "Posted in / posted out · sample seat. Punch Missing." },
-        boh: { title: "Back of house", posted: "Posted in / posted out · sample seat. Punch Missing." },
-        delivery: { title: "Delivery", posted: "Posted in / posted out · sample seat. Punch Missing." },
-        dishwasher: { title: "Dishwasher", posted: "Posted in / posted out · sample seat. Punch Missing." },
-      };
+      /** Myke suck-in Waves 0–4 — sample shop only */
+      const CHIPS = [
+        { id: "pos", label: "POS email / close", ask: "pos" },
+        { id: "schedule", label: "Schedule photo", ask: "schedule" },
+        { id: "roles", label: "Labor cards / roles", ask: "roles" },
+        { id: "vendors", label: "Trucks / cadence", ask: "vendors" },
+        { id: "invoiceEmail", label: "Invoice email where?", ask: "invoiceEmail" },
+        { id: "menu", label: "Menu photo", ask: "menu" },
+        { id: "invoice", label: "One invoice", ask: "invoice" },
+      ];
 
-      const STARTERS = {
-        home: null,
-        menu: "What’s on the menu and what do you charge? Plate + price. Recipe and order guide come later — that’s how SKU drift stays honest when beef goes up.",
-        schedules: "Schedules are the thing you already write. Labor lives on that grid — who you posted, when they were supposed to walk in, when they were supposed to walk out. Drop the week. Then we spawn labor cards and a labor report. We do not write the week yet. No invented hours.",
-        cards: "Labor cards spawn from the schedule. Drop the week first if it’s empty. Each card is a seat: posted in, posted out. Late drift only if the punch exists. Punch ≠ schedule. We don’t invent stay-late hours.",
-        report: "Labor report spawns from the same schedule. How many people in each seat is how this shop actually runs — tribal knowledge, not a textbook. Late / stay-late stays Missing until punches land.",
-        foh: "Front of house on the schedule. Posted in / posted out. Punch Missing — we will not say they stayed late.",
-        boh: "Back of house on the schedule. Posted in / posted out. Punch Missing.",
-        delivery: "Delivery on the schedule. Posted in / posted out. Punch Missing.",
-        dishwasher: "Dish on the schedule. Posted in / posted out. Punch Missing.",
-        guides: "Order guides come after the menu. What’s on the plate, then what you buy. Placeholder for now.",
-        invoices: "Invoice later unlocks SKU drift: beef went up, switch the house or raise the plate. Invoice ≠ COGS. Don’t drop one until the menu is in.",
-      };
-
-      const PLACE = {
-        home: "Drop last night’s close, or pick Menu / Schedules.",
-        menu: "Burger $14. Cheese, bun, smash patty…",
-        schedules: "Mon–Sun, who you already posted, in and out…",
-        cards: "A station from the schedule…",
-        report: "How many on the floor, the line, dish…",
-        foh: "Floor posted…",
-        boh: "Line posted…",
-        delivery: "Drivers posted…",
-        dishwasher: "Dish posted…",
-        guides: "Order guide later. Menu first.",
-        invoices: "Invoice later. Menu first.",
+      const known = {
+        pain: null,
+        pos: false,
+        close: false,
+        schedule: false,
+        roles: false,
+        vendors: false,
+        invoiceEmail: false,
+        menu: false,
+        invoice: false,
+        punches: false,
       };
 
       let room = "home";
       const threads = { home: [] };
-      const known = { close: false, menu: false, schedule: false, punches: false };
 
       function threadOf(id) {
         if (!threads[id]) threads[id] = [];
@@ -146,74 +154,140 @@
         threadOf(id).push({ who, html, extra: extra || "" });
       }
 
+      function closePack() {
+        return `<div class="pack">
+          <div class="tile"><b>Sales</b><span>Downtown net $9,840 · Verified on close</span></div>
+          <div class="tile"><b>Promos</b><span>Comps $186 · on the close</span></div>
+          <div class="tile"><b>Void Hunter</b><span>$122 voids · above house median · pattern only</span></div>
+          <div class="tile"><b>SKU drift</b><span>Missing — menu + invoice</span></div>
+        </div>`;
+      }
+
       function spawnAgents() {
         return `<div class="cards">
-          <button class="card" type="button" data-room="cards"><b>Labor cards</b><span>Each posted shift: station, in, out.</span></button>
-          <button class="card" type="button" data-room="report"><b>Labor report</b><span>Headcount by seat. That’s how this shop runs.</span></button>
+          <button class="card" type="button" data-room="cards"><b>Labor cards</b><span>Posted in / out by seat</span></button>
+          <button class="card" type="button" data-room="report"><b>Labor report</b><span>Headcount = how this shop runs</span></button>
         </div>`;
       }
 
       function positionCards() {
         return `<div class="cards">
-          <button class="card" type="button" data-room="foh"><b>Front of house</b><span>${POSITIONS.foh.posted}</span></button>
-          <button class="card" type="button" data-room="boh"><b>Back of house</b><span>${POSITIONS.boh.posted}</span></button>
-          <button class="card" type="button" data-room="delivery"><b>Delivery</b><span>${POSITIONS.delivery.posted}</span></button>
-          <button class="card" type="button" data-room="dishwasher"><b>Dishwasher</b><span>${POSITIONS.dishwasher.posted}</span></button>
+          <button class="card" type="button" data-act="roles"><b>FOH · 3</b><span>Posted in / out · Punch Missing</span></button>
+          <button class="card" type="button" data-act="roles"><b>Line · 2</b><span>Posted in / out · Punch Missing</span></button>
+          <button class="card" type="button" data-act="roles"><b>Dish · 1</b><span>Posted in / out · Punch Missing</span></button>
+          <button class="card" type="button" data-act="roles"><b>Run · 1</b><span>Posted in / out · Punch Missing</span></button>
         </div>`;
       }
 
-      function extraFor(id) {
-        if (id === "schedules") return spawnAgents();
-        if (id === "cards") return known.schedule ? positionCards() : "";
-        return "";
+      function missingList() {
+        return CHIPS.filter((c) => !known[c.id === "pos" ? "pos" : c.id] && !(c.id === "pos" && known.close));
+      }
+
+      function renderMissbar() {
+        const bar = document.getElementById("missbar");
+        const started = known.pain || known.pos || known.close;
+        if (!started) {
+          bar.hidden = true;
+          return;
+        }
+        bar.hidden = false;
+        const parts = [`<span class="lab">Missing</span>`];
+        CHIPS.forEach((c) => {
+          const got = c.id === "pos" ? known.pos || known.close : known[c.id];
+          parts.push(
+            got
+              ? `<span class="chip got">${c.label} ✓</span>`
+              : `<button class="chip" type="button" data-ask="${c.ask}">${c.label}</button>`
+          );
+        });
+        bar.innerHTML = parts.join("");
+      }
+
+      function updateNavPills() {
+        const set = (id, got, missLabel) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          let pill = el.querySelector(".pill");
+          if (!pill) {
+            pill = document.createElement("span");
+            pill.className = "pill";
+            el.appendChild(pill);
+          }
+          pill.className = "pill " + (got ? "ok" : "miss");
+          pill.textContent = got ? "Got it" : missLabel;
+        };
+        set("nav-menu", known.menu, "Missing");
+        set("nav-schedules", known.schedule, "Missing");
+        set("nav-vendors", known.vendors && known.invoiceEmail, known.vendors ? "Email path?" : "Missing");
+        set("nav-invoices", known.invoice, "Later");
+        ["nav-cards", "nav-report"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle("dim", !known.schedule);
+        });
       }
 
       function followsFor() {
-        if (room === "schedules" || known.schedule) {
-          if (room === "schedules") return [["cards", "Labor cards"], ["report", "Labor report"]];
+        if (!known.pain && !known.close && !known.pos && room === "home" && !threadOf("home").length) {
+          return [];
         }
-        if (room === "cards") return [["report", "Labor report"], ["foh", "Front of house"]];
-        if (room === "report") return [["cards", "Labor cards"], ["home", "Last night’s close"]];
-        if (known.close && !known.schedule) return [["schedules", "Drop the schedule"], ["menu", "What’s on the menu?"]];
-        if (known.menu && !known.close) return [["home", "Drop last night’s close"], ["schedules", "Schedules"]];
-        if (room === "menu") return [["schedules", "Schedules"], ["home", "Last night’s close"]];
-        return [["menu", "Menu"], ["schedules", "Schedules"]];
+        const out = [];
+        if (!known.pos && !known.close) out.push(["ask:pos", "Where does POS email reports?"]);
+        if ((known.close || known.pos) && !known.schedule) out.push(["ask:schedule", "Picture of the schedules"]);
+        if (known.schedule && !known.roles) out.push(["ask:roles", "Labor cards or shift/role?"]);
+        if ((known.close || known.pos) && !known.vendors) out.push(["ask:vendors", "Performance / Sysco?"]);
+        if (known.vendors && !known.invoiceEmail) out.push(["ask:invoiceEmail", "Invoice email — where?"]);
+        if ((known.close || known.pos) && !known.menu) out.push(["ask:menu", "Picture of the menu"]);
+        if (known.menu && !known.invoice) out.push(["ask:invoice", "Drop one invoice"]);
+        if (known.schedule) out.push(["room:cards", "Labor cards"], ["room:report", "Labor report"]);
+        return out.slice(0, 4);
       }
 
       function render() {
         document.querySelectorAll(".nav").forEach((el) => {
           el.classList.toggle("on", el.dataset.room === room);
-          if (el.dataset.room === "cards" || el.dataset.room === "report") {
-            el.classList.toggle("dim", !known.schedule && room !== el.dataset.room);
-          }
         });
+        updateNavPills();
+        renderMissbar();
         const list = threadOf(room);
         const el = document.getElementById("thread");
-        const prompt = document.getElementById("prompt");
-        prompt.placeholder = PLACE[room] || PLACE.home;
         const chips = document.getElementById("follows");
         chips.innerHTML = "";
+        const prompt = document.getElementById("prompt");
+
         if (!list.length && room === "home") {
-          el.innerHTML = `<div class="empty"><h1>What happened last night?</h1><p>One chat. Menu or Schedules — things you already run. Labor comes off the schedule.</p></div>`;
-          followsFor().forEach(([id, label]) => {
-            const b = document.createElement("button");
-            b.type = "button";
-            b.dataset.room = id;
-            b.textContent = label;
-            chips.appendChild(b);
-          });
+          prompt.placeholder = "Labor? Cash? Fragmented data? Or drop the POS email / close…";
+          el.innerHTML = `<div class="empty">
+            <h1>What problem are you trying to solve?</h1>
+            <p>Labor? Cash flow? Or you’re just tired of fragmented data sitting here? No worries — we got you.<br/>We don’t integrate day one. Forward the POS email, take a picture, or drop a Drive file.</p>
+            <div class="pain">
+              <button type="button" data-pain="labor"><b>Labor</b><span>Too many on / drift</span></button>
+              <button type="button" data-pain="cash"><b>Cash flow</b><span>DoorDash / deposit fog</span></button>
+              <button type="button" data-pain="fragmented"><b>Fragmented data</b><span>Reports everywhere</span></button>
+            </div>
+          </div>`;
           return;
         }
+
+        if (room === "schedules") prompt.placeholder = "Photo or paste the week you already posted…";
+        else if (room === "menu") prompt.placeholder = "Picture of the menu — prices + what’s on the plate…";
+        else if (room === "vendors") prompt.placeholder = "Performance, Sysco, locals, how many times a week…";
+        else if (room === "invoices") prompt.placeholder = "Photo or forward one invoice…";
+        else prompt.placeholder = "Forward POS email, drop the close, or answer the Missing chip…";
+
         el.innerHTML = list
           .map(
             (m) =>
               `<div class="msg ${m.who}"><div class="who">${m.who === "me" ? "You" : "Action Shift"}</div><div class="body">${m.html}${m.extra || ""}</div></div>`
           )
           .join("");
-        followsFor().forEach(([id, label]) => {
+        followsFor().forEach(([key, label]) => {
           const b = document.createElement("button");
           b.type = "button";
-          b.dataset.room = id;
+          if (key.startsWith("ask:")) {
+            b.dataset.ask = key.slice(4);
+          } else if (key.startsWith("room:")) {
+            b.dataset.room = key.slice(5);
+          }
           b.textContent = label;
           chips.appendChild(b);
         });
@@ -226,77 +300,248 @@
       function openRoom(id) {
         room = id;
         const t = threadOf(id);
-        if (!t.length && STARTERS[id]) {
-          add(id, "as", STARTERS[id], extraFor(id));
+        if (!t.length) {
+          if (id === "menu") {
+            add(id, "as", known.menu
+              ? "Menu’s in. When the invoice lands we show plate drift and the cheaper house — you shouldn’t sit there doing SKUs by hand."
+              : "Can we get a picture of your menu? We’ll show where plate costs are drifting and point the cheaper house when the invoice’s in. Recipes suck in today’s world. The one thing we’re good at is figuring out the chaos for you.");
+          } else if (id === "schedules") {
+            add(id, "as", known.schedule
+              ? "Schedule’s in. Labor cards and the report spawn from that grid." + spawnAgents()
+              : "Can you take a picture of the schedules? That way we know how many people are on, and we’ll see if labor is drifting — right now in restaurants, labor’s one of the biggest things.", known.schedule ? spawnAgents() : "");
+          } else if (id === "cards") {
+            add(id, "as", known.schedule
+              ? "You gave us a schedule — labor cards by seat. Posted in / posted out. Late drift Missing until punches."
+              : "Drop the schedule photo first. Labor cards spawn from that week.", known.schedule ? positionCards() : "");
+          } else if (id === "report") {
+            add(id, "as", known.schedule
+              ? "Labor report: sample headcount 3 floor / 2 line / 1 dish / 1 run. That’s how this shop runs — not a textbook. Late stays Missing — no punches."
+              : "Need the schedule photo before headcount means anything.");
+          } else if (id === "vendors") {
+            add(id, "as", "Do you use Performance, Sysco? Cool — how many times a week do those main trucks hit you? Any local vendors too?");
+          } else if (id === "invoices") {
+            add(id, "as", "Drop one invoice (photo is fine). So you don’t keep photographing forever — do they email the invoice or order automatically? If so, where does that land?");
+          }
         }
         render();
         document.getElementById("prompt").focus();
       }
 
+      function askChip(ask) {
+        room = "home";
+        const lines = {
+          pos: "We don’t need to integrate yet. Where does your POS email the nightly reports — sales, labor, voids? Forward that email, take a picture of it, or drop the download / Drive file. We’ll do the hard work.",
+          schedule: "Can you take a picture of the schedules? That way we know how many people are on, and we’ll see if labor is drifting — labor’s one of the biggest things right now.",
+          roles: "You gave us a schedule — do you have labor cards, or is it shift / role specific? How *this* shop runs the seats.",
+          vendors: "Do you use Performance, Sysco? Cool — how many times a week do those main trucks hit you? Any local vendors too?",
+          invoiceEmail: "So you don’t have to keep taking pictures — do they email you the invoice or the order automatically? If so, where does that land? (Drive connect later — still no portal passwords.)",
+          menu: "Can we get a picture of your menu? We’ll show where plate costs are drifting and point the cheaper house when the invoice’s in — you shouldn’t sit there doing SKUs by hand. Recipes suck. We’re good at the chaos.",
+          invoice: "Drop one invoice — photo or forward. We’ll pull SKU + pack + price. Invoice ≠ COGS.",
+        };
+        add("home", "as", lines[ask] || lines.pos);
+        render();
+      }
+
       function look(text) {
         const v = text.toLowerCase();
-        if (/invoice|sysco|us foods/.test(v)) return "invoices";
-        if (/order guide|par/.test(v)) return "guides";
-        if (/punch|clock|timecard|stayed late/.test(v)) return known.schedule ? "report" : "schedules";
-        if (/schedule|monday|am–pm|am-pm|posted/.test(v)) return "schedules";
-        if (/labor card|front of house|dishwasher|back of house/.test(v)) return "cards";
-        if (/labor report|headcount/.test(v)) return "report";
-        if (/menu|burger|price|\$/.test(v) && room === "menu") return "menu";
-        if (/void|net sales|end of day|end-of-day|close|z report/.test(v)) return "close";
-        if (room !== "home") return room;
-        return "close";
+        if (/labor|too many on|overtime|ot\b/.test(v) && !known.close && !known.pos) return "pain:labor";
+        if (/cash|doordash|door dash|payout|deposit|fees/.test(v) && !known.close && !known.pos) return "pain:cash";
+        if (/fragment|dashboard|spreadsheet|everywhere|guessing/.test(v) && !known.close && !known.pos) return "pain:fragmented";
+        if (/performance|sysco|us foods|pf[gs]|broadliner|truck|vendor|local vendor/.test(v)) return "vendors";
+        if (/invoice email|email.*invoice|gmail|outlook|drive folder|inbox/.test(v)) return "invoiceEmail";
+        if (/invoice|sysco pdf|us foods\.pdf/.test(v)) return "invoice";
+        if (/menu|burger|plate|\$\d/.test(v) && (room === "menu" || /menu|picture of (the )?menu/.test(v))) return "menu";
+        if (/labor card|shift.?role|role specific|foh|boh|dish|stations/.test(v)) return "roles";
+        if (/schedule|picture of the schedule|photo.*schedule|mon–sun|monday|posted in/.test(v)) return "schedule";
+        if (/pos email|forward|gmail\.com|drive\.google|dropped:.*\.(csv|pdf|png|jpe?g)|nightly report|sales report|email the/.test(v)) return "pos";
+        if (/void|net sales|end of day|end-of-day|close|z report|toast.*sales/.test(v)) return "close";
+        if (/punch|clock|timecard/.test(v)) return "punches";
+        if (room === "menu") return "menu";
+        if (room === "schedules") return "schedule";
+        if (room === "vendors") return "vendors";
+        if (room === "invoices") return "invoice";
+        if (room === "cards") return "roles";
+        return known.close || known.pos ? "follow" : "pos";
+      }
+
+      function applyPain(pain) {
+        known.pain = pain;
+        room = "home";
+        const me =
+          pain === "labor"
+            ? "Labor — too many on / drift."
+            : pain === "cash"
+              ? "Cash flow — DoorDash / deposit fog."
+              : "Fragmented data — tired of guessing across reports.";
+        add("home", "me", me);
+        if (pain === "labor") {
+          add(
+            "home",
+            "as",
+            "Labor. Cool — we don’t integrate day one. Where does your POS email the nightly sales / labor reports? Forward it, photo it, or drop the Drive file. After that close lands, I’ll want a picture of the schedules."
+          );
+        } else if (pain === "cash") {
+          add(
+            "home",
+            "as",
+            "Cash flow. Got a redacted DoorDash statement? Paste page 1 — we label the math. Or forward last night’s POS close first so we see sales vs what you’re fighting. No portal password."
+          );
+        } else {
+          add(
+            "home",
+            "as",
+            "Fragmented data. No worries — we got you. We don’t need an API yet. Where does the POS email the reports? One file in, one next action out. Then we suck in the schedule and vendors from Missing chips — not a six-week onboard."
+          );
+        }
+        document.getElementById("hint").textContent = "Forward / photo / Drive. No portal passwords.";
+        render();
       }
 
       function reply(kind, text) {
-        if (kind === "close") {
+        if (kind.startsWith("pain:")) {
+          applyPain(kind.slice(5));
+          return null;
+        }
+        if (kind === "pos" || kind === "close") {
+          known.pos = true;
           known.close = true;
-          return "Close is in. Sample shop: Downtown net $980,000 · voids $12,200 vs a 0.51% house median. Sales, promos, Void Hunter live on that file. SKU drift waits on menu + invoice. Not a food-cost %.";
+          const lead =
+            kind === "pos"
+              ? "Got the POS path — email / photo / Drive. No integration required to start. "
+              : "Close is in. ";
+          return {
+            html:
+              lead +
+              "Sample Downtown: net $9,840 · voids $122 vs house median. One move tonight: pull the void detail before pre-shift — pattern only, nobody gets hung. Verbal yes doesn’t close it. Tonight’s proof is the next close." +
+              (known.schedule
+                ? ""
+                : " Next: can you take a picture of the schedules? Labor’s one of the biggest things right now."),
+            extra: closePack(),
+          };
+        }
+        if (kind === "schedule") {
+          known.schedule = true;
+          room = "schedules";
+          return {
+            html:
+              "Schedule photo’s in. Sample week: 3 floor / 2 line / 1 dish / 1 run — how this shop runs, not a textbook. Posted in / out on the cards. Late drift Missing until punches. We don’t invent hours." +
+              (known.roles ? "" : " You gave us a schedule — do you have labor cards, or is it shift / role specific?"),
+            extra: spawnAgents(),
+          };
+        }
+        if (kind === "roles") {
+          known.roles = true;
+          room = "cards";
+          return {
+            html: "Got it — seats are shift / role specific for this shop. Cards spawned from the schedule. Punch ≠ schedule. No invented overtime.",
+            extra: positionCards(),
+          };
+        }
+        if (kind === "vendors") {
+          known.vendors = true;
+          room = "vendors";
+          return {
+            html:
+              "Performance / Sysco noted — sample cadence twice a week + a local produce truck. " +
+              (known.invoiceEmail
+                ? "Invoice email path already on file."
+                : "So you don’t keep taking pictures — do they email the invoice or order automatically? If so, where does that land?"),
+          };
+        }
+        if (kind === "invoiceEmail") {
+          known.invoiceEmail = true;
+          return {
+            html: "Remembered: invoices land in that inbox / folder (sample). When you’re ready we can watch it so you’re not photographing every ticket — still no portal passwords. Drop one invoice when you want SKU lines.",
+          };
         }
         if (kind === "menu") {
           known.menu = true;
-          return "Got a plate and a price. That’s the menu. What’s in it matters later when beef goes up — switch the house or raise the burger. Order guide and invoice after this. We didn’t invent a save.";
+          room = "menu";
+          return {
+            html: "Menu photo’s in. We’ll show plate drift and the cheaper house when the invoice’s in — you shouldn’t sit there doing SKUs by hand. Recipes suck. We’re good at the chaos. SKU drift still Missing until one invoice.",
+          };
         }
-        if (kind === "schedules") {
-          known.schedule = true;
-          return "Schedule’s in. Sample week: 3 on the floor, 2 on the line, 1 dish, 1 run. That’s how this shop works — headcount by seat, not a textbook. Posted in / posted out is on the cards. Late drift needs the punch. Punches are Missing. We do not auto-write the week. No invented hours. No invented overtime.";
+        if (kind === "invoice") {
+          known.invoice = true;
+          room = "invoices";
+          return {
+            html: "Invoice in. Sample: ground beef moved on the last two buys. Switch house or raise the plate — your call. We don’t invent the save. Invoice ≠ COGS. No count → no food-cost %.",
+          };
         }
-        if (kind === "cards") {
-          return "Labor cards spawned from the schedule. Each seat: posted in, posted out. Stay-late only if a punch says they stayed. Punch ≠ schedule. No labor $.";
+        if (kind === "punches") {
+          known.punches = true;
+          return { html: "Punches would sit next to posted in / out. Late drift only with a punch. We still don’t invent a save." };
         }
-        if (kind === "report") {
-          return known.punches
-            ? "Punches would sit next to posted in / out. We still don’t invent a save."
-            : "Labor report: sample headcount 3 floor / 2 line / 1 dish / 1 run. That’s the workflow. Late / stay-late is Missing — no punches. We will not say someone stayed late to make a story.";
-        }
-        if (POSITIONS[kind]) {
-          return `${POSITIONS[kind].title}: ${POSITIONS[kind].posted} That’s the owner’s post, not the clock. Drift waits on a punch. No invented late.`;
-        }
-        if (kind === "guides") return STARTERS.guides;
-        if (kind === "invoices") return STARTERS.invoices;
-        return "Got it. Menu or the schedule — pick one. Labor comes off the schedule.";
+        return {
+          html: known.close || known.pos
+            ? "Got it. Tap a Missing chip — schedule photo, trucks, menu — or drop the next file."
+            : "We don’t integrate day one. Where does your POS email the nightly reports? Forward, photo, or Drive.",
+        };
       }
 
       function send(raw) {
         const text = (raw || document.getElementById("prompt").value || "").trim();
         if (!text) return;
         const kind = look(text);
-        if (kind !== "close" && kind !== room && STARTERS[kind]) room = kind === "close" ? "home" : kind;
-        const dest = room;
+        if (kind.startsWith("pain:")) {
+          document.getElementById("prompt").value = "";
+          applyPain(kind.slice(5));
+          return;
+        }
+        const dest = ["schedule", "roles", "vendors", "menu", "invoice"].includes(kind)
+          ? kind === "schedule"
+            ? "schedules"
+            : kind === "roles"
+              ? "cards"
+              : kind === "menu"
+                ? "menu"
+                : kind === "invoice"
+                  ? "invoices"
+                  : "vendors"
+          : "home";
+        room = dest;
         add(dest, "me", text.replace(/</g, "&lt;"));
-        add(dest, "as", reply(kind, text), extraFor(kind === "close" ? dest : kind));
+        const r = reply(kind, text);
+        if (r) add(dest, "as", r.html, r.extra || "");
         document.getElementById("prompt").value = "";
-        document.getElementById("hint").textContent = "One more if you want. Or tap the left.";
+        document.getElementById("hint").textContent = missingList().length
+          ? "Missing chips still open — one file at a time."
+          : "Loop closed enough for a night proof. Owner seat stays free.";
+        render();
+      }
+
+      function reset() {
+        Object.keys(threads).forEach((k) => delete threads[k]);
+        threads.home = [];
+        Object.keys(known).forEach((k) => {
+          known[k] = k === "pain" ? null : false;
+        });
+        room = "home";
+        document.getElementById("hint").textContent = "No day-one API. Email / photo / Drive. We do the hard work.";
         render();
       }
 
       document.body.addEventListener("click", (e) => {
-        const t = e.target.closest("[data-room]");
-        if (!t) return;
-        if (t.classList.contains("new")) {
-          threads.home = [];
-          known.close = known.menu = known.schedule = known.punches = false;
+        const pain = e.target.closest("[data-pain]");
+        if (pain) {
+          applyPain(pain.dataset.pain);
+          return;
         }
-        openRoom(t.dataset.room);
+        const ask = e.target.closest("[data-ask]");
+        if (ask) {
+          askChip(ask.dataset.ask);
+          return;
+        }
+        const act = e.target.closest("[data-act]");
+        if (act) {
+          if (act.dataset.act === "reset") reset();
+          if (act.dataset.act === "roles") {
+            send("Shift / role specific — FOH, line, dish, run.");
+          }
+          return;
+        }
+        const t = e.target.closest("[data-room]");
+        if (t) openRoom(t.dataset.room);
       });
       document.getElementById("send").addEventListener("click", () => send());
       document.getElementById("prompt").addEventListener("keydown", (e) => {
@@ -308,7 +553,12 @@
       document.getElementById("file").addEventListener("change", (e) => {
         const f = e.target.files[0];
         if (!f) return;
-        send("Dropped: " + f.name);
+        const name = f.name;
+        if (/schedule|roster|shift/i.test(name)) send("Dropped schedule photo: " + name);
+        else if (/menu/i.test(name)) send("Dropped menu photo: " + name);
+        else if (/invoice|sysco|usfoods|performance/i.test(name)) send("Dropped invoice: " + name);
+        else send("Dropped POS report / email file: " + name);
+        e.target.value = "";
       });
       const box = document.getElementById("box");
       ["dragenter", "dragover"].forEach((ev) =>
@@ -325,7 +575,7 @@
       );
       box.addEventListener("drop", (e) => {
         const name = (e.dataTransfer.files[0] && e.dataTransfer.files[0].name) || "drop.txt";
-        send("Dropped: " + name);
+        send("Dropped POS report / email file: " + name);
       });
       render();
     </script>
