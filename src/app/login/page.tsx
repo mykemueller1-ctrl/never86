@@ -74,6 +74,14 @@ export default function OperatorLoginPage() {
         <p className="compass-body text-[13px] mt-6" style={{ color: '#6e6e73' }}>
           New or returning operator—the same email link handles both.
         </p>
+        <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
+          Looking for Community Tap?{' '}
+          <Link href="/communities" className="underline" style={{ color: '#0066ff' }}>
+            Open the communities door
+          </Link>
+          {' '}
+          for the public-safe lab, station seats, and free owner seat — no private numbers.
+        </p>
       </section>
     </main>
   );
