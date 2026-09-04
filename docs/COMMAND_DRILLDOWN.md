@@ -4,7 +4,7 @@
 **Date:** 2026-09-04  
 **Name lock:** The LLM plug-and-play desk for the **1-to-1 through 1-to-5 unit owner is Action Shift.** Command is the same loop when the group is bigger. Do not sell that owner a “Command Center.”  
 **Quality bar:** same as the 1P–3P / Audit path — honest labels, no vapor, no invented dollars.  
-**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Labor roles, Schedules. `/demo/command.html` redirects here.
+**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules (labor cards + report spawn from the schedule). `/demo/command.html` redirects here.
 
 ---
 
@@ -88,8 +88,8 @@ The live answer page already says this: [A restaurant command center without ano
 | Surface | Job |
 |---|---|
 | **The box** | One composer. Type, paste, or drop. Enter sends. That’s the whole job. |
-| **Left menu** | Things they already know: **Menu, Labor, Schedules.** Labor breaks into **role cards**: Front of house, Back of house, Delivery, Dishwasher. We learn every seat in that shop **before** we talk numbers to the 1–5 owner. |
-| **The suck-in** | After one reply, one or two follow-up pills — same as an LLM suggested prompt. Menu → price + what’s in it. Schedules → they already write these; **later** we auto-fill so they stop. Order guides and invoices stay under **Later**. |
+| **Left menu** | Things they already know: **Menu** and **Schedules**. Labor is not a sibling. A schedule **spawns** labor cards + a labor report. |
+| **The suck-in** | After one reply, one or two follow-up pills. Schedule → labor cards (posted in / out by seat) → labor report (headcount = how this shop runs). Late drift only with a punch. Order guides and invoices stay under **Later**. |
 | **The receipt** | One chat bubble, not a dashboard. Close pack (sales, promos, Void Hunter, SKU drift) lives *inside* that bubble when a close lands. |
 
 Voice: short. Concrete. Not a robot. Not Myke. See `docs/TWO_TRACKS.md`.
@@ -101,12 +101,10 @@ Voice: short. Concrete. Not a robot. Not Myke. See `docs/TWO_TRACKS.md`.
 | Room | What they already know | Honesty |
 |---|---|---|
 | **Menu** | What they charge. What’s in the plate. | Placeholder until they paste a menu. Recipe / order guide later. |
-| **Labor** | Roles, not a labor %. | Role cards first. **No invented labor $.** |
-| **Front of house** | Floor: server, host, bar — their names. | Learn the seat before we talk. |
-| **Back of house** | Line, prep, expo. | Same. |
-| **Delivery** | Drivers. In-house or 3P. | Same. Fees stay Estimated until a statement. |
-| **Dishwasher** | Dish is a role. | Same. |
-| **Schedules** | The week they already posted. | We **do not** auto-write schedules today. Later that’s the time-save. No invented hours. |
+| **Schedules** | The week they already posted. In and out per seat. | We **do not** auto-write schedules today. No invented hours. |
+| **Labor cards** (spawned) | Each row on that schedule: station, posted in, posted out. FOH / BOH / Delivery / Dish live here. | Posted times Verified when on the schedule. **Punch ≠ schedule.** |
+| **Labor report** (spawned) | Headcount by station — tribal knowledge of *this* shop’s workflow. | Count of posted seats. Not a national norm. |
+| **Late / stay-late drift** | Clock vs posted out. | **Missing until punches.** Do not invent overtime or “they stayed late.” |
 | **Order guides / Invoices** | Later. | Invoice unlocks SKU drift. Invoice ≠ COGS. |
 
 ### The close pack (inside the chat, not a dashboard)
@@ -177,7 +175,7 @@ Live probes (2026-09-03, this run):
 - Wired Thanx / Marqii / Looker / EONR (scaffolds in `agents/`, not Command UI).
 - `never86-command-center-v2` and `taco-bamba-command-center` as GitHub repos (see §6).
 
-**Now on this branch (static, sample only):** `public/demo/action-shift.html` — one chat, one prompt. Left menu is the shop (Menu, Labor roles, Schedules). Not wired to ops DB. Not Bamba. `public/demo/command.html` redirects here.
+**Now on this branch (static, sample only):** `public/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Labor cards / report spawn from the schedule. Not wired to ops DB. Not Bamba. `public/demo/command.html` redirects here.
 
 ---
 
@@ -186,7 +184,7 @@ Live probes (2026-09-03, this run):
 Tell it like an LLM close, not like a BI tool.
 
 0. **Plug.** One box. Paste or drop. No account for the sample desk.
-1. **Left menu is the shop.** Menu, Labor (FOH / BOH / Delivery / Dish), Schedules. Order guides and invoices stay Later. Follow-up pills suck them to the next room.
+1. **Left menu is the shop.** Menu. Schedules. Labor cards and labor report **spawn from the schedule**. Order guides and invoices stay Later.
 2. **Network miss.** After a close lands: the group number that is off. One miss. Ranked. Source-tagged.
 3. **Shop.** Which unit is carrying it. Compare to the network’s own median — not a national benchmark you don’t have.
 4. **Statement / close line.** The actual line. If it isn’t on the close or a statement, the chip stays Missing and the rail asks for it.
@@ -315,7 +313,7 @@ STACK-MAP still lists `never86-command-center-v2` as private. If those trees onl
 
 **Shipped on this branch (static HTML):** `public/demo/action-shift.html` — ChatGPT-simple owner chat. `public/demo/command.html` redirects so a 1–5 owner never lands on a Command logo.
 
-Sample Downtown voids come from the fictional pizza numbers already on `/demo/3p-fee-finder` — and only after they send a close. We do not auto-write schedules. We do not invent labor $. Role cards are how we learn the shop.
+Sample Downtown voids come from the fictional pizza numbers already on `/demo/3p-fee-finder` — and only after they send a close. Sample schedule headcount (3 floor / 2 line / 1 dish / 1 run) is a shape, not their crew. We do not auto-write schedules. We do not invent labor $ or stay-late hours. Punch ≠ schedule.
 
 **Next slice on `main`:**
 
@@ -326,11 +324,11 @@ Sample Downtown voids come from the fictional pizza numbers already on `/demo/3p
 
 The suck-in order (safe):
 
-1. One prompt — close, menu, labor role, or schedule.
-2. One reply. One or two follow-up pills.
-3. Menu (price + plate) before order guide / invoice.
-4. Roles before labor $. Schedule paste before any auto-write (auto-write is not built).
-5. Missing count → food cost stays Missing. SKU drift ≠ food cost.
+1. One prompt — close, menu, or schedule.
+2. Schedule lands → spawn labor cards + labor report.
+3. Posted in / out from the schedule. Late drift Missing until punches.
+4. Headcount by seat = how this shop runs. Not a textbook.
+5. Menu (price + plate) before order guide / invoice. Missing count → no food cost.
 
 ---
 
@@ -341,14 +339,14 @@ Sections only. No dollars invented in the room.
 1. **Promise.** Find the leak. Assign the fix. Keep the receipt. **Action Shift** is the 1–5 owner desk. Command is later.
 2. **Who it’s for.** Hustler 1–5 unit owner. Knows they should close the loop. Won’t. We automate the read and gamify the next file. Not Myke. Not Rik. Not Bamba.
 3. **What it is not.** Another dashboard. Not R365. Not Voosh portal login. Not a fee calculator.
-4. **The rock.** One chat, one prompt — ChatGPT / Grok. Left menu: Menu, Labor, Schedules.
-5. **The suck-in.** Follow-up pills. Role cards (FOH / BOH / Delivery / Dish) before numbers. Demo: `/demo/action-shift.html`.
+4. **The rock.** One chat, one prompt. Left: Menu, Schedules.
+5. **The suck-in.** Schedule → labor cards + labor report. Posted in / out. Late only with a punch. Demo: `/demo/action-shift.html`.
 6. **1P–3P as one miss type.** Mix from POS is Verified. Take-rate dollars are Estimated until the statement or written rate card is in. `/audit` remains the Google door for one statement.
 7. **Honesty pills.** Verified / Estimated / Unverified / Missing. Incomplete week stays Open.
 8. **What we will not say.** Guaranteed recovery. Named thieves. Bamba or CTAP private figures. “We saved you $X” without a proof object.
 9. **Proof of method.** `/audit` + `/demo/action-shift.html`. Gated Command / Bamba stay off this pitch.
 10. **Seat math.** Owner seat free. FOH manager and BOH manager paid later. Extra shops paid.
-11. **Ask.** One box. Or tap Labor and name a role. That’s the hook.
+11. **Ask.** One box. Or drop the schedule. That’s the hook.
 
 ### Math that is safe to say in the room
 
@@ -363,7 +361,10 @@ Sections only. No dollars invented in the room.
 | Promo / discount / comp lines on the close | Verified when on the POS close | Pattern. Manager-approve the fat ones. Do not invent a promo save. |
 | SKU drift (vendor up → switch house or raise the plate from recipe + cost) | Missing until invoice; then Estimated | Invoice vs last buy. **Not food cost %.** Invoice ≠ COGS. Not enterprise variance. |
 | Food cost / prime cost | Missing / Unverified | No count → no food cost. Invoice ≠ COGS. SKU drift ≠ food cost. |
-| Labor $ / role cost | Missing until close + schedule + role | Role cards first. No invented labor $. |
+| Labor $ / role cost | Missing until close + schedule + punches | No invented labor $. |
+| Posted in / posted out | Verified when on the schedule they dropped | Owner’s post, not the clock. |
+| Late / stay-late drift | Missing until punches | Punch ≠ schedule. Do not invent overtime. |
+| Headcount by station | Verified count of posted seats | How *this* shop runs. Not a national norm. |
 | Auto-written schedule | Not built | They paste the week they already posted. Later we fill it. No invented hours. |
 | Payout vs POS | Unverified until both sides | POS ≠ payout. Need finalized payout ID + bank. |
 | Action Shift cash/labor/payout lines | Unverified observations | Operator-supplied targets only. Proof object required. |
@@ -372,7 +373,7 @@ Sections only. No dollars invented in the room.
 
 ## 9. Suggested talk track (no numbers)
 
-“One chat. Like ChatGPT. Left side is your shop: menu, labor, schedules. We learn dishwasher and the floor before we talk numbers. Later we write the schedule so you don’t. Later you drop the order guide and the invoice. Tonight just talk. We don’t invent food cost. We don’t mail your guys. Command is a later building.”
+“One chat. Like ChatGPT. Left side is menu and schedules. Labor lives on the schedule — who you posted, in and out. We spawn the labor cards and the report from that grid. How many on dish vs the floor is how your shop runs. Late only if the punch says so. We don’t invent food cost. We don’t mail your guys. Command is a later building.”
 
 ---
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Action Shift — owner seat · Never 86'd</title>
-    <meta name="description" content="One chat. One prompt. Menu, labor, schedules. Sample shop only." />
+    <meta name="description" content="One chat. One prompt. Menu and Schedules. Labor comes off the schedule. Sample shop only." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -70,14 +70,11 @@
         <button class="new" type="button" data-room="home">New chat</button>
         <p class="sec">The shop</p>
         <button class="nav" type="button" data-room="menu">Menu<small>What you charge. What’s in it.</small></button>
-        <button class="nav" type="button" data-room="labor">Labor<small>Learn the roles first.</small></button>
+        <button class="nav" type="button" data-room="schedules">Schedules<small>Labor lives here. Posted in / posted out.</small></button>
         <div class="roles">
-          <button class="nav" type="button" data-room="foh">Front of house</button>
-          <button class="nav" type="button" data-room="boh">Back of house</button>
-          <button class="nav" type="button" data-room="delivery">Delivery</button>
-          <button class="nav" type="button" data-room="dishwasher">Dishwasher</button>
+          <button class="nav dim" type="button" data-room="cards">Labor cards</button>
+          <button class="nav dim" type="button" data-room="report">Labor report</button>
         </div>
-        <button class="nav" type="button" data-room="schedules">Schedules<small>You already write these. Later we fill them.</small></button>
         <p class="sec">Later</p>
         <button class="nav dim" type="button" data-room="guides">Order guides</button>
         <button class="nav dim" type="button" data-room="invoices">Invoices</button>
@@ -87,7 +84,7 @@
         <div class="dock">
           <div class="follows" id="follows"></div>
           <div class="box" id="box">
-            <textarea id="prompt" rows="2" placeholder="Drop last night’s close, or pick Menu / Labor / Schedules."></textarea>
+            <textarea id="prompt" rows="2" placeholder="Drop last night’s close, or pick Menu / Schedules."></textarea>
             <div class="bar">
               <span id="hint">One box. Like ChatGPT. We read it.</span>
               <div>
@@ -96,47 +93,49 @@
               </div>
             </div>
           </div>
-          <p class="fine">Sample shop — not yours, not Bamba. We don’t invent food cost. We don’t write your schedule yet. Invoice ≠ COGS.</p>
+          <p class="fine">Sample shop — not yours, not Bamba. We don’t invent food cost, labor $, or late hours. Invoice ≠ COGS. Punch ≠ schedule.</p>
         </div>
       </main>
     </div>
     <script>
-      const ROLES = {
-        foh: { title: "Front of house", line: "Server, host, bartender — whatever you call the floor." },
-        boh: { title: "Back of house", line: "Line, prep, expo. Kitchen names, your names." },
-        delivery: { title: "Delivery", line: "Drivers. In-house or 3P. We learn it before we talk fees." },
-        dishwasher: { title: "Dishwasher", line: "Dish is a role. Not a leftover. Hours and who covers it." },
+      const POSITIONS = {
+        foh: { title: "Front of house", posted: "Posted in / posted out · sample seat. Punch Missing." },
+        boh: { title: "Back of house", posted: "Posted in / posted out · sample seat. Punch Missing." },
+        delivery: { title: "Delivery", posted: "Posted in / posted out · sample seat. Punch Missing." },
+        dishwasher: { title: "Dishwasher", posted: "Posted in / posted out · sample seat. Punch Missing." },
       };
 
       const STARTERS = {
         home: null,
         menu: "What’s on the menu and what do you charge? Plate + price. Recipe and order guide come later — that’s how SKU drift stays honest when beef goes up.",
-        labor: "Labor first means roles, not a labor %. We learn every seat in this shop before we talk numbers to a 1–5 owner.",
-        foh: ROLES.foh.line + " What do you call this role here?",
-        boh: ROLES.boh.line + " What do you call this role here?",
-        delivery: ROLES.delivery.line + " Who runs the bag out the door?",
-        dishwasher: ROLES.dishwasher.line + " Who’s on dish this week?",
-        schedules: "Paste the week you already posted. Later we fill the grid so you don’t write it. Not tonight. No invented hours.",
+        schedules: "Schedules are the thing you already write. Labor lives on that grid — who you posted, when they were supposed to walk in, when they were supposed to walk out. Drop the week. Then we spawn labor cards and a labor report. We do not write the week yet. No invented hours.",
+        cards: "Labor cards spawn from the schedule. Drop the week first if it’s empty. Each card is a seat: posted in, posted out. Late drift only if the punch exists. Punch ≠ schedule. We don’t invent stay-late hours.",
+        report: "Labor report spawns from the same schedule. How many people in each seat is how this shop actually runs — tribal knowledge, not a textbook. Late / stay-late stays Missing until punches land.",
+        foh: "Front of house on the schedule. Posted in / posted out. Punch Missing — we will not say they stayed late.",
+        boh: "Back of house on the schedule. Posted in / posted out. Punch Missing.",
+        delivery: "Delivery on the schedule. Posted in / posted out. Punch Missing.",
+        dishwasher: "Dish on the schedule. Posted in / posted out. Punch Missing.",
         guides: "Order guides come after the menu. What’s on the plate, then what you buy. Placeholder for now.",
         invoices: "Invoice later unlocks SKU drift: beef went up, switch the house or raise the plate. Invoice ≠ COGS. Don’t drop one until the menu is in.",
       };
 
       const PLACE = {
-        home: "Drop last night’s close, or pick Menu / Labor / Schedules.",
+        home: "Drop last night’s close, or pick Menu / Schedules.",
         menu: "Burger $14. Cheese, bun, smash patty…",
-        labor: "Tell us the roles. Or tap Front / Back / Delivery / Dish.",
-        foh: "We call the floor…",
-        boh: "We call the line…",
-        delivery: "Drivers are…",
-        dishwasher: "Dish is…",
-        schedules: "Mon–Sun, who you already scheduled…",
+        schedules: "Mon–Sun, who you already posted, in and out…",
+        cards: "A station from the schedule…",
+        report: "How many on the floor, the line, dish…",
+        foh: "Floor posted…",
+        boh: "Line posted…",
+        delivery: "Drivers posted…",
+        dishwasher: "Dish posted…",
         guides: "Order guide later. Menu first.",
         invoices: "Invoice later. Menu first.",
       };
 
       let room = "home";
       const threads = { home: [] };
-      const known = { close: false, menu: false, labor: false, schedule: false };
+      const known = { close: false, menu: false, schedule: false, punches: false };
 
       function threadOf(id) {
         if (!threads[id]) threads[id] = [];
@@ -147,29 +146,46 @@
         threadOf(id).push({ who, html, extra: extra || "" });
       }
 
-      function laborCards() {
+      function spawnAgents() {
         return `<div class="cards">
-          <button class="card" type="button" data-room="foh"><b>Front of house</b><span>${ROLES.foh.line}</span></button>
-          <button class="card" type="button" data-room="boh"><b>Back of house</b><span>${ROLES.boh.line}</span></button>
-          <button class="card" type="button" data-room="delivery"><b>Delivery</b><span>${ROLES.delivery.line}</span></button>
-          <button class="card" type="button" data-room="dishwasher"><b>Dishwasher</b><span>${ROLES.dishwasher.line}</span></button>
+          <button class="card" type="button" data-room="cards"><b>Labor cards</b><span>Each posted shift: station, in, out.</span></button>
+          <button class="card" type="button" data-room="report"><b>Labor report</b><span>Headcount by seat. That’s how this shop runs.</span></button>
         </div>`;
       }
 
+      function positionCards() {
+        return `<div class="cards">
+          <button class="card" type="button" data-room="foh"><b>Front of house</b><span>${POSITIONS.foh.posted}</span></button>
+          <button class="card" type="button" data-room="boh"><b>Back of house</b><span>${POSITIONS.boh.posted}</span></button>
+          <button class="card" type="button" data-room="delivery"><b>Delivery</b><span>${POSITIONS.delivery.posted}</span></button>
+          <button class="card" type="button" data-room="dishwasher"><b>Dishwasher</b><span>${POSITIONS.dishwasher.posted}</span></button>
+        </div>`;
+      }
+
+      function extraFor(id) {
+        if (id === "schedules") return spawnAgents();
+        if (id === "cards") return known.schedule ? positionCards() : "";
+        return "";
+      }
+
       function followsFor() {
-        if (room === "labor" && !known.labor) return [["foh", "Front of house"], ["boh", "Back of house"]];
-        if (known.close && !known.labor) return [["labor", "Who worked last night?"], ["menu", "What’s on the menu?"]];
-        if (known.labor && !known.schedule) return [["schedules", "Drop this week’s schedule"], ["dishwasher", "Who’s on dish?"]];
-        if (known.menu && !known.close) return [["home", "Drop last night’s close"], ["guides", "Order guide later"]];
-        if (known.schedule && !known.close) return [["home", "Drop last night’s close"]];
-        if (room === "menu") return [["labor", "Labor next"], ["schedules", "Schedules"]];
-        if (room === "schedules") return [["labor", "Roles first"], ["home", "Last night’s close"]];
-        return [["menu", "Menu"], ["labor", "Labor"], ["schedules", "Schedules"]];
+        if (room === "schedules" || known.schedule) {
+          if (room === "schedules") return [["cards", "Labor cards"], ["report", "Labor report"]];
+        }
+        if (room === "cards") return [["report", "Labor report"], ["foh", "Front of house"]];
+        if (room === "report") return [["cards", "Labor cards"], ["home", "Last night’s close"]];
+        if (known.close && !known.schedule) return [["schedules", "Drop the schedule"], ["menu", "What’s on the menu?"]];
+        if (known.menu && !known.close) return [["home", "Drop last night’s close"], ["schedules", "Schedules"]];
+        if (room === "menu") return [["schedules", "Schedules"], ["home", "Last night’s close"]];
+        return [["menu", "Menu"], ["schedules", "Schedules"]];
       }
 
       function render() {
         document.querySelectorAll(".nav").forEach((el) => {
           el.classList.toggle("on", el.dataset.room === room);
+          if (el.dataset.room === "cards" || el.dataset.room === "report") {
+            el.classList.toggle("dim", !known.schedule && room !== el.dataset.room);
+          }
         });
         const list = threadOf(room);
         const el = document.getElementById("thread");
@@ -178,7 +194,7 @@
         const chips = document.getElementById("follows");
         chips.innerHTML = "";
         if (!list.length && room === "home") {
-          el.innerHTML = `<div class="empty"><h1>What happened last night?</h1><p>One chat. Pick Menu, Labor, or Schedules — things you already run. We learn the shop before we talk.</p></div>`;
+          el.innerHTML = `<div class="empty"><h1>What happened last night?</h1><p>One chat. Menu or Schedules — things you already run. Labor comes off the schedule.</p></div>`;
           followsFor().forEach(([id, label]) => {
             const b = document.createElement("button");
             b.type = "button";
@@ -211,8 +227,7 @@
         room = id;
         const t = threadOf(id);
         if (!t.length && STARTERS[id]) {
-          const extra = id === "labor" ? laborCards() : "";
-          add(id, "as", STARTERS[id], extra);
+          add(id, "as", STARTERS[id], extraFor(id));
         }
         render();
         document.getElementById("prompt").focus();
@@ -222,7 +237,10 @@
         const v = text.toLowerCase();
         if (/invoice|sysco|us foods/.test(v)) return "invoices";
         if (/order guide|par/.test(v)) return "guides";
-        if (/schedule|monday|am–pm|am-pm/.test(v)) return "schedules";
+        if (/punch|clock|timecard|stayed late/.test(v)) return known.schedule ? "report" : "schedules";
+        if (/schedule|monday|am–pm|am-pm|posted/.test(v)) return "schedules";
+        if (/labor card|front of house|dishwasher|back of house/.test(v)) return "cards";
+        if (/labor report|headcount/.test(v)) return "report";
         if (/menu|burger|price|\$/.test(v) && room === "menu") return "menu";
         if (/void|net sales|end of day|end-of-day|close|z report/.test(v)) return "close";
         if (room !== "home") return room;
@@ -240,18 +258,22 @@
         }
         if (kind === "schedules") {
           known.schedule = true;
-          return "Schedule’s in. We can read who you already posted. We do not auto-write the week yet. That’s the time-save later. No invented hours.";
+          return "Schedule’s in. Sample week: 3 on the floor, 2 on the line, 1 dish, 1 run. That’s how this shop works — headcount by seat, not a textbook. Posted in / posted out is on the cards. Late drift needs the punch. Punches are Missing. We do not auto-write the week. No invented hours. No invented overtime.";
+        }
+        if (kind === "cards") {
+          return "Labor cards spawned from the schedule. Each seat: posted in, posted out. Stay-late only if a punch says they stayed. Punch ≠ schedule. No labor $.";
+        }
+        if (kind === "report") {
+          return known.punches
+            ? "Punches would sit next to posted in / out. We still don’t invent a save."
+            : "Labor report: sample headcount 3 floor / 2 line / 1 dish / 1 run. That’s the workflow. Late / stay-late is Missing — no punches. We will not say someone stayed late to make a story.";
+        }
+        if (POSITIONS[kind]) {
+          return `${POSITIONS[kind].title}: ${POSITIONS[kind].posted} That’s the owner’s post, not the clock. Drift waits on a punch. No invented late.`;
         }
         if (kind === "guides") return STARTERS.guides;
         if (kind === "invoices") return STARTERS.invoices;
-        if (ROLES[kind] || kind === "labor") {
-          known.labor = true;
-          const role = ROLES[kind];
-          return role
-            ? `Learning ${role.title}. ${role.line} No labor $ until a close and a schedule. We learn the seat first.`
-            : "Roles first. Tap Front, Back, Delivery, or Dish. We learn every seat before we talk a 1–5 owner into numbers.";
-        }
-        return "Got it. Menu, labor, or the schedule — pick one. We stay in one chat.";
+        return "Got it. Menu or the schedule — pick one. Labor comes off the schedule.";
       }
 
       function send(raw) {
@@ -261,7 +283,7 @@
         if (kind !== "close" && kind !== room && STARTERS[kind]) room = kind === "close" ? "home" : kind;
         const dest = room;
         add(dest, "me", text.replace(/</g, "&lt;"));
-        add(dest, "as", reply(kind, text), kind === "labor" ? laborCards() : "");
+        add(dest, "as", reply(kind, text), extraFor(kind === "close" ? dest : kind));
         document.getElementById("prompt").value = "";
         document.getElementById("hint").textContent = "One more if you want. Or tap the left.";
         render();
