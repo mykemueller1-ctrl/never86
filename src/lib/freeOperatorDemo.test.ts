@@ -24,13 +24,14 @@ const CTAP_STAFF = /karlee|sturtz|ashley|holding|kenzy/i;
 const LIVE_Z = /\$1,000\.00|\$1,070\.00|\$12\.00|Late Deliverys/;
 
 describe('free operator demo pack', () => {
-  it('keeps the phone mouth and the four chips', () => {
+  it('keeps the phone mouth and the five chips', () => {
     expect([...FREE_OPERATOR_MOUTH]).toEqual(['talk', 'type', 'photo', 'file']);
     expect(FREE_OPERATOR_CHIPS.map((chip) => chip.label)).toEqual([
       'Front of house',
       'Back of house',
       'Schedule',
       'Vendor',
+      'Merchant',
     ]);
   });
 
@@ -68,12 +69,14 @@ describe('free operator demo pack', () => {
     expect(resolveFreeOperatorAsk('invoice and food cost').ok).toBe(true);
     expect(resolveFreeOperatorAsk('schedule hours').ok).toBe(true);
     expect(resolveFreeOperatorAsk('vendor cadence').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('merchant account').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('card processing').ok).toBe(true);
 
     const empty = resolveFreeOperatorAsk('   ');
     expect(empty.ok).toBe(false);
     if (!empty.ok) {
       expect(empty.inventedClose).toBe(false);
-      expect(empty.needs).toMatch(/Vendor/);
+      expect(empty.needs).toMatch(/Merchant/);
     }
 
     const other = resolveFreeOperatorAsk('what is the weather');
@@ -85,6 +88,13 @@ describe('free operator demo pack', () => {
     if (typedBeatsChip.ok) {
       expect(typedBeatsChip.chipId).toBe('vendor');
       expect(typedBeatsChip.slug).toBe('vendor-silence');
+    }
+
+    const merchantBeatsFoh = resolveFreeOperatorAsk('merchant account', 'foh');
+    expect(merchantBeatsFoh.ok).toBe(true);
+    if (merchantBeatsFoh.ok) {
+      expect(merchantBeatsFoh.chipId).toBe('merchant');
+      expect(merchantBeatsFoh.slug).toBe('merchant-account');
     }
   });
 

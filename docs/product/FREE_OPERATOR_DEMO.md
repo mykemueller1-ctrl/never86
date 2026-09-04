@@ -9,7 +9,7 @@ Sample answers: `/operator/answers/{slug}` — labeled **FICTIONAL / sample-not-
 
 ## What this is
 
-Phone-first ask for the small operator. Talk / type / photo / file. Chips: Front of house, Back of house, Schedule, Vendor. A chip or typed ask shows the sample card **on this phone**; “Open this card” is optional. WHAT I KNOW cards stay **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close. Sample answer URLs are noindex.
+Phone-first ask for the small operator. Talk / type / photo / file. Chips: Front of house, Back of house, Schedule, Vendor, Merchant. A chip or typed ask shows the sample card **on this phone**; “Open this card” is optional. WHAT I KNOW cards stay **NEED** / **READY**. A local photo or file stays on this phone and never becomes a close. Sample answer URLs are noindex. This phone does not take a merchant account.
 
 ## What this is not
 
@@ -21,6 +21,10 @@ Phone-first ask for the small operator. Talk / type / photo / file. Chips: Front
 ## Vendor silence
 
 First 14 calendar days are advisory. Missing cadence is **Missing Evidence**, not $0 and not a missed truck.
+
+## Merchant
+
+The buyer is a merchant. A free terminal is a processing contract. Missing agreement or rate confirmation is **Missing Evidence**. This preview does not process cards and does not invent a rate.
 
 ## Evidence states for this job
 
