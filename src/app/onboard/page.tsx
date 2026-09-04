@@ -51,9 +51,9 @@ export default function OnboardPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· free operator</span>
+                Never 86&apos;d <span className="italic text-ink-600">· 1–3 unit owner seat</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">One email · straight into the product</p>
+              <p className="compass-eyebrow-dim mt-2">Seat 1 free · seats 2–3 paid later · not Command Center</p>
             </span>
           </Link>
           <Link href="/login" className="compass-pill"><span className="avatar">↗</span><span>Sign in</span></Link>
@@ -64,12 +64,12 @@ export default function OnboardPage() {
         <div className="mx-auto max-w-5xl">
           <div className="grid items-start gap-10 lg:grid-cols-[1.15fr_.85fr]">
             <div>
-              <p className="compass-eyebrow mb-5">— Payroll · Prices · Process</p>
+              <p className="compass-eyebrow mb-5">— 1–3 unit ICP · Payroll · Prices · Process</p>
               <h1 className="compass-display text-5xl md:text-7xl mb-5">
-                Find what&apos;s <em>leaking.</em>
+                Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Nobody has time to read every invoice line. Never 86&apos;d does—then checks labor and the daily process chaos around it. You get the number, the receipt, and the next move.
+                Built for independent operators running one to three locations. Seat 1 belongs to the owner and is free for one store. Add seat 2 or seat 3 when a GM or station lead needs the same proof. Multi-unit Command Center stays a separate build.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -83,9 +83,9 @@ export default function OnboardPage() {
             </div>
 
             <div className="compass-card lg:sticky lg:top-8">
-              <p className="compass-card-label" style={{ color: '#0066ff' }}>Try the real operator</p>
+              <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
               <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Click. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. No password. No setup interview before you see the product.</p>
+              <p className="compass-body mt-3 text-sm">No card. No password. Seat 1 is the owner seat for one store. Seats 2 and 3 stay locked until you expand.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <input
                   type="email"

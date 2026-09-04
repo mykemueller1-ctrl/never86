@@ -71,7 +71,7 @@ export const BASE_WHAT_I_KNOW: readonly WhatIKnowCard[] = [
 ];
 
 export const PUBLIC_PREVIEW_COPY =
-  'Files stay on this phone. Do not add private restaurant data yet.';
+  "Preview only—don't add private restaurant data here yet. Production V2 keeps original files private.";
 
 export const OWNER_SEAT_EOD = {
   surface: 'owner-seat' as const,
@@ -79,6 +79,86 @@ export const OWNER_SEAT_EOD = {
   copy:
     'Owner seat — not this public preview — forwards PDQ Z + Hourly + Void to close+{seat}@inbound.never86.ai. This phone does not issue a seat address, does not take a merchant account, and does not read your inbox.',
 };
+
+export type PrimeCostEvidence = {
+  id: 'schedule' | 'hourly' | 'timeclock';
+  short: string;
+  title: string;
+  icon: string;
+  state: KnowledgeState;
+  reason: string;
+};
+
+export const OWNER_PRIME_COST_EVIDENCE: readonly PrimeCostEvidence[] = [
+  {
+    id: 'schedule',
+    short: 'Schedule',
+    title: 'Weekly schedule',
+    icon: '☰',
+    state: 'READY',
+    reason: 'I know who was planned.',
+  },
+  {
+    id: 'hourly',
+    short: 'Hourly sales',
+    title: 'Hourly sales',
+    icon: '$',
+    state: 'NEED',
+    reason: 'From your POS.',
+  },
+  {
+    id: 'timeclock',
+    short: 'Time clock',
+    title: 'Time clock',
+    icon: '◷',
+    state: 'NEED',
+    reason: 'Actual punches.',
+  },
+];
+
+export const OWNER_DESK_TRAY = [
+  { id: 'action', label: 'Action Shift', icon: '⚡' },
+  { id: 'food', label: 'Food', icon: '🍽' },
+  { id: 'labor', label: 'Labor', icon: '◷' },
+  { id: 'pop', label: 'Pop', icon: '🥤' },
+  { id: 'beer', label: 'Beer', icon: '🍺' },
+  { id: 'liquor', label: 'Liquor', icon: '🥃' },
+] as const;
+
+export type OwnerDeskTrayId = (typeof OWNER_DESK_TRAY)[number]['id'];
+
+export function resolveOwnerDeskAsk(
+  question: string,
+  tray: OwnerDeskTrayId = 'action',
+): ResolveAskResult {
+  const query = normalizeAsk(question);
+  if (!query) {
+    if (tray === 'labor') {
+      return { ok: true, slug: 'schedule-labor', chipId: 'schedule', inventedClose: false };
+    }
+    if (tray === 'food') {
+      return { ok: true, slug: 'boh-invoice', chipId: 'boh', inventedClose: false };
+    }
+    if (tray === 'beer' || tray === 'liquor' || tray === 'pop') {
+      return { ok: true, slug: 'vendor-silence', chipId: 'vendor', inventedClose: false };
+    }
+    return {
+      ok: false,
+      reason: 'Ask is empty. The mouth is ready. The close is not.',
+      needs: 'Talk, type, photo, or file. Name labor, invoice, voids, or vendor cadence.',
+      inventedClose: false,
+    };
+  }
+
+  if (/\bbeer\b|\bmargin\b|\bpackage\b|\bcredits?\b/.test(query)) {
+    return { ok: true, slug: 'vendor-silence', chipId: 'vendor', inventedClose: false };
+  }
+  if (/\blabor\b|\bschedule\b|\bclock\b|\bhours?\b|\bovertime\b/.test(query)) {
+    return { ok: true, slug: 'schedule-labor', chipId: 'schedule', inventedClose: false };
+  }
+
+  return resolveFreeOperatorAsk(question);
+}
 
 export type DemoVendorCadenceInput = {
   cadenceDays?: number | null;
@@ -238,8 +318,10 @@ export const FREE_OPERATOR_ANSWERS: readonly FreeOperatorAnswer[] = [
       'This preview does not process cards and does not replace the till. $0 verified — FICTIONAL / sample-not-verified.',
       'A promised rate without the agreement is Unverified, not a leak. A marketplace merchant-fee line is a statement job, not a new processor.',
     ],
-    coachTomorrow: 'Bring the merchant agreement and one processing statement for the same days. Do not switch processors from this preview.',
-    needs: 'Current merchant agreement or rate confirmation plus one processing statement. Missing paper is Missing Evidence.',
+    coachTomorrow:
+      'Bring the merchant agreement and one processing statement for the same days. Do not switch processors from this preview.',
+    needs:
+      'Current merchant agreement or rate confirmation plus one processing statement. Missing paper is Missing Evidence.',
     sampleLabel: SAMPLE_LABEL,
     sampleDollars: 'none-verified',
     verifiedClose: false,
@@ -340,6 +422,8 @@ export function freeOperatorCorpus(): string {
     mouth: FREE_OPERATOR_MOUTH,
     cards: BASE_WHAT_I_KNOW,
     answers: FREE_OPERATOR_ANSWERS,
+    tray: OWNER_DESK_TRAY,
+    primeCost: OWNER_PRIME_COST_EVIDENCE,
     preview: PUBLIC_PREVIEW_COPY,
     eod: OWNER_SEAT_EOD,
     sampleLabel: SAMPLE_LABEL,

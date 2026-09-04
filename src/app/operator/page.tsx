@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { FreeOperatorPhone } from '@/components/FreeOperatorPhone';
 
 export const metadata: Metadata = {
-  title: "Ask the house — free operator phone | Never 86'd",
+  title: "Owner desk — 1–3 unit Action Shift | Never 86'd",
   description:
-    'Phone-first operator seat: talk, type, photo, or file. One leak, one coach tomorrow, needs named. Sample answers stay fictional. Files stay on this phone.',
+    'Phone-first owner seat for 1–3 unit operators: Action Shift, Prime Cost Coach, labor and beverage asks. Sample answers stay fictional. Files stay on this phone.',
   alternates: { canonical: 'https://www.never86.ai/operator' },
   openGraph: {
-    title: "Ask the house — free operator phone | Never 86'd",
-    description: 'Not a dashboard. WHAT I KNOW stays NEED or READY. No invented close. No private restaurant data yet.',
+    title: "Owner desk — 1–3 unit Action Shift | Never 86'd",
+    description: 'Not a dashboard. Need or Ready only. No invented close. No private restaurant data yet.',
     url: 'https://www.never86.ai/operator',
   },
 };

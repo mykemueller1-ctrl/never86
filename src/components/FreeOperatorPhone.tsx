@@ -5,50 +5,55 @@ import { useMemo, useRef, useState } from 'react';
 import { trackEvent } from '@/lib/track';
 import { FreeOperatorAnswerCard } from '@/components/FreeOperatorAnswerCard';
 import {
-  BASE_WHAT_I_KNOW,
-  FREE_OPERATOR_CHIPS,
-  FREE_OPERATOR_MOUTH,
-  OWNER_SEAT_EOD,
+  OWNER_DESK_TRAY,
+  OWNER_PRIME_COST_EVIDENCE,
   PUBLIC_PREVIEW_COPY,
   SAMPLE_LABEL,
   type FreeOperatorAnswer,
-  type FreeOperatorChipId,
   type FreeOperatorMouth,
-  type WhatIKnowCard,
+  type OwnerDeskTrayId,
+  type PrimeCostEvidence,
   getFreeOperatorAnswer,
-  nameLocalEvidence,
-  resolveFreeOperatorAsk,
+  resolveOwnerDeskAsk,
 } from '@/lib/freeOperatorDemo';
 
-const MOUTH_LABEL: Record<FreeOperatorMouth, string> = {
-  talk: 'Talk',
-  type: 'Type',
-  photo: 'Photo',
-  file: 'File',
-};
+type DeskView = 'home' | 'labor' | 'food' | 'bev';
+
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function weekdayLabel() {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+}
 
 export function FreeOperatorPhone() {
   const [ask, setAsk] = useState('');
-  const [chipId, setChipId] = useState<FreeOperatorChipId | null>(null);
-  const [mouth, setMouth] = useState<FreeOperatorMouth>('type');
-  const [cards, setCards] = useState<WhatIKnowCard[]>(() => [...BASE_WHAT_I_KNOW]);
-  const [localName, setLocalName] = useState<string | null>(null);
+  const [view, setView] = useState<DeskView>('home');
+  const [tray, setTray] = useState<OwnerDeskTrayId>('action');
+  const [evidence, setEvidence] = useState<PrimeCostEvidence[]>(() =>
+    OWNER_PRIME_COST_EVIDENCE.map((row) => ({ ...row })),
+  );
   const [listening, setListening] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
   const [answer, setAnswer] = useState<FreeOperatorAnswer | null>(null);
+  const [localName, setLocalName] = useState<string | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
 
-  const readyCount = useMemo(() => cards.filter((card) => card.state === 'READY').length, [cards]);
-  const needCount = cards.length - readyCount;
+  const readyCount = useMemo(() => evidence.filter((row) => row.state === 'READY').length, [evidence]);
+  const coachReady = readyCount >= 2;
 
-  function goAsk(nextAsk: string, nextChip: FreeOperatorChipId | null = null) {
-    const resolved = resolveFreeOperatorAsk(nextAsk, nextChip);
+  function goAsk(nextAsk: string) {
+    const resolved = resolveOwnerDeskAsk(nextAsk, tray);
     if (!resolved.ok) {
       setAnswer(null);
       setFlash(`${resolved.reason} NEEDS: ${resolved.needs}`);
-      trackEvent('operator_demo_ask_empty', { pagePath: '/operator', meta: { chip: nextChip } });
+      trackEvent('operator_demo_ask_empty', { pagePath: '/operator', meta: { tray } });
       return;
     }
     const next = getFreeOperatorAnswer(resolved.slug);
@@ -57,23 +62,22 @@ export function FreeOperatorPhone() {
       setFlash('That sample card is missing. No close invented.');
       return;
     }
-    setChipId(resolved.chipId);
     setAnswer(next);
     setFlash(null);
-    trackEvent('operator_demo_ask', { pagePath: '/operator', meta: { slug: resolved.slug, chip: resolved.chipId } });
+    trackEvent('operator_demo_ask', { pagePath: '/operator', meta: { slug: resolved.slug, tray } });
     queueMicrotask(() => answerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
-  function onChip(id: FreeOperatorChipId) {
-    const chip = FREE_OPERATOR_CHIPS.find((row) => row.id === id);
-    setChipId(id);
-    setMouth('type');
-    if (chip) setAsk(chip.label);
-    goAsk(chip?.label ?? '', id);
+  function onTray(next: OwnerDeskTrayId) {
+    setTray(next);
+    if (next === 'action') setView('home');
+    if (next === 'labor') setView('labor');
+    if (next === 'food') setView('food');
+    if (next === 'pop' || next === 'beer' || next === 'liquor') setView('bev');
+    trackEvent('operator_desk_tray', { pagePath: '/operator', meta: { tray: next } });
   }
 
   function onMouth(next: FreeOperatorMouth) {
-    setMouth(next);
     setFlash(null);
     if (next === 'photo') {
       photoRef.current?.click();
@@ -96,7 +100,6 @@ export function FreeOperatorPhone() {
           (window as Window & { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition
         : undefined;
     if (!SpeechRecognition) {
-      setMouth('type');
       setFlash('Talk is not available on this phone. Type it.');
       return;
     }
@@ -112,134 +115,298 @@ export function FreeOperatorPhone() {
     };
     recognition.onerror = () => {
       setListening(false);
-      setMouth('type');
       setFlash('Talk missed that. Type it.');
     };
     recognition.onend = () => setListening(false);
     recognition.start();
   }
 
+  function markEvidence(id: PrimeCostEvidence['id']) {
+    setEvidence((rows) =>
+      rows.map((row) =>
+        row.id === id
+          ? {
+              ...row,
+              state: 'READY',
+              reason: `${row.title} named on this phone. Named is not a verified close.`,
+            }
+          : row,
+      ),
+    );
+    setFlash(`${id} marked ready on this phone only. ${SAMPLE_LABEL}`);
+    trackEvent('operator_desk_evidence', { pagePath: '/operator', meta: { id } });
+  }
+
   function onLocalFile(kind: 'photo' | 'file', file: File | undefined) {
     if (!file) return;
     setLocalName(file.name);
-    setCards(nameLocalEvidence(BASE_WHAT_I_KNOW, kind, file.name));
     setFlash(`${file.name} stays on this phone. Named is not a verified close.`);
+    if (view === 'labor' || tray === 'labor') markEvidence('hourly');
     trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true } });
   }
 
   return (
-    <div className="operator-phone">
-      <header className="operator-phone-top">
-        <Link href="/" className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#005de8]">
-          Never 86&apos;d
-        </Link>
-        <p className="mt-3 font-serif text-[2.1rem] leading-[0.95] tracking-[-0.04em] text-[#161616]">
-          Ask the house.
-        </p>
-        <p className="mt-3 text-[15px] leading-relaxed text-[#514b43]">
-          One leak. One coach tomorrow. Needs named. Not a dashboard.
-        </p>
-        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#766f65]">{PUBLIC_PREVIEW_COPY}</p>
+    <div className="owner-desk">
+      <header className="owner-desk-top">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-serif text-[1.85rem] leading-none tracking-[-0.03em] text-[#161616]">
+              {greeting()}, operator.
+            </p>
+            <p className="mt-2 text-sm text-[#6f675e]">Demo restaurant · Owner desk · 1–3 unit ICP</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="owner-desk-icon-btn"
+              aria-label="Add evidence"
+              onClick={() => onMouth('file')}
+            >
+              +
+            </button>
+            <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
+              1
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {evidence.map((row) => (
+            <button
+              key={row.id}
+              type="button"
+              className={`owner-desk-pill ${row.state === 'READY' ? 'is-ready' : 'is-need'}`}
+              onClick={() => (row.state === 'READY' ? undefined : markEvidence(row.id))}
+            >
+              {row.state === 'READY' ? `${row.short} ✓` : `Need ${row.short.toLowerCase()}`}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <div ref={answerRef} className={answer ? 'mt-6' : undefined} aria-live="polite">
+      {view === 'home' ? (
+        <section className="mt-7">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#e66b27]">
+            Action Shift · {weekdayLabel()}
+          </p>
+          <h1 className="mt-3 font-serif text-[2.35rem] leading-[0.95] tracking-[-0.04em] text-[#161616]">
+            What&apos;s going on in your restaurant?
+          </h1>
+          <p className="mt-3 text-[15px] leading-relaxed text-[#514b43]">
+            Talk, type, take a picture, or add a file. Ask it exactly like you&apos;d ask another operator.
+          </p>
+
+          <article className="owner-desk-card mt-6">
+            <div className="flex items-start gap-3">
+              <span className="owner-desk-bolt" aria-hidden>
+                ⚡
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-semibold text-[#161616]">
+                      {coachReady ? 'Prime Cost Coach is warming up' : 'Let’s finish your Prime Cost Coach.'}
+                    </h2>
+                    <p className="mt-2 text-sm leading-relaxed text-[#514b43]">
+                      {coachReady
+                        ? 'Two reports are named. Add the third so labor vs demand can be checked without inventing the percentage.'
+                        : 'I already understand the schedule. I still need hourly sales and the time-clock report so I can show where labor outran demand—not just tell you the percentage was high.'}
+                    </p>
+                  </div>
+                  <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-[#e66b27]">
+                    {readyCount} of 3 ready
+                  </span>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {evidence.map((row) => (
+                    <button
+                      key={`chip-${row.id}`}
+                      type="button"
+                      className={`owner-desk-chip ${row.state === 'READY' ? 'is-ready' : 'is-need'}`}
+                      onClick={() => (row.state === 'READY' ? undefined : markEvidence(row.id))}
+                    >
+                      {row.state === 'READY' ? `${row.short} ✓` : `Need ${row.short.toLowerCase()}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      {view === 'labor' ? (
+        <section className="mt-7">
+          <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-[#161616]">
+            Labor & schedule
+          </h1>
+          <p className="mt-2 text-sm text-[#6f675e]">Plan vs actual · demo restaurant</p>
+
+          <article className="owner-desk-card owner-desk-card-peach mt-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <span className="owner-desk-bolt" aria-hidden>
+                  ⚡
+                </span>
+                <div>
+                  <h2 className="text-lg font-semibold text-[#161616]">Unlock Prime Cost Coach</h2>
+                  <p className="mt-1 text-sm text-[#514b43]">Two real reports turn this on.</p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#e66b27]">
+                {readyCount} of 3 ready
+              </span>
+            </div>
+            <ul className="mt-4 space-y-2">
+              {evidence.map((row) => (
+                <li key={row.id}>
+                  <button
+                    type="button"
+                    className={`owner-desk-evidence ${row.state === 'READY' ? 'is-ready' : ''}`}
+                    onClick={() => (row.state === 'READY' ? undefined : markEvidence(row.id))}
+                  >
+                    <span className="owner-desk-evidence-icon" aria-hidden>
+                      {row.state === 'READY' ? '✓' : row.icon}
+                    </span>
+                    <span className="text-left">
+                      <span className="block font-semibold text-[#161616]">{row.title}</span>
+                      <span className="mt-1 block text-sm text-[#6f675e]">{row.reason}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" className="owner-desk-primary" onClick={() => onMouth('file')}>
+                Choose a report
+              </button>
+              <button type="button" className="owner-desk-secondary" onClick={() => onMouth('photo')}>
+                Take a picture
+              </button>
+            </div>
+          </article>
+
+          {answer?.slug === 'schedule-labor' ? null : (
+            <article className="owner-desk-card mt-4">
+              <div className="flex items-start gap-3">
+                <span className="owner-desk-avatar" aria-hidden>
+                  N86
+                </span>
+                <div>
+                  <p className="text-sm leading-relaxed text-[#252525]">
+                    Add the schedule, time clock, and hourly sales. I&apos;ll line up planned people, actual punches,
+                    and demand by hour. I&apos;ll tell you what I know, what I&apos;m missing, and the smallest next
+                    move—without making up the answer.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="owner-desk-chip is-ready">Owner question</span>
+                    <span className="owner-desk-chip is-need">Needs source evidence</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          )}
+        </section>
+      ) : null}
+
+      {view === 'food' || view === 'bev' ? (
+        <section className="mt-7">
+          <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-[#161616]">
+            {view === 'food' ? 'Food & invoice truth' : 'Beverage margin'}
+          </h1>
+          <p className="mt-2 text-sm text-[#6f675e]">
+            Ask for the count, invoice, or package change. Missing count stays Missing Evidence.
+          </p>
+          <article className="owner-desk-card mt-5">
+            <div className="flex items-start gap-3">
+              <span className="owner-desk-avatar" aria-hidden>
+                N86
+              </span>
+              <div>
+                <p className="text-sm leading-relaxed text-[#252525]">
+                  I know the vendor rhythm. Add a current count or invoice and I&apos;ll compare draft, package,
+                  credits, and price changes.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="owner-desk-chip is-ready">Ready</span>
+                  <span className="owner-desk-chip is-need">No private dollars yet</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      <div ref={answerRef} className={answer ? 'mt-5 scroll-mt-24' : undefined} aria-live="polite">
         {answer ? <FreeOperatorAnswerCard answer={answer} compact /> : null}
       </div>
 
-      <section aria-labelledby="what-i-know-heading" className="mt-6">
-        <div className="flex items-end justify-between gap-3">
-          <h2 id="what-i-know-heading" className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#005de8]">
-            What I know
-          </h2>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#766f65]">
-            {needCount} need · {readyCount} ready
-          </p>
-        </div>
-        <ul className="mt-3 space-y-2">
-          {cards.map((card) => (
-            <li key={card.id} className="rounded-2xl border border-[#d8cec0] bg-[#fffaf2] px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-medium text-[#1b1b1b]">{card.title}</p>
-                <span
-                  className={`font-mono text-[10px] uppercase tracking-[0.14em] ${
-                    card.state === 'READY' ? 'text-[#0f6b3a]' : 'text-[#9a4a00]'
-                  }`}
-                >
-                  {card.state}
-                </span>
-              </div>
-              <p className="mt-1 text-sm leading-relaxed text-[#554f47]">{card.reason}</p>
-            </li>
-          ))}
-        </ul>
-        {localName ? (
-          <p className="mt-3 text-sm text-[#554f47]">
-            {localName} · on this phone · {SAMPLE_LABEL}
-          </p>
-        ) : null}
-      </section>
+      {localName ? (
+        <p className="mt-4 text-sm text-[#6f675e]">
+          {localName} · on this phone · {SAMPLE_LABEL}
+        </p>
+      ) : null}
 
-      <section className="mt-6 rounded-2xl border border-[#d8cec0] bg-[#fffaf2] px-4 py-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#766f65]">Forward EOD</p>
-        <p className="mt-2 text-sm leading-relaxed text-[#514b43]">{OWNER_SEAT_EOD.copy}</p>
-      </section>
-
-      <div className="operator-phone-mouth">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Ask chips">
-          {FREE_OPERATOR_CHIPS.map((chip) => (
-            <button
-              key={chip.id}
-              type="button"
-              className={`rounded-full border px-3 py-2 text-sm ${
-                chipId === chip.id
-                  ? 'border-[#005de8] bg-[#005de8] text-white'
-                  : 'border-[#afa396] bg-white text-[#24211e]'
-              }`}
-              onClick={() => onChip(chip.id)}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-
+      <div className="owner-desk-mouth">
         <form
-          className="mt-3"
           onSubmit={(event) => {
             event.preventDefault();
-            goAsk(ask, chipId);
+            goAsk(ask);
           }}
         >
-          <label htmlFor="operator-ask" className="sr-only">
-            Ask
+          <label htmlFor="owner-desk-ask" className="sr-only">
+            Ask what&apos;s happening
           </label>
-          <textarea
-            id="operator-ask"
-            value={ask}
-            onChange={(event) => setAsk(event.target.value)}
-            rows={3}
-            placeholder={listening ? 'Listening…' : 'Talk, type, or tap a chip.'}
-            className="w-full rounded-2xl border border-[#d8cec0] bg-white px-4 py-3 text-[16px] text-[#161616] placeholder:text-[#8a8176]"
-          />
-          <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Ask mouth">
-            {FREE_OPERATOR_MOUTH.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold ${
-                  mouth === item ? 'border-[#005de8] text-[#005de8]' : 'border-[#afa396] text-[#423e38]'
-                }`}
-                onClick={() => onMouth(item)}
-              >
-                {MOUTH_LABEL[item]}
+          <div className="owner-desk-ask-shell">
+            <textarea
+              id="owner-desk-ask"
+              value={ask}
+              onChange={(event) => setAsk(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  goAsk(ask);
+                }
+              }}
+              rows={2}
+              placeholder={listening ? 'Listening…' : "Ask what's happening in your restaurant..."}
+              className="owner-desk-ask"
+            />
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <button type="button" className="owner-desk-round" aria-label="Add file" onClick={() => onMouth('file')}>
+                  +
+                </button>
+                <button type="button" className="owner-desk-round" aria-label="Take photo" onClick={() => onMouth('photo')}>
+                  ▣
+                </button>
+                <button type="button" className="owner-desk-round" aria-label="Talk" onClick={() => onMouth('talk')}>
+                  ●
+                </button>
+              </div>
+              <button type="submit" className="owner-desk-send" aria-label="Send ask">
+                ↑
               </button>
-            ))}
-            <button type="submit" className="human-button human-button-primary min-h-11 flex-[1.2] text-sm">
-              Ask →
-            </button>
+            </div>
           </div>
         </form>
-        {flash ? <p className="mt-3 text-sm leading-relaxed text-[#9a4a00]">{flash}</p> : null}
+        <p className="mt-2 text-center text-[11px] leading-relaxed text-[#8a8176]">{PUBLIC_PREVIEW_COPY}</p>
+        {flash ? <p className="mt-2 text-center text-sm text-[#9a4a00]">{flash}</p> : null}
       </div>
+
+      <nav className="owner-desk-tray" aria-label="Owner desk sections">
+        {OWNER_DESK_TRAY.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`owner-desk-tray-btn ${tray === item.id ? 'is-active' : ''}`}
+            aria-label={item.label}
+            onClick={() => onTray(item.id)}
+          >
+            <span aria-hidden>{item.icon}</span>
+          </button>
+        ))}
+      </nav>
 
       <input
         ref={photoRef}

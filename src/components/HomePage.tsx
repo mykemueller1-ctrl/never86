@@ -54,7 +54,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              No card · no password · no sales call · one operator seat free
+              1–3 unit operators · no card · no password · seat 1 owner free
             </p>
           </div>
 
@@ -119,6 +119,39 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link href="/onboard" className="human-button human-button-light">Open Never 86&apos;d →</Link>
             <Link href="/llm-shells" className="human-button border border-[#5f7591] text-white hover:border-white">Find it in ChatGPT →</Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="one-to-three" className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <p className="human-kicker">1–3 unit ICP · not Command Center</p>
+          <h2 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
+            Owner seat first.
+            <span className="block italic text-[#005de8]">Pay when you add seats.</span>
+          </h2>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#514b43]">
+            This build is for independent operators running one to three locations. Seat 1 is the owner and stays free for one store. Seat 2 and seat 3 unlock when you bring in a GM or station lead. Multi-unit Command Center is a separate track.
+          </p>
+          <div className="mt-12 grid gap-4 md:grid-cols-3">
+            {[
+              ['Seat 1', 'Owner', 'Free · one store · one login · morning action + night proof'],
+              ['Seat 2', 'Manager / GM', 'Paid expansion · one manager login · no staff-wide PINs'],
+              ['Seat 3', 'Kitchen / FOH / bar', 'Paid expansion · station templates owned by the manager seat'],
+            ].map(([seat, role, copy]) => (
+              <article key={seat} className="human-receipt-card">
+                <p className="font-mono text-xs font-bold text-[#005de8]">{seat}</p>
+                <h3 className="mt-8 font-serif text-3xl leading-tight text-[#1b1b1b]">{role}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-[#5b554d]">{copy}</p>
+              </article>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link href="/onboard" className="human-button human-button-primary">Claim free owner seat →</Link>
+            <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
+            <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>
+            <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
+            <Link href="/command-center" className="human-button human-button-secondary">Multi-unit Command Center →</Link>
           </div>
         </div>
       </section>

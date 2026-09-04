@@ -26,15 +26,17 @@ export function HumanSiteHeader() {
 
         <nav className="hidden items-center gap-6 text-sm text-[#423e38] lg:flex" aria-label="Primary navigation">
           <Link href="/#what-it-finds" className="human-nav-link">What it finds</Link>
-          <Link href="/#how-it-works" className="human-nav-link">How it works</Link>
+          <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
+          <Link href="/operator" className="human-nav-link">Owner desk</Link>
+          <Link href="/pricing" className="human-nav-link">Pricing</Link>
+          <Link href="/command-center" className="human-nav-link">Command Center</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
-          <Link href="/operator" className="human-nav-link">Phone seat</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
-          <Link href="/onboard" className="human-button human-button-primary text-sm">Open with email →</Link>
+          <Link href="/onboard" className="human-button human-button-primary text-sm">Claim owner seat →</Link>
         </nav>
 
         <Link href="/onboard" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          Open with email →
+          Claim owner seat →
         </Link>
       </div>
     </header>
@@ -75,7 +77,8 @@ export function HumanSiteFooter() {
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
           <Link href="/onboard" className="human-nav-link">Open with email</Link>
-          <Link href="/operator" className="human-nav-link">Phone seat</Link>
+          <Link href="/operator" className="human-nav-link">Owner desk</Link>
+          <Link href="/command-center" className="human-nav-link">Command Center</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
           <Link href="/privacy" className="human-nav-link">Privacy</Link>

@@ -8,6 +8,8 @@ import {
   FREE_OPERATOR_ANSWERS,
   FREE_OPERATOR_CHIPS,
   FREE_OPERATOR_MOUTH,
+  OWNER_DESK_TRAY,
+  OWNER_PRIME_COST_EVIDENCE,
   OWNER_SEAT_EOD,
   PUBLIC_PREVIEW_COPY,
   SAMPLE_LABEL,
@@ -17,6 +19,7 @@ import {
   getFreeOperatorAnswer,
   nameLocalEvidence,
   resolveFreeOperatorAsk,
+  resolveOwnerDeskAsk,
 } from './freeOperatorDemo';
 
 const ROOT = join(process.cwd());
@@ -98,6 +101,37 @@ describe('free operator demo pack', () => {
     }
   });
 
+  it('routes Owner desk asks for labor and beer margin without inventing a close', () => {
+    const labor = resolveOwnerDeskAsk('Why did labor feel wrong?', 'labor');
+    expect(labor.ok).toBe(true);
+    if (labor.ok) {
+      expect(labor.slug).toBe('schedule-labor');
+      expect(labor.inventedClose).toBe(false);
+    }
+
+    const beer = resolveOwnerDeskAsk('What happened to beer margin?', 'beer');
+    expect(beer.ok).toBe(true);
+    if (beer.ok) {
+      expect(beer.slug).toBe('vendor-silence');
+      expect(beer.inventedClose).toBe(false);
+    }
+
+    const emptyAction = resolveOwnerDeskAsk('   ', 'action');
+    expect(emptyAction.ok).toBe(false);
+    if (!emptyAction.ok) expect(emptyAction.inventedClose).toBe(false);
+
+    const emptyLabor = resolveOwnerDeskAsk('', 'labor');
+    expect(emptyLabor.ok).toBe(true);
+    if (emptyLabor.ok) expect(emptyLabor.slug).toBe('schedule-labor');
+  });
+
+  it('keeps Prime Cost Coach evidence NEED or READY only', () => {
+    expect(OWNER_PRIME_COST_EVIDENCE).toHaveLength(3);
+    expect(OWNER_PRIME_COST_EVIDENCE.every((row) => row.state === 'NEED' || row.state === 'READY')).toBe(true);
+    expect(OWNER_PRIME_COST_EVIDENCE.filter((row) => row.state === 'READY').map((row) => row.id)).toEqual(['schedule']);
+    expect(OWNER_DESK_TRAY.map((row) => row.id)).toEqual(['action', 'food', 'labor', 'pop', 'beer', 'liquor']);
+  });
+
   it('labels every sample dollar fictional and never claims verified money', () => {
     const corpus = freeOperatorCorpus();
     expect(corpus).toMatch(/FICTIONAL \/ sample-not-verified/);
@@ -134,23 +168,27 @@ describe('free operator demo pack', () => {
     expect(OWNER_SEAT_EOD.notThisDemo).toBe(true);
     expect(OWNER_SEAT_EOD.copy).toMatch(/close\+\{seat\}@inbound\.never86\.ai/);
     expect(OWNER_SEAT_EOD.copy).toMatch(/not this public preview/i);
-    expect(PUBLIC_PREVIEW_COPY).toBe('Files stay on this phone. Do not add private restaurant data yet.');
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/Preview only/i);
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/private restaurant data/i);
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/Production V2/i);
   });
 
   it('keeps CTap staff names, pars, and live Z dollars out of public demo copy', () => {
     const corpus = freeOperatorCorpus();
     expect(findFreeOperatorPrivacyHits(FREE_OPERATOR_ANSWERS)).toEqual([]);
     expect(findFreeOperatorPrivacyHits(BASE_WHAT_I_KNOW)).toEqual([]);
+    expect(findFreeOperatorPrivacyHits(OWNER_PRIME_COST_EVIDENCE)).toEqual([]);
     expect(corpus).not.toMatch(CTAP_STAFF);
     expect(corpus).not.toMatch(LIVE_Z);
     expect(corpus).not.toMatch(/\bPIN\b/);
     expect(corpus.toLowerCase()).not.toMatch(/\bpars?\b/);
+    expect(corpus.toLowerCase()).not.toMatch(/community tap/);
   });
 
   it('does not sound like a suite dashboard', () => {
     const corpus = freeOperatorCorpus().toLowerCase();
     expect(corpus).not.toMatch(/dashboard/);
-    for (const phrase of ['AI-powered', 'game-changer', 'unlock', 'guaranteed recovery'] as const) {
+    for (const phrase of ['AI-powered', 'game-changer', 'guaranteed recovery'] as const) {
       expect(corpus).not.toContain(phrase.toLowerCase());
     }
     expect(BANNED_PHRASES).toContain('AI-powered');
@@ -169,8 +207,12 @@ describe('free operator demo pages stay off Neon and staff login', () => {
       expect(blob).not.toMatch(/DATABASE_URL/);
     }
     expect(ui).toContain('FreeOperatorAnswerCard');
+    expect(ui).toContain('owner-desk');
+    expect(ui).toContain('Prime Cost Coach');
     expect(ui).not.toMatch(/router\.push/);
-    expect(ui).toMatch(/goAsk\(ask, chipId\)/);
+    expect(ui).toMatch(/goAsk\(ask\)/);
+    expect(ui).toMatch(/Demo restaurant/);
+    expect(ui).not.toMatch(/Community Tap/);
     expect(answer).toMatch(/robots:\s*\{\s*index:\s*false/);
     expect(card).toContain('Coach this tomorrow');
     expect(card).toContain('Needs');

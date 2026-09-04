@@ -159,12 +159,12 @@ export const ROLES: Record<string, RoleSpec> = {
   owner: {
     slug: 'owner',
     oneWord: 'Solo',
-    subhead: 'Solo operator. Same screen as the chain. None of the enterprise price.',
-    audience: 'For independent operators · founders · GMs running 1 to 5 units',
+    subhead: '1–3 unit independents. Same receipt-backed math. Owner seat free first.',
+    audience: 'For independent operators · founders · GMs running 1 to 3 units',
     badge: 'Owner',
     tone: 'gold',
     headline: { l1: 'No enterprise bloat.', gradient: 'No enterprise price.', l3: 'The same honest math.' },
-    intro: 'You\'re running ops, finance, marketing, and HR yourself. We don\'t replace any of that. We put the leak in front of you with a name and a next step — and we don\'t make you read a PhD-thesis report to find it.',
+    intro: 'You\'re running ops, finance, marketing, and HR yourself across one to three locations. We don\'t replace any of that. We put the leak in front of you with a name and a next step — and we don\'t make you read a PhD-thesis report to find it.',
     pains: [
       'The "back office" is you, on a laptop, at 11pm.',
       'You can feel the leak — you can\'t name it.',
@@ -172,9 +172,9 @@ export const ROLES: Record<string, RoleSpec> = {
       'The reports your accountant gives you don\'t answer the questions you actually have.',
     ],
     reliefs: [
-      'Same source-tag discipline the 50-unit groups get. Smaller bill.',
+      'Seat 1 is the owner seat and starts free for one store.',
+      'Seats 2–3 unlock for GM / station leads when you need shared proof — paid expansion, not Command Center.',
       'One screen ranked by what costs you money this week.',
-      'The 6 quick-win demos are free to try — bring your CSV.',
       'Direct line to the founder — operator-to-operator.',
     ],
     freeAgents: [

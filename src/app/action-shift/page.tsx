@@ -12,11 +12,12 @@ type Seat = {
   name: string;
 };
 
-// Free plan = one operator seat. Extra seats / role controls are paid later (#118).
+// Free plan = one owner seat for the 1–3 unit ICP.
+// Seats 2–3 are paid expansion. Multi-unit Command Center is a separate build.
 const SEATS: Seat[] = [
-  { n: 1, role: 'Owner-operator', status: 'free', name: 'You · this store' },
-  { n: 2, role: 'Manager / GM', status: 'invite', name: 'One manager login · no staff-wide PINs' },
-  { n: 3, role: 'Kitchen / FOH / driver stations', status: 'invite', name: 'Templates owned by the manager seat' },
+  { n: 1, role: 'Owner-operator', status: 'free', name: 'You · this store · 1–3 unit ICP' },
+  { n: 2, role: 'Manager / GM', status: 'invite', name: 'Paid seat · one manager login' },
+  { n: 3, role: 'Kitchen / FOH / driver stations', status: 'invite', name: 'Paid seat · templates under manager' },
 ];
 
 export default function ActionShiftDeskPage() {
@@ -87,13 +88,13 @@ export default function ActionShiftDeskPage() {
       />
       <div className="relative mx-auto max-w-3xl px-5 pb-24 pt-8">
         <p className="text-xs tracking-[0.2em] uppercase text-[#8fa898]">
-          CTAP · Action Shift · proof install
+          1–3 unit ICP · Action Shift · not Command Center
         </p>
         <h1 className="mt-3 font-serif text-4xl leading-tight text-[#f3f5f0] md:text-5xl">
           Never 86&apos;d
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#a8b5ac]">
-          Yesterday&apos;s numbers → one next action → night proof. One free seat. Extra seats paid later.
+          Yesterday&apos;s numbers → one next action → night proof. Seat 1 is the owner and free. Seats 2 and 3 are paid when you expand the team.
         </p>
 
         <nav className="mt-8 flex flex-wrap gap-4 text-sm text-[#c5d0c8]">
@@ -124,7 +125,7 @@ export default function ActionShiftDeskPage() {
         </nav>
 
         <section id="seats" className="mt-12 border-t border-white/10 pt-8">
-          <h2 className="text-sm tracking-wide text-[#8fa898]">Free seat · one store · one login</h2>
+          <h2 className="text-sm tracking-wide text-[#8fa898]">1–3 unit seats · owner free · 2–3 paid</h2>
           <ul className="mt-4 space-y-3">
             {SEATS.map((s) => (
               <li
@@ -142,7 +143,10 @@ export default function ActionShiftDeskPage() {
             ))}
           </ul>
           <p className="mt-3 text-xs text-[#7a8a80]">
-            Manager operating UI is visible as a synthetic proof.{' '}
+            Claim the free owner seat with email, then open the manager seat as synthetic proof.{' '}
+            <Link href="/onboard" className="text-[#c4a35a] underline-offset-4 hover:underline">
+              Claim owner seat →
+            </Link>{' '}
             <Link href="/action-shift/manager" className="text-[#c4a35a] underline-offset-4 hover:underline">
               Open manager seat →
             </Link>
