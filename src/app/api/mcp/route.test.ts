@@ -27,7 +27,7 @@ describe('public MCP route', () => {
     }
   });
 
-  it('exposes knowledge tools first, then Payroll / Prices / Process analysis', () => {
+  it('exposes knowledge tools first, then Payroll / Prices / Process / beverage analysis', () => {
     expect(MCP_PUBLIC_TOOLS.map((tool) => tool.name)).toEqual([
       'get_operator_system',
       'get_operator_logic',
@@ -35,7 +35,9 @@ describe('public MCP route', () => {
       'list_answers',
       'list_free_agents',
       'list_agent_jobs',
+      'list_specialists',
       'analyze_labor',
+      'analyze_beverage',
       'analyze_vendor_prices',
       'build_action_shift',
     ]);
@@ -75,6 +77,61 @@ describe('public MCP route', () => {
     expect(text).toContain('store-chief-of-staff');
     expect(text).toContain('memory-curator');
     expect(text).not.toMatch(/karlee|sturtz|\$1,000\.00/i);
+  });
+
+  it('lists specialists and serves specialist_brief prompt', async () => {
+    const listed = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 12,
+        method: 'tools/call',
+        params: { name: 'list_specialists', arguments: {} },
+      }),
+    }));
+    const listedBody = await listed.json();
+    const listedText = listedBody.result.content[0].text as string;
+    expect(listedText).toContain('labor');
+    expect(listedText).toContain('truth-qa');
+    expect(listedText).toContain('never86://specialist/labor');
+
+    const prompt = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 13,
+        method: 'prompts/get',
+        params: { name: 'specialist_brief', arguments: { specialist_id: 'labor' } },
+      }),
+    }));
+    const promptBody = await prompt.json();
+    expect(promptBody.result.messages[0].content.text).toMatch(/ONE JOB/);
+    expect(promptBody.result.messages[0].content.text).toMatch(/analyze_labor/);
+  });
+
+  it('analyzes beverage CSV as Unverified without theft language', async () => {
+    const response = await POST(new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 14,
+        method: 'tools/call',
+        params: {
+          name: 'analyze_beverage',
+          arguments: {
+            csv: 'Location,Category,Consumed,Poured,UnitPrice\nDemo,Beer,10,8,4',
+          },
+        },
+      }),
+    }));
+    const body = await response.json();
+    const text = body.result.content[0].text as string;
+    expect(text).toContain('Unverified');
+    expect(text).toMatch(/No count/i);
+    expect(text.toLowerCase()).not.toContain('theft');
   });
 
   it('analyzes operator-provided vendor pricing as Unverified', async () => {

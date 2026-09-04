@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildActionShift, type ActionShiftInput } from '@/lib/actionShift';
 import {
+  MCP_PROMPTS,
+  MCP_RESOURCES,
+  getMcpPrompt,
   handleGet3pAuditLogic,
   handleGetOperatorLogic,
   handleGetOperatorSystem,
   handleListAgentJobs,
   handleListAnswers,
   handleListFreeAgents,
+  handleListSpecialists,
+  readMcpResource,
 } from '@/lib/agentGovernance/knowledge';
+import { runBeverageCostScore } from '@/lib/beverageScoreCsv';
 import { runLaborDrift } from '@/lib/laborDriftCsv';
 import {
   MCP_PUBLIC_ENDPOINT,
@@ -21,9 +27,8 @@ import { runVendorDrift } from '@/lib/vendorDriftCsv';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Public, read-only MCP server. Knowledge tools return public packs only.
-// Analysis tools accept only data the operator deliberately sends in a tool call.
-// It never reads tenant records, sends messages, or makes financial, employment, or vendor decisions.
+// Public, read-only MCP server. Knowledge + specialist discovery + analysis.
+// Never reads tenant records, sends messages, or makes employment/vendor decisions.
 
 type JsonRpcReq = {
   jsonrpc: '2.0';
@@ -69,11 +74,38 @@ async function handle(req: JsonRpcReq): Promise<Response> {
     case 'initialize':
       return ok(req.id, {
         protocolVersion: MCP_PUBLIC_PROTOCOL,
-        capabilities: { tools: {} },
+        capabilities: { tools: {}, resources: {}, prompts: {} },
         serverInfo: MCP_PUBLIC_SERVER_INFO,
       });
     case 'tools/list':
       return ok(req.id, { tools: MCP_PUBLIC_TOOLS });
+    case 'resources/list':
+      return ok(req.id, { resources: MCP_RESOURCES });
+    case 'resources/read': {
+      const uri = (req.params as { uri?: string })?.uri;
+      if (!uri) return err(req.id, -32602, 'resources/read requires uri');
+      const resource = readMcpResource(uri);
+      if (!resource.ok) return err(req.id, -32602, resource.error);
+      return ok(req.id, {
+        contents: [{ uri, mimeType: 'application/json', text: resource.text }],
+      });
+    }
+    case 'prompts/list':
+      return ok(req.id, { prompts: MCP_PROMPTS });
+    case 'prompts/get': {
+      const name = (req.params as { name?: string })?.name;
+      const args = ((req.params as { arguments?: Record<string, unknown> })?.arguments ?? {}) as Record<
+        string,
+        unknown
+      >;
+      if (!name) return err(req.id, -32602, 'prompts/get requires name');
+      const prompt = getMcpPrompt(name, args);
+      if (!prompt.ok) return err(req.id, -32602, prompt.error);
+      return ok(req.id, {
+        description: name,
+        messages: [{ role: 'user', content: { type: 'text', text: prompt.text } }],
+      });
+    }
     case 'tools/call': {
       const name = (req.params as { name?: string })?.name;
       const args = (req.params as { arguments?: Record<string, unknown> })?.arguments ?? {};
@@ -98,6 +130,9 @@ async function handle(req: JsonRpcReq): Promise<Response> {
       if (name === 'list_agent_jobs') {
         return textResult(req.id, handleListAgentJobs(args.team));
       }
+      if (name === 'list_specialists') {
+        return textResult(req.id, handleListSpecialists());
+      }
 
       if (name === 'analyze_labor') {
         const input = operatorCsv(args);
@@ -107,6 +142,19 @@ async function handle(req: JsonRpcReq): Promise<Response> {
         return textResult(req.id, {
           evidenceState: 'Unverified',
           warning: 'Patterns are review leads, not proof of theft, time fraud, or employee misconduct.',
+          report,
+        });
+      }
+
+      if (name === 'analyze_beverage') {
+        const input = operatorCsv(args);
+        if (!input.ok) return textResult(req.id, input.error, true);
+        const report = runBeverageCostScore(input.csv);
+        if ('ok' in report && report.ok === false) return textResult(req.id, report, true);
+        return textResult(req.id, {
+          evidenceState: 'Unverified',
+          warning:
+            'No count → no beverage-cost claim. Patterns are review leads only. Confirm transfers, waste, pack size, comps, and recipe before disputing.',
           report,
         });
       }
@@ -151,10 +199,6 @@ async function handle(req: JsonRpcReq): Promise<Response> {
 
       return err(req.id, -32601, `Unknown tool: ${name}`);
     }
-    case 'resources/list':
-      return ok(req.id, { resources: [] });
-    case 'prompts/list':
-      return ok(req.id, { prompts: [] });
     case 'notifications/initialized':
       return ok(req.id, {});
     default:
@@ -190,5 +234,7 @@ export async function GET() {
       description: tool.description,
       readOnly: true,
     })),
+    resources: MCP_RESOURCES.map((resource) => resource.uri),
+    prompts: MCP_PROMPTS.map((prompt) => prompt.name),
   });
 }

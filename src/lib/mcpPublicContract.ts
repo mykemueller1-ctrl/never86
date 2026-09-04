@@ -109,6 +109,13 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
   {
+    name: 'list_specialists',
+    description:
+      'List domain specialists (labor, beverage, food-invoice, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
+    inputSchema: emptyObjectSchema,
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
     name: 'analyze_labor',
     description:
       'Analyze an operator-provided labor or time-clock CSV for schedule-versus-actual drift, early clock-ins, late clock-outs, overtime concentration, and possible shifts with no attached sales. Returns Unverified observations only; it never alleges theft or misconduct.',
@@ -121,6 +128,26 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
           maxLength: 750000,
           description:
             'CSV text with Location, Employee, Scheduled Start/End, and Clock In/Out. Optional Net Sales and Wage Rate improve the report.',
+        },
+      },
+      required: ['csv'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'analyze_beverage',
+    description:
+      'Analyze an operator-provided beverage / bar CSV for pour-vs-inventory or package cost patterns. Returns Unverified review leads only; no count means no beverage-cost claim; never invents pour cost or names theft.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        csv: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 750000,
+          description:
+            'CSV text for beverage cost scoring (item, pours/sales, inventory or package fields per the beverage score adapter).',
         },
       },
       required: ['csv'],
@@ -197,6 +224,7 @@ export const MCP_KNOWLEDGE_TOOL_NAMES = [...KNOWLEDGE_TOOL_NAMES];
 
 export const MCP_ANALYSIS_TOOL_NAMES = [
   'analyze_labor',
+  'analyze_beverage',
   'analyze_vendor_prices',
   'build_action_shift',
 ] as const;

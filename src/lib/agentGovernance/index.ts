@@ -26,10 +26,25 @@ export {
 
 export {
   KNOWLEDGE_TOOL_NAMES,
+  MCP_RESOURCES,
+  MCP_PROMPTS,
   handleGetOperatorSystem,
   handleGetOperatorLogic,
   handleGet3pAuditLogic,
   handleListAnswers,
   handleListFreeAgents,
   handleListAgentJobs,
+  handleListSpecialists,
+  handleGetSpecialist,
+  readMcpResource,
+  getMcpPrompt,
 } from './knowledge';
+
+export {
+  SPECIALIST_PACKS,
+  listSpecialists,
+  getSpecialist,
+  specialistBriefPrompt,
+  type SpecialistId,
+  type SpecialistPack,
+} from './specialists';

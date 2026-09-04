@@ -44,8 +44,10 @@ Call `list_agent_jobs` (or `listAgentJobs()` in code). Store specialists own cap
 ## How LLMs should start
 
 1. `get_operator_system`  
-2. `list_agent_jobs`  
-3. Domain tool (`get_operator_logic` / `get_3p_audit_logic`) or analysis tool with operator-provided data  
-4. Human approves any store memory or external draft  
+2. `list_agent_jobs` + `list_specialists`  
+3. `prompts/get` → `specialist_brief` for the seat you need  
+4. Domain tool (`get_operator_logic` / analysis CSV tool) with operator-provided data  
+5. Human approves any store memory or external draft  
 
+Research synthesis + seat map: [`GREATEST_OPERATOR_AGENT_OS.md`](GREATEST_OPERATOR_AGENT_OS.md).  
 Skill pack: `src/lib/llmShells/skillPack.ts` · Cursor skill: `skills/never86/SKILL.md`.

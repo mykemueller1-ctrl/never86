@@ -4,6 +4,9 @@ import {
   getAgentJob,
   listAgentJobs,
   listMemoryAtoms,
+  listSpecialists,
+  getSpecialist,
+  specialistBriefPrompt,
   orchestrationRule,
   proposeMemoryAtom,
   resetStoreMemoryForTests,
@@ -20,6 +23,20 @@ describe('agent governance registry', () => {
     expect(getAgentJob('void-hunter')?.team).toBe('free-agent');
     expect(orchestrationRule()).toMatch(/one deterministic backend/i);
     expect(orchestrationRule()).toMatch(/store-scoped memory/i);
+  });
+
+  it('exposes six domain specialists with one job each', () => {
+    const packs = listSpecialists();
+    expect(packs.map((p) => p.id)).toEqual([
+      'labor',
+      'beverage',
+      'food-invoice',
+      'human-coach',
+      'design-qa',
+      'truth-qa',
+    ]);
+    expect(getSpecialist('labor')?.publicTools).toContain('analyze_labor');
+    expect(specialistBriefPrompt('truth-qa')).toMatch(/NEVER/);
   });
 });
 

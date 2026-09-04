@@ -14,6 +14,12 @@ import {
 } from '../publicOperatorLogic';
 import { getOperatorSystem } from '../operatorSystem';
 import { listAgentJobs, orchestrationRule, type AgentTeam } from './registry';
+import {
+  getSpecialist,
+  listSpecialists,
+  specialistBriefPrompt,
+  type SpecialistPack,
+} from './specialists';
 
 const WWW = 'https://www.never86.ai';
 
@@ -89,6 +95,120 @@ export function handleListAgentJobs(teamRaw?: unknown) {
   };
 }
 
+export function handleListSpecialists() {
+  return {
+    discovery: 'get_operator_system → list_agent_jobs → list_specialists → domain tools',
+    orchestration: orchestrationRule(),
+    specialists: listSpecialists().map((pack) => ({
+      id: pack.id,
+      name: pack.name,
+      job: pack.job,
+      seats: pack.seats,
+      ownsStages: pack.ownsStages,
+      logicDomains: pack.logicDomains,
+      publicTools: pack.publicTools,
+      resourceUri: pack.resourceUri,
+      promptUri: pack.promptUri,
+      never: pack.never,
+    })),
+  };
+}
+
+export function handleGetSpecialist(idRaw?: unknown) {
+  if (typeof idRaw !== 'string' || !idRaw.trim()) {
+    return {
+      ok: false as const,
+      error: 'Pass specialist_id (labor, beverage, food-invoice, human-coach, design-qa, truth-qa).',
+    };
+  }
+  const pack = getSpecialist(idRaw.trim());
+  if (!pack) return { ok: false as const, error: `Unknown specialist "${idRaw}".` };
+  return { ok: true as const, specialist: pack as SpecialistPack, brief: specialistBriefPrompt(pack.id) };
+}
+
+export const MCP_RESOURCES = [
+  {
+    uri: 'never86://operator-system',
+    name: 'Never86 operator system',
+    description: 'Versioned public operator OS pack. Same payload as get_operator_system.',
+    mimeType: 'application/json',
+  },
+  ...listSpecialists().map((pack) => ({
+    uri: pack.resourceUri,
+    name: pack.name,
+    description: pack.job,
+    mimeType: 'application/json',
+  })),
+] as const;
+
+export const MCP_PROMPTS = [
+  {
+    name: 'specialist_brief',
+    description: 'One-agent-one-job system brief for a Never86 specialist. Args: specialist_id.',
+    arguments: [
+      {
+        name: 'specialist_id',
+        description: 'labor | beverage | food-invoice | human-coach | design-qa | truth-qa',
+        required: true,
+      },
+    ],
+  },
+  {
+    name: 'truth_gate_check',
+    description: 'Critic instructions for unsupported claims. Args: claim (optional free text).',
+    arguments: [
+      {
+        name: 'claim',
+        description: 'Optional claim text to stress-test against truth gates.',
+        required: false,
+      },
+    ],
+  },
+] as const;
+
+export function readMcpResource(uri: string): { ok: true; text: string } | { ok: false; error: string } {
+  if (uri === 'never86://operator-system') {
+    return { ok: true, text: JSON.stringify(handleGetOperatorSystem(), null, 2) };
+  }
+  const match = /^never86:\/\/specialist\/([a-z0-9-]+)$/.exec(uri);
+  if (match) {
+    const pack = getSpecialist(match[1]);
+    if (!pack) return { ok: false, error: `Unknown specialist resource: ${uri}` };
+    return { ok: true, text: JSON.stringify(pack, null, 2) };
+  }
+  return { ok: false, error: `Unknown resource: ${uri}` };
+}
+
+export function getMcpPrompt(
+  name: string,
+  args: Record<string, unknown> = {},
+): { ok: true; text: string } | { ok: false; error: string } {
+  if (name === 'specialist_brief') {
+    const id = typeof args.specialist_id === 'string' ? args.specialist_id : '';
+    const brief = specialistBriefPrompt(id);
+    if (!brief) {
+      return {
+        ok: false,
+        error: 'Pass specialist_id: labor | beverage | food-invoice | human-coach | design-qa | truth-qa',
+      };
+    }
+    return { ok: true, text: brief };
+  }
+  if (name === 'truth_gate_check') {
+    const claim = typeof args.claim === 'string' ? args.claim.trim() : '';
+    const critic = specialistBriefPrompt('truth-qa') ?? '';
+    return {
+      ok: true,
+      text: [
+        critic,
+        claim ? `\nClaim under review:\n${claim}` : '\nNo claim provided — list blockers and required evidence only.',
+        '\nReturn: pass | block | missing-evidence, with reason. Do not invent dollars.',
+      ].join('\n'),
+    };
+  }
+  return { ok: false, error: `Unknown prompt: ${name}` };
+}
+
 export const KNOWLEDGE_TOOL_NAMES = [
   'get_operator_system',
   'get_operator_logic',
@@ -96,4 +216,5 @@ export const KNOWLEDGE_TOOL_NAMES = [
   'list_answers',
   'list_free_agents',
   'list_agent_jobs',
+  'list_specialists',
 ] as const;
