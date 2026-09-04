@@ -44,18 +44,18 @@ export default function Home() {
               Your restaurant already creates the answer. It is buried in labor, invoices, and the daily mess. Never 86&apos;d reads the evidence, explains what changed, and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>
-                Claim the free owner seat →
+              <Link href="/" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/', label: 'Start playing' } })}>
+                Start playing →
               </Link>
-              <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'Watch the recorded demo' } })}>
-                Watch the recorded demo
+              <Link href="/onboard" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>
+                Claim the free owner seat
               </Link>
             </div>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#514b43]">
-              Watch the recorded demo, then give your email. Seat 1 is free for one store. No card. No password.
+              Open play on the home page. Claim a free owner seat with email when you want your own login. Seat 1 is free for one store. No card. No password.
             </p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Email capture · magic link · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
+              Open now · Community Tap seat 1 · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
             </p>
           </div>
 
@@ -193,8 +193,9 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
-            <Link href="/#demo" className="human-button human-button-secondary">Watch the recorded demo</Link>
+            <Link href="/" className="human-button human-button-primary">Start playing →</Link>
+            <Link href="/onboard" className="human-button human-button-secondary">Claim the free owner seat →</Link>
+            <Link href="/operator" className="human-button human-button-secondary">Try Owner desk →</Link>
             <Link href="/action-shift" className="human-button human-button-secondary">See Action Shift seats</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
             <Link href="/command-center" className="human-button human-button-secondary">Multi-unit Command Center →</Link>

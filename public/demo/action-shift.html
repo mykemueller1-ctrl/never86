@@ -4,8 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index,follow" />
-    <title>Action Shift — open play · Never 86'd</title>
-    <meta name="description" content="One free owner seat. Pain first. POS email/photo — no day-one API. Community Tap is seat 1. Any operator can play." />
+    <title>Never 86'd — open play · free owner seat</title>
+    <meta name="description" content="never86.ai front door. One free owner seat. Pain first. POS email/photo — no day-one API. Community Tap is seat 1. Any operator can play now." />
+    <link rel="canonical" href="https://www.never86.ai/" />
+    <meta property="og:title" content="Never 86'd — open play · free owner seat" />
+    <meta property="og:description" content="Pain first. POS email/photo — no day-one API. Community Tap holds seat 1. Any operator can start playing." />
+    <meta property="og:url" content="https://www.never86.ai/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -83,14 +87,14 @@
     <div class="app">
       <aside class="rail">
         <div class="brand">
-          <div class="mark">A</div>
-          <div><strong>Action Shift</strong><br /><span style="color:var(--muted);font-size:12px">Open play · seat 1 free</span></div>
+          <div class="mark">N</div>
+          <div><strong>Never 86'd</strong><br /><span style="color:var(--muted);font-size:12px">never86.ai · open play</span></div>
         </div>
         <p class="sec">Seats</p>
         <button class="nav on" type="button" disabled style="cursor:default">Seat 1 · Community Tap<small>First store · assigned · public proof build</small><span class="pill ok">Assigned</span></button>
         <button class="nav" type="button" disabled style="cursor:default;opacity:.85">Your play session<small>Any operator · no login · sample shop</small><span class="pill ok">Open</span></button>
         <button class="nav dim" type="button" disabled style="cursor:default">Seats 2–3<small>Paid when you expand the team</small></button>
-        <p style="padding:4px 10px 12px;font-size:11px;color:var(--muted);line-height:1.4">Claim a real seat with email → <a href="/onboard" style="color:inherit;font-weight:600">/onboard</a> · sign in → <a href="/login" style="color:inherit;font-weight:600">/login</a></p>
+        <p style="padding:4px 10px 12px;font-size:11px;color:var(--muted);line-height:1.4">Claim a real seat with email → <a href="/onboard" style="color:inherit;font-weight:600">/onboard</a> · sign in → <a href="/login" style="color:inherit;font-weight:600">/login</a> · product story → <a href="/product" style="color:inherit;font-weight:600">/product</a></p>
         <button class="new" type="button" data-act="reset">New chat</button>
         <p class="sec">The shop</p>
         <button class="nav" type="button" data-room="menu" id="nav-menu">Menu<small>Picture · plate drift / cheaper house</small></button>
@@ -262,6 +266,7 @@
         if (!list.length && room === "home") {
           prompt.placeholder = "Labor? Cash? Fragmented data? Or drop the POS email / close…";
           el.innerHTML = `<div class="empty">
+            <p style="font:600 11px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px">Never 86'd · never86.ai</p>
             <h1>What problem are you trying to solve?</h1>
             <p>Labor? Cash flow? Or you’re just tired of fragmented data sitting here? No worries — we got you.<br/>We don’t integrate day one. Forward the POS email, take a picture, or drop a Drive file.</p>
             <div class="pain">
