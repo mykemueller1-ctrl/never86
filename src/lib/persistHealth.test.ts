@@ -90,6 +90,7 @@ describe('persist health (boolean presence only)', () => {
   it('keeps public /audit and /trial off the Neon persist path', () => {
     const audit = readFileSync(join(ROOT, 'src/app/audit/page.tsx'), 'utf8');
     const trial = readFileSync(join(ROOT, 'src/app/trial/page.tsx'), 'utf8');
+    const operator = readFileSync(join(ROOT, 'src/app/operator/page.tsx'), 'utf8');
     const auditIntake = readFileSync(join(ROOT, 'src/app/api/audit-intake/route.ts'), 'utf8');
     const waitlist = readFileSync(join(ROOT, 'src/app/api/waitlist/route.ts'), 'utf8');
 
@@ -97,6 +98,8 @@ describe('persist health (boolean presence only)', () => {
     expect(audit).not.toMatch(/DATABASE_URL/);
     expect(trial).not.toMatch(/from ['"]@\/db['"]/);
     expect(trial).not.toMatch(/DATABASE_URL/);
+    expect(operator).not.toMatch(/from ['"]@\/db['"]/);
+    expect(operator).not.toMatch(/DATABASE_URL/);
     expect(auditIntake).not.toMatch(/from ['"]@\/db['"]/);
     expect(auditIntake).not.toMatch(/DATABASE_URL/);
     expect(waitlist).toMatch(/databaseUrlPresent/);

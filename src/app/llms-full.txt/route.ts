@@ -30,6 +30,7 @@ export async function GET() {
 - Promotions and ads: https://www.never86.ai/audit/promotions-ads
 - Refunds and adjustments: https://www.never86.ai/audit/refunds-adjustments
 - High delivery cost: https://www.never86.ai/audit/high-delivery-cost
+- Phone free-operator seat: https://www.never86.ai/operator — talk / type / photo / file. Sample answers stay fictional. Files stay on this phone.
 
 ${answers.map((answer) => `## ${answer.title}
 URL: https://www.never86.ai/answers/${answer.slug}

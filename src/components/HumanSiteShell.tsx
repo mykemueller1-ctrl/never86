@@ -28,6 +28,7 @@ export function HumanSiteHeader() {
           <Link href="/#what-it-finds" className="human-nav-link">What it finds</Link>
           <Link href="/#how-it-works" className="human-nav-link">How it works</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
+          <Link href="/operator" className="human-nav-link">Phone seat</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/onboard" className="human-button human-button-primary text-sm">Open with email →</Link>
         </nav>
@@ -72,8 +73,9 @@ export function HumanSiteFooter() {
             Built from firsthand operating experience inside independent restaurants and a 28-location, private-equity-backed restaurant group. Every claim stays tied to the evidence in front of us.
           </p>
         </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
+        <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
           <Link href="/onboard" className="human-nav-link">Open with email</Link>
+          <Link href="/operator" className="human-nav-link">Phone seat</Link>
           <Link href="/login" className="human-nav-link">Sign in</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
           <Link href="/privacy" className="human-nav-link">Privacy</Link>
