@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Never 86\'d — Restaurant Ops, Finally Fixed',
-  description: 'Invoice OCR, Z-Report processing, and morning briefings for independent restaurant operators. Built by an operator, for operators.',
+  title: 'Never 86\'d — Operator OS for Hospitality',
+  description:
+    'One location plus the owner seat is free. Never 86\'d is the operator OS for hospitality: invoices, Z/POS, 3P, labor, and morning briefs with proof.',
   openGraph: {
     title: 'Never 86\'d',
-    description: 'Restaurant ops platform built by an operator, for operators.',
+    description:
+      'Operator OS for hospitality with one free owner seat for a single location.',
     url: 'https://never86.ai',
   },
 };

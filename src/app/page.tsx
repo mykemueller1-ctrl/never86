@@ -1,124 +1,135 @@
-'use client';
-
-import { useState } from 'react';
+import Link from 'next/link';
+import { OwnerSeatForm } from '@/components/owner-seat-form';
 
 export default function Home() {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [restaurantName, setRestaurantName] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus('loading');
-
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, restaurantName }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setStatus('success');
-        setMessage(data.message || "You're on the list!");
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (err: any) {
-      setStatus('error');
-      setMessage(err.message || 'Something went wrong');
-    }
-  }
-
   return (
-    <main className="min-h-screen bg-dark-800 flex flex-col items-center justify-center px-6">
-      <div className="max-w-2xl w-full text-center">
-        {/* Logo */}
-        <h1 className="text-5xl md:text-7xl font-bold text-gold-500 mb-4 tracking-tight">
-          Never 86'd
-        </h1>
-        <p className="text-dark-200 text-lg md:text-xl mb-2">
-          Restaurant ops, finally fixed.
-        </p>
-        <p className="text-dark-300 text-base md:text-lg mb-12 max-w-lg mx-auto">
-          Invoice OCR. Z-Report processing. Morning briefings with your real numbers —
-          before you walk in the door. Built by an operator, for operators.
-        </p>
+    <main className="min-h-screen bg-dark-800 px-6 py-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-16">
+        <section className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div>
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-gold-500">
+              Operator OS for hospitality
+            </p>
+            <h1 className="max-w-4xl text-5xl font-bold tracking-tight text-white md:text-7xl">
+              Find the leak. Assign the fix. Keep the receipt.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-dark-200 md:text-xl">
+              Never 86&apos;d is the operator OS for restaurants and hospitality groups. It reads
+              the proof from invoices, Z reports, labor, tips, vendors, beverage, catering, and
+              3P so the owner sees the one action that matters before the shift starts.
+            </p>
+            <div className="mt-8 rounded-2xl border border-gold-700/60 bg-gold-500/10 p-6">
+              <p className="text-lg font-semibold text-white">
+                One location + one owner seat is free.
+              </p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-dark-200">
+                Seat 1 belongs to the owner. That first seat stays free for a single location.
+                When you add seat 2, seat 3, or more people, those become paid seats.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/trial"
+                className="inline-flex items-center justify-center rounded-lg bg-gold-500 px-6 py-3 font-semibold text-dark-900 transition-colors hover:bg-gold-600"
+              >
+                Claim free owner seat
+              </Link>
+              <Link
+                href="/audit"
+                className="inline-flex items-center justify-center rounded-lg border border-dark-500 px-6 py-3 font-semibold text-white transition-colors hover:border-gold-500 hover:text-gold-500"
+              >
+                See the 3P audit
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-4 text-sm text-dark-300 sm:grid-cols-3">
+              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
+                <p className="font-semibold text-white">Homepage = operator OS</p>
+                <p className="mt-2">The owner sees the full operating system, not just a fee chart.</p>
+              </div>
+              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
+                <p className="font-semibold text-white">3P is the Google door</p>
+                <p className="mt-2">DoorDash and Uber Eats proof brings operators in through the audit.</p>
+              </div>
+              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
+                <p className="font-semibold text-white">Human approves the action</p>
+                <p className="mt-2">Never 86&apos;d finds the leak, assigns the fix, and keeps the receipt.</p>
+              </div>
+            </div>
+          </div>
 
-        {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 text-left">
-          <div className="bg-dark-700 rounded-xl p-6 border border-dark-600">
-            <div className="text-gold-500 text-2xl mb-3">📄</div>
-            <h3 className="text-white font-semibold mb-2">Invoice OCR</h3>
-            <p className="text-dark-300 text-sm">
-              Email or upload your invoices. AI reads every line item — vendor, quantity, price, category. No manual entry.
+          <OwnerSeatForm />
+        </section>
+
+        <section className="grid gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
+            <div className="mb-3 text-2xl text-gold-500">📄</div>
+            <h2 className="text-xl font-semibold text-white">Vendor + invoice truth</h2>
+            <p className="mt-3 text-sm leading-6 text-dark-300">
+              OCR reads line items, price moves, pack changes, and invoice gaps so the owner knows
+              whether COGS drift came from the vendor, the mix, or the count.
             </p>
           </div>
-          <div className="bg-dark-700 rounded-xl p-6 border border-dark-600">
-            <div className="text-gold-500 text-2xl mb-3">📊</div>
-            <h3 className="text-white font-semibold mb-2">Z-Report Processing</h3>
-            <p className="text-dark-300 text-sm">
-              Drop your end-of-day report. Get food cost %, liquor cost %, prime cost %, check average — calculated automatically.
+          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
+            <div className="mb-3 text-2xl text-gold-500">📊</div>
+            <h2 className="text-xl font-semibold text-white">Shift proof, not guesses</h2>
+            <p className="mt-3 text-sm leading-6 text-dark-300">
+              Z/POS, voids, labor, tips, beverage, and catering are normalized into a single
+              operating picture, so POS does not get confused with payout and incomplete weeks stay open.
             </p>
           </div>
-          <div className="bg-dark-700 rounded-xl p-6 border border-dark-600">
-            <div className="text-gold-500 text-2xl mb-3">☀️</div>
-            <h3 className="text-white font-semibold mb-2">Morning Briefing</h3>
-            <p className="text-dark-300 text-sm">
-              6 AM email with yesterday's numbers, week-to-date trends, and flags if anything's off-target. Know before you walk in.
+          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
+            <div className="mb-3 text-2xl text-gold-500">☀️</div>
+            <h2 className="text-xl font-semibold text-white">Yesterday to one action</h2>
+            <p className="mt-3 text-sm leading-6 text-dark-300">
+              The morning brief turns yesterday into the next action, the owner approves it, and
+              the night proof closes the loop.
             </p>
           </div>
-        </div>
+        </section>
 
-        {/* Waitlist Form */}
-        {status === 'success' ? (
-          <div className="bg-dark-700 rounded-xl p-8 border border-gold-700">
-            <p className="text-gold-500 text-xl font-semibold mb-2">{message}</p>
-            <p className="text-dark-300">Check your email — we sent you a welcome note.</p>
+        <section className="rounded-3xl border border-dark-600 bg-dark-700/70 p-8">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-500">
+                Who this is for
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-white">
+                Built for owners first, then the rest of the floor.
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-dark-300">
+                Start with the owner seat so the person carrying the P&amp;L gets the cleanest signal
+                first. After that, add paid seats for GMs, chefs, finance, or multi-unit leaders
+                when you want the workflow shared across the operation.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl border border-gold-700 bg-dark-800 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-500">
+                  Seat 1
+                </p>
+                <p className="mt-2 text-lg font-semibold text-white">Owner</p>
+                <p className="mt-2 text-sm text-dark-300">Free for one location.</p>
+              </div>
+              <div className="rounded-xl border border-dark-600 bg-dark-800 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-dark-300">
+                  Seat 2
+                </p>
+                <p className="mt-2 text-lg font-semibold text-white">GM or operator</p>
+                <p className="mt-2 text-sm text-dark-300">Paid when you expand the team.</p>
+              </div>
+              <div className="rounded-xl border border-dark-600 bg-dark-800 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-dark-300">
+                  Seat 3
+                </p>
+                <p className="mt-2 text-lg font-semibold text-white">Chef or finance</p>
+                <p className="mt-2 text-sm text-dark-300">Paid seat with shared proof.</p>
+              </div>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-dark-400 focus:outline-none focus:border-gold-500 transition-colors"
-            />
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-dark-400 focus:outline-none focus:border-gold-500 transition-colors"
-            />
-            <input
-              type="text"
-              placeholder="Restaurant name (optional)"
-              value={restaurantName}
-              onChange={(e) => setRestaurantName(e.target.value)}
-              className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-dark-400 focus:outline-none focus:border-gold-500 transition-colors"
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="w-full bg-gold-500 hover:bg-gold-600 text-dark-900 font-semibold rounded-lg px-4 py-3 transition-colors disabled:opacity-50"
-            >
-              {status === 'loading' ? 'Joining...' : 'Join the Waitlist'}
-            </button>
-            {status === 'error' && (
-              <p className="text-red-400 text-sm">{message}</p>
-            )}
-          </form>
-        )}
+        </section>
 
-        {/* Footer */}
-        <p className="text-dark-400 text-xs mt-16">
-          Never 86'd · Built by an operator, for operators · never86.ai
+        <p className="text-center text-xs text-dark-400">
+          Never 86&apos;d · Built by an operator, for operators · never86.ai
         </p>
       </div>
     </main>
