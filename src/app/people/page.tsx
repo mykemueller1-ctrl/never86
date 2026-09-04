@@ -5,9 +5,32 @@ import { trackEvent } from '@/lib/track';
 import { useState } from 'react';
 
 const PILLARS = [
-  { name: 'Shift Pulse',     tag: 'Tonight', body: "Tonight's shift in one screen. Covers vs forecast, station median, the goal, the streak.", href: '/demo/shift-pulse', status: 'live' as const },
-  { name: 'Knowledge Brain', tag: 'Recipes', body: 'Recipes, specs, service rules, the answers your line asks every shift.', status: 'coming' as const },
-  { name: 'Achievements',    tag: 'Streaks', body: 'Streaks that mean something. Voids under the line. Upsell records. Zero-comp shifts.', status: 'coming' as const },
+  {
+    name: 'Shift Pulse',
+    tag: 'Tonight',
+    body: "Tonight's shift in one screen. Covers vs forecast, station median, the goal, the streak.",
+    href: '/demo/shift-pulse',
+    status: 'live' as const,
+  },
+  {
+    name: 'Knowledge Brain',
+    tag: 'Recipes',
+    body: 'Recipes, specs, service rules, the answers your line asks every shift.',
+    status: 'coming' as const,
+  },
+  {
+    name: 'Achievements',
+    tag: 'Streaks',
+    body: 'Streaks that mean something. Voids under the line. Upsell records. Zero-comp shifts.',
+    status: 'coming' as const,
+  },
+];
+
+const STATIONS = [
+  { name: 'Kitchen', job: 'Tickets, prep, 86 board' },
+  { name: 'Bar', job: 'Pour specs, open bottles, count' },
+  { name: 'FOH', job: 'Covers, comps, guest recovery' },
+  { name: 'Drivers', job: 'Late runs, bag checks, route proof' },
 ];
 
 export default function PeoplePage() {
@@ -28,7 +51,7 @@ export default function PeoplePage() {
           email,
           name,
           restaurantName,
-          agentRequested: 'CTAP · People platform',
+          agentRequested: 'CTAP · Communities',
           sourcePage: '/people',
         }),
       });
@@ -53,28 +76,79 @@ export default function PeoplePage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· people</span>
+                Never 86&apos;d <span className="italic text-ink-600">· communities</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Product 02 · CTAP · coming</p>
+              <p className="compass-eyebrow-dim mt-2">Product 02 · floor OS · live Shift Pulse</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
-            <Link href="/for" onClick={() => trackEvent('people_nav_click', { meta: { target: '/for', label: 'Seats' } })} className="compass-pill"><span className="avatar">S</span><span>Seats</span></Link>
-            <Link href="/onboard" onClick={() => trackEvent('people_nav_click', { meta: { target: '/onboard', label: 'Onboard your store' } })} className="btn-primary" style={{ background: '#0066ff' }}>Onboard your store</Link>
+            <Link
+              href="/login"
+              onClick={() => trackEvent('people_nav_click', { meta: { target: '/login', label: 'Sign in' } })}
+              className="compass-pill"
+            >
+              <span className="avatar">→</span>
+              <span>Sign in</span>
+            </Link>
+            <Link
+              href="/demo/shift-pulse"
+              onClick={() => trackEvent('people_nav_click', { meta: { target: '/demo/shift-pulse', label: 'Try Shift Pulse' } })}
+              className="btn-primary"
+              style={{ background: '#0066ff' }}
+            >
+              Try Shift Pulse →
+            </Link>
           </nav>
         </div>
       </div>
 
       <section className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-16">
-        <p className="compass-eyebrow mb-6">— Product 02 · coming</p>
+        <p className="compass-eyebrow mb-6">— Communities · live now</p>
         <h1 className="compass-display text-5xl md:text-7xl lg:text-[88px] mb-10">
           The crew sees<br />
           <em>what the back office</em> sees.
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-2xl mb-10">
-          Built on a real restaurant. Fort Dodge, Iowa. 41 staff, 7 departments, every shift on one screen.
+          Communities is the floor seat: tonight&apos;s shift, station jobs, and one next move — without another dashboard. Sample Shift Pulse is live. Full cohort opens next.
         </p>
-        <a href="#notify" onClick={() => trackEvent('people_hero_cta_click', { meta: { target: '#notify', label: 'Get notified' } })} className="btn-primary" style={{ background: '#0066ff' }}>Get notified →</a>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/demo/shift-pulse"
+            onClick={() => trackEvent('people_hero_cta_click', { meta: { target: '/demo/shift-pulse', label: 'Open Shift Pulse' } })}
+            className="btn-primary"
+            style={{ background: '#0066ff' }}
+          >
+            Open live Shift Pulse →
+          </Link>
+          <a
+            href="#notify"
+            onClick={() => trackEvent('people_hero_cta_click', { meta: { target: '#notify', label: 'Get notified' } })}
+            className="compass-pill"
+          >
+            Get cohort notify
+          </a>
+        </div>
+      </section>
+
+      <section className="border-t border-[#e8e8ed] py-20 md:py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <p className="compass-eyebrow mb-4">— Stations</p>
+          <h2 className="compass-display text-3xl md:text-5xl mb-4">
+            One house. <em>Four rooms.</em>
+          </h2>
+          <p className="compass-body text-lg max-w-2xl mb-12">
+            Public-safe station map. No staff names, PINs, or private store numbers on this page.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {STATIONS.map((station) => (
+              <div key={station.name} className="compass-card">
+                <p className="compass-card-label">Station</p>
+                <h3>{station.name}</h3>
+                <p className="compass-body text-[14px] mt-2">{station.job}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="border-t border-[#e8e8ed] py-20 md:py-24 px-6">
@@ -90,18 +164,23 @@ export default function PeoplePage() {
                   <div className="flex items-center justify-between">
                     <p className="compass-card-label">{p.tag}</p>
                     <span className="text-[11px] font-medium inline-flex items-center gap-1.5" style={{ color: '#34c759' }}>
-                      <span className="compass-live-dot" style={{ marginRight: 0 }} />Live
+                      <span className="compass-live-dot" style={{ marginRight: 0 }} />
+                      Live
                     </span>
                   </div>
                   <h3>{p.name}</h3>
                   <p className="compass-body text-[14px] mt-2 mb-5">{p.body}</p>
-                  <p className="text-[14px] inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>Try it free <span aria-hidden>→</span></p>
+                  <p className="text-[14px] inline-flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: '#0066ff' }}>
+                    Try it free <span aria-hidden>→</span>
+                  </p>
                 </Link>
               ) : (
                 <div key={p.name} className="compass-card">
                   <div className="flex items-center justify-between">
                     <p className="compass-card-label">{p.tag}</p>
-                    <span className="text-[11px] font-medium" style={{ color: '#6e6e73' }}>Coming</span>
+                    <span className="text-[11px] font-medium" style={{ color: '#6e6e73' }}>
+                      Coming
+                    </span>
                   </div>
                   <h3>{p.name}</h3>
                   <p className="compass-body text-[14px] mt-2">{p.body}</p>
@@ -118,9 +197,17 @@ export default function PeoplePage() {
           <h2 className="compass-display text-3xl md:text-5xl mb-8">
             People-native AI. <em>Not back-office software</em> with a chat box.
           </h2>
-          <p className="compass-body text-lg md:text-xl leading-relaxed">
-            Every other restaurant tool was built for the office. We&apos;re building one for the floor — and giving the office a window into it.
+          <p className="compass-body text-lg md:text-xl leading-relaxed mb-8">
+            Every other restaurant tool was built for the office. Communities is for the floor — and gives the owner seat a window into it.
           </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/login" className="btn-primary" style={{ background: '#0066ff' }}>
+              Operator sign in →
+            </Link>
+            <Link href="/onboard" className="compass-pill">
+              Claim free owner seat
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -130,7 +217,9 @@ export default function PeoplePage() {
           <h2 className="compass-display text-4xl md:text-5xl mb-3 text-center">
             First <em>in line.</em>
           </h2>
-          <p className="compass-body text-lg mb-10 text-center">We&apos;ll reach out when CTAP opens to a cohort.</p>
+          <p className="compass-body text-lg mb-10 text-center">
+            We&apos;ll reach out when Communities opens to the next cohort. No staff PII collected here beyond the email you type.
+          </p>
           {status === 'success' ? (
             <div className="compass-card text-center">
               <p className="font-serif text-2xl text-ink-800 mb-2">{message}</p>
@@ -138,9 +227,28 @@ export default function PeoplePage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="compass-card space-y-3">
-              <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
-              <input type="text" placeholder="Restaurant or group" value={restaurantName} onChange={(e) => setRestaurantName(e.target.value)} className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors" />
+              <input
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
+              />
+              <input
+                type="text"
+                placeholder="Restaurant or group"
+                value={restaurantName}
+                onChange={(e) => setRestaurantName(e.target.value)}
+                className="w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors"
+              />
               <button type="submit" disabled={status === 'loading'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                 {status === 'loading' ? 'Sending…' : 'Get notified →'}
               </button>
@@ -153,12 +261,33 @@ export default function PeoplePage() {
       <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-[#6e6e73] text-[12px]">
           <div className="flex items-center gap-2">
-            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>N86</span>
-            <span>Never 86&apos;d · Built by operators</span>
+            <span className="brand-monogram" style={{ width: '1.1rem', height: '1.1rem', fontSize: '0.5rem' }}>
+              N86
+            </span>
+            <span>Never 86&apos;d · Communities</span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/for" onClick={() => trackEvent('people_footer_click', { meta: { target: '/for', label: 'Seats' } })} className="hover:text-ink-800 transition-colors">Seats</Link>
-            <Link href="/reports/login" onClick={() => trackEvent('people_footer_click', { meta: { target: '/reports/login', label: 'Sign in' } })} className="hover:text-ink-800 transition-colors">Sign in</Link>
+            <Link
+              href="/demo/shift-pulse"
+              onClick={() => trackEvent('people_footer_click', { meta: { target: '/demo/shift-pulse', label: 'Shift Pulse' } })}
+              className="hover:text-ink-800 transition-colors"
+            >
+              Shift Pulse
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => trackEvent('people_footer_click', { meta: { target: '/login', label: 'Sign in' } })}
+              className="hover:text-ink-800 transition-colors"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/onboard"
+              onClick={() => trackEvent('people_footer_click', { meta: { target: '/onboard', label: 'Onboard' } })}
+              className="hover:text-ink-800 transition-colors"
+            >
+              Owner seat
+            </Link>
           </div>
         </div>
       </footer>
