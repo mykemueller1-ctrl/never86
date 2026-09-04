@@ -11,14 +11,13 @@ describe('open play door', () => {
     expect(html).toMatch(/No portal passwords/);
     expect(html).not.toMatch(/\bPIN\b/);
     expect(html).toMatch(/not Community Tap private dollars/);
+    expect(html).toMatch(/canonical" href="https:\/\/www\.never86\.ai\/play"/);
   });
 
-  it('exposes /play as the public Action Shift door', () => {
-    const page = readFileSync(resolve('src/app/play/page.tsx'), 'utf8');
-    expect(page).toMatch(/canonical: 'https:\/\/www\.never86\.ai\/play'/);
-    expect(page).toMatch(/\/demo\/action-shift\.html/);
-    expect(page).toMatch(/Community Tap/);
-    expect(page).toMatch(/\/onboard/);
+  it('rewrites /play to the suck-in desk (no iframe)', () => {
+    const config = readFileSync(resolve('next.config.js'), 'utf8');
+    expect(config).toMatch(/source: '\/play'/);
+    expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
   });
 
   it('marks Community Tap as seat 1 on /action-shift', () => {
