@@ -13,17 +13,30 @@
 - Shrink / variance ranks **review work**. Never name staff as thieves.
 - POS ≠ payout. Marketplace statement ≠ bank deposit.
 
+## House pour — ask every unit
+
+Drink recipes are **per operator**. Never assume 1.5 oz (or 1.75 / 2).
+
+```
+ask_pour_standards → operator answers → declare_pour_standards → human approves memory
+```
+
+Categories: spirit_shot · mixed_drink_liquor · wine_glass · draft_pour · packaged_beer · double_spirit  
+
+Choice menu (options only): 1 · 1.25 · 1.5 · **1.75** · 2 · 4 · 5 · 6 · 12 · 16 fl oz (+ custom).
+
+Straight shot and mixed-drink liquor are often different — ask both. Doubles are their own line.
+
 ## Beverage pour path
 
 ```
 bottleFlOz = packageMl / 29.5735295625
-poursPerPackage = (unitsPerPackage × unitFlOz) / pourSpecFlOz
-costPerPour = packageCost / poursPerPackage   # pack + pourSpec verified
+poursPerPackage = (unitsPerPackage × unitFlOz) / housePourSpecFlOz
+costPerPour = packageCost / poursPerPackage   # pack + HOUSE pourSpec verified
 shrinkUnits = max(0, inventoryConsumed − posPoured)   # Never86 BCS
 pourCostPct = beverageCogs$ / beverageSales$          # needs counts + sales
 ```
 
-Common pourSpecs (operator-approved only): spirit 1 / 1.25 / 1.5 / 2 fl oz; wine 5 / 6; draft 12 / 16.  
 Kegs (TTB barrel = 31 US gal): half 15.5 · quarter 7.75 · sixth ≈ 5.1667.
 
 ## Food recipe path

@@ -4,6 +4,7 @@ import {
 } from './marketplaceCost';
 import { NEVER86_OPERATOR_SYSTEM } from './operatorSystem';
 import { recipeCostKnowledgePack } from './recipeCost';
+import { pourStandardsKnowledgePack } from './operatorPourStandards';
 import { uomKnowledgePack } from './uomConvert';
 
 export const PUBLIC_LOGIC_DOMAINS = [
@@ -30,6 +31,7 @@ export const PUBLIC_LOGIC_DOMAINS = [
   'uom-cost',
   'recipe-cost',
   'forensic-pnl',
+  'pour-standards',
 ] as const;
 
 export type PublicLogicDomain = (typeof PUBLIC_LOGIC_DOMAINS)[number];
@@ -279,7 +281,7 @@ const beverage = {
   },
   boundary:
     'This is a pour-vs-inventory heuristic. Transfers, waste, unit/pack mismatch, comps, recipes, and count timing can explain it. Fluid oz ≠ weight oz. Missing pourSpec or keg size is Missing Evidence.',
-  relatedDomains: ['uom-cost', 'vendor-drift'],
+  relatedDomains: ['uom-cost', 'pour-standards', 'vendor-drift'],
 };
 
 const productMixPars = {
@@ -309,6 +311,8 @@ const productMixPars = {
 const uomCost = uomKnowledgePack();
 
 const recipeCostLogic = recipeCostKnowledgePack();
+
+const pourStandards = pourStandardsKnowledgePack();
 
 const forensicPnl = {
   purpose:
@@ -372,6 +376,7 @@ export const PUBLIC_OPERATOR_LOGIC = {
   'product-mix-pars': productMixPars,
   'uom-cost': uomCost,
   'recipe-cost': recipeCostLogic,
+  'pour-standards': pourStandards,
   'forensic-pnl': forensicPnl,
 } as const;
 

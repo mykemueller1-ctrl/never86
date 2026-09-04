@@ -39,6 +39,8 @@ describe('public MCP route', () => {
       'analyze_labor',
       'analyze_beverage',
       'convert_uom',
+      'ask_pour_standards',
+      'declare_pour_standards',
       'analyze_recipe_cost',
       'analyze_vendor_prices',
       'build_action_shift',

@@ -117,21 +117,22 @@ export function kegFlOz(kegGal: number): UomOk<number> | UomError {
   return convertVolume(kegGal, 'gal', 'flOz');
 }
 
-export type CommonPourSpecFlOz = 1 | 1.25 | 1.5 | 2 | 5 | 6 | 12 | 16;
+export type CommonPourSpecFlOz = 1 | 1.25 | 1.5 | 1.75 | 2 | 5 | 6 | 12 | 16;
 
 export const COMMON_POUR_SPECS: readonly {
   id: string;
   pourSpecFlOz: CommonPourSpecFlOz;
   use: string;
 }[] = [
-  { id: 'spirit-1', pourSpecFlOz: 1, use: 'Compact / measured well pour' },
-  { id: 'spirit-1.25', pourSpecFlOz: 1.25, use: 'House compromise pour' },
-  { id: 'spirit-1.5', pourSpecFlOz: 1.5, use: 'US standard shot / spirit base' },
-  { id: 'spirit-2', pourSpecFlOz: 2, use: 'Double / rocks — separate recipe line' },
-  { id: 'wine-5', pourSpecFlOz: 5, use: 'US standard wine glass' },
-  { id: 'wine-6', pourSpecFlOz: 6, use: 'Larger wine pour' },
-  { id: 'beer-12', pourSpecFlOz: 12, use: 'Common draft pour' },
-  { id: 'beer-16', pourSpecFlOz: 16, use: 'US pint' },
+  { id: 'spirit-1', pourSpecFlOz: 1, use: 'Choice only — compact / measured well pour' },
+  { id: 'spirit-1.25', pourSpecFlOz: 1.25, use: 'Choice only — house compromise pour' },
+  { id: 'spirit-1.5', pourSpecFlOz: 1.5, use: 'Choice only — common US shot; ask this unit' },
+  { id: 'spirit-1.75', pourSpecFlOz: 1.75, use: 'Choice only — common mixed-drink liquor pour; ask this unit' },
+  { id: 'spirit-2', pourSpecFlOz: 2, use: 'Choice only — double / heavy house pour; ask this unit' },
+  { id: 'wine-5', pourSpecFlOz: 5, use: 'Choice only — common wine glass; ask this unit' },
+  { id: 'wine-6', pourSpecFlOz: 6, use: 'Choice only — larger wine pour; ask this unit' },
+  { id: 'beer-12', pourSpecFlOz: 12, use: 'Choice only — common draft; ask this unit' },
+  { id: 'beer-16', pourSpecFlOz: 16, use: 'Choice only — US pint; ask this unit' },
 ];
 
 export const BEER_PACK_SIZES = [12, 24, 30] as const;
@@ -139,6 +140,7 @@ export const BEER_PACK_SIZES = [12, 24, 30] as const;
 export const UOM_TRUTH_GATES = [
   'Fluid ounce (fl oz) is volume. Avoirdupois ounce (oz) is mass. Never conflate.',
   'Never invent case conversion, keg size, bottle mL, or pourSpec. Missing → Missing Evidence.',
+  'House pour is per unit. Ask 1.5 / 1.75 / 2 (or custom) — never assume one industry default.',
   'Invoice package UoM (CASE / BTL / KEG) must match pack size before cost-per-pour.',
   'PourSpec is knowledge, not a verdict. Missing pour log → liquor/beer stay Open.',
 ] as const;
@@ -171,7 +173,8 @@ export function uomKnowledgePack() {
   );
 
   return {
-    purpose: 'Convert verified restaurant package sizes into pour and portion units without inventing pack or pourSpec.',
+    purpose:
+      'Convert verified restaurant package sizes into pour and portion units without inventing pack or pourSpec. House pour ounces are asked per unit — see operatorPourStandards / ask_pour_standards.',
     constants: {
       mlPerUsFlOz: ML_PER_US_FL_OZ,
       flOzPerUsGal: FL_OZ_PER_US_GAL,
@@ -182,13 +185,13 @@ export function uomKnowledgePack() {
     formulas: {
       bottleFlOz: 'packageMl / 29.5735295625',
       kegFlOz: 'kegGal * 128',
-      poursPerPackage: '(unitsPerPackage * unitFlOz) / pourSpecFlOz',
-      costPerPour: 'packageCost / poursPerPackage  // only when pack + pourSpec verified',
+      poursPerPackage: '(unitsPerPackage * unitFlOz) / housePourSpecFlOz',
+      costPerPour: 'packageCost / poursPerPackage  // only when pack + house pourSpec verified',
       epUnitCost: 'apUnitCost / yieldFraction',
     },
     spiritBottles: bottles,
     kegs,
-    commonPourSpecs: COMMON_POUR_SPECS,
+    pourSizeChoiceMenu: COMMON_POUR_SPECS,
     beerPackSizes: BEER_PACK_SIZES,
     truthGates: UOM_TRUTH_GATES,
     never: [
@@ -196,6 +199,7 @@ export function uomKnowledgePack() {
       'Never assume “a keg” is a half barrel.',
       'Never treat 12-pack, 24-pack, and 30-pack as the same case.',
       'Never invent yield, case pack, or pourSpec.',
+      'Never apply 1.5 oz (or any size) as a universal pour — ask this unit.',
     ],
   };
 }

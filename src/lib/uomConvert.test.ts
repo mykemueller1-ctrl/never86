@@ -57,7 +57,9 @@ describe('uomConvert', () => {
 
     expect(BEER_PACK_SIZES).toEqual([12, 24, 30]);
     const pack = uomKnowledgePack();
-    expect(pack.truthGates.join(' ')).toMatch(/Never invent/);
-    expect(pack.formulas.poursPerPackage).toMatch(/pourSpecFlOz/);
+    expect(pack.truthGates.join(' ')).toMatch(/Ask 1\.5 \/ 1\.75 \/ 2/);
+    expect(pack.formulas.poursPerPackage).toMatch(/housePourSpecFlOz/);
+    expect(pack.pourSizeChoiceMenu.some((row) => row.pourSpecFlOz === 1.75)).toBe(true);
+    expect(pack.never.join(' ')).toMatch(/universal pour/);
   });
 });

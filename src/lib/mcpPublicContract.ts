@@ -158,7 +158,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'convert_uom',
     description:
-      'Convert verified restaurant package sizes into pour/portion units (bottle mL → fl oz, keg gal → fl oz, pours per package, cost per pour). Refuses invented pack size or pourSpec. Fluid ounce ≠ weight ounce.',
+      'Convert verified restaurant package sizes into pour/portion units (bottle mL → fl oz, keg gal → fl oz, pours per package, cost per pour). Refuses invented pack size or pourSpec. Fluid ounce ≠ weight ounce. House pour ounces come from ask_pour_standards / declare_pour_standards — never assume 1.5.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -171,7 +171,11 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         keg_gal: { type: 'number', exclusiveMinimum: 0 },
         units_per_package: { type: 'number', exclusiveMinimum: 0 },
         unit_fl_oz: { type: 'number', exclusiveMinimum: 0 },
-        pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0 },
+        pour_spec_fl_oz: {
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'House pour in fl oz from THIS unit (1.5, 1.75, 2, or custom). Required for pours_per_package — never invent.',
+        },
         package_cost: { type: 'number', minimum: 0 },
         pours_per_package: { type: 'number', exclusiveMinimum: 0 },
         amount: { type: 'number', minimum: 0 },
@@ -179,6 +183,61 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
         to: { type: 'string' },
       },
       required: ['op'],
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'ask_pour_standards',
+    description:
+      'Interview pack for THIS restaurant unit’s drink pour sizes. Returns questions and choice menus (1.5 / 1.75 / 2 oz, etc.). Does not invent a house pour. Call before costing drink recipes.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store_id: { type: 'string', description: 'Store / unit id. Pour standards are per unit.' },
+        location_id: { type: 'string', description: 'Optional bar / location within the store.' },
+        categories: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+          },
+        },
+      },
+      additionalProperties: false,
+    },
+    annotations: MCP_READ_ONLY_ANNOTATIONS,
+  },
+  {
+    name: 'declare_pour_standards',
+    description:
+      'Validate operator-answered house pour lines for one unit (e.g. shot 1.5, mixed 1.75, wine 5). Returns Missing Evidence for unanswered categories. Does not write memory — returns a Memory Curator proposal for human approve.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        store_id: { type: 'string' },
+        location_id: { type: 'string' },
+        lines: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                enum: ['spirit_shot', 'mixed_drink_liquor', 'wine_glass', 'draft_pour', 'packaged_beer', 'double_spirit'],
+              },
+              pour_spec_fl_oz: { type: 'number', exclusiveMinimum: 0, maximum: 32 },
+              label: { type: 'string' },
+              measure_method: { type: 'string' },
+              approved_by: { type: 'string' },
+              source: { type: 'string' },
+            },
+            required: ['category', 'pour_spec_fl_oz'],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ['store_id', 'lines'],
       additionalProperties: false,
     },
     annotations: MCP_READ_ONLY_ANNOTATIONS,
@@ -295,6 +354,8 @@ export const MCP_ANALYSIS_TOOL_NAMES = [
   'analyze_labor',
   'analyze_beverage',
   'convert_uom',
+  'ask_pour_standards',
+  'declare_pour_standards',
   'analyze_recipe_cost',
   'analyze_vendor_prices',
   'build_action_shift',

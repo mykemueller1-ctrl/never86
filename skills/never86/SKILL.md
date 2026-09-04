@@ -15,10 +15,10 @@ This file is a thin pointer. The Never86 OAuth/MCP backend owns restaurant logic
 
 1. Connect to `https://www.never86.ai/api/mcp`.
 2. Call `get_operator_system` first, then `list_specialists` (one agent · one job).
-3. For cost / pour / recipe / P&L: `get_operator_logic` domains `uom-cost`, `recipe-cost`, `forensic-pnl`, `beverage`, `vendor-drift`. Tools: `convert_uom`, `analyze_recipe_cost`, `analyze_beverage`.
+3. For cost / pour / recipe / P&L: `get_operator_logic` domains `pour-standards`, `uom-cost`, `recipe-cost`, `forensic-pnl`, `beverage`, `vendor-drift`. Tools: `ask_pour_standards`, `declare_pour_standards`, `convert_uom`, `analyze_recipe_cost`, `analyze_beverage`.
 4. Use only the public read-only tools listed by `tools/list` (knowledge + analysis). Optional: `prompts/get` → `specialist_brief`.
 5. Do not reimplement Action Shift, 3P formulas, vendor silence, UoM, recipe cost, or evidence states in this skill.
-6. Typed values stay Unverified. Missing Evidence is not $0. Do not invent pack size, pourSpec, yield, or facts.
+6. Typed values stay Unverified. Missing Evidence is not $0. Do not invent pack size, pourSpec, yield, or facts. **Ask each unit** their house pour (1.5 / 1.75 / 2 / custom) — never assume.
 7. A verbal yes does not close an action. Escalate overdue unverified manager-checklist steps to the manager seat as Missing Evidence — not theft.
 8. Vendor/service copy is DRAFT-ONLY. Never send, post, refund, pay, or change mailbox state.
 9. Keep one store's rules out of another tenant. Memory Curator writes only human-approved store rules.

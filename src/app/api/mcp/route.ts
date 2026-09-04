@@ -16,6 +16,13 @@ import {
 import { runBeverageCostScore } from '@/lib/beverageScoreCsv';
 import { runLaborDrift } from '@/lib/laborDriftCsv';
 import {
+  askPourStandards,
+  declarePourStandards,
+  proposePourStandardsMemory,
+  type HousePourLine,
+  type PourCategory,
+} from '@/lib/operatorPourStandards';
+import {
   calculateEpUnitCost,
   calculateRecipeCost,
   contributionMargin,
@@ -195,6 +202,19 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           return textResult(req.id, { evidenceState: 'Unverified', ...result });
         }
         if (op === 'pours_per_package') {
+          if (args.pour_spec_fl_oz === undefined) {
+            return textResult(
+              req.id,
+              {
+                ok: false,
+                invented: false,
+                evidenceState: 'Missing Evidence',
+                error:
+                  'pours_per_package needs pour_spec_fl_oz from THIS unit. Call ask_pour_standards first — do not assume 1.5, 1.75, or 2 oz.',
+              },
+              true,
+            );
+          }
           const result = poursPerPackage({
             unitsPerPackage: Number(args.units_per_package),
             unitFlOz: Number(args.unit_fl_oz),
@@ -234,6 +254,54 @@ async function handle(req: JsonRpcReq): Promise<Response> {
           },
           true,
         );
+      }
+
+      if (name === 'ask_pour_standards') {
+        const categories = Array.isArray(args.categories)
+          ? (args.categories as PourCategory[])
+          : undefined;
+        return textResult(req.id, {
+          warning:
+            'Ask THESE questions at this unit. Choice menus are options — not defaults. Do not invent 1.5 / 1.75 / 2 oz.',
+          ...askPourStandards({
+            storeId: typeof args.store_id === 'string' ? args.store_id : '',
+            locationId: typeof args.location_id === 'string' ? args.location_id : null,
+            categories,
+          }),
+        });
+      }
+
+      if (name === 'declare_pour_standards') {
+        const rawLines = Array.isArray(args.lines) ? args.lines : [];
+        const lines: HousePourLine[] = rawLines.map((row) => {
+          const r = row as Record<string, unknown>;
+          return {
+            category: r.category as PourCategory,
+            pourSpecFlOz: Number(r.pour_spec_fl_oz),
+            label: typeof r.label === 'string' ? r.label : undefined,
+            measureMethod: typeof r.measure_method === 'string' ? r.measure_method : undefined,
+            approvedBy: typeof r.approved_by === 'string' ? r.approved_by : undefined,
+            source: typeof r.source === 'string' ? r.source : undefined,
+          };
+        });
+        const declared = declarePourStandards({
+          storeId: typeof args.store_id === 'string' ? args.store_id : '',
+          locationId: typeof args.location_id === 'string' ? args.location_id : null,
+          lines,
+        });
+        if ('ok' in declared && declared.ok === false) {
+          return textResult(req.id, declared, true);
+        }
+        if (!('status' in declared)) {
+          return textResult(req.id, { ok: false, error: 'declare_pour_standards failed' }, true);
+        }
+        const memoryProposal = proposePourStandardsMemory(declared);
+        return textResult(req.id, {
+          warning:
+            'House pours stay Unverified until a human approves the Memory Curator proposal. LLM ranks; human sends/approves.',
+          standards: declared,
+          memoryProposal,
+        });
       }
 
       if (name === 'analyze_recipe_cost') {

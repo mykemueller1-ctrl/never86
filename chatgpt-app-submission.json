@@ -128,6 +128,30 @@
         "destructive_justification": "Cannot invent pourSpec, keg size, or case conversion, or alter stock counts."
       }
     },
+    "ask_pour_standards": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns interview questions for this unit's house pour sizes without writing memory or inventing ounces.",
+        "open_world_justification": "Does not contact bars, POS systems, or distributors.",
+        "destructive_justification": "Cannot set pour policy or assume 1.5 / 1.75 / 2 oz for any store."
+      }
+    },
+    "declare_pour_standards": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Validates operator-answered pour lines and returns a Memory Curator proposal; it does not auto-approve memory.",
+        "open_world_justification": "Does not message staff or alter POS buttons.",
+        "destructive_justification": "Cannot write store memory without a human approver."
+      }
+    },
     "analyze_recipe_cost": {
       "annotations": {
         "readOnlyHint": true,
