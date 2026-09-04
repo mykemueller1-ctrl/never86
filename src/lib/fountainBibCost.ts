@@ -37,6 +37,142 @@ export const COMMON_FOUNTAIN_MIX_RATIOS = [
 
 export const COMMON_CUP_MARKED_FL_OZ = [9, 12, 16, 20, 24, 32] as const;
 
+/**
+ * Ice-pack interview choices (usable liquid = cup × (1 − iceFraction)).
+ * Rule of thumb used by catering / batch-bar planners — not a silent Never86 default.
+ * Sources: industry light/medium/heavy ≈ 15% / 25% / 40% ice displacement.
+ */
+export const ICE_PACK_CHOICES = [
+  {
+    id: 'light',
+    iceFraction: 0.15,
+    label: 'Light ice (~15%)',
+    note: 'More liquid. Choice only — confirm how this unit scoops.',
+  },
+  {
+    id: 'medium',
+    iceFraction: 0.25,
+    label: 'Medium ice (~25%)',
+    note: 'Common cubed-ice rule of thumb. Choice only.',
+  },
+  {
+    id: 'heavy',
+    iceFraction: 0.4,
+    label: 'Heavy ice (~40%)',
+    note: 'Packed cup / crushed ice. On a 9 oz cup ≈ 5.4 oz liquid — close to a ~5 oz operator guess with liquor + soda.',
+  },
+] as const;
+
+export type IcePackId = (typeof ICE_PACK_CHOICES)[number]['id'];
+
+/** Suggested liquid-fill interview options for a marked 9 oz cup (choice menu only). */
+export const COMMON_9OZ_LIQUID_FILL_CHOICES_FL_OZ = [4.5, 5, 5.5, 6, 6.5] as const;
+
+/**
+ * Estimate liquid fill from marked cup + ice pack. Evidence stays Estimated —
+ * operator can override with a measured liquidFillFlOz.
+ */
+export function estimateLiquidFillFromIcePack(input: {
+  cupMarkedFlOz: number;
+  icePack: IcePackId;
+}):
+  | {
+      ok: true;
+      invented: false;
+      evidenceState: 'Estimated';
+      cupMarkedFlOz: number;
+      icePack: IcePackId;
+      iceFraction: number;
+      liquidFillFlOz: number;
+      iceDisplacementFlOz: number;
+      note: string;
+    }
+  | { ok: false; invented: false; evidenceState: 'Missing Evidence'; error: string } {
+  if (!Number.isFinite(input.cupMarkedFlOz) || input.cupMarkedFlOz <= 0) {
+    return {
+      ok: false,
+      invented: false,
+      evidenceState: 'Missing Evidence',
+      error: 'cupMarkedFlOz must be > 0 before estimating ice displacement.',
+    };
+  }
+  const pack = ICE_PACK_CHOICES.find((row) => row.id === input.icePack);
+  if (!pack) {
+    return {
+      ok: false,
+      invented: false,
+      evidenceState: 'Missing Evidence',
+      error: 'icePack must be light | medium | heavy (interview choices). Or give liquidFillFlOz directly.',
+    };
+  }
+  const liquidFillFlOz = input.cupMarkedFlOz * (1 - pack.iceFraction);
+  return {
+    ok: true,
+    invented: false,
+    evidenceState: 'Estimated',
+    cupMarkedFlOz: input.cupMarkedFlOz,
+    icePack: pack.id,
+    iceFraction: pack.iceFraction,
+    liquidFillFlOz,
+    iceDisplacementFlOz: input.cupMarkedFlOz - liquidFillFlOz,
+    note:
+      pack.id === 'heavy' && Math.abs(input.cupMarkedFlOz - 9) < 1e-9
+        ? '9 oz cup + heavy ice ≈ 5.4 oz liquid. Operator ~5 oz guess with 2 oz liquor is in-band. Measure to upgrade from Estimated.'
+        : 'Ice-pack estimate only. Upgrade with a measured liquid fill when available.',
+  };
+}
+
+/**
+ * Split total liquid fill into spirit + soda. Prefer operator house pour for spirit.
+ * Example: 9 oz cup, ~5 oz liquid, 2 oz liquor → ~3 oz Pepsi.
+ */
+export function splitCupLiquid(input: {
+  liquidFillFlOz: number;
+  spiritFlOz: number;
+}):
+  | {
+      ok: true;
+      invented: false;
+      liquidFillFlOz: number;
+      spiritFlOz: number;
+      sodaFlOz: number;
+      evidenceState: 'Unverified';
+    }
+  | { ok: false; invented: false; evidenceState: 'Missing Evidence'; error: string } {
+  if (!Number.isFinite(input.liquidFillFlOz) || input.liquidFillFlOz <= 0) {
+    return {
+      ok: false,
+      invented: false,
+      evidenceState: 'Missing Evidence',
+      error: 'liquidFillFlOz must be > 0 (after ice). A ~5 oz guess on a 9 oz iced cup is an interview option — not invented.',
+    };
+  }
+  if (!Number.isFinite(input.spiritFlOz) || input.spiritFlOz < 0) {
+    return {
+      ok: false,
+      invented: false,
+      evidenceState: 'Missing Evidence',
+      error: 'spiritFlOz must be ≥ 0 from THIS unit’s house pour (e.g. 1.5 / 1.75 / 2).',
+    };
+  }
+  if (input.spiritFlOz > input.liquidFillFlOz) {
+    return {
+      ok: false,
+      invented: false,
+      evidenceState: 'Missing Evidence',
+      error: `spiritFlOz (${input.spiritFlOz}) exceeds liquid fill (${input.liquidFillFlOz}).`,
+    };
+  }
+  return {
+    ok: true,
+    invented: false,
+    liquidFillFlOz: input.liquidFillFlOz,
+    spiritFlOz: input.spiritFlOz,
+    sodaFlOz: input.liquidFillFlOz - input.spiritFlOz,
+    evidenceState: 'Unverified',
+  };
+}
+
 export type FountainAskItem = {
   id: string;
   question: string;
@@ -121,6 +257,8 @@ export function askFountainBibStandards(input?: {
   ask: readonly FountainAskItem[];
   mixRatioChoiceMenu: typeof COMMON_FOUNTAIN_MIX_RATIOS;
   cupMarkedChoiceMenuFlOz: typeof COMMON_CUP_MARKED_FL_OZ;
+  icePackChoiceMenu: typeof ICE_PACK_CHOICES;
+  liquidFillChoiceMenuFlOz9oz: typeof COMMON_9OZ_LIQUID_FILL_CHOICES_FL_OZ;
   onboardingScript: readonly string[];
 } {
   const product = input?.productHint?.trim() || 'fountain soda on the gun';
@@ -131,6 +269,8 @@ export function askFountainBibStandards(input?: {
     evidenceState: 'Missing Evidence',
     mixRatioChoiceMenu: COMMON_FOUNTAIN_MIX_RATIOS,
     cupMarkedChoiceMenuFlOz: COMMON_CUP_MARKED_FL_OZ,
+    icePackChoiceMenu: ICE_PACK_CHOICES,
+    liquidFillChoiceMenuFlOz9oz: COMMON_9OZ_LIQUID_FILL_CHOICES_FL_OZ,
     ask: [
       {
         id: 'gun_product',
@@ -161,15 +301,25 @@ export function askFountainBibStandards(input?: {
       {
         id: 'cup_marked',
         question: 'What cup size is marked on the vessel for this drink? (e.g. 9 oz)',
-        why: 'Marked cup size is not liquid fill when ice and a straw are in the cup.',
+        why: 'Marked cup size is approximate max capacity — not serving liquid with ice (supplier cups say this).',
         choices: COMMON_CUP_MARKED_FL_OZ.map(String),
+        allowCustom: true,
+      },
+      {
+        id: 'ice_pack',
+        question:
+          'How packed is the ice in that cup — light (~15%), medium (~25%), or heavy (~40%)? Or skip and give liquid ounces directly.',
+        why:
+          'Catering/bar rule of thumb for ice displacement. Heavy ice in a 9 oz cup ≈ 5.4 oz liquid — a ~5 oz operator guess with ~2 oz liquor is in-band. Still Estimated until measured.',
+        choices: ICE_PACK_CHOICES.map((r) => r.id),
         allowCustom: true,
       },
       {
         id: 'liquid_fill',
         question:
-          'After ice and straw, how many fluid ounces of liquid actually go in that cup? Measure or estimate from a fill line — do not use the cup mark alone.',
-        why: 'Ice displaces soda. Costing a “9 oz cup” as 9 oz of Pepsi invents liquid volume.',
+          'After ice and straw, how many fluid ounces of liquid actually go in? For a 9 oz iced cup, common interview options are 4.5 / 5 / 5.5 / 6 / 6.5 — ~5 oz is a solid heavy-ice guess with ~2 oz liquor.',
+        why: 'Ice displaces soda. Costing a “9 oz cup” as 9 oz of Pepsi invents liquid volume. Measure when you can.',
+        choices: COMMON_9OZ_LIQUID_FILL_CHOICES_FL_OZ.map(String),
         allowCustom: true,
       },
     ],
@@ -179,9 +329,9 @@ export function askFountainBibStandards(input?: {
       '3. Confirm pour ratio on the gun / valve card (e.g. 5+1) — choice menu is options only.',
       '4. Convert: finishedGal = syrupGal × (waterParts/syrupParts + 1); finishedFlOz = finishedGal × 128.',
       '5. costPerFinishedFlOz = bibCost / finishedFlOz.',
-      '6. Cup: marked size vs liquid after ice + straw — ask both.',
+      '6. Cup: marked size vs liquid after ice. Heavy ice (~40%) on 9 oz ≈ 5.4 oz liquid; operator ~5 oz + ~2 oz liquor is a research-backed interview band.',
       '7. Spirit line (Hawkeye vodka): ask THIS unit’s mixed-drink liquor pour (1.5 / 1.75 / 2 / custom).',
-      '8. Pepsi in the cup = liquidFillFlOz − vodkaFlOz (or operator-stated soda fill).',
+      '8. Pepsi in the cup = liquidFillFlOz − vodkaFlOz (e.g. 5 − 2 = 3 oz Pepsi).',
       '9. Drink cost = vodkaCost + pepsiCost. Never invent mix ratio, ice fill, or house pour.',
     ],
   };
@@ -542,23 +692,39 @@ export function fountainBibKnowledgePack() {
       finishedGal: 'syrupGal × (waterParts / syrupParts + 1)',
       finishedFlOz: 'finishedGal × 128',
       costPerFinishedFlOz: 'bibCost / finishedFlOz',
+      usableLiquidFromIcePack: 'cupMarkedFlOz × (1 − iceFraction)  // Estimated until measured',
       sodaFlOzInCup: 'liquidFillFlOz − spiritFlOz',
       sodaCost: 'sodaFlOzInCup × costPerFinishedFlOz',
     },
+    iceResearch: {
+      lightFraction: 0.15,
+      mediumFraction: 0.25,
+      heavyFraction: 0.4,
+      note:
+        'Catering/bar rule of thumb: cubed ice ~25%, packed/crushed up to ~40%. Cup mark is approximate max capacity, not serving liquid.',
+      nineOzHeavyIceApproxLiquidFlOz: 5.4,
+      operatorGuessBand:
+        '~5 oz total liquid in a 9 oz iced cup with ~2 oz liquor → ~3 oz Pepsi. Interview option, not a silent default.',
+    },
     exampleWalkthrough: {
       recipe: 'Hawkeye vodka + Pepsi on the gun',
-      cup: '9 oz marked, ice + straw → ask liquid fill (not 9 oz of Pepsi)',
+      cup: '9 oz marked, ice + straw → ask liquid fill (~5 oz is a heavy-ice band; not 9 oz of Pepsi)',
       bib: '5-gal syrup BIB → ask invoice $ and mix ratio (often 5+1, but ASK)',
       spirit: 'Ask THIS unit mixed-drink liquor pour (1.5 / 1.75 / 2 / custom)',
+      split: 'If liquidFill=5 and spirit=2 → Pepsi=3 fl oz',
     },
     truthGates: [
       'BIB syrup gallons ≠ finished beverage gallons.',
       'Mix ratio is per gun / BIB — choice menu is interview options only.',
       'Cup mark ≠ liquid fill when ice and straw are present.',
+      'Ice-pack % (15/25/40) yields Estimated liquid fill — measure to upgrade.',
+      '~5 oz liquid in a 9 oz iced cup with ~2 oz liquor is a research-backed interview band, not invented.',
       'Missing ratio, BIB $, liquid fill, or house pour → Missing Evidence.',
       'Invoice on syrup is not period soda COGS without counts.',
     ],
     mixRatioChoiceMenu: COMMON_FOUNTAIN_MIX_RATIOS,
     cupMarkedChoiceMenuFlOz: COMMON_CUP_MARKED_FL_OZ,
+    icePackChoiceMenu: ICE_PACK_CHOICES,
+    liquidFillChoiceMenuFlOz9oz: COMMON_9OZ_LIQUID_FILL_CHOICES_FL_OZ,
   };
 }

@@ -49,8 +49,10 @@ import {
   costFountainBib,
   costFountainCupPour,
   declareCupService,
+  estimateLiquidFillFromIcePack,
   fountainBibKnowledgePack,
   walkFountainSpiritDrink,
+  type IcePackId,
 } from '@/lib/fountainBibCost';
 import {
   MCP_PUBLIC_ENDPOINT,
@@ -307,12 +309,24 @@ async function handle(req: JsonRpcReq): Promise<Response> {
             ...result,
           });
         }
+        if (op === 'estimate_cup_liquid') {
+          const result = estimateLiquidFillFromIcePack({
+            cupMarkedFlOz: Number(args.cup_marked_fl_oz),
+            icePack: args.ice_pack as IcePackId,
+          });
+          if (!result.ok) return textResult(req.id, result, true);
+          return textResult(req.id, {
+            warning:
+              'Estimated only from ice-pack interview band (15/25/40%). Heavy ice on 9 oz ≈ 5.4 oz liquid — a ~5 oz operator guess with ~2 oz liquor is in-band. Measure to upgrade.',
+            ...result,
+          });
+        }
         return textResult(
           req.id,
           {
             ok: false,
             error:
-              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | fountain_bib | cup_service | fountain_cup_pour | knowledge',
+              'convert_uom requires op: bottle_fl_oz | keg_fl_oz | pours_per_package | cost_per_pour | volume | mass | fountain_bib | cup_service | fountain_cup_pour | estimate_cup_liquid | knowledge',
           },
           true,
         );

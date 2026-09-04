@@ -286,8 +286,8 @@ describe('public MCP route', () => {
               water_parts: 5,
               syrup_parts: 1,
               cup_marked_fl_oz: 9,
-              liquid_fill_fl_oz: 6,
-              spirit_pour_fl_oz: 1.5,
+              liquid_fill_fl_oz: 5,
+              spirit_pour_fl_oz: 2,
               spirit_cost_per_fl_oz: 0.2,
             },
           },
@@ -298,7 +298,7 @@ describe('public MCP route', () => {
     const text = costedBody.result.content[0].text as string;
     expect(costedBody.result.isError).toBeFalsy();
     expect(text).toContain('"phase": "costed"');
-    expect(text).toContain('"sodaFlOz": 4.5');
+    expect(text).toContain('"sodaFlOz": 3');
     expect(text).toMatch(/Pepsi|Hawkeye/i);
   });
 });

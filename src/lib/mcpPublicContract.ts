@@ -174,10 +174,11 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
             'fountain_bib',
             'cup_service',
             'fountain_cup_pour',
+            'estimate_cup_liquid',
             'knowledge',
           ],
           description:
-            'Conversion operation. Use knowledge for the full UoM pack. Fountain BIB ops need operator-declared mix ratio + cup liquid fill — never invent 5+1 or ice fill.',
+            'Conversion operation. Use knowledge for the full UoM pack. Fountain BIB ops need operator-declared mix ratio + cup liquid fill — never invent 5+1 or ice fill. estimate_cup_liquid uses ice-pack interview bands (15/25/40%) as Estimated only.',
         },
         package_ml: { type: 'number', exclusiveMinimum: 0 },
         keg_gal: { type: 'number', exclusiveMinimum: 0 },
@@ -217,6 +218,12 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
           description: 'Liquid fl oz after ice + straw. Cup mark alone is not enough.',
         },
         ice_note: { type: 'string' },
+        ice_pack: {
+          type: 'string',
+          enum: ['light', 'medium', 'heavy'],
+          description:
+            'For estimate_cup_liquid: light~15% / medium~25% / heavy~40% ice displacement. Estimated only — 9 oz heavy ≈ 5.4 oz liquid.',
+        },
         spirit_fl_oz: {
           type: 'number',
           minimum: 0,
