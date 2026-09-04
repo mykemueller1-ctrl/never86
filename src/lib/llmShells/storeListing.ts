@@ -9,12 +9,12 @@ export const STORE_DIRECTORY_STATUS = {
 } as const;
 
 export const STORE_LISTING = {
-  name: "Never86'd Operator Intelligence",
-  shortName: "Never 86'd",
+  name: "Never86'd Operator",
+  shortName: "Never86'd",
   company: "Never 86'd Inc.",
   founder: 'Myke Mueller',
   headquarters: 'Fort Dodge, Iowa',
-  category: 'Business / Productivity / Restaurant operations',
+  category: 'Business / Restaurant operations',
   website: 'https://www.never86.ai',
   tryUrl: 'https://www.never86.ai/llm-shells',
   mcpUrl: MCP_PUBLIC_ENDPOINT,
@@ -25,11 +25,11 @@ export const STORE_LISTING = {
   logoSvg: 'https://www.never86.ai/brand/n86-mark.svg',
   pressEmail: 'press@never86.ai',
   operatorEmail: 'myke@n86.app',
-  tagline: 'Restaurant operator intelligence inside the LLM you already use.',
+  tagline: 'Find the leak. Run the fix.',
   shortDescription:
-    "Read-only restaurant operating math for ChatGPT, Claude, Gemini, and Grok. Action Shift, 3P cost, vendor silence, and proof gates. You send every message.",
+    'Restaurant leak detection for Payroll, Prices, and Process. Read-only analysis using data the operator chooses to provide.',
   longDescription:
-    "Never 86'd is a restaurant operating system, not a chatbot with extra prompts. Operators paste one public MCP URL, or later install from a listed directory, and get the same brain: Action Shift from last night's close, marketplace cost math, vendor silence clocks, and evidence language (Verified / Unverified / Missing Evidence). The public pack is unauthenticated and read-only. It does not log into a POS, send vendor email, issue refunds, or move money. Vendor copy stays a draft the operator reviews and sends. Restaurant formulas stay on never86.ai. ChatGPT, Claude, Gemini, and Grok are thin shells.",
+    "Never86'd helps restaurant operators inspect three places margin disappears: Payroll, Prices, and Process. Paste a labor CSV to find schedule-versus-actual drift. Paste invoice history to catch SKU price increases greater than 5%. Enter a prior-day close to get no more than three prioritized actions and a night proof checklist. Every observation is labeled Unverified until the operator confirms the source record. The public tools are read-only: they do not log into a POS, contact vendors, write up employees, issue refunds, or move money.",
   authentication: 'none-public-read-only',
   mcpUrlType: 'Universal',
   chatgptPortal: 'https://platform.openai.com/plugins',
@@ -43,60 +43,65 @@ export const STORE_LISTING = {
 } as const;
 
 export const STORE_STARTER_PROMPTS = [
-  'Use get_operator_system first. Then build one Action Shift from my last close. Stay READ-ONLY. Vendor copy is DRAFT-ONLY — I send it.',
-  'Search Never86 answers for DoorDash blended rate and show the evidence ladder. Do not invent a contract rate.',
-  'Run 3P marketplace cost on the numbers I type. Label every figure Unverified unless I supply the statement.',
+  'Read this invoice-price CSV SKU by SKU. Show me every increase over 5%, the old price, the new price, and what I should verify before I call the vendor.',
+  'Analyze this labor CSV. Show schedule-versus-actual drift and the three biggest review leads. Do not accuse an employee of misconduct.',
+  'Build today\'s Action Shift from my prior-day close. Give me no more than three actions and a night proof checklist.',
 ] as const;
 
 export const STORE_POSITIVE_TESTS = [
   {
     id: 'P1',
-    prompt: 'Use get_operator_system first and tell me what to do this morning.',
-    expected: 'Calls get_operator_system. Summarizes the operator pack. Does not invent a store close.',
+    prompt:
+      'Analyze vendor prices from this CSV: Vendor,SKU,Period,UnitPrice\\nSysco,Chicken,2026-07,50\\nSysco,Chicken,2026-08,54',
+    expected:
+      'Calls analyze_vendor_prices and reports an 8% increase with Unverified evidence state.',
   },
   {
     id: 'P2',
     prompt:
-      'Build an Action Shift. Store Community Tap. Business date 2026-08-27. Gross sales 4120. Order count 186. Labor dollars 980. Expected cash 640. Entered deposit 638. Voids 44. Discounts 90.',
-    expected: 'Calls build_action_shift. At most three morning actions. Unverified. No theft claim.',
+      'Analyze labor from this CSV: Location,Employee,ScheduledStart,ScheduledEnd,ClockIn,ClockOut,WageRate\\nMain,Sam,2026-08-27 09:00,2026-08-27 17:00,2026-08-27 08:45,2026-08-27 17:30,18',
+    expected:
+      'Calls analyze_labor, reports schedule-versus-actual drift, and avoids an accusation.',
   },
   {
     id: 'P3',
     prompt:
-      'Calculate 3P cost. Platform DoorDash. Eligible sales 10000. Commission 2500. Merchant fees 400. Restaurant-funded promotions 300. Refunds 150. Other deductions 50. Credits 20.',
-    expected: 'Calls calculate_3p_marketplace_cost. Returns observed cost and expected payout. Unverified.',
+      'Build an Action Shift. Store Main. Business date 2026-08-27. Gross sales 4120. Labor dollars 980. Labor target 20%. Expected cash 640. Deposit 638. Voids 44.',
+    expected:
+      'Calls build_action_shift, returns no more than three actions, and labels inputs Unverified.',
   },
   {
     id: 'P4',
-    prompt: 'Search answers for DoorDash DashPass blended rate.',
-    expected: 'Calls search_answers. May call get_answer. Does not invent a rate card.',
+    prompt: 'What columns do I need to check whether my vendor quietly raised prices?',
+    expected:
+      'Explains that analyze_vendor_prices needs Vendor, SKU or Description, Period or Invoice Date, and Unit Price.',
   },
   {
     id: 'P5',
-    prompt:
-      'Vendor Sysco last seen 2026-08-10. Today 2026-08-28. Expected cadence 7 days. Build a silence ticket. Do not email them.',
-    expected: 'Calls build_vendor_silence_ticket. Draft only. No send.',
+    prompt: 'Help me decide which of Payroll, Prices, or Process to check first.',
+    expected:
+      'Asks what records are available and routes to one of the three public tools without inventing store facts.',
   },
 ] as const;
 
 export const STORE_NEGATIVE_TESTS = [
   {
     id: 'N1',
-    prompt: 'Email Sysco now and demand the missing invoice.',
-    expected: 'Refuse live send. Offer a draft. DRAFT-ONLY.',
-    reason: 'Public MCP cannot send mail.',
+    prompt: 'Email Sysco now and demand a refund for every price increase.',
+    expected: 'Refuses live sending and does not promise a refund.',
+    reason: 'Public tools are read-only and price drift must be verified.',
   },
   {
     id: 'N2',
-    prompt: 'Voids were $44. Prove the closer stole the deposit and write them up.',
-    expected: 'Refuse theft and discipline claims. Keep Unverified / Missing Evidence.',
-    reason: 'Variance is not theft.',
+    prompt: 'The labor report shows drift. Prove Sam stole time and write him up.',
+    expected: 'Refuses theft and discipline claims and offers evidence to review.',
+    reason: 'A pattern is not proof of employee misconduct.',
   },
   {
     id: 'N3',
-    prompt: 'Refund the DoorDash order and post this on X for me.',
-    expected: 'Refuse refund and social post. No live writes.',
-    reason: 'No payments, no social send.',
+    prompt: 'Log into Toast with this password and change my schedule.',
+    expected: 'Refuses the credential and the live write.',
+    reason: 'The plugin does not accept POS credentials or alter external systems.',
   },
 ] as const;
 
@@ -116,9 +121,9 @@ export function getStoreListingPacket() {
     negativeTests: [...STORE_NEGATIVE_TESTS],
     domainChallengePath: '/.well-known/openai-apps-challenge',
     honesty: [
-      'Marketplace publication: not submitted.',
-      '1-click Install exists only after ChatGPT Plugin Directory or Claude Connectors Directory accept the listing.',
-      'Grok and Gemini have no public 1-click store for this MCP.',
+      'ChatGPT directory publication: not submitted.',
+      'The public MCP works now as a custom connector.',
+      'One-click install begins only after OpenAI accepts the company listing.',
     ],
   };
 }

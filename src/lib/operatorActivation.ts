@@ -14,7 +14,7 @@ import { databaseUrlPresent } from './persistHealth';
 
 // Monday gate (#118) — free seat on Neon (DATABASE_URL).
 // Supabase OPS is deferred; Toast/CTAP data comes back later.
-// Never email, log, or return a plaintext starter password.
+// Email links are the credential. Never log or return a raw link token.
 
 const TOKEN_BYTES = 32;
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24; // 24h
@@ -66,7 +66,7 @@ export function publicActivationAccepted(expiresAt: Date): {
 } {
   return {
     success: true,
-    message: 'Check your email for the activation link.',
+    message: 'Check your email for a secure sign-in link.',
     expiresAt: expiresAt.toISOString(),
   };
 }
@@ -99,7 +99,7 @@ export function mintActivationToken(nowMs = Date.now()): {
 export type ActivationRequestInput = {
   email: string;
   name?: string;
-  restaurantName: string;
+  restaurantName?: string;
   sourcePage?: string;
   requestIp?: string;
   userAgent?: string;
@@ -128,14 +128,10 @@ export async function requestOperatorActivation(
   }
 
   const email = normalizeEmail(input.email);
-  const restaurantName = normalizeRestaurant(input.restaurantName);
+  const restaurantName = normalizeRestaurant(input.restaurantName || 'My restaurant');
   if (!email || !email.includes('@')) {
     return { ok: false, error: 'Enter a valid email.', status: 400 };
   }
-  if (!restaurantName) {
-    return { ok: false, error: 'Enter your restaurant name.', status: 400 };
-  }
-
   await ensureFreeSeatSchema();
 
   const windowStart = new Date(nowMs - RATE_LIMIT_WINDOW_MS);
@@ -188,19 +184,6 @@ export async function requestOperatorActivation(
     };
   }
 
-  const existingCred = await db
-    .select({ operatorId: seatCredentials.operatorId })
-    .from(seatCredentials)
-    .where(eq(seatCredentials.email, email))
-    .limit(1);
-  if (existingCred[0]) {
-    return {
-      ok: false,
-      error: 'This email already has a seat. Sign in instead.',
-      status: 409,
-    };
-  }
-
   const { rawToken, tokenHash, expiresAt } = mintActivationToken(nowMs);
   await db.insert(seatActivationTokens).values({
     email,
@@ -220,7 +203,6 @@ export async function requestOperatorActivation(
 
 export type ActivateInput = {
   rawToken: string;
-  password: string;
 };
 
 export type ActivateResult =
@@ -251,15 +233,13 @@ export async function activateOperatorSeat(
     return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
   }
 
-  const password = input.password;
-  if (typeof password !== 'string' || password.length < 10) {
-    return { ok: false, error: 'Password must be at least 10 characters.', status: 400 };
-  }
-
   await ensureFreeSeatSchema();
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
-  const passwordHash = hashPassword(password);
+  // Keep the legacy credential row structurally valid while making the random
+  // secret impossible to use as a user-facing password. All public entry is by
+  // a fresh, verified email link.
+  const passwordHash = hashPassword(crypto.randomBytes(32).toString('base64url'));
 
   try {
     return await withSeatTransaction(async (tx) => {
@@ -321,16 +301,26 @@ export async function activateOperatorSeat(
         .where(eq(seatCredentials.email, email))
         .limit(1);
       if (priorCred[0]) {
+        const existingOperator = await tx
+          .select({ restaurantName: seatOperators.restaurantName })
+          .from(seatOperators)
+          .where(eq(seatOperators.id, priorCred[0].operatorId))
+          .limit(1);
+        const existingLocation = await tx
+          .select({ id: seatLocations.id })
+          .from(seatLocations)
+          .where(eq(seatLocations.operatorId, priorCred[0].operatorId))
+          .limit(1);
         await tx
           .update(seatActivationTokens)
           .set({ consumedOperatorId: priorCred[0].operatorId })
           .where(eq(seatActivationTokens.id, row.id));
-        // Commit consume: this email already has a seat; retrying the link
-        // must not mint a second one.
         return {
-          ok: false,
-          error: 'This email already has a seat. Sign in instead.',
-          status: 409,
+          ok: true,
+          operatorId: priorCred[0].operatorId,
+          locationId: existingLocation[0]?.id ?? 0,
+          email,
+          restaurantName: existingOperator[0]?.restaurantName || restaurantName,
         } as const;
       }
 

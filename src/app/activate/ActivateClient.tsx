@@ -1,109 +1,69 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-type Status = 'idle' | 'loading' | 'error' | 'done';
+type Status = 'loading' | 'error' | 'done';
 
 export default function ActivateClient() {
   const params = useSearchParams();
   const token = useMemo(() => params.get('token')?.trim() || '', [params]);
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
-  const [message, setMessage] = useState('');
+  const started = useRef(false);
+  const [status, setStatus] = useState<Status>('loading');
+  const [message, setMessage] = useState('Verifying your email…');
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+
     if (!token) {
       setStatus('error');
-      setMessage('Missing activation token. Use the link from your email.');
+      setMessage('This page needs the secure link from your email.');
       return;
     }
-    if (password.length < 10) {
-      setStatus('error');
-      setMessage('Password must be at least 10 characters.');
-      return;
-    }
-    if (password !== confirm) {
-      setStatus('error');
-      setMessage('Passwords do not match.');
-      return;
-    }
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/onboard/activate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Activation failed');
+
+    async function openOperator() {
+      try {
+        const res = await fetch('/api/onboard/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Sign-in failed');
+        setStatus('done');
+        setMessage('Email verified. Opening your operator…');
+        window.location.replace(data.redirect || '/dashboard');
+      } catch (err: unknown) {
+        setStatus('error');
+        setMessage(err instanceof Error ? err.message : 'Sign-in failed');
       }
-      setStatus('done');
-      window.location.href = data.redirect || '/dashboard';
-    } catch (err: unknown) {
-      setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Activation failed');
     }
-  }
+
+    void openOperator();
+  }, [token]);
 
   return (
     <main className="min-h-screen bg-[#0c1210] text-[#e8ebe6]">
-      <div className="mx-auto max-w-lg px-5 py-16">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#8fa898]">Free seat · one store · one login</p>
-        <h1 className="mt-4 font-serif text-4xl tracking-tight text-white">Choose your password.</h1>
-        <p className="mt-3 text-[#b7c0b8] leading-relaxed">
-          We never email a starter password. After this, you land on an empty desk that asks only for
-          yesterday&apos;s complete business-day close.
+      <div className="mx-auto max-w-lg px-5 py-24 text-center">
+        <p className="text-xs uppercase tracking-[0.2em] text-[#8fa898]">Never 86&apos;d · secure email sign-in</p>
+        <h1 className="mt-4 font-serif text-4xl tracking-tight text-white">
+          {status === 'error' ? 'That link did not open.' : 'You’re in.'}
+        </h1>
+        <p className="mt-4 text-[#b7c0b8] leading-relaxed" role={status === 'error' ? 'alert' : 'status'}>
+          {message}
         </p>
-
-        {!token ? (
-          <div className="mt-8 rounded-xl border border-[#3a4540] bg-[#121a17] p-5 text-sm text-[#c9d2cb]">
-            This page needs the link from your activation email.{' '}
-            <Link href="/onboard" className="text-[#7eb6ff] underline">
-              Request a new seat
-            </Link>
-            .
+        {status === 'loading' ? (
+          <div className="mx-auto mt-8 h-2 w-32 overflow-hidden rounded-full bg-[#26312c]">
+            <div className="h-full w-2/3 animate-pulse rounded-full bg-[#7eb6ff]" />
           </div>
-        ) : (
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
-            <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.14em] text-[#8fa898]">Password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-[#3a4540] bg-[#121a17] px-4 py-3 text-white outline-none focus:border-[#7eb6ff]"
-                minLength={10}
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.14em] text-[#8fa898]">Confirm</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="w-full rounded-xl border border-[#3a4540] bg-[#121a17] px-4 py-3 text-white outline-none focus:border-[#7eb6ff]"
-                minLength={10}
-                required
-              />
-            </label>
-            {status === 'error' ? <p className="text-sm text-[#ff8f8f]">{message}</p> : null}
-            <button
-              type="submit"
-              disabled={status === 'loading' || status === 'done'}
-              className="w-full rounded-full bg-[#e8ebe6] px-5 py-3.5 text-sm font-semibold text-[#0c1210] disabled:opacity-60"
-            >
-              {status === 'loading' ? 'Activating…' : 'Activate my free seat →'}
-            </button>
-          </form>
-        )}
+        ) : null}
+        {status === 'error' ? (
+          <Link href="/login" className="mt-8 inline-flex rounded-full bg-[#e8ebe6] px-5 py-3 text-sm font-semibold text-[#0c1210]">
+            Send me a new link →
+          </Link>
+        ) : null}
       </div>
     </main>
   );

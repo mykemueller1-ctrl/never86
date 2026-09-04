@@ -1,304 +1,386 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import Link from 'next/link';
 import type { DeskClose } from '@/lib/deskClose';
-import { serializeVendorSilencePacket } from '@/lib/vendorSilenceParse';
 
 const INK = '#141414';
 const BLUE = '#2424cf';
 const MUTED = '#6b6b66';
 const RULE = '#d8d3c5';
+const PAPER = '#f7f4ec';
+
+type Mode = 'payroll' | 'prices' | 'process';
+
+type LaborResult = {
+  ok: true;
+  shifts: number;
+  employees: number;
+  totalDriftMinutes: number;
+  totalDriftDollars: number;
+  driftRatio: number;
+  perEmployee: Array<{
+    store: string;
+    name: string;
+    earlyClockIns: number;
+    lateClockOuts: number;
+    totalOtMinutes: number;
+    shiftsRun: number;
+  }>;
+  ghostShifts: Array<{
+    store: string;
+    name: string;
+    clockedMinutes: number;
+    shiftStart: string;
+  }>;
+};
+
+type PriceResult = {
+  ok: true;
+  prevPeriod: string;
+  currPeriod: string;
+  totalSkus: number;
+  flaggedSkus: number;
+  totalDriftDollars: number;
+  perSku: Array<{
+    vendor: string;
+    sku: string;
+    prevPrice: number;
+    currPrice: number;
+    driftPct: number;
+    driftDollars: number;
+    flagged: boolean;
+  }>;
+};
 
 type DeskPayload = {
   restaurantName: string | null;
-  forwardTo: string;
+  forwardTo?: string;
   desk: DeskClose | null;
   closeId: number | null;
 };
 
-function Stamp({ state }: { state: string }) {
-  const label = state === 'missing-evidence' ? 'MISSING EVIDENCE' : state.toUpperCase();
-  const color = state === 'missing-evidence' ? '#b45309' : BLUE;
-  return (
-    <span className="font-mono uppercase" style={{ fontSize: 9, letterSpacing: '0.08em', color, border: `1px solid ${color}`, padding: '2px 5px' }}>
-      {label}
-    </span>
-  );
+const MODE_COPY: Record<Mode, { label: string; headline: string; detail: string }> = {
+  payroll: {
+    label: 'Payroll',
+    headline: 'Where scheduled hours became paid drift.',
+    detail: 'Upload a time-clock CSV. We compare scheduled start and end against actual punches.',
+  },
+  prices: {
+    label: 'Prices',
+    headline: 'Read every SKU without reading every invoice.',
+    detail: 'Upload two or more periods of vendor pricing. We flag increases greater than 5%.',
+  },
+  process: {
+    label: 'Process',
+    headline: 'Turn yesterday into three moves.',
+    detail: 'Paste or upload a complete prior-day close. We return no more than three actions.',
+  },
+};
+
+function money(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
-function NumberBox({ label, display, state }: { label: string; display: string; state: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ border: `1px solid ${BLUE}`, padding: '12px 14px' }}>
+    <div style={{ border: `1px solid ${BLUE}`, padding: '14px 16px' }}>
       <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>{label}</p>
-      <p className="font-serif" style={{ fontSize: 26, margin: '6px 0 8px', color: INK }}>{display}</p>
-      <Stamp state={state} />
+      <p className="font-serif" style={{ fontSize: 28, color: INK, marginTop: 6 }}>{value}</p>
+      <p className="font-mono uppercase" style={{ fontSize: 9, color: BLUE, marginTop: 8 }}>UNVERIFIED</p>
     </div>
   );
 }
 
 export default function FreeSeatDesk({ operatorId }: { operatorId: number }) {
-  const [payload, setPayload] = useState<DeskPayload | null>(null);
-  const [desk, setDesk] = useState<DeskClose | null>(null);
+  const [mode, setMode] = useState<Mode>('payroll');
+  const [restaurantName, setRestaurantName] = useState('Your restaurant');
+  const [forwardTo, setForwardTo] = useState<string | null>(null);
+  const [processDesk, setProcessDesk] = useState<DeskClose | null>(null);
   const [closeId, setCloseId] = useState<number | null>(null);
-  const [text, setText] = useState('');
+  const [labor, setLabor] = useState<LaborResult | null>(null);
+  const [prices, setPrices] = useState<PriceResult | null>(null);
+  const [processText, setProcessText] = useState('');
+  const [processFile, setProcessFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [proofKind, setProofKind] = useState('pos-close');
-  const [proofNote, setProofNote] = useState('');
-  const [silenceVendor, setSilenceVendor] = useState('');
-  const [silenceLastSeen, setSilenceLastSeen] = useState('');
-  const [silenceAsOf, setSilenceAsOf] = useState('');
-  const [silenceCadence, setSilenceCadence] = useState('');
-  const [silenceGrace, setSilenceGrace] = useState('');
-  const [silencePausedDates, setSilencePausedDates] = useState('');
-  const [silenceProgramStart, setSilenceProgramStart] = useState('');
-  const [silencePauseWeekends, setSilencePauseWeekends] = useState(false);
 
   useEffect(() => {
     fetch('/api/desk')
-      .then((r) => r.json())
-      .then((data) => {
+      .then((response) => response.json())
+      .then((data: DeskPayload & { success?: boolean }) => {
         if (!data.success) return;
-        setPayload({ restaurantName: data.restaurantName, forwardTo: data.forwardTo, desk: data.desk, closeId: data.closeId });
-        setDesk(data.desk);
+        if (data.restaurantName) setRestaurantName(data.restaurantName);
+        if (data.forwardTo) setForwardTo(data.forwardTo);
+        setProcessDesk(data.desk);
         setCloseId(data.closeId);
       })
       .catch(() => {});
   }, [operatorId]);
 
-  async function submitDocs(docs: FormData) {
+  function choose(next: Mode) {
+    setMode(next);
+    setStatus(null);
+  }
+
+  async function runCsv(file: File) {
+    const endpoint = mode === 'payroll'
+      ? '/api/connect/labor-drift'
+      : '/api/connect/vendor-drift';
     setBusy(true);
     setStatus(null);
     try {
-      const res = await fetch('/api/intake/close', { method: 'POST', body: docs });
-      const data = await res.json();
-      if (!data.success) {
-        setStatus(data.error || 'Could not read that close.');
-        return;
-      }
-      setDesk(data.desk);
-      setCloseId(data.closeId);
-      setStatus(data.persisted ? 'Close is on the desk.' : 'Parsed. Neon intake table still needs drizzle/0003 to keep it overnight.');
-    } catch {
-      setStatus('Could not reach intake.');
+      const form = new FormData();
+      form.set('file', file);
+      const response = await fetch(endpoint, { method: 'POST', body: form });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Could not read that CSV.');
+      if (mode === 'payroll') setLabor(data as LaborResult);
+      else setPrices(data as PriceResult);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not read that CSV.');
     } finally {
       setBusy(false);
     }
   }
 
-  function onPaste(e: FormEvent) {
-    e.preventDefault();
-    const form = new FormData();
-    form.set('text', text);
-    form.set('filename', 'paste.txt');
-    void submitDocs(form);
-  }
-
-  function onFiles(files: FileList | null) {
-    if (!files?.length) return;
-    const form = new FormData();
-    for (const file of Array.from(files)) form.append('file', file);
-    void submitDocs(form);
-  }
-
-  function onSilence(e: FormEvent) {
-    e.preventDefault();
-    const packet = serializeVendorSilencePacket({
-      vendor: silenceVendor,
-      store: payload?.restaurantName || undefined,
-      lastSeenDate: silenceLastSeen,
-      asOfDate: silenceAsOf,
-      expectedCadenceDays: silenceCadence,
-      graceDays: silenceGrace,
-      pauseWeekends: silencePauseWeekends,
-      pausedDates: silencePausedDates,
-      programStartedDate: silenceProgramStart,
-    });
-    const form = new FormData();
-    form.set('text', packet);
-    form.set('filename', 'vendor-silence.txt');
-    void submitDocs(form);
-  }
-
-  async function prove(actionId: string, outcome: 'verified' | 'acknowledged' | 'not-done' | 'data-missing') {
+  async function runSample() {
+    if (mode === 'process') {
+      setProcessText([
+        'Store: Sample Restaurant',
+        'Business Date: 2026-08-27',
+        'Subtotal: $4,120.00',
+        'Labor Summary Total: $980.00',
+        'Expected Cash: $640.00',
+        'Actual Deposit: $638.00',
+        '# Voids: $44.00',
+        'Promo: $90.00',
+      ].join('\n'));
+      return;
+    }
     setBusy(true);
+    setStatus(null);
     try {
-      const res = await fetch('/api/desk/proof', {
+      const sample = mode === 'payroll'
+        ? { url: '/samples/timesheet-labor.csv', name: 'sample-labor.csv' }
+        : { url: '/samples/vendor-drift.csv', name: 'sample-vendor-prices.csv' };
+      const response = await fetch(sample.url);
+      if (!response.ok) throw new Error('Could not load the sample.');
+      const file = new File([await response.blob()], sample.name, { type: 'text/csv' });
+      await runCsv(file);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not load the sample.');
+      setBusy(false);
+    }
+  }
+
+  async function runProcess(event: FormEvent) {
+    event.preventDefault();
+    if (!processText.trim() && !processFile) {
+      setStatus('Paste a close or choose a file first.');
+      return;
+    }
+    setBusy(true);
+    setStatus(null);
+    try {
+      const form = new FormData();
+      if (processText.trim()) {
+        form.set('text', processText);
+        form.set('filename', 'close.txt');
+      }
+      if (processFile) form.set('file', processFile);
+      const response = await fetch('/api/intake/close', { method: 'POST', body: form });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Could not read that close.');
+      setProcessDesk(data.desk);
+      setCloseId(data.closeId);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not read that close.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function closeWithProof(actionId: string) {
+    setBusy(true);
+    setStatus(null);
+    try {
+      const response = await fetch('/api/desk/proof', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionId,
-          outcome,
-          proofKind: outcome === 'verified' ? proofKind : 'other-source',
-          proofNote,
+          outcome: 'acknowledged',
+          proofKind: 'other-source',
+          proofNote: 'Operator acknowledged this review item.',
           closeId,
         }),
       });
-      const data = await res.json();
-      setStatus(data.success ? `Night proof: ${data.state}` : data.error);
-    } catch {
-      setStatus('Could not save proof.');
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Could not save the receipt.');
+      setStatus('Receipt saved.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not save the receipt.');
     } finally {
       setBusy(false);
     }
   }
 
-  const mix = desk?.mix;
+  const copy = MODE_COPY[mode];
 
   return (
     <div>
       <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>
-        / {payload?.restaurantName || 'YOUR RESTAURANT'} — FREE SEAT · ONE STORE · PRIOR BUSINESS DAY
+        / {restaurantName} · OPERATOR
       </p>
-      <h1 className="font-serif" style={{ fontSize: 44, letterSpacing: '-0.015em', margin: '10px 0 6px' }}>
-        {desk ? `Yesterday, ${desk.businessDate || 'date missing'}.` : 'Drop yesterday’s close.'}
+      <h1 className="font-serif" style={{ fontSize: 48, lineHeight: 1.05, letterSpacing: '-0.02em', margin: '12px 0 8px' }}>
+        Find the leak. Run the fix.
       </h1>
-      <p className="font-serif italic" style={{ fontSize: 19, color: BLUE, marginBottom: 18 }}>
-        Forward the PDQ email, upload the Z / Void / Hourly files, or paste native text. Vendor invoices, purchase orders, theoretical-usage, and vendor-silence packets feed the same Action Shift. No POS or vendor-portal password.
-      </p>
-      <p style={{ fontSize: 13, color: MUTED, marginBottom: 18 }}>
-        Manager seat owns station checklists.{' '}
-        <Link href="/dashboard/manager" className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: BLUE }}>
-          Open manager board →
-        </Link>
+      <p className="font-serif italic" style={{ fontSize: 20, color: BLUE, marginBottom: 28 }}>
+        Payroll. Prices. Process. Pick one and use your own numbers—or run the sample first.
       </p>
 
-      <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 16, marginBottom: 22 }}>
-        <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED, marginBottom: 8 }}>Forward EOD to</p>
-        <p className="font-mono" style={{ fontSize: 14, color: INK }}>{payload?.forwardTo || 'Sign in to see your close address.'}</p>
-        <p style={{ fontSize: 13, color: MUTED, marginTop: 8 }}>
-          PDQ scheduled EOD should attach ZReport_Summary, Void_Promo_Report, and Hourly_Sales_Report in one email. Filename date is the business date.
-          A Void-only message is Missing Evidence — export the native Z and Hourly PDFs from PDQ Reports. Do not type dollars. Extra stores and seats are paid.
-        </p>
+      <div className="grid gap-3 md:grid-cols-3" style={{ marginBottom: 28 }}>
+        {(Object.keys(MODE_COPY) as Mode[]).map((key) => {
+          const item = MODE_COPY[key];
+          const selected = key === mode;
+          return (
+            <button
+              type="button"
+              key={key}
+              onClick={() => choose(key)}
+              className="text-left"
+              style={{
+                border: `1px solid ${selected ? BLUE : RULE}`,
+                borderTop: `4px solid ${selected ? BLUE : INK}`,
+                padding: 18,
+                background: selected ? '#f2f7ff' : '#fffdf7',
+              }}
+            >
+              <p className="font-mono uppercase" style={{ fontSize: 10, color: selected ? BLUE : MUTED, letterSpacing: '0.1em' }}>{item.label}</p>
+              <p className="font-serif" style={{ fontSize: 21, color: INK, marginTop: 7 }}>{item.headline}</p>
+            </button>
+          );
+        })}
       </div>
 
-      <form onSubmit={onPaste} className="space-y-3" style={{ marginBottom: 22 }}>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Paste the native-text Z, Hourly, Void report, vendor invoice, purchase order, theoretical usage, or vendor silence packet…"
-          rows={8}
-          className="w-full"
-          style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 12, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
-        />
-        <div className="flex flex-wrap gap-3">
-          <button type="submit" disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, background: INK, color: '#f7f4ec', padding: '10px 16px' }}>
-            {busy ? 'Reading…' : 'Read paste →'}
-          </button>
-          <label className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px', cursor: 'pointer' }}>
-            Upload files
-            <input type="file" multiple className="hidden" accept=".txt,.pdf,.csv" onChange={(e) => onFiles(e.target.files)} />
-          </label>
-        </div>
-      </form>
+      <section style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 22, marginBottom: 26 }}>
+        <p className="font-mono uppercase" style={{ fontSize: 10, color: BLUE, letterSpacing: '0.1em' }}>{copy.label}</p>
+        <h2 className="font-serif" style={{ fontSize: 30, color: INK, marginTop: 6 }}>{copy.headline}</h2>
+        <p style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>{copy.detail}</p>
 
-      <form onSubmit={onSilence} className="space-y-3" style={{ marginBottom: 22, border: `1px solid ${RULE}`, padding: 16 }}>
-        <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>
-          Vendor silence · typed cadence (Unverified)
-        </p>
-        <p style={{ fontSize: 13, color: MUTED }}>
-          First 14 days after program start stay advisory. Missing cadence or last-seen is Missing Evidence, not a ticket and not $0. Quiet is a follow-up, not a missed truck.
-        </p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <input value={silenceVendor} onChange={(e) => setSilenceVendor(e.target.value)} placeholder="Vendor" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silenceLastSeen} onChange={(e) => setSilenceLastSeen(e.target.value)} placeholder="Last seen YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silenceAsOf} onChange={(e) => setSilenceAsOf(e.target.value)} placeholder="As of YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silenceCadence} onChange={(e) => setSilenceCadence(e.target.value)} placeholder="Cadence days" inputMode="numeric" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silenceGrace} onChange={(e) => setSilenceGrace(e.target.value)} placeholder="Grace days (optional)" inputMode="numeric" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silencePausedDates} onChange={(e) => setSilencePausedDates(e.target.value)} placeholder="Paused dates YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <input value={silenceProgramStart} onChange={(e) => setSilenceProgramStart(e.target.value)} placeholder="Program start YYYY-MM-DD" style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }} />
-          <label style={{ fontSize: 13, color: INK, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="checkbox" checked={silencePauseWeekends} onChange={(e) => setSilencePauseWeekends(e.target.checked)} />
-            Pause weekends
-          </label>
-        </div>
-        <button type="submit" disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', border: `1px solid ${INK}`, color: INK, padding: '10px 16px', background: '#fff' }}>
-          {busy ? 'Reading…' : 'Read silence clock →'}
-        </button>
-      </form>
-      {status ? <p style={{ fontSize: 13, color: MUTED, marginBottom: 18 }}>{status}</p> : null}
-
-      {desk ? (
-        <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 12 }}>
-            <NumberBox label="Sales" display={desk.sales.display} state={desk.sales.state} />
-            <NumberBox label="Labor" display={desk.labor.display} state={desk.labor.state} />
-            <NumberBox label="Cash" display={desk.cash.status === 'unentered' ? 'Unentered' : desk.cash.display} state={desk.cash.state} />
-            <NumberBox label="Voids" display={desk.voids.display} state={desk.voids.state} />
-          </div>
-          {mix ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 28 }}>
-              <NumberBox label="Food" display={mix.food.display} state={mix.food.state} />
-              <NumberBox label="Beer" display={mix.beer.display} state={mix.beer.state} />
-              <NumberBox label="Liquor" display={mix.liquor.display} state={mix.liquor.state} />
-              <NumberBox label="Pop" display={mix.pop.display} state={mix.pop.state} />
+        {mode === 'process' ? (
+          <form onSubmit={runProcess} className="mt-5 space-y-3">
+            <div style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 14 }}>
+              <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED, marginBottom: 8 }}>Forward EOD to</p>
+              <p className="font-mono" style={{ fontSize: 14, color: INK }}>{forwardTo || 'Sign in to see your close address.'}</p>
+              <p style={{ fontSize: 13, color: MUTED, marginTop: 8 }}>
+                PDQ scheduled EOD should attach ZReport_Summary, Void_Promo_Report, and Hourly_Sales_Report in one email. Filename date is the business date.
+                A Void-only message is Missing Evidence — export the native Z and Hourly PDFs from PDQ Reports. Do not type dollars.
+              </p>
             </div>
-          ) : null}
-          {desk.hourlyPeak ? (
-            <p className="font-mono" style={{ fontSize: 12, color: MUTED, marginBottom: 24 }}>
-              Peak hour {desk.hourlyPeak.hour} · {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(desk.hourlyPeak.sales)}
-              {desk.hourlyPeak.guests != null ? ` · ${desk.hourlyPeak.guests} guests` : ''} · Unverified
-            </p>
-          ) : null}
-
-          <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: INK, marginBottom: 8 }}>Action Shift · ≤3 moves</p>
-          {desk.actionShift ? (
-            <ul className="space-y-4" style={{ marginBottom: 28 }}>
-              {desk.actionShift.morningActions.map((a, i) => (
-                <li key={a.instanceKey || `${a.id}-${i}`} style={{ borderLeft: `3px solid ${BLUE}`, padding: '8px 0 8px 14px' }}>
-                  <p className="font-mono uppercase" style={{ fontSize: 10, color: MUTED }}>
-                    {String(i + 1).padStart(2, '0')} · {a.owner}
-                    {a.dollarsObserved != null ? ` · $${a.dollarsObserved.toFixed(2)}` : ''}
-                  </p>
-                  <p className="font-serif" style={{ fontSize: 22, color: INK, marginTop: 4 }}>{a.title}</p>
-                  <p style={{ fontSize: 14, color: '#3d3d38', marginTop: 4 }}>{a.move}</p>
-                  <p className="font-mono" style={{ fontSize: 11, color: MUTED, marginTop: 8 }}>
-                    Proof object: {a.proof.object} · {a.claimBoundary}
-                  </p>
-                  <div className="flex flex-wrap gap-2" style={{ marginTop: 10 }}>
-                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'acknowledged')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Ack</button>
-                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'verified')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${INK}`, background: INK, color: '#f7f4ec', padding: '6px 10px' }}>Close with proof</button>
-                    <button type="button" disabled={busy} onClick={() => prove(a.instanceKey || a.id, 'data-missing')} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${RULE}`, padding: '6px 10px' }}>Missing data</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={{ fontSize: 14, color: MUTED, marginBottom: 24 }}>{desk.actionShiftError || 'Need a Z with net sales, a current + prior vendor invoice, a PO / invoice / usage packet, or a vendor-silence clock before Action Shift can rank a move.'}</p>
-          )}
-
-          <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', marginBottom: 8 }}>Night proof object</p>
-          <div className="flex flex-wrap gap-3" style={{ marginBottom: 18 }}>
-            <select value={proofKind} onChange={(e) => setProofKind(e.target.value)} style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13 }}>
-              <option value="pos-close">POS close</option>
-              <option value="deposit-slip">Deposit slip</option>
-              <option value="time-clock">Time clock</option>
-              <option value="schedule">Schedule</option>
-              <option value="ticket-detail">Ticket detail</option>
-              <option value="exception-log">Exception log</option>
-              <option value="invoice-packet">Invoice packet</option>
-              <option value="po-packet">PO / receiving packet</option>
-              <option value="receiving-log">Receiving log (resets last-seen)</option>
-              <option value="photo">Photo</option>
-            </select>
-            <input
-              value={proofNote}
-              onChange={(e) => setProofNote(e.target.value)}
-              placeholder="What the shift created (not a verbal yes)"
-              style={{ border: `1px solid ${RULE}`, padding: '8px 10px', fontSize: 13, minWidth: 240 }}
+            <textarea
+              value={processText}
+              onChange={(event) => setProcessText(event.target.value)}
+              placeholder="Paste yesterday’s close…"
+              rows={8}
+              className="w-full"
+              style={{ border: `1px solid ${RULE}`, background: '#fff', padding: 12, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
             />
-          </div>
-
-          {desk.missingEvidence.length ? (
-            <div>
-              <p className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', color: MUTED }}>Missing evidence</p>
-              <ul className="list-disc pl-5" style={{ fontSize: 13, color: '#3d3d38', marginTop: 8 }}>
-                {desk.missingEvidence.map((line) => <li key={line}>{line}</li>)}
-              </ul>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="font-mono uppercase" style={{ fontSize: 11, border: `1px solid ${INK}`, padding: '10px 14px', cursor: 'pointer' }}>
+                Choose close file
+                <input type="file" className="hidden" accept=".txt,.pdf,.csv" onChange={(event) => setProcessFile(event.target.files?.[0] ?? null)} />
+              </label>
+              {processFile ? <span style={{ fontSize: 12, color: MUTED }}>{processFile.name}</span> : null}
+              <button type="submit" disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px' }}>
+                {busy ? 'Reading…' : 'Build my three moves →'}
+              </button>
+              <button type="button" onClick={() => void runSample()} disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, color: BLUE, padding: '10px 4px' }}>Load sample</button>
             </div>
-          ) : null}
-        </>
+          </form>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3 mt-5">
+            <label className="font-mono uppercase" style={{ fontSize: 11, border: `1px solid ${INK}`, background: INK, color: PAPER, padding: '10px 16px', cursor: 'pointer' }}>
+              {busy ? 'Reading…' : `Upload ${copy.label} CSV →`}
+              <input type="file" className="hidden" accept=".csv,text/csv" disabled={busy} onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void runCsv(file);
+              }} />
+            </label>
+            <button type="button" onClick={() => void runSample()} disabled={busy} className="font-mono uppercase" style={{ fontSize: 11, color: BLUE, padding: '10px 4px' }}>Run sample</button>
+          </div>
+        )}
+      </section>
+
+      {status ? <p style={{ borderLeft: `3px solid ${BLUE}`, paddingLeft: 12, fontSize: 14, color: MUTED, marginBottom: 22 }}>{status}</p> : null}
+
+      {mode === 'payroll' && labor ? (
+        <section>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <Stat label="Paid drift" value={money(labor.totalDriftDollars)} />
+            <Stat label="Drift minutes" value={String(labor.totalDriftMinutes)} />
+            <Stat label="Shifts read" value={String(labor.shifts)} />
+            <Stat label="Review leads" value={String(labor.ghostShifts.length)} />
+          </div>
+          <p className="font-mono uppercase mb-3" style={{ fontSize: 10, letterSpacing: '0.1em' }}>Largest schedule-versus-actual leads</p>
+          <div className="space-y-3">
+            {labor.perEmployee.slice(0, 5).map((row) => (
+              <div key={`${row.store}-${row.name}`} style={{ borderLeft: `3px solid ${BLUE}`, background: '#fffdf7', padding: '12px 16px' }}>
+                <p className="font-serif" style={{ fontSize: 20 }}>{row.name} · {row.store}</p>
+                <p style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{Math.round(row.totalOtMinutes)} drift min · {row.earlyClockIns} early clocks · {row.lateClockOuts} late clocks · {row.shiftsRun} shifts</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12, color: MUTED, marginTop: 14 }}>Review lead only. This is not proof of time theft or employee misconduct.</p>
+        </section>
+      ) : null}
+
+      {mode === 'prices' && prices ? (
+        <section>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <Stat label="SKUs read" value={String(prices.totalSkus)} />
+            <Stat label="Over 5%" value={String(prices.flaggedSkus)} />
+            <Stat label="Unit drift" value={money(prices.totalDriftDollars)} />
+            <Stat label="Periods" value={`${prices.prevPeriod} → ${prices.currPeriod}`} />
+          </div>
+          <p className="font-mono uppercase mb-3" style={{ fontSize: 10, letterSpacing: '0.1em' }}>Invoice lines to verify</p>
+          <div className="space-y-3">
+            {prices.perSku.filter((row) => row.flagged).slice(0, 10).map((row) => (
+              <div key={`${row.vendor}-${row.sku}`} style={{ borderLeft: `3px solid ${BLUE}`, background: '#fffdf7', padding: '12px 16px' }}>
+                <p className="font-serif" style={{ fontSize: 20 }}>{row.sku} · {row.vendor}</p>
+                <p style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{money(row.prevPrice)} → {money(row.currPrice)} · {(row.driftPct * 100).toFixed(1)}% increase</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12, color: MUTED, marginTop: 14 }}>Confirm pack size, substitutions, credits, and invoice terms before contacting the vendor.</p>
+        </section>
+      ) : null}
+
+      {mode === 'process' && processDesk?.actionShift ? (
+        <section>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <Stat label="Sales" value={processDesk.sales.display} />
+            <Stat label="Labor" value={processDesk.labor.display} />
+            <Stat label="Cash" value={processDesk.cash.display} />
+            <Stat label="Voids" value={processDesk.voids.display} />
+          </div>
+          <p className="font-mono uppercase mb-3" style={{ fontSize: 10, letterSpacing: '0.1em' }}>Today · no more than three moves</p>
+          <div className="space-y-3">
+            {processDesk.actionShift.morningActions.map((action, index) => (
+              <div key={action.instanceKey || `${action.id}-${index}`} style={{ borderLeft: `3px solid ${BLUE}`, background: '#fffdf7', padding: '14px 16px' }}>
+                <p className="font-mono uppercase" style={{ fontSize: 10, color: MUTED }}>{String(index + 1).padStart(2, '0')} · {action.owner}</p>
+                <p className="font-serif" style={{ fontSize: 22, marginTop: 5 }}>{action.title}</p>
+                <p style={{ fontSize: 14, color: '#3d3d38', marginTop: 5 }}>{action.move}</p>
+                <p className="font-mono" style={{ fontSize: 11, color: MUTED, marginTop: 8 }}>Receipt: {action.proof.object}</p>
+                <button type="button" disabled={busy} onClick={() => void closeWithProof(action.instanceKey || action.id)} className="font-mono uppercase" style={{ fontSize: 10, border: `1px solid ${INK}`, padding: '7px 10px', marginTop: 10 }}>Acknowledge</button>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
     </div>
   );
