@@ -1,27 +1,31 @@
 # Intake — bamba-sales-labor-enterprise-v1
 
-**Status:** drafted · tested in-repo · not merged · not deployed · not live-verified  
+**Status:** drafted · tested in-repo · merge-ready onto `main` that already has #190 · not deployed · not live-verified  
 **Task:** `bamba-sales-labor-enterprise-v1`  
-**Surface:** `/command-center/sales-labor` (reports gate, noindex)
+**Surfaces:** `/command-center/sales-labor` · `/command-center/prime-cost` (reports gate, noindex)
 
-## What this is
+## Lane lock
 
-One Never86 Command Center sales-labor desk for the Taco Bamba Sales Labor Report (MP) v5 Daily parse. Not a new product. Lane C isolation: Bamba tenant memory only.
+This is the bigger Taco Bamba Command Center lane. #190 polish is now on `main` and was merged into this branch with `-X theirs` so this PR does not revert it.
 
-- Daily / WTD / PTD in that order
-- Store and region rollup
-- CY / PY / FCST, checks, catering, avg check, comps, staff meals, voids + evidence
-- Peer-median 1.5× void/comp flags
-- Sheet1 drill-downs: comps servers, staff meals, training meals, void ranking, daypart, ticket times, p-mix
-- Color flags for school / holiday / concert this year, not last
+## Prime-cost desks
 
-## Agents
+Not a new product. Same Lane C Bamba tenant. Still two seats (`builder-1`, `qa-1`). No 1,000-agent swarm.
 
-Exactly two seats in `config/bamba-sales-labor-agents.json`: `builder-1` and `qa-1`. No 1,000-agent swarm.
+| Desk | Status |
+|---|---|
+| Sales | Done — Aug 12 Daily canary 125273.41 |
+| Labor | Open — no Bamba labor dollars |
+| Food | Open — no count → no food cost. Invoice ≠ COGS |
+| Liquor | Open — no pour log / depletion |
+| Beer | Open — no pour log / depletion |
+| Inventory | Open — no count |
+
+Prime cost % stays Open until food and labor are both verified.
 
 ## Hard gates
 
 - No CTap or New American Grill numbers
-- No staff names
-- No merge, deploy, live migration, CRM write, or send
-- Incomplete WTD/PTD stay Open
+- No invented food, liquor, beer, labor, or inventory dollars
+- No merge click from this factory slot (GitHub human gate)
+- No live migration, CRM write, or send
