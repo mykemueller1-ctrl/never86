@@ -20,6 +20,8 @@ describe('never86.ai open play front door', () => {
     expect(config).toMatch(/source: '\/'/);
     expect(config).toMatch(/source: '\/play'/);
     expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
+    expect(config).toMatch(/source: '\/communities'/);
+    expect(config).toMatch(/destination: '\/portal'/);
   });
 
   it('keeps the marketing story on /product', () => {
