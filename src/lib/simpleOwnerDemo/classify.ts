@@ -1,15 +1,23 @@
+import { isOperatorV2PlateId, plateById } from '@/lib/operatorV2';
 import type { EvidenceKind, SourceTag } from './types';
 
 const KIND_PATTERNS: readonly { kind: EvidenceKind; pattern: RegExp; source: string }[] = [
   { kind: 'hourly', pattern: /hourly|hour[_-\s]?sales/, source: 'operator-upload:hourly' },
-  { kind: 'timeclock', pattern: /time[_-\s]?clock|timesheet|punch|clock[_-\s]?in/, source: 'operator-upload:timeclock' },
+  { kind: 'timeclock', pattern: /time[_-\s]?clock|timesheet|punch|clock[_-\s]?in|clock[_-\s]?out/, source: 'operator-upload:timeclock' },
+  { kind: 'labor-cards', pattern: /labor[_-\s]?card|role[_-\s]?card|shift[_-\s]?role/, source: 'operator-upload:labor-cards' },
   { kind: 'schedule', pattern: /schedule|roster|labor[_-\s]?plan/, source: 'operator-upload:schedule' },
+  { kind: 'order-guide', pattern: /order[_-\s]?guide|par[_-\s]?sheet/, source: 'operator-upload:order-guide' },
+  { kind: 'menu', pattern: /\bmenu\b|plate[_-\s]?list/, source: 'operator-upload:menu' },
   { kind: 'z', pattern: /\bz[_-\s]?report|zreport|end[_-\s]?of[_-\s]?day|\beod\b/, source: 'operator-upload:z' },
   { kind: 'void', pattern: /void|promo[_-\s]?report/, source: 'operator-upload:void' },
   { kind: 'invoice', pattern: /invoice|vendor[_-\s]?bill/, source: 'operator-upload:invoice' },
 ];
 
-export function classifyUpload(filename: string, contentType = ''): {
+export function classifyUpload(
+  filename: string,
+  contentType = '',
+  folderHint?: string,
+): {
   kind: EvidenceKind;
   sourceTags: SourceTag[];
 } {
@@ -22,6 +30,17 @@ export function classifyUpload(filename: string, contentType = ''): {
       };
     }
   }
+
+  if (folderHint && isOperatorV2PlateId(folderHint)) {
+    const plate = plateById(folderHint);
+    if (plate) {
+      return {
+        kind: plate.evidenceKind,
+        sourceTags: [{ tag: 'unverified', source: `operator-upload:${plate.evidenceKind}:folder` }],
+      };
+    }
+  }
+
   return {
     kind: 'other',
     sourceTags: [{ tag: 'unverified', source: 'operator-upload:other' }],

@@ -14,7 +14,17 @@ import {
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
 import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
-import { OPERATOR_V2_PLATES, type OperatorV2Plate } from '@/lib/operatorV2';
+import {
+  OPERATOR_V2_PLATES,
+  dailyCompareFromEvidence,
+  projectFoldersFromKinds,
+  spawnLaborRoleCards,
+  type DailyCompareChip,
+  type LaborRoleCard,
+  type OperatorV2FolderState,
+  type OperatorV2Plate,
+  type OperatorV2PlateId,
+} from '@/lib/operatorV2';
 
 type DeskView = 'home' | 'labor' | 'food' | 'bev';
 
@@ -42,11 +52,27 @@ function emptyEvidence(): PrimeCostEvidence[] {
   }));
 }
 
+function emptyFolders(): OperatorV2FolderState[] {
+  return projectFoldersFromKinds(new Set());
+}
+
+function emptyRoleCards(): LaborRoleCard[] {
+  return spawnLaborRoleCards({ scheduleReady: false, laborCardsReady: false, clockReady: false });
+}
+
+function emptyDailyCompare(): DailyCompareChip[] {
+  return dailyCompareFromEvidence({ scheduleReady: false, clockReady: false });
+}
+
 export function FreeOperatorPhone() {
   const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
   const [evidence, setEvidence] = useState<PrimeCostEvidence[]>(emptyEvidence);
+  const [folders, setFolders] = useState<OperatorV2FolderState[]>(emptyFolders);
+  const [roleCards, setRoleCards] = useState<LaborRoleCard[]>(emptyRoleCards);
+  const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
+  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -62,6 +88,9 @@ export function FreeOperatorPhone() {
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
     setEvidence(next.evidence.map((row) => ({ ...row })));
+    if (next.folders) setFolders(next.folders.map((row) => ({ ...row })));
+    if (next.laborCards) setRoleCards(next.laborCards.map((row) => ({ ...row })));
+    if (next.dailyCompare) setDailyCompare(next.dailyCompare.map((row) => ({ ...row })));
   }
 
   useEffect(() => {
@@ -119,10 +148,14 @@ export function FreeOperatorPhone() {
   }
 
   function openPlate(plate: OperatorV2Plate) {
+    setActiveFolder(plate.id);
     setAsk(plate.ask);
     onTray(plate.tray);
-    trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id } });
-    void goAsk(plate.ask, 'type');
+    const folder = folders.find((row) => row.id === plate.id);
+    const needPhoto = !folder || folder.state === 'NEED';
+    trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id, ocr: needPhoto } });
+    if (needPhoto) photoRef.current?.click();
+    void goAsk(plate.ask, needPhoto ? 'photo' : 'type');
   }
 
   function onTray(next: OwnerDeskTrayId) {
@@ -185,6 +218,7 @@ export function FreeOperatorPhone() {
     try {
       const form = new FormData();
       form.set('file', file);
+      if (activeFolder) form.set('folder', activeFolder);
       const res = await fetch('/api/upload', { method: 'POST', body: form });
       const body = (await res.json()) as {
         success?: boolean;
@@ -234,14 +268,19 @@ export function FreeOperatorPhone() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {evidence.map((row) => (
-            <span
-              key={row.id}
-              className={`owner-desk-pill ${row.state === 'READY' ? 'is-ready' : 'is-need'}`}
+        <div className="mt-4 flex flex-wrap gap-2" aria-label="Missing folders">
+          {folders.map((folder) => (
+            <button
+              key={folder.id}
+              type="button"
+              className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'}`}
+              onClick={() => {
+                const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                if (plate) openPlate(plate);
+              }}
             >
-              {row.state === 'READY' ? `${row.short} ✓` : `Need ${row.short.toLowerCase()}`}
-            </span>
+              {folder.state === 'READY' ? `${folder.label} ✓` : `Missing · ${folder.label}`}
+            </button>
           ))}
         </div>
       </header>
@@ -255,22 +294,28 @@ export function FreeOperatorPhone() {
             What&apos;s going on in your restaurant?
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-white/85">
-            Talk, type, take a picture, or add a file. Every ask and file is stored on this seat.
+            Paper-shop folders first: schedule, labor cards, menu, order guide. Photo the week. Labor cards name
+            roles. Daily compare to the clock finds early leave, late leave, and labor drift.
           </p>
 
-          <div className="owner-v2-plates mt-6" aria-label="Missing folders">
-            {OPERATOR_V2_PLATES.map((plate) => (
-              <button
-                key={plate.id}
-                type="button"
-                className="owner-v2-plate"
-                onClick={() => openPlate(plate)}
-              >
-                <span className="owner-v2-plate-kicker">{plate.folder}</span>
-                <span className="owner-v2-plate-label">{plate.label}</span>
-                <span className="owner-v2-plate-miss">Missing · {plate.missingUntil}</span>
-              </button>
-            ))}
+          <div className="owner-v2-plates mt-6" aria-label="Project folders">
+            {folders.map((folder) => {
+              const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+              return (
+                <button
+                  key={folder.id}
+                  type="button"
+                  className={`owner-v2-plate ${folder.state === 'READY' ? 'is-ready' : ''}`}
+                  onClick={() => plate && openPlate(plate)}
+                >
+                  <span className="owner-v2-plate-kicker">{folder.folder}</span>
+                  <span className="owner-v2-plate-label">{folder.label}</span>
+                  <span className="owner-v2-plate-miss">
+                    {folder.state === 'READY' ? 'On this seat · named is not a close' : folder.reason}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           <article className="owner-desk-card mt-6">
@@ -313,80 +358,136 @@ export function FreeOperatorPhone() {
       {view === 'labor' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            Labor & schedule
+            Labor cards · roles
           </h1>
-          <p className="mt-2 text-sm text-white/80">Plan vs actual · demo restaurant</p>
+          <p className="mt-2 text-sm text-white/80">
+            Paper-shop OCR. Daily compare to the clock. Punch ≠ schedule.
+          </p>
 
-          <article className="owner-desk-card owner-desk-card-peach mt-5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <span className="owner-desk-bolt" aria-hidden>
-                  ⚡
-                </span>
-                <div>
-                  <h2 className="text-lg font-semibold text-[#06122b]">Unlock Prime Cost Coach</h2>
-                  <p className="mt-1 text-sm text-[#3d4d73]">Two real reports turn this on.</p>
-                </div>
-              </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#003bb5]">
-                {readyCount} of 3 ready
-              </span>
+          <div className="owner-v2-plates mt-5" aria-label="Labor folders">
+            {folders
+              .filter((folder) => folder.id === 'schedule' || folder.id === 'labor-cards')
+              .map((folder) => {
+                const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                return (
+                  <button
+                    key={folder.id}
+                    type="button"
+                    className={`owner-v2-plate ${folder.state === 'READY' ? 'is-ready' : ''}`}
+                    onClick={() => plate && openPlate(plate)}
+                  >
+                    <span className="owner-v2-plate-kicker">{folder.folder}</span>
+                    <span className="owner-v2-plate-label">{folder.label}</span>
+                    <span className="owner-v2-plate-miss">{folder.reason}</span>
+                  </button>
+                );
+              })}
+          </div>
+
+          <article className="owner-desk-card mt-5">
+            <h2 className="text-lg font-semibold text-[#06122b]">Roles on the card</h2>
+            <p className="mt-1 text-sm text-[#3d4d73]">
+              Labor cards name seats, not people. FOH, Line, Dish, Run spawn from the week schedule.
+            </p>
+            <div className="owner-v2-roles mt-4">
+              {roleCards.map((card) => (
+                <button
+                  key={card.id}
+                  type="button"
+                  className={`owner-v2-role ${card.state === 'READY' ? 'is-ready' : ''}`}
+                  onClick={() => {
+                    const plate = OPERATOR_V2_PLATES.find((row) => row.id === 'labor-cards');
+                    if (plate) openPlate(plate);
+                  }}
+                >
+                  <span className="owner-v2-plate-kicker">{card.role}</span>
+                  <span className="owner-v2-role-meta">
+                    {card.posted === 'On schedule' ? 'Posted in / out' : 'Posted Missing'}
+                  </span>
+                  <span className="owner-v2-plate-miss">
+                    {card.punch === 'Missing' ? 'Punch Missing' : 'Clock landed · compare open'}
+                  </span>
+                </button>
+              ))}
             </div>
+          </article>
+
+          <article className="owner-desk-card owner-desk-card-peach mt-4">
+            <h2 className="text-lg font-semibold text-[#06122b]">Daily compare</h2>
+            <p className="mt-1 text-sm text-[#3d4d73]">
+              Early leave, late leave, and labor drift vs the posted card. No invented overtime.
+            </p>
             <ul className="mt-4 space-y-2">
-              {evidence.map((row) => (
-                <li key={row.id}>
-                  <div className={`owner-desk-evidence ${row.state === 'READY' ? 'is-ready' : ''}`}>
+              {dailyCompare.map((chip) => (
+                <li key={chip.id}>
+                  <div className={`owner-desk-evidence ${chip.state === 'READY' ? 'is-ready' : ''}`}>
                     <span className="owner-desk-evidence-icon" aria-hidden>
-                      {row.state === 'READY' ? '✓' : row.icon}
+                      {chip.state === 'READY' ? '✓' : '◷'}
                     </span>
                     <span className="text-left">
-                      <span className="block font-semibold text-[#06122b]">{row.title}</span>
-                      <span className="mt-1 block text-sm text-[#3d4d73]">{row.reason}</span>
+                      <span className="block font-semibold text-[#06122b]">{chip.label}</span>
+                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.rule}</span>
+                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.reason}</span>
                     </span>
                   </div>
                 </li>
               ))}
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" className="owner-desk-primary" onClick={() => onMouth('file')}>
-                Choose a report
+              <button
+                type="button"
+                className="owner-desk-primary"
+                onClick={() => {
+                  setActiveFolder('schedule');
+                  onMouth('photo');
+                }}
+              >
+                Photo the schedule
               </button>
-              <button type="button" className="owner-desk-secondary" onClick={() => onMouth('photo')}>
-                Take a picture
+              <button
+                type="button"
+                className="owner-desk-secondary"
+                onClick={() => {
+                  setActiveFolder('labor-cards');
+                  onMouth('file');
+                }}
+              >
+                Add labor cards or clock
               </button>
             </div>
           </article>
-
-          {answer?.slug === 'schedule-labor' ? null : (
-            <article className="owner-desk-card mt-4">
-              <div className="flex items-start gap-3">
-                <span className="owner-desk-avatar" aria-hidden>
-                  N86
-                </span>
-                <div>
-                  <p className="text-sm leading-relaxed text-[#06122b]">
-                    Add the schedule, time clock, and hourly sales. I&apos;ll line up planned people, actual punches,
-                    and demand by hour from the files on this seat—without making up the answer.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="owner-desk-chip is-ready">Owner question</span>
-                    <span className="owner-desk-chip is-need">Needs source evidence</span>
-                  </div>
-                </div>
-              </div>
-            </article>
-          )}
         </section>
       ) : null}
 
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Food & invoice truth' : 'Beverage margin'}
+            {view === 'food' ? 'Menu & order guides' : 'Beverage margin'}
           </h1>
           <p className="mt-2 text-sm text-white/80">
-            Ask for the count, invoice, or package change. Missing count stays Missing Evidence.
+            Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
           </p>
+          {view === 'food' ? (
+            <div className="owner-v2-plates mt-5" aria-label="Food folders">
+              {folders
+                .filter((folder) => folder.id === 'menu' || folder.id === 'order-guide')
+                .map((folder) => {
+                  const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                  return (
+                    <button
+                      key={folder.id}
+                      type="button"
+                      className={`owner-v2-plate ${folder.state === 'READY' ? 'is-ready' : ''}`}
+                      onClick={() => plate && openPlate(plate)}
+                    >
+                      <span className="owner-v2-plate-kicker">{folder.folder}</span>
+                      <span className="owner-v2-plate-label">{folder.label}</span>
+                      <span className="owner-v2-plate-miss">{folder.reason}</span>
+                    </button>
+                  );
+                })}
+            </div>
+          ) : null}
           <article className="owner-desk-card mt-5">
             <div className="flex items-start gap-3">
               <span className="owner-desk-avatar" aria-hidden>
@@ -394,11 +495,12 @@ export function FreeOperatorPhone() {
               </span>
               <div>
                 <p className="text-sm leading-relaxed text-[#06122b]">
-                  I know the vendor rhythm. Add a current count or invoice and I&apos;ll compare draft, package,
-                  credits, and price changes.
+                  {view === 'food'
+                    ? 'Picture the menu and the order guide. Top plates first. Missing count stays Missing Evidence.'
+                    : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="owner-desk-chip is-ready">Ready</span>
+                  <span className="owner-desk-chip is-ready">OCR folder</span>
                   <span className="owner-desk-chip is-need">No private dollars yet</span>
                 </div>
               </div>

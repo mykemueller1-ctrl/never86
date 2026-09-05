@@ -18,6 +18,7 @@ export type SimpleOwnerDemoService = {
     filename: string;
     contentType: string;
     bytes: Uint8Array;
+    folder?: string;
   }): Promise<
     | { ok: true; upload: SimpleOwnerUploadRecord; readiness: SimpleOwnerReadiness }
     | { ok: false; status: number; error: string; code: string }
@@ -55,7 +56,7 @@ export function createSimpleOwnerDemoService(deps: {
   }
 
   return {
-    async upload({ operatorId, filename, contentType, bytes }) {
+    async upload({ operatorId, filename, contentType, bytes, folder }) {
       if (!filename.trim()) {
         return { ok: false, status: 400, error: 'Name the file.', code: 'filename_required' };
       }
@@ -75,7 +76,7 @@ export function createSimpleOwnerDemoService(deps: {
       }
 
       const createdAt = now();
-      const classified = classifyUpload(filename, contentType);
+      const classified = classifyUpload(filename, contentType, folder);
       const objectKey = buildObjectKey(operatorId, filename, createdAt);
       const stored = await deps.objects.put({
         operatorId,

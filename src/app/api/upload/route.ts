@@ -19,11 +19,14 @@ export async function POST(req: NextRequest) {
     }
 
     const bytes = new Uint8Array(await file.arrayBuffer());
+    const folderRaw = form?.get('folder');
+    const folder = typeof folderRaw === 'string' ? folderRaw : undefined;
     const result = await service.upload({
       operatorId,
       filename: file.name,
       contentType: file.type || 'application/octet-stream',
       bytes,
+      folder,
     });
     if (!result.ok) {
       return jsonError(result.status, result.error, result.code);

@@ -22,12 +22,22 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('Hourly_Sales_Report.pdf').kind).toBe('hourly');
     expect(classifyUpload('time-clock.csv').kind).toBe('timeclock');
     expect(classifyUpload('weekly-schedule.xlsx').kind).toBe('schedule');
+    expect(classifyUpload('labor-cards.jpg').kind).toBe('labor-cards');
+    expect(classifyUpload('menu-photo.png').kind).toBe('menu');
+    expect(classifyUpload('order-guide.pdf').kind).toBe('order-guide');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
       tag: 'unverified',
       source: 'operator-upload:hourly',
     });
+  });
+
+  it('uses the open folder to classify a paper-shop camera photo', () => {
+    expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'schedule').kind).toBe('schedule');
+    expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'labor-cards').kind).toBe('labor-cards');
+    expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'menu').kind).toBe('menu');
+    expect(classifyUpload('time-clock.csv', 'text/csv', 'schedule').kind).toBe('timeclock');
   });
 
   it('scopes object keys by operator_id', () => {
@@ -60,6 +70,26 @@ describe('simple owner demo readiness', () => {
     expect(hourly.readyCount).toBe(1);
     expect(hourly.evidence.find((row) => row.id === 'hourly')?.state).toBe('READY');
     expect(hourly.evidence.find((row) => row.id === 'schedule')?.state).toBe('NEED');
+    expect(empty.folders.every((folder) => folder.state === 'NEED')).toBe(true);
+    expect(empty.laborCards.every((card) => card.punch === 'Missing')).toBe(true);
+    expect(empty.dailyCompare.map((chip) => chip.id)).toEqual(['early-leave', 'late-leave', 'labor-drift']);
+  });
+
+  it('spawns role cards after a schedule lands and opens daily compare only after the clock', () => {
+    const scheduled = readinessFromUploads('demo:a', [fakeUpload('demo:a', 'schedule', 'week-schedule.jpg')]);
+    expect(scheduled.folders.find((folder) => folder.id === 'schedule')?.state).toBe('READY');
+    expect(scheduled.laborCards.every((card) => card.posted === 'On schedule')).toBe(true);
+    expect(scheduled.laborCards.every((card) => card.punch === 'Missing')).toBe(true);
+    expect(scheduled.dailyCompare.every((chip) => chip.state === 'NEED')).toBe(true);
+
+    const clocked = readinessFromUploads('demo:a', [
+      fakeUpload('demo:a', 'schedule', 'week-schedule.jpg'),
+      fakeUpload('demo:a', 'labor-cards', 'labor-cards.jpg'),
+      fakeUpload('demo:a', 'timeclock', 'time-clock.csv'),
+    ]);
+    expect(clocked.folders.find((folder) => folder.id === 'labor-cards')?.state).toBe('READY');
+    expect(clocked.laborCards.map((card) => card.role)).toEqual(['FOH', 'Line', 'Dish', 'Run']);
+    expect(clocked.dailyCompare.every((chip) => chip.state === 'READY')).toBe(true);
   });
 });
 
@@ -193,12 +223,14 @@ describe('compose never invents a close', () => {
     expect(answer.sampleDollars).toBe('none-verified');
     expect(answer.inventedClose).toBe(false);
     expect(answer.headline.toLowerCase()).not.toMatch(/%\s*\d/);
+    expect(answer.facts.join(' ')).toMatch(/Labor cards name roles/);
+    expect(answer.facts.join(' ')).toMatch(/early leave/);
   });
 });
 
 function fakeUpload(
   operatorId: string,
-  evidenceKind: 'schedule' | 'hourly' | 'timeclock',
+  evidenceKind: 'schedule' | 'hourly' | 'timeclock' | 'labor-cards' | 'menu' | 'order-guide',
   filename: string,
 ) {
   return {
