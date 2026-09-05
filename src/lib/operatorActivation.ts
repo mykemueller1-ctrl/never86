@@ -9,6 +9,7 @@ import {
   seatOperators,
 } from '../db/schema';
 import { restaurantNameForSeatClaim } from './ctapSeat1';
+import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN } from './ownerDeskAuth';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
 import { databaseUrlPresent } from './persistHealth';
@@ -431,6 +432,8 @@ export type FreeSeatCredential = {
   email: string;
   passwordHash: string;
   name: string | null;
+  /** Null until the operator sets their own password (activation writes an unusable placeholder). */
+  passwordSetAt: Date | null;
 };
 
 export async function findFreeSeatCredential(email: string): Promise<FreeSeatCredential | null> {
@@ -442,6 +445,7 @@ export async function findFreeSeatCredential(email: string): Promise<FreeSeatCre
       email: seatCredentials.email,
       passwordHash: seatCredentials.passwordHash,
       name: seatOperators.restaurantName,
+      passwordSetAt: seatCredentials.passwordSetAt,
     })
     .from(seatCredentials)
     .leftJoin(seatOperators, eq(seatOperators.id, seatCredentials.operatorId))
@@ -454,8 +458,54 @@ export async function findFreeSeatCredential(email: string): Promise<FreeSeatCre
         email: r.email,
         passwordHash: r.passwordHash,
         name: r.name,
+        passwordSetAt: r.passwordSetAt,
       }
     : null;
+}
+
+export type SetFreeSeatPasswordResult =
+  | { ok: true }
+  | { ok: false; error: string; status: number };
+
+/**
+ * Let a signed-in free-seat operator set their OWN password once, so future
+ * sign-ins can use email+password instead of a fresh magic-link email every
+ * visit. Scoped to (operatorId, email) so a session can only ever set the
+ * password for the seat it already belongs to.
+ */
+export async function setFreeSeatPassword(
+  operatorId: number,
+  email: string,
+  password: string,
+  nowMs = Date.now(),
+): Promise<SetFreeSeatPasswordResult> {
+  if (typeof password !== 'string' || password.length < MIN_FREE_SEAT_PASSWORD_LEN) {
+    return {
+      ok: false,
+      error: `Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    };
+  }
+  if (password.length > MAX_FREE_SEAT_PASSWORD_LEN) {
+    return {
+      ok: false,
+      error: `Password must be at most ${MAX_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    };
+  }
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
+  }
+  const normalized = normalizeEmail(email);
+  const updated = await db
+    .update(seatCredentials)
+    .set({ passwordHash: hashPassword(password), passwordSetAt: new Date(nowMs) })
+    .where(and(eq(seatCredentials.operatorId, operatorId), eq(seatCredentials.email, normalized)))
+    .returning({ id: seatCredentials.id });
+  if (!updated[0]) {
+    return { ok: false, error: 'No seat found for this session.', status: 404 };
+  }
+  return { ok: true };
 }
 
 export async function touchFreeSeatLogin(operatorId: number, email: string): Promise<void> {
@@ -491,6 +541,7 @@ export function refuseSecondFreeSeat(existingCredentialCount: number): {
 }
 
 export { verifyPassword };
+export { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN };
 
 export async function findFreeSeatOperator(operatorId: number): Promise<{
   operatorId: number;

@@ -628,6 +628,10 @@ export const seatCredentials = pgTable('seat_credentials', {
   passwordHash: text('password_hash').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   lastLoginAt: timestamp('last_login_at'),
+  // Null until the operator sets their own password. Activation writes an
+  // unusable random placeholder here, so this column is what actually gates
+  // "email+password" sign-in vs. always falling back to a fresh email link.
+  passwordSetAt: timestamp('password_set_at'),
 });
 
 export const seatAuthAttempts = pgTable('seat_auth_attempts', {

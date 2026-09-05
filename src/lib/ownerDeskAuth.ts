@@ -3,6 +3,16 @@ import { escapeHtml } from './escapeHtml';
 /** Void Hunter blue. Magic-link mail and owner-desk first paint use this only. */
 export const VOID_HUNTER_BLUE = '#0066ff';
 
+/**
+ * Shared client/server minimum for a self-service free-seat password.
+ * Import this everywhere a password length is validated or displayed so the
+ * client form and `setFreeSeatPassword` never drift out of sync.
+ */
+export const MIN_FREE_SEAT_PASSWORD_LEN = 8;
+
+/** Upper bound so an oversized password can't be used to burn CPU in scrypt hashing (DoS). */
+export const MAX_FREE_SEAT_PASSWORD_LEN = 128;
+
 /** Signed-in owner first paint — SimpleOwnerDemo chat, not the card picker. */
 export const OWNER_DESK_PATH = '/operator' as const;
 

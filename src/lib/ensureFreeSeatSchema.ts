@@ -79,8 +79,15 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
       email text not null unique,
       password_hash text not null,
       created_at timestamptz not null default now(),
-      last_login_at timestamptz
+      last_login_at timestamptz,
+      password_set_at timestamptz
     )
+  `;
+
+  await sql`
+    -- Backward-compat for databases created before password_set_at existed
+    -- on the CREATE TABLE above; a no-op on freshly created tables.
+    alter table seat_credentials add column if not exists password_set_at timestamptz
   `;
 
   // Keep free-seat ids out of the OPS operator_users range.
