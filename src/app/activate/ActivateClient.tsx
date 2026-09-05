@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { MIN_FREE_SEAT_PASSWORD_LEN, OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 type Status = 'loading' | 'error' | 'set-password' | 'done';
-
-const MIN_PASSWORD_LEN = 8;
 
 export default function ActivateClient() {
   const params = useSearchParams();
@@ -57,9 +55,9 @@ export default function ActivateClient() {
 
   async function onSetPassword(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < MIN_PASSWORD_LEN) {
+    if (password.length < MIN_FREE_SEAT_PASSWORD_LEN) {
       setPasswordStatus('error');
-      setPasswordError(`Password must be at least ${MIN_PASSWORD_LEN} characters.`);
+      setPasswordError(`Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`);
       return;
     }
     setPasswordStatus('saving');
@@ -104,7 +102,7 @@ export default function ActivateClient() {
               placeholder="Choose a password (8+ characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              minLength={MIN_PASSWORD_LEN}
+              minLength={MIN_FREE_SEAT_PASSWORD_LEN}
               required
               className="w-full rounded-xl border border-[#26312c] bg-[#101815] px-4 py-3 text-white placeholder-[#6e7d72] outline-none focus:border-[#0066ff]"
             />

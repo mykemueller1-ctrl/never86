@@ -9,6 +9,7 @@ import {
   seatOperators,
 } from '../db/schema';
 import { restaurantNameForSeatClaim } from './ctapSeat1';
+import { MIN_FREE_SEAT_PASSWORD_LEN } from './ownerDeskAuth';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
 import { databaseUrlPresent } from './persistHealth';
@@ -462,8 +463,6 @@ export async function findFreeSeatCredential(email: string): Promise<FreeSeatCre
     : null;
 }
 
-export const MIN_FREE_SEAT_PASSWORD_LEN = 8;
-
 export type SetFreeSeatPasswordResult =
   | { ok: true }
   | { ok: false; error: string; status: number };
@@ -535,6 +534,7 @@ export function refuseSecondFreeSeat(existingCredentialCount: number): {
 }
 
 export { verifyPassword };
+export { MIN_FREE_SEAT_PASSWORD_LEN };
 
 export async function findFreeSeatOperator(operatorId: number): Promise<{
   operatorId: number;
