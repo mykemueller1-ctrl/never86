@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Find the leak. Run the fix. | Never 86'd",
     description:
-      "Payroll. Prices. Process. Open with one verified email and try the real restaurant operator.",
+      "Watch the recorded demo, then give your email to claim the free owner seat. Payroll. Prices. Process.",
     url: 'https://www.never86.ai/',
   },
 };
