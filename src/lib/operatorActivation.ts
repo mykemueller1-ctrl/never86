@@ -9,7 +9,7 @@ import {
   seatOperators,
 } from '../db/schema';
 import { restaurantNameForSeatClaim } from './ctapSeat1';
-import { MIN_FREE_SEAT_PASSWORD_LEN } from './ownerDeskAuth';
+import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN } from './ownerDeskAuth';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
 import { databaseUrlPresent } from './persistHealth';
@@ -486,6 +486,13 @@ export async function setFreeSeatPassword(
       status: 400,
     };
   }
+  if (password.length > MAX_FREE_SEAT_PASSWORD_LEN) {
+    return {
+      ok: false,
+      error: `Password must be at most ${MAX_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    };
+  }
   if (!neonConfigured()) {
     return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
   }
@@ -534,7 +541,7 @@ export function refuseSecondFreeSeat(existingCredentialCount: number): {
 }
 
 export { verifyPassword };
-export { MIN_FREE_SEAT_PASSWORD_LEN };
+export { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN };
 
 export async function findFreeSeatOperator(operatorId: number): Promise<{
   operatorId: number;

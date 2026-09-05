@@ -10,6 +10,9 @@ export const VOID_HUNTER_BLUE = '#0066ff';
  */
 export const MIN_FREE_SEAT_PASSWORD_LEN = 8;
 
+/** Upper bound so an oversized password can't be used to burn CPU in scrypt hashing (DoS). */
+export const MAX_FREE_SEAT_PASSWORD_LEN = 128;
+
 /** Signed-in owner first paint — SimpleOwnerDemo chat, not the card picker. */
 export const OWNER_DESK_PATH = '/operator' as const;
 

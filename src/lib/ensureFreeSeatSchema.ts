@@ -85,6 +85,8 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
   `;
 
   await sql`
+    -- Backward-compat for databases created before password_set_at existed
+    -- on the CREATE TABLE above; a no-op on freshly created tables.
     alter table seat_credentials add column if not exists password_set_at timestamptz
   `;
 

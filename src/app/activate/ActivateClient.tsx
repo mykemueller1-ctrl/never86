@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { MIN_FREE_SEAT_PASSWORD_LEN, OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN, OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 type Status = 'loading' | 'error' | 'set-password' | 'done';
 
@@ -103,6 +103,7 @@ export default function ActivateClient() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={MIN_FREE_SEAT_PASSWORD_LEN}
+              maxLength={MAX_FREE_SEAT_PASSWORD_LEN}
               required
               className="w-full rounded-xl border border-[#26312c] bg-[#101815] px-4 py-3 text-white placeholder-[#6e7d72] outline-none focus:border-[#0066ff]"
             />

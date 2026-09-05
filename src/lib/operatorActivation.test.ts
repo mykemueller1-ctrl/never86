@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FREE_SEAT_ID_FLOOR,
+  MAX_FREE_SEAT_PASSWORD_LEN,
   MIN_FREE_SEAT_PASSWORD_LEN,
   SeatActivationAbort,
   activationEmailConfigured,
@@ -120,6 +121,16 @@ describe('operatorActivation pure helpers', () => {
     expect(result).toEqual({
       ok: false,
       error: `Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    });
+  });
+
+  it('rejects an oversized self-service password before hashing it (DoS guard)', async () => {
+    const tooLong = 'x'.repeat(MAX_FREE_SEAT_PASSWORD_LEN + 1);
+    const result = await setFreeSeatPassword(1_000_001, 'owner@example.test', tooLong);
+    expect(result).toEqual({
+      ok: false,
+      error: `Password must be at most ${MAX_FREE_SEAT_PASSWORD_LEN} characters.`,
       status: 400,
     });
   });
