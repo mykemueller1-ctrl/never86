@@ -8,6 +8,7 @@
 
 | Job | Status | Intake file |
 |---|---|---|
+| **Orchestrator rebuild v1** | **DRAFTED — PR THIS BRANCH** | Supervisor + labor/vendor/voids/action-shift/memory. Inventory + `/portal` house-code door. Not merged/deployed/live-verified. |
 | **YouTube desk swarm v1** | **MERGED #179 — SLATE DRAFTED** | [2026-08-31-youtube-desk-swarm.md](2026-08-31-youtube-desk-swarm.md) · first slate [../grok-bots/batches/2026-09-03-youtube-slate.md](../grok-bots/batches/2026-09-03-youtube-slate.md). MCP org 2.1.0 live. Desk not pasted. No upload. All assets `approve: N`. |
 | **Command-center specialist swarm v1** | **MERGING NOW** | [2026-08-30-command-center-swarm.md](2026-08-30-command-center-swarm.md) — Store + company specialists, 10 CSV-first free agents, Sample Store One Action Shift, `/action-shift/swarm`. No send, no portal login |
 | **Shareable Grok Bot swarm** | **MERGED #172** | [2026-08-30-grok-shareable-86-swarm.md](2026-08-30-grok-shareable-86-swarm.md) — 15 ranked public bots; no branded 86 operator exists; team/workflow/API notes in `docs/company/grok-bots/`. Not added to the live desk. |
