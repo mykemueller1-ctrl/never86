@@ -24,7 +24,7 @@ const FACTS = [
   ['Founder',          'Myke Mueller'],
   ['Site',             'https://www.never86.ai'],
   ['Press',            'press@never86.ai'],
-  ['Sales / operator', 'myke@n86.app'],
+  ['Sales / operator', 'myke@never86.ai'],
   ['Headquarters',     'Fort Dodge, Iowa'],
 ];
 

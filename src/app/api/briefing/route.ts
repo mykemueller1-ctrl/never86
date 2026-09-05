@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { briefings, zReports, invoices } from '@/db/schema';
 import { generateBriefing } from '@/lib/anthropic';
-import { sendMorningBriefing } from '@/lib/email';
+import { getOwnerEmail, sendMorningBriefing } from '@/lib/email';
 import { desc, eq } from 'drizzle-orm';
 
 // GET /api/briefing — Trigger morning briefing (called by Vercel Cron)
@@ -57,11 +57,8 @@ export async function GET(req: NextRequest) {
       })
       .returning();
 
-    // Send email
-    await sendMorningBriefing(
-      process.env.OWNER_EMAIL || 'myke@n86.app',
-      htmlContent
-    );
+    // Send email — never myke@n86.app (Resend bounce-suppressed since 2026-07-25)
+    await sendMorningBriefing(getOwnerEmail(), htmlContent);
 
     // Update sent timestamp
     await db

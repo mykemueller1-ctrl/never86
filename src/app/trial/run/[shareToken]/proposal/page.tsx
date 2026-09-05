@@ -139,7 +139,7 @@ export default async function ProposalPage({ params }: { params: Params }) {
           </ol>
 
           <div className="footer">
-            <div>Never 86&apos;d · Built by operators · myke@n86.app</div>
+            <div>Never 86&apos;d · Built by operators · myke@never86.ai</div>
             <div className="mono">never86.ai/trial/run/{shareToken.slice(0, 8)}…</div>
           </div>
 

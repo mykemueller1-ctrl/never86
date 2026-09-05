@@ -62,7 +62,7 @@ const TIERS = [
       'Unlimited history',
       'Dedicated onboarding call with Myke',
     ],
-    cta: { label: 'Talk multi-unit Command →', href: 'mailto:myke@n86.app?subject=Multi-unit%20Command%20Center' },
+    cta: { label: 'Talk multi-unit Command →', href: 'mailto:myke@never86.ai?subject=Multi-unit%20Command%20Center' },
     accent: false,
   },
   {
@@ -76,7 +76,7 @@ const TIERS = [
       'Scoped and priced with you — no off-the-shelf promises',
       'Quarterly business review with the founder',
     ],
-    cta: { label: 'Email myke@n86.app', href: 'mailto:myke@n86.app?subject=Enterprise%20pricing%20-%20never86' },
+    cta: { label: 'Email myke@never86.ai', href: 'mailto:myke@never86.ai?subject=Enterprise%20pricing%20-%20never86' },
     accent: false,
   },
 ];

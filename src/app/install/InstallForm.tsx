@@ -57,7 +57,7 @@ export default function InstallForm() {
     return (
       <div className="compass-card text-center">
         <p className="font-serif text-2xl text-ink-800 mb-2">You&apos;re in.</p>
-        <p className="compass-body">Myke will reach out within 24 hours from <span className="font-mono text-ink-800">myke@n86.app</span> with your operator-app invite.</p>
+        <p className="compass-body">Myke will reach out within 24 hours from <span className="font-mono text-ink-800">myke@never86.ai</span> with your operator-app invite.</p>
         {fromShareToken && <p className="compass-body text-[13px] mt-4" style={{ color: '#86868b' }}>Linked to /trial/run/{fromShareToken}</p>}
       </div>
     );

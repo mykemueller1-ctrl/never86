@@ -33,7 +33,7 @@ export default function PrivacyPage() {
           Last updated August 28, 2026. Company: Never 86{"'"}d Inc., Fort Dodge, Iowa.
           Contact <a className="font-semibold text-[#0066ff] hover:underline" href="mailto:press@never86.ai">press@never86.ai</a>
           {' '}or{' '}
-          <a className="font-semibold text-[#0066ff] hover:underline" href="mailto:myke@n86.app">myke@n86.app</a>.
+          <a className="font-semibold text-[#0066ff] hover:underline" href="mailto:myke@never86.ai">myke@never86.ai</a>.
         </p>
 
         <div className="space-y-8 compass-body text-base">

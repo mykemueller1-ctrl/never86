@@ -44,6 +44,18 @@ describe('email delivery gates', () => {
     const prev = process.env.OWNER_EMAIL;
     process.env.OWNER_EMAIL = 'myke@n86.app';
     expect(getOwnerEmail()).toBe('mykemueller1@gmail.com');
+    process.env.OWNER_EMAIL = '  Myke@N86.APP ';
+    expect(getOwnerEmail()).toBe('mykemueller1@gmail.com');
+    process.env.OWNER_EMAIL = 'myke@never86.ai';
+    expect(getOwnerEmail()).toBe('myke@never86.ai');
+    if (prev === undefined) delete process.env.OWNER_EMAIL;
+    else process.env.OWNER_EMAIL = prev;
+  });
+
+  it('falls back to Gmail when OWNER_EMAIL is unset', () => {
+    const prev = process.env.OWNER_EMAIL;
+    delete process.env.OWNER_EMAIL;
+    expect(getOwnerEmail()).toBe('mykemueller1@gmail.com');
     if (prev === undefined) delete process.env.OWNER_EMAIL;
     else process.env.OWNER_EMAIL = prev;
   });

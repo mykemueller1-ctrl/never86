@@ -205,12 +205,12 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   },
   {
     name: 'OWNER_EMAIL',
-    purpose: 'Notification recipient. Public-safe default is myke@n86.app.',
+    purpose: 'Notification recipient. Use a deliverable inbox (Gmail or myke@never86.ai). Never myke@n86.app — Resend bounce-suppressed since 2026-07-25.',
     surfaces: ['vercel', 'local-env'],
     kind: 'public',
     required: false,
-    placeholder: 'myke@n86.app',
-    setup: 'Vercel env.',
+    placeholder: 'mykemueller1@gmail.com',
+    setup: 'Vercel env. getOwnerEmail() rejects the retired n86.app address.',
   },
   {
     name: 'GOOGLE_CLIENT_ID',

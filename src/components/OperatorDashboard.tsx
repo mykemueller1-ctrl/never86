@@ -165,7 +165,7 @@ export default async function OperatorDashboard({ operatorId, displayName }: { o
       <Shell name="DASHBOARD">
         <div style={{ border: `1px solid ${RULE}`, background: '#fffdf7', padding: 24, maxWidth: 560 }}>
           <p className="font-serif" style={{ fontSize: 22 }}>We couldn&apos;t reach your numbers.</p>
-          <p style={{ fontSize: 13, color: MUTED, marginTop: 6 }}>Give it a second and refresh — if it keeps happening, email myke@n86.app.</p>
+          <p style={{ fontSize: 13, color: MUTED, marginTop: 6 }}>Give it a second and refresh — if it keeps happening, email myke@never86.ai.</p>
         </div>
       </Shell>
     );
