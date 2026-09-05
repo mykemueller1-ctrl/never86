@@ -6,6 +6,11 @@
 import { AGENT_SPECS, getAgentSpec } from '../agentSpecs';
 import { getCompanyOrg } from '../companyOrg';
 import { FREE_AGENT_SLUGS } from '../commandCenterSwarm/types';
+import {
+  getOrchestrationSeat,
+  listOrchestrationSeats,
+  orchestrationRule as v1OrchestrationRule,
+} from '../orchestration';
 import { NEVER86_OPERATOR_SYSTEM } from '../operatorSystem';
 
 export type AgentTeam = 'store' | 'company' | 'free-agent';
@@ -23,21 +28,21 @@ export type AgentJob = {
 };
 
 const STORE_IDS: Record<string, string> = {
-  'Store Chief of Staff': 'store-chief-of-staff',
-  'Source Collector': 'source-collector',
-  'Margin Analyst': 'margin-analyst',
-  'Operator Coach': 'operator-coach',
-  'Proof Verifier': 'proof-verifier',
-  'Memory Curator': 'memory-curator',
+  Supervisor: 'supervisor',
+  Labor: 'labor',
+  Vendor: 'vendor',
+  Voids: 'voids',
+  'Action Shift': 'action-shift',
+  Memory: 'memory',
 };
 
 const STORE_STAGES: Record<string, readonly string[]> = {
-  'store-chief-of-staff': ['decide', 'assign'],
-  'source-collector': ['capture', 'parse'],
-  'margin-analyst': ['truth-gate', 'normalize', 'decide'],
-  'operator-coach': ['assign'],
-  'proof-verifier': ['prove'],
-  'memory-curator': ['learn'],
+  supervisor: ['capture', 'truth-gate', 'assign'],
+  labor: ['parse', 'truth-gate', 'decide'],
+  vendor: ['parse', 'truth-gate', 'decide'],
+  voids: ['parse', 'truth-gate'],
+  'action-shift': ['decide', 'assign', 'approve', 'prove'],
+  memory: ['learn'],
 };
 
 const NEVER_SEND = [
@@ -49,17 +54,14 @@ const NEVER_SEND = [
 ] as const;
 
 function storeJobs(): AgentJob[] {
-  return NEVER86_OPERATOR_SYSTEM.agents.storeTeam.map((member) => {
-    const id = STORE_IDS[member.name] ?? member.name.toLowerCase().replace(/\s+/g, '-');
-    return {
-      team: 'store' as const,
-      id,
-      name: member.name,
-      job: member.job,
-      ownsStages: STORE_STAGES[id] ?? [],
-      never: NEVER_SEND,
-    };
-  });
+  return listOrchestrationSeats().map((seat) => ({
+    team: 'store' as const,
+    id: STORE_IDS[seat.name] ?? seat.id,
+    name: seat.name,
+    job: seat.job,
+    ownsStages: STORE_STAGES[seat.id] ?? seat.ownsStages,
+    never: NEVER_SEND,
+  }));
 }
 
 function companyJobs(): AgentJob[] {
@@ -95,11 +97,15 @@ export function listAgentJobs(team: AgentTeam | 'all' = 'all'): AgentJob[] {
 }
 
 export function getAgentJob(id: string): AgentJob | null {
-  return listAgentJobs('all').find((row) => row.id === id) ?? null;
+  const exact = listAgentJobs('all').find((row) => row.id === id);
+  if (exact) return exact;
+  const aliased = getOrchestrationSeat(id);
+  if (!aliased) return null;
+  return listAgentJobs('all').find((row) => row.id === aliased.id) ?? null;
 }
 
 export function orchestrationRule(): string {
-  return NEVER86_OPERATOR_SYSTEM.agents.orchestration;
+  return v1OrchestrationRule();
 }
 
 export function governanceLoop(): readonly { stage: string; rule: string }[] {

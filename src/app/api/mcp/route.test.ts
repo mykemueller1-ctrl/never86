@@ -79,8 +79,8 @@ describe('public MCP route', () => {
     }));
     const body = await response.json();
     const text = body.result.content[0].text as string;
-    expect(text).toContain('store-chief-of-staff');
-    expect(text).toContain('memory-curator');
+    expect(text).toContain('supervisor');
+    expect(text).toContain('"id": "memory"');
     expect(text).not.toMatch(/karlee|sturtz|\$1,000\.00/i);
   });
 
@@ -98,8 +98,9 @@ describe('public MCP route', () => {
     const listedBody = await listed.json();
     const listedText = listedBody.result.content[0].text as string;
     expect(listedText).toContain('labor');
-    expect(listedText).toContain('truth-qa');
+    expect(listedText).toContain('voids');
     expect(listedText).toContain('never86://specialist/labor');
+    expect(listedText).not.toContain('design-qa');
 
     const prompt = await POST(new NextRequest('http://localhost/api/mcp', {
       method: 'POST',

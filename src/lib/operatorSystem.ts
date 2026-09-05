@@ -83,12 +83,20 @@ export const NEVER86_OPERATOR_SYSTEM = {
       { name: 'Truth/QA Critic', job: 'Challenges unsupported math, claims, and fake integrations.' },
       { name: 'GTM Operator', job: 'Drafts education and follow-up for founder approval; never impersonates or auto-posts.' },
     ],
-    orchestration: 'Use specialist agents around one deterministic backend and one store-scoped memory layer. Do not rely on a wandering mega-agent or separate business logic in each LLM.',
+    orchestration:
+      'Never86 orchestration 4.0.0: one supervisor routes to labor, vendor, voids, action-shift, or memory. One agent · one job. Tenant-scoped by operator_id. Source-tagged memory persists forever. House-code portal /portal is the only seat door. Live math stays at https://www.never86.ai/api/mcp. Do not rely on a wandering mega-agent or separate business logic in each LLM.',
+    orchestrationV1: {
+      version: '4.0.0',
+      seatDoor: '/portal',
+      mcp: 'https://www.never86.ai/api/mcp',
+      supervisor: 'supervisor',
+      specialists: ['labor', 'vendor', 'voids', 'action-shift', 'memory'],
+    },
   },
   memory: {
     record: ['store and location scope', 'raw rule or correction', 'normalized interpretation', 'source/provenance', 'approver', 'approved at', 'effective date', 'version', 'superseded by', 'confidence'],
     allowed: ['vendor cadence', 'order day', 'delivery day', 'owner', 'inbox/source route', 'POS category mapping', 'recipe/pack/yield mapping', 'business-day cutoff', 'operator target', 'exception handling'],
-    controls: ['show', 'correct', 'approve', 'supersede', 'delete', 'export'],
+    controls: ['show', 'correct', 'approve', 'supersede', 'export'],
     boundary: 'Never promote a fact from one store into a universal restaurant rule. A model guess is not memory.',
   },
   truthGates: [

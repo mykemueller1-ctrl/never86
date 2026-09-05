@@ -19,26 +19,21 @@ describe('agent governance registry', () => {
     const jobs = listAgentJobs('all');
     expect(jobs.length).toBeGreaterThan(15);
     expect(listAgentJobs('store').every((row) => row.team === 'store')).toBe(true);
-    expect(getAgentJob('memory-curator')?.job).toMatch(/human-approved/i);
+    expect(getAgentJob('memory')?.job).toMatch(/human-approved/i);
+    expect(getAgentJob('memory-curator')?.id).toBe('memory');
     expect(getAgentJob('void-hunter')?.team).toBe('free-agent');
-    expect(orchestrationRule()).toMatch(/one deterministic backend/i);
-    expect(orchestrationRule()).toMatch(/store-scoped memory/i);
+    expect(orchestrationRule()).toMatch(/one supervisor routes/i);
+    expect(orchestrationRule()).toMatch(/operator_id/i);
   });
 
-  it('exposes seven domain specialists with one job each', () => {
+  it('exposes five domain specialists with one job each', () => {
     const packs = listSpecialists();
-    expect(packs.map((p) => p.id)).toEqual([
-      'labor',
-      'beverage',
-      'food-invoice',
-      'recipe-cost',
-      'human-coach',
-      'design-qa',
-      'truth-qa',
-    ]);
+    expect(packs.map((p) => p.id)).toEqual(['labor', 'vendor', 'voids', 'action-shift', 'memory']);
     expect(getSpecialist('labor')?.publicTools).toContain('analyze_labor');
-    expect(getSpecialist('recipe-cost')?.publicTools).toContain('convert_uom');
-    expect(specialistBriefPrompt('truth-qa')).toMatch(/NEVER/);
+    expect(getSpecialist('vendor')?.publicTools).toContain('analyze_vendor_prices');
+    expect(getSpecialist('beverage')?.id).toBe('vendor');
+    expect(getSpecialist('design-qa')).toBeNull();
+    expect(specialistBriefPrompt('supervisor')).toMatch(/NEVER/);
   });
 });
 
