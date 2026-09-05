@@ -34,6 +34,7 @@ describe('owner desk post-auth redirect', () => {
     const client = read('src/app/activate/ActivateClient.tsx');
     const dashboard = read('src/app/dashboard/page.tsx');
     const desk = read('src/components/OperatorDashboard.tsx');
+    const proxy = read('src/proxy.ts');
 
     expect(activate).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
     expect(activate).not.toMatch(/redirect:\s*'\/dashboard'/);
@@ -53,6 +54,9 @@ describe('owner desk post-auth redirect', () => {
 
     expect(desk).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
     expect(desk).not.toContain('<FreeSeatDesk');
+
+    expect(proxy).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
+    expect(proxy).toMatch(/pathname === '\/dashboard'/);
   });
 
   it('keeps the authenticated first screen as the SimpleOwnerDemo composer', () => {
