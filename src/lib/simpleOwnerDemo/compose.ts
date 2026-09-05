@@ -5,6 +5,11 @@ import {
   type OwnerDeskTrayId,
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
+import {
+  dailyCompareFromEvidence,
+  projectFoldersFromKinds,
+  spawnLaborRoleCards,
+} from '@/lib/operatorV2';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -37,9 +42,16 @@ export function readinessFromUploads(
   if (sourceTags.length === 0) {
     sourceTags.push({ tag: 'unverified', source: 'simple-owner-demo:no-uploads' });
   }
+  const folders = projectFoldersFromKinds(kinds);
+  const scheduleReady = kinds.has('schedule');
+  const laborCardsReady = kinds.has('labor-cards');
+  const clockReady = kinds.has('timeclock');
   return {
     operatorId,
     evidence,
+    folders,
+    laborCards: spawnLaborRoleCards({ scheduleReady, laborCardsReady, clockReady }),
+    dailyCompare: dailyCompareFromEvidence({ scheduleReady, clockReady }),
     readyCount: evidence.filter((row) => row.state === 'READY').length,
     uploadCount: uploads.length,
     askCount,
@@ -63,18 +75,36 @@ export function composeAskAnswer(input: {
     { tag: 'unverified', source: `simple-owner-ask:${slug}` },
   ];
 
+  const folderReady = (input.readiness.folders ?? []).filter((row) => row.state === 'READY').map((row) => row.label);
+  const folderNeed = (input.readiness.folders ?? []).filter((row) => row.state === 'NEED').map((row) => row.label);
+  const laborAsk =
+    input.tray === 'labor' ||
+    /\blabor\b|\broles?\b|\bearly leave\b|\blate leave\b|\bdrift\b|\bschedule\b|\bposted in\b/.test(
+      input.question.toLowerCase(),
+    );
+
   const evidenceFact =
     input.uploads.length === 0
       ? 'No files are on this seat yet. Prime Cost Coach stays NEED until schedule, hourly, and time clock land.'
       : `This seat has ${input.uploads.length} source-tagged upload(s). Ready: ${ready.join(', ') || 'none'}. Still NEED: ${missing.join(', ') || 'none'}.`;
 
+  const folderFact =
+    folderReady.length || folderNeed.length
+      ? `First-class folders — Ready: ${folderReady.join(', ') || 'none'}. Still Missing: ${folderNeed.join(', ') || 'none'}. Schedule and labor cards are OCR inputs, same as menu and order guide.`
+      : 'Schedule, labor cards, menu, and order guide stay first-class Missing chips until a photo or file lands.';
+
+  const laborFact = laborAsk
+    ? 'Labor cards name roles (FOH, Line, Dish, Run). Daily compare to the clock flags early leave, late leave, and labor drift. Punch ≠ schedule. No invented overtime.'
+    : 'This desk answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.';
+
   const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
 
   const facts = [
     evidenceFact,
+    folderFact,
     persistFact,
-    sample?.facts[0] ?? 'This desk answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.',
-    'No dollar is verified from an upload or a typed guess. Missing Evidence stays open.',
+    sample?.facts[0] ?? laborFact,
+    laborAsk ? laborFact : 'No dollar is verified from an upload or a typed guess. Missing Evidence stays open.',
   ];
 
   return {

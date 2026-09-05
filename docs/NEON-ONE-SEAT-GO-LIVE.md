@@ -28,9 +28,10 @@ Set on the project that deploys **www.never86.ai**. Names only. Do not print sec
 |---|---|---|
 | `DATABASE_URL` | yes | Pooled URL for this Neon project / production branch |
 | `RESEND_API_KEY` | yes | Live Resend key. Missing → magic link 503 |
-| `OWNER_EMAIL` | yes | Operator notify address (name only in chat) |
+| `OWNER_EMAIL` | yes | Production notify for seat 1: `communitypizza2026@gmail.com` |
 | `ONE_SEAT_CLAIM_ENABLED` | yes | `true` |
 | `ONE_SEAT_ALLOW_LIVE_EMAIL` | yes | `true` |
+| `HOUSE_CODE_PORTAL_ENABLED` | keep false | `false` — `/portal` stays fail-closed |
 | `NEXT_PUBLIC_SITE_URL` | yes | `https://www.never86.ai` |
 | `CTAP_SEAT1_EMAIL` | optional | defaults to `communitypizza2026@gmail.com` |
 | `CTAP_SEAT1_RESTAURANT` | optional | defaults to `Community Tap` |

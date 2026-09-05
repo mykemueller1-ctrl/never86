@@ -9,7 +9,7 @@ const PILLARS = [
   {
     label: 'Payroll',
     title: 'Labor before it becomes payroll.',
-    copy: 'Line up schedules, punches, sales, and overtime. See where labor outran demand while there is still time to coach the shift.',
+    copy: 'Photo the week. Labor cards name roles. Daily compare to the clock finds early leave, late leave, and labor drift — punch ≠ schedule.',
     ask: 'Where did labor drift yesterday?',
   },
   {
@@ -41,7 +41,7 @@ export default function Home() {
               <span className="block italic text-[#005de8]">Run the fix.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#514b43] md:text-xl">
-              Your restaurant already creates the answer. It is buried in labor, invoices, and the daily mess. Never 86&apos;d reads the evidence, explains what changed, and gives you one move with the receipt attached.
+              Paper-shop folders first: schedule, labor cards, menu, order guide. Photo the week. Labor cards name roles. Daily compare to the clock. Never 86&apos;d reads the evidence and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>

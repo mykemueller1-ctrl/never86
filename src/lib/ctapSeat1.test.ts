@@ -51,5 +51,8 @@ describe('Operator V2 plates', () => {
     expect(nextMissingPlate(new Set()).id).toBe('schedule');
     expect(nextMissingPlate(new Set(['schedule'])).id).toBe('labor-cards');
     expect(OPERATOR_V2_PLATES.every((plate) => plate.ask.length > 20)).toBe(true);
+    expect(OPERATOR_V2_PLATES.every((plate) => plate.ocrInput === true)).toBe(true);
+    expect(OPERATOR_V2_PLATES.every((plate) => plate.firstClass === true)).toBe(true);
+    expect(OPERATOR_V2_PLATES.every((plate) => plate.deferred === false)).toBe(true);
   });
 });

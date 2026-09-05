@@ -8,7 +8,7 @@ type Status = 'idle' | 'loading' | 'sent' | 'error';
 
 const PLATES = [
   { title: 'Schedules', line: 'Photo the week. Labor lives here.' },
-  { title: 'Labor cards', line: 'Posted in/out. Drift only after a punch.' },
+  { title: 'Labor cards', line: 'Roles on the card. Daily compare to the clock.' },
   { title: 'Menu', line: 'Picture the plates. Cost the movers first.' },
   { title: 'Order guides', line: 'What is Missing before the next truck.' },
 ] as const;
@@ -70,7 +70,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Seat 1 is Community Tap — the canary shop. Email opens the chat desk. Plates ask the next question: schedule, labor cards, menu, order guide. Not a dashboard. Not Command Center.
+                Seat 1 is Community Tap — the canary shop. Email opens the chat desk. First-class folders: schedule, labor cards, menu, order guide. Photo the paper. Labor cards name roles. Daily compare to the clock. Not a dashboard. Not Command Center.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">

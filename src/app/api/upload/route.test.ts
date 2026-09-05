@@ -79,6 +79,32 @@ describe('POST /api/upload and POST /api/ask', () => {
     expect(readyBody.readiness.evidence.find((row: { id: string }) => row.id === 'hourly')?.state).toBe(
       'READY',
     );
+    expect(readyBody.readiness.folders).toHaveLength(4);
+    expect(readyBody.readiness.laborCards.map((card: { role: string }) => card.role)).toEqual([
+      'FOH',
+      'Line',
+      'Dish',
+      'Run',
+    ]);
+  });
+
+  it('tags a camera photo to the open schedule folder', async () => {
+    const form = new FormData();
+    form.set('file', new File([new Uint8Array([9, 8, 7])], 'IMG_1234.jpg', { type: 'image/jpeg' }));
+    form.set('folder', 'schedule');
+    const uploadRes = await uploadPost(
+      new NextRequest('http://localhost/api/upload', { method: 'POST', body: form }),
+    );
+    const uploadBody = await uploadRes.json();
+    expect(uploadRes.status).toBe(200);
+    expect(uploadBody.evidenceKind).toBe('schedule');
+    expect(uploadBody.readiness.folders.find((row: { id: string }) => row.id === 'schedule')?.state).toBe(
+      'READY',
+    );
+    expect(uploadBody.readiness.laborCards.every((card: { posted: string }) => card.posted === 'On schedule')).toBe(
+      true,
+    );
+    expect(uploadBody.readiness.dailyCompare.every((chip: { state: string }) => chip.state === 'NEED')).toBe(true);
   });
 
   it('does not return a hardcoded local-phone answer', async () => {
