@@ -736,3 +736,71 @@ export const simpleOwnerBlobs = pgTable('simple_owner_blobs', {
 export type SimpleOwnerUpload = typeof simpleOwnerUploads.$inferSelect;
 export type SimpleOwnerAsk = typeof simpleOwnerAsks.$inferSelect;
 export type SimpleOwnerBlob = typeof simpleOwnerBlobs.$inferSelect;
+
+// ── Nag Vendor Portal (food + liquor vendor photo intake) ──
+// Drafted schema. Live apply stays a human gate. Routes ensure-if-missing only.
+// operatorId is the same string tenant id used by simpleOwnerUploads (`seat:<id>`
+// for a claimed owner seat, `demo:<uuid>` before claim) — never the numeric
+// seat_operators.id.
+
+export const nagVendors = pgTable('nag_vendors', {
+  id: text('id').primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  name: text('name').notNull(),
+  category: text('category').notNull(), // 'food' | 'liquor'
+  contactName: text('contact_name'),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('nag_vendors_operator_idx').on(table.operatorId),
+]);
+
+export const nagVendorPhotos = pgTable('nag_vendor_photos', {
+  id: text('id').primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  vendorId: text('vendor_id').notNull(),
+  filename: text('filename').notNull(),
+  contentType: text('content_type').notNull(),
+  byteLength: integer('byte_length').notNull(),
+  objectKey: text('object_key').notNull(),
+  storageBackend: text('storage_backend').notNull(),
+  sourceTags: jsonb('source_tags').$type<{ tag: string; source: string }[]>().default([]).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('nag_vendor_photos_vendor_idx').on(table.vendorId),
+  index('nag_vendor_photos_operator_idx').on(table.operatorId),
+]);
+
+export type NagVendor = typeof nagVendors.$inferSelect;
+export type NagVendorPhoto = typeof nagVendorPhotos.$inferSelect;
+
+// ── Nag Weekly Prime Cost ──
+// Persistent weekly rollup of sales, labor, voids, and cash variance, keyed to
+// the numeric seat_operators/seat_locations ids (same tenancy as seatCloses).
+// Drafted schema. Live apply stays a human gate. Job ensures-if-missing only.
+
+export const nagWeeklyPrimeCost = pgTable('nag_weekly_prime_cost', {
+  id: serial('id').primaryKey(),
+  operatorId: integer('operator_id').notNull(),
+  locationId: integer('location_id').notNull(),
+  weekStart: date('week_start').notNull(),
+  weekEnd: date('week_end').notNull(),
+  grossSales: numeric('gross_sales', { precision: 12, scale: 2 }).notNull(),
+  laborCost: numeric('labor_cost', { precision: 12, scale: 2 }).notNull(),
+  voidsTotal: numeric('voids_total', { precision: 12, scale: 2 }).notNull(),
+  cashVariance: numeric('cash_variance', { precision: 12, scale: 2 }).notNull(),
+  primeCostPercent: numeric('prime_cost_percent', { precision: 6, scale: 2 }),
+  daysWithData: integer('days_with_data').notNull(),
+  sourceTags: jsonb('source_tags').$type<{ tag: string; source: string }[]>().default([]).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('nag_weekly_prime_cost_operator_location_week_idx').on(
+    table.operatorId,
+    table.locationId,
+    table.weekStart,
+  ),
+]);
+
+export type NagWeeklyPrimeCost = typeof nagWeeklyPrimeCost.$inferSelect;
