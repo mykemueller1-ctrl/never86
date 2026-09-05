@@ -1,4 +1,5 @@
 import type { EvidenceStatus, SalesLaborTenantId } from '../bambaSalesLabor/types';
+import type { ReasoningLayer } from '../logicPack2026/skillRegistry';
 
 export const PRIME_COST_CATEGORIES = ['sales', 'labor', 'food', 'menu', 'liquor', 'beer', 'inventory'] as const;
 export type PrimeCostCategory = (typeof PRIME_COST_CATEGORIES)[number];
