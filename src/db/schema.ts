@@ -736,3 +736,44 @@ export const simpleOwnerBlobs = pgTable('simple_owner_blobs', {
 export type SimpleOwnerUpload = typeof simpleOwnerUploads.$inferSelect;
 export type SimpleOwnerAsk = typeof simpleOwnerAsks.$inferSelect;
 export type SimpleOwnerBlob = typeof simpleOwnerBlobs.$inferSelect;
+
+// ── Vendor Scout: food & liquor vendor directory + photo intake ──
+// Drafted schema. Live apply stays a human gate. A vendor row is a directory
+// entry (who to call, what they sell), never a live-priced catalog — price
+// drift lives in `vendorDriftCsv` off the operator's own invoices, not here.
+
+export const vendors = pgTable('vendors', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  operatorId: text('operator_id').notNull(),
+  name: text('name').notNull(),
+  category: text('category').notNull(), // food | liquor | beer | wine | produce | other
+  accountNumber: text('account_number'),
+  contactName: text('contact_name'),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  deliveryDays: jsonb('delivery_days').$type<string[]>().default([]),
+  notes: text('notes'),
+  active: boolean('active').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('vendors_operator_idx').on(table.operatorId),
+  index('vendors_category_idx').on(table.category),
+]);
+
+export const vendorPhotos = pgTable('vendor_photos', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  vendorId: uuid('vendor_id').notNull().references(() => vendors.id, { onDelete: 'cascade' }),
+  operatorId: text('operator_id').notNull(),
+  photoType: text('photo_type').notNull(), // invoice | price-sheet | delivery | label | storefront | other
+  fileUrl: text('file_url').notNull(),
+  capturedAt: timestamp('captured_at'),
+  uploadedBy: text('uploaded_by'),
+  ocrText: text('ocr_text'),
+  evidence: text('evidence').default('unverified').notNull(), // verified | estimated | unverified | open
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('vendor_photos_vendor_idx').on(table.vendorId),
+]);
+
+export type Vendor = typeof vendors.$inferSelect;
+export type VendorPhoto = typeof vendorPhotos.$inferSelect;
