@@ -215,8 +215,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('/api/upload');
     expect(ui).not.toMatch(/router\.push/);
     expect(ui).toMatch(/goAsk\(ask/);
-    expect(ui).toMatch(/Demo restaurant/);
-    expect(ui).not.toMatch(/Community Tap/);
+    expect(ui).toMatch(/CTAP_SEAT1_PUBLIC_LABEL/);
+    expect(ui).toMatch(/OPERATOR_V2_PLATES/);
+    expect(ui).not.toMatch(/\$[\d,]+/);
     expect(ui).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(deskCss).toMatch(/#0066ff/);
