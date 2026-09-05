@@ -11,13 +11,25 @@ function resendClient(): Resend {
 }
 const resend = { emails: { send: (...args: Parameters<Resend['emails']['send']>) => resendClient().emails.send(...args) } };
 
+/** Gmail inbox Myke actually reads. Never route owner mail to myke@n86.app. */
 const FALLBACK_OWNER_EMAIL = 'mykemueller1@gmail.com';
+
+/** Brand inbound that lands in Resend receiving (MX on never86.ai). */
+export const BRAND_OWNER_EMAIL = 'myke@never86.ai';
+
+/** Hard-bounced 2026-07-25 → Resend suppression. Sends never leave the queue. */
+export const RETIRED_OWNER_EMAIL = 'myke@n86.app';
+
+export function isRetiredOwnerEmail(email: string | undefined | null): boolean {
+  return (email ?? '').trim().toLowerCase() === RETIRED_OWNER_EMAIL;
+}
 
 export function getOwnerEmail(): string {
   const configured = process.env.OWNER_EMAIL?.trim();
-  return configured && configured.toLowerCase() !== 'myke@n86.app'
-    ? configured
-    : FALLBACK_OWNER_EMAIL;
+  if (!configured || isRetiredOwnerEmail(configured)) {
+    return FALLBACK_OWNER_EMAIL;
+  }
+  return configured;
 }
 
 /** Public lead forms fail closed when Resend is not configured. */

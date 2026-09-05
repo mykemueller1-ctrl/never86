@@ -83,7 +83,7 @@ export default function EvidenceStandardPage() {
       <section className="max-w-4xl mx-auto px-6 py-16">
         <p className="compass-eyebrow mb-4">— Request a correction</p>
         <h2 className="compass-display text-3xl md:text-4xl">Bring the source.</h2>
-        <p className="compass-body text-lg mt-4 max-w-2xl">If a public page misstates a platform policy, source, or calculation, email the URL and supporting evidence to <a className="underline" href="mailto:myke@n86.app">myke@n86.app</a>. Material corrections will be reflected in the page and updated date.</p>
+        <p className="compass-body text-lg mt-4 max-w-2xl">If a public page misstates a platform policy, source, or calculation, email the URL and supporting evidence to <a className="underline" href="mailto:myke@never86.ai">myke@never86.ai</a>. Material corrections will be reflected in the page and updated date.</p>
       </section>
 
       <MarketplaceAuditFooter />

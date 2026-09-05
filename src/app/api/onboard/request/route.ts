@@ -29,8 +29,18 @@ async function sendActivationEmail(email: string, link: string, expiresAt: Date)
   const resend = new Resend(key);
   const sent = await resend.emails.send(activationEmailPayload(email, link, expiresAt));
   if (sent.error) {
+    console.error('[onboard/request] Resend send failed', {
+      to: email,
+      name: sent.error.name,
+      message: sent.error.message,
+    });
     throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
   }
+  if (!sent.data?.id) {
+    console.error('[onboard/request] Resend returned no message id', { to: email });
+    throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
+  }
+  console.info('[onboard/request] activation email queued', { to: email, resendId: sent.data.id });
 }
 
 // POST /api/onboard/request — mint a one-time activation token on Neon (hashed at rest).

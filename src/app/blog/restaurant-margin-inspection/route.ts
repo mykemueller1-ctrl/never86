@@ -147,7 +147,7 @@ const html = `<!DOCTYPE html>
   </dl>
 
   <div class="cta">
-    <p><strong>Buying a restaurant — or selling one and want the numbers clean first?</strong> Never 86'd runs the margin inspection against your POS data. <a href="https://www.never86.ai">never86.ai</a> · myke@n86.app</p>
+    <p><strong>Buying a restaurant — or selling one and want the numbers clean first?</strong> Never 86'd runs the margin inspection against your POS data. <a href="https://www.never86.ai">never86.ai</a> · myke@never86.ai</p>
   </div>
 </article>
 </body>

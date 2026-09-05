@@ -28,7 +28,7 @@ Set on the project that deploys **www.never86.ai**. Names only. Do not print sec
 |---|---|---|
 | `DATABASE_URL` | yes | Pooled URL for this Neon project / production branch |
 | `RESEND_API_KEY` | yes | Live Resend key. Missing → magic link 503 |
-| `OWNER_EMAIL` | yes | Production notify for seat 1: `communitypizza2026@gmail.com` |
+| `OWNER_EMAIL` | yes | Deliverable notify inbox: `mykemueller1@gmail.com` or `myke@never86.ai`. **Never** `myke@n86.app` (Resend bounce-suppressed). |
 | `ONE_SEAT_CLAIM_ENABLED` | yes | `true` |
 | `ONE_SEAT_ALLOW_LIVE_EMAIL` | yes | `true` |
 | `HOUSE_CODE_PORTAL_ENABLED` | keep false | `false` — `/portal` stays fail-closed |

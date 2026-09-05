@@ -109,7 +109,7 @@ export default function StoryPage() {
 
           <h2 className="compass-display text-3xl md:text-4xl mt-12 mb-4">The direct line</h2>
           <p>
-            If something on the screen doesn&apos;t make sense, you can email me directly. I read everything. I respond personally. <a href="mailto:myke@n86.app" className="underline text-ink-800 font-mono" style={{ textDecorationColor: '#0066ff' }}>myke@n86.app</a>.
+            If something on the screen doesn&apos;t make sense, you can email me directly. I read everything. I respond personally. <a href="mailto:myke@never86.ai" className="underline text-ink-800 font-mono" style={{ textDecorationColor: '#0066ff' }}>myke@never86.ai</a>.
           </p>
           <p>
             If we&apos;re wrong about a number on your data, we&apos;ll walk it back in writing — same rule we ran on the first $8.3M.

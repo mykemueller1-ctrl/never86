@@ -24,7 +24,7 @@ export const STORE_LISTING = {
   docsUrl: 'https://www.never86.ai/mcp',
   logoSvg: 'https://www.never86.ai/brand/n86-mark.svg',
   pressEmail: 'press@never86.ai',
-  operatorEmail: 'myke@n86.app',
+  operatorEmail: 'myke@never86.ai',
   tagline: 'Find the leak. Run the fix.',
   shortDescription:
     'Restaurant leak detection for merchants: one specialist per job, then Payroll, Prices, Process, and Beverage. Read-only analysis using data the operator chooses to provide.',

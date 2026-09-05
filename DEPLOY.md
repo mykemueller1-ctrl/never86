@@ -55,7 +55,7 @@ Repo: `github.com/mykemueller1-ctrl/never86`
    - `ANTHROPIC_API_KEY` = your Claude API key
    - `RESEND_API_KEY` = your Resend key
    - `CRON_SECRET` = any random string (e.g. `n86-cron-2024`)
-   - `OWNER_EMAIL` = `myke@n86.app`
+   - `OWNER_EMAIL` = `mykemueller1@gmail.com` (not `myke@n86.app` — that address is Resend-suppressed)
    - Optional Grok model API: `XAI_API_KEY` (xAI console → Vercel encrypted env; never Git)
    - Private Grok → Cursor factory: `NEVER86_OAUTH_CLIENT_SECRET`, `CURSOR_API_KEY` (already live; do not rotate from a factory job)
 4. Click Deploy
