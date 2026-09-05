@@ -1,10 +1,11 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getCommandCenterData, type CommandCenterData } from '@/lib/commandCenter';
 import { buildCoachCards, type CoachCard } from '@/lib/coachCards';
 import { opsDbConfigured } from '@/lib/opsDb';
 import { isFreeSeatOperatorId } from '@/lib/operatorActivation';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 import SignOutButton from './SignOutButton';
-import FreeSeatDesk from './FreeSeatDesk';
 
 // The operator's home in the COMPASS brief design — the exact language of the
 // demo docs (Weekly Brief / coaching cards): cream paper, serif display, mono
@@ -149,13 +150,9 @@ function EmptyState({ name }: { name: string }) {
 }
 
 export default async function OperatorDashboard({ operatorId, displayName }: { operatorId: number; displayName?: string }) {
-  // Neon free-seat operators (Monday gate) stay on the prior-day desk — no OPS command center.
+  // Neon free-seat operators open the chat composer, not the three-card picker.
   if (isFreeSeatOperatorId(operatorId)) {
-    return (
-      <Shell name="OPERATOR" showLegacyLinks={false}>
-        <FreeSeatDesk operatorId={operatorId} />
-      </Shell>
-    );
+    redirect(OWNER_DESK_POST_AUTH_REDIRECT);
   }
   if (!opsDbConfigured()) {
     return <Shell name="DASHBOARD"><EmptyState name="YOUR RESTAURANT" /></Shell>;

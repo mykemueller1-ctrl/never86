@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 type Status = 'loading' | 'error' | 'done';
 
@@ -34,7 +35,7 @@ export default function ActivateClient() {
         if (!res.ok || !data.success) throw new Error(data.error || 'Sign-in failed');
         setStatus('done');
         setMessage('Email verified. Opening your operator…');
-        window.location.replace(data.redirect || '/dashboard');
+        window.location.replace(data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
       } catch (err: unknown) {
         setStatus('error');
         setMessage(err instanceof Error ? err.message : 'Sign-in failed');

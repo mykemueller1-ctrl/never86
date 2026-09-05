@@ -7,6 +7,7 @@ import {
   OPERATOR_COOKIE,
   OPERATOR_COOKIE_OPTS,
 } from '@/lib/operatorSession';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
 
     const res = NextResponse.json({
       success: true,
-      redirect: '/dashboard',
+      redirect: OWNER_DESK_POST_AUTH_REDIRECT,
       restaurantName: result.restaurantName,
     });
     res.cookies.set(OPERATOR_COOKIE, session, OPERATOR_COOKIE_OPTS);
