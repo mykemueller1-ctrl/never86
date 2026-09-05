@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FREE_SEAT_ID_FLOOR,
+  MIN_FREE_SEAT_PASSWORD_LEN,
   SeatActivationAbort,
   activationEmailConfigured,
   activationTokenIsConsumable,
@@ -13,6 +14,7 @@ import {
   publicActivationAccepted,
   refuseSecondFreeSeat,
   refuseSecondFreeStore,
+  setFreeSeatPassword,
 } from './operatorActivation';
 
 describe('operatorActivation pure helpers', () => {
@@ -111,6 +113,15 @@ describe('operatorActivation pure helpers', () => {
     expect(chooseLoginPlane({ passwordHash: 'x' }, false)).toBe('deny-neon');
     expect(chooseLoginPlane({ passwordHash: 'x' }, true)).toBe('neon');
     expect(chooseLoginPlane(null, false)).toBe('ops');
+  });
+
+  it('rejects a self-service password shorter than the minimum, before touching Neon', async () => {
+    const result = await setFreeSeatPassword(1_000_001, 'owner@example.test', 'short');
+    expect(result).toEqual({
+      ok: false,
+      error: `Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    });
   });
 
   it('aborts activation so second-store and id-namespace failures can roll back', () => {
