@@ -14,6 +14,7 @@ describe('activation flow prompts a one-time password set before opening the des
     expect(client).toContain("import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN");
     expect(client).toMatch(/minLength=\{MIN_FREE_SEAT_PASSWORD_LEN\}/);
     expect(client).toMatch(/maxLength=\{MAX_FREE_SEAT_PASSWORD_LEN\}/);
+    expect(client).toMatch(/password\.length > MAX_FREE_SEAT_PASSWORD_LEN/);
   });
 
   it('lets the operator skip straight to the desk without setting a password', () => {

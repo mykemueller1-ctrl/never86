@@ -24,7 +24,12 @@ describe('returning owners land in the desk, not the claim/login forms', () => {
   });
 
   it('keeps the magic-link and password forms in their own client components', () => {
-    expect(read('src/app/login/LoginClient.tsx')).toContain("'use client'");
+    const loginClient = read('src/app/login/LoginClient.tsx');
+    expect(loginClient).toContain("'use client'");
     expect(read('src/app/onboard/OnboardClient.tsx')).toContain("'use client'");
+    // Password-login redirect must never hardcode a path that could drift
+    // from OWNER_DESK_POST_AUTH_REDIRECT.
+    expect(loginClient).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
+    expect(loginClient).not.toMatch(/\|\|\s*'\/operator'/);
   });
 });

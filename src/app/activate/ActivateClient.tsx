@@ -60,6 +60,11 @@ export default function ActivateClient() {
       setPasswordError(`Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`);
       return;
     }
+    if (password.length > MAX_FREE_SEAT_PASSWORD_LEN) {
+      setPasswordStatus('error');
+      setPasswordError(`Password must be at most ${MAX_FREE_SEAT_PASSWORD_LEN} characters.`);
+      return;
+    }
     setPasswordStatus('saving');
     setPasswordError('');
     try {

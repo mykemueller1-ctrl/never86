@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 const inputClass =
   'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
@@ -26,7 +27,7 @@ export default function OperatorLoginPage() {
         });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
-        window.location.href = data.redirect || '/operator';
+        window.location.href = data.redirect || OWNER_DESK_POST_AUTH_REDIRECT;
       } catch (err: unknown) {
         setStatus('error');
         setMessage(err instanceof Error ? err.message : 'Wrong email or password.');
