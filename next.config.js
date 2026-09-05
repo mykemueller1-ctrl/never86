@@ -9,16 +9,12 @@ const nextConfig = {
     },
   },
   async redirects() {
-    // House-code /portal is the only communities seat door.
+    // House-code /portal is the CTAP community seat. Strangers use /onboard.
     return [{ source: '/communities', destination: '/portal', permanent: false }];
   },
   async rewrites() {
-    // never86.ai front door = open Action Shift suck-in (no iframe).
-    // Marketing story stays at /product.
-    return [
-      { source: '/', destination: '/demo/action-shift.html' },
-      { source: '/play', destination: '/demo/action-shift.html' },
-    ];
+    // Sample-shop suck-in stays at /play. Homepage is email-first claim, not open play.
+    return [{ source: '/play', destination: '/demo/action-shift.html' }];
   },
 };
 

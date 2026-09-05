@@ -33,10 +33,17 @@ describe('one-seat claim', () => {
   });
 
   it('rejects live-looking emails in git/test and keeps phone/X unavailable', () => {
-    expect(normalizeEmail('tom@communitytap.example')).toBeNull();
-    expect(normalizeEmail('foh@example.test')).toBe('foh@example.test');
+    expect(normalizeEmail('tom@communitytap.example', {})).toBeNull();
+    expect(normalizeEmail('foh@example.test', {})).toBe('foh@example.test');
     expect(unavailableProviderMessage('phone')).toMatch(/not available|wait/i);
     expect(unavailableProviderMessage('x')).toMatch(/not available|wait/i);
+  });
+
+  it('accepts live shop email only when ONE_SEAT_ALLOW_LIVE_EMAIL=true', () => {
+    expect(normalizeEmail('communitypizza2026@gmail.com', {})).toBeNull();
+    expect(
+      normalizeEmail('communitypizza2026@gmail.com', { ONE_SEAT_ALLOW_LIVE_EMAIL: 'true' }),
+    ).toBe('communitypizza2026@gmail.com');
   });
 
   it('creates a pending request with no tenant access and never returns a raw token', () => {

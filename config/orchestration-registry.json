@@ -1,0 +1,19 @@
+{
+  "version": "4.0.0",
+  "brandBlue": "#0066ff",
+  "mcp": "https://www.never86.ai/api/mcp",
+  "seatDoor": "/portal",
+  "supervisor": "supervisor",
+  "specialists": ["labor", "vendor", "voids", "action-shift", "memory"],
+  "never": [
+    "auto-mail",
+    "auto-post",
+    "portal-login",
+    "theft-allegation",
+    "guaranteed-recovery",
+    "forked-business-logic",
+    "cross-tenant-read",
+    "delete-memory",
+    "house-code-in-git"
+  ]
+}

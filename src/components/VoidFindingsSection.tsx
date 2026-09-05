@@ -57,7 +57,7 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
       ) : null}
 
       <div className="bg-void-500/10 border border-void-500/30 rounded-xl p-4 mb-4">
-        <p className="text-void-300 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
+        <p className="text-void-600 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
         <p className="text-dark-200 text-sm">
           Top-offender rows are the highest measured void totals — not accusations. Some are channel buckets,
           some are shared tills, some are real. Start at the top, pull the void reasons, then decide.
@@ -91,9 +91,9 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
                     <td className="px-4 py-2">
                       <span className="flex items-center gap-3">
                         <span className="relative inline-block h-1.5 w-20 sm:w-28 rounded bg-white/5 overflow-hidden align-middle">
-                          <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-void-700 to-void-400" style={{ width: `${w}%` }} />
+                          <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-void-800 to-void-400" style={{ width: `${w}%` }} />
                         </span>
-                        <span className="text-void-300 tabular-nums font-semibold">{usd(amt)}</span>
+                        <span className="text-void-400 tabular-nums font-semibold">{usd(amt)}</span>
                       </span>
                     </td>
                     <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{count(row.count ?? 0)}</td>

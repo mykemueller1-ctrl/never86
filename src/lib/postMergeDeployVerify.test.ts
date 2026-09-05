@@ -21,7 +21,8 @@ describe('post-merge deploy-verify locks', () => {
     expect(read('src/app/communities/page.tsx')).toMatch(/redirect\(HOUSE_CODE_SEAT_DOOR\)/);
     expect(read('next.config.js')).toMatch(/source: '\/communities'/);
     expect(read('next.config.js')).toMatch(/destination: '\/portal'/);
-    expect(read('src/app/portal/page.tsx')).toMatch(/only community seat/i);
+    expect(read('src/app/portal/page.tsx')).toMatch(/community house-code/i);
+    expect(read('src/app/portal/page.tsx')).toMatch(/\/onboard/);
     expect(read('src/app/login/page.tsx')).toMatch(/href="\/portal"/);
   });
 

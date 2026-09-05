@@ -5,7 +5,7 @@ import { MCP_PUBLIC_ENDPOINT, MCP_PUBLIC_TOOLS } from '@/lib/mcpPublicContract';
 export const metadata: Metadata = {
   title: "Never86'd MCP · Operator specialists + Payroll, Prices, Process",
   description:
-    "Public read-only Never86'd MCP: operator system knowledge, one-agent-one-job specialists, labor, beverage, vendor prices, and Action Shift.",
+    "Public read-only Never86'd MCP: operator system knowledge, one supervisor, labor / vendor / voids / Action Shift / memory specialists.",
   alternates: { canonical: 'https://www.never86.ai/mcp' },
   robots: { index: true, follow: true },
 };

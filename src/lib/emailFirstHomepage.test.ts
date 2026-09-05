@@ -14,6 +14,7 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
   const home = readFileSync(resolve('src/components/HomePage.tsx'), 'utf8');
   const shell = readFileSync(resolve('src/components/HumanSiteShell.tsx'), 'utf8');
   const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
+  const config = readFileSync(resolve('next.config.js'), 'utf8');
 
   it('makes the homepage primary button claim the free owner seat', () => {
     expect(home).toMatch(/human-button human-button-primary/);
@@ -55,6 +56,13 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
     expect(shell).not.toMatch(/href="\/play"[^>]*human-nav-link">Play/);
     expect(shell).not.toMatch(/human-nav-link">Owner desk/);
     expect(shell).toMatch(/href="\/login"/);
-    expect(shell).toMatch(/href="\/communities"/);
+    expect(shell).toMatch(/href="\/portal"/);
+    expect(shell).not.toMatch(/href="\/communities"/);
+  });
+
+  it('does not rewrite the homepage to open play', () => {
+    expect(config).not.toMatch(/source: '\/'/);
+    expect(config).toMatch(/source: '\/play'/);
+    expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
   });
 });

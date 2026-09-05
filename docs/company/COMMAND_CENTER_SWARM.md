@@ -20,7 +20,7 @@ Loop: capture → parse → truth-gate → normalize → decide → assign (≤3
 1. Stay on the isolated Cursor branch. Do not merge.
 2. `npm test -- src/lib/commandCenterSwarm.test.ts src/lib/threePFeeFinderCsv.test.ts src/lib/rateCardAuditCsv.test.ts src/lib/shiftPulseCsv.test.ts`
 3. `npm run swarm:run` — prints the sample-store receipt (0 sends, 0 portal logins).
-4. `npm run dev` then open `/action-shift/swarm` (noindex, no login). `/command-center/swarm` is the same view behind the existing reports password.
+4. `npm run dev` then open `/action-shift/swarm` (noindex, no login). `/command-center/swarm` redirects there (duplicate archived). Seat door is `/portal`.
 5. Optional JSON: `GET /api/command-center/swarm`
 
 Sample CSVs: `public/samples/swarm/*.csv`

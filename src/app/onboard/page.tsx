@@ -6,10 +6,11 @@ import { trackEvent } from '@/lib/track';
 
 type Status = 'idle' | 'loading' | 'sent' | 'error';
 
-const PILLARS = [
-  { title: 'Payroll', line: 'See labor creep before payroll closes.' },
-  { title: 'Prices', line: 'Read every invoice line and catch SKU drift.' },
-  { title: 'Process', line: 'Turn floor chaos into one next move.' },
+const PLATES = [
+  { title: 'Schedules', line: 'Photo the week. Labor lives here.' },
+  { title: 'Labor cards', line: 'Posted in/out. Drift only after a punch.' },
+  { title: 'Menu', line: 'Picture the plates. Cost the movers first.' },
+  { title: 'Order guides', line: 'What is Missing before the next truck.' },
 ] as const;
 
 export default function OnboardPage() {
@@ -64,19 +65,19 @@ export default function OnboardPage() {
         <div className="mx-auto max-w-5xl">
           <div className="grid items-start gap-10 lg:grid-cols-[1.15fr_.85fr]">
             <div>
-              <p className="compass-eyebrow mb-5">— 1–3 unit ICP · Payroll · Prices · Process</p>
+              <p className="compass-eyebrow mb-5">— Seat 1 · Community Tap · Operator V2 plates</p>
               <h1 className="compass-display text-5xl md:text-7xl mb-5">
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Built for independent operators running one to three locations. Seat 1 belongs to the owner and is free for one store. Add seat 2 or seat 3 when a GM or station lead needs the same proof. Multi-unit Command Center stays a separate build.
+                Seat 1 is Community Tap — the canary shop. Email opens the chat desk. Plates ask the next question: schedule, labor cards, menu, order guide. Not a dashboard. Not Command Center.
               </p>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {PILLARS.map((pillar) => (
-                  <div className="compass-card" key={pillar.title}>
-                    <p className="compass-card-label">{pillar.title}</p>
-                    <p className="compass-body mt-2 text-sm leading-snug">{pillar.line}</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {PLATES.map((plate) => (
+                  <div className="compass-card" key={plate.title}>
+                    <p className="compass-card-label" style={{ color: '#0066ff' }}>{plate.title}</p>
+                    <p className="compass-body mt-2 text-sm leading-snug">{plate.line}</p>
                   </div>
                 ))}
               </div>
@@ -85,7 +86,7 @@ export default function OnboardPage() {
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
               <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Click. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. No password. Seat 1 is the owner seat for one store. Seats 2 and 3 stay locked until you expand.</p>
+              <p className="compass-body mt-3 text-sm">No card. No password. Community Tap seat 1 uses the shop email already on file. Extra seats stay locked.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <input
                   type="email"

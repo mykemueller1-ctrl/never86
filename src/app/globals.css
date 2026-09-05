@@ -861,6 +861,45 @@ a.btn-secondary:hover, button.btn-secondary:hover {
 .owner-desk-card-peach {
   background: #eef3ff;
 }
+.owner-v2-plates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.owner-v2-plate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.96);
+  color: #06122b;
+  border-radius: 1rem;
+  padding: 0.7rem 0.75rem;
+  cursor: pointer;
+}
+.owner-v2-plate-kicker {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0066ff;
+}
+.owner-v2-plate-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.owner-v2-plate-miss {
+  font-size: 0.7rem;
+  line-height: 1.3;
+  color: #3d4d73;
+}
+@media (max-width: 420px) {
+  .owner-v2-plates {
+    grid-template-columns: 1fr;
+  }
+}
 .owner-desk-bolt {
   display: inline-flex;
   align-items: center;

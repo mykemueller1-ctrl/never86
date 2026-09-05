@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import {
   ONE_SEAT_CLAIM_ENABLED_ENV,
+  liveEmailAllowed,
   completeGoogleClaim,
   createGooglePkceState,
   decideClaim,
@@ -85,6 +86,8 @@ export function handleEmailStart(input: {
     email: input.email,
     ip: input.ip,
     store: input.store ?? getOneSeatMemoryStore(),
+    allowLiveEmail: liveEmailAllowed(env),
+    env,
   });
 }
 

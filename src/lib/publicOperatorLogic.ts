@@ -105,7 +105,7 @@ const proofMemory = {
     'A verbal yes can acknowledge an action but cannot verify it.',
     'Financial truth changes only from relevant same-scope evidence.',
     'Every learned rule carries store scope, provenance, approver, effective date, and version.',
-    'Operators can inspect, correct, supersede, delete, and export learned rules.',
+    'Operators can inspect, correct, supersede, and export learned rules. Memory is never deleted.',
     NEVER86_OPERATOR_SYSTEM.memory.boundary,
   ],
 };
