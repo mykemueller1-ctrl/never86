@@ -15,9 +15,9 @@ describe('never86.ai open play front door', () => {
     expect(html).toMatch(/\/product/);
   });
 
-  it('rewrites / and /play to the suck-in desk (no iframe page)', () => {
+  it('keeps /play as the sample-shop suck-in and parks open play off the homepage', () => {
     const config = readFileSync(resolve('next.config.js'), 'utf8');
-    expect(config).toMatch(/source: '\/'/);
+    expect(config).not.toMatch(/source: '\/'/);
     expect(config).toMatch(/source: '\/play'/);
     expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
     expect(config).toMatch(/source: '\/communities'/);

@@ -94,7 +94,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'list_agent_jobs',
     description:
-      'List the public one-agent-one-job governance registry: store team, company roles, and free agents — each with a single job string.',
+      'List the public one-agent-one-job registry: supervisor + labor/vendor/voids/action-shift/memory, plus company roles and free-agent product catalog.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -111,7 +111,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'list_specialists',
     description:
-      'List domain specialists (labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, truth-qa) with one job each, allowed tools, and MCP resource URIs.',
+      'List domain specialists (labor, vendor, voids, action-shift, memory) with one job each, allowed tools, and MCP resource URIs. Supervisor routes; house-code /portal is the only seat door.',
     inputSchema: emptyObjectSchema,
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },

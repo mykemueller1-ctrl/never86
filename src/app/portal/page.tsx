@@ -5,7 +5,7 @@ import { PortalHouseForm } from './PortalHouseForm';
 
 export const metadata: Metadata = {
   title: "House-code seat | Never 86'd",
-  description: 'Community house-code portal. The only community seat door. Fail-closed. No private store data.',
+  description: 'Community house-code portal. CTAP community seat door. Fail-closed. No private store data.',
   robots: { index: false, follow: false },
 };
 
@@ -19,7 +19,7 @@ export default function HouseCodePortalPage() {
             <p className="font-serif text-[24px] leading-none text-ink-800">
               Never 86&apos;d <span className="italic text-ink-600">· house code</span>
             </p>
-            <p className="compass-eyebrow-dim mt-2">Only community seat door · {HOUSE_CODE_SEAT_DOOR}</p>
+            <p className="compass-eyebrow-dim mt-2">Community seat door · {HOUSE_CODE_SEAT_DOOR}</p>
           </span>
         </Link>
       </div>
@@ -30,17 +30,17 @@ export default function HouseCodePortalPage() {
         </p>
         <h1 className="compass-display text-4xl md:text-5xl mb-3">House code. Then the desk.</h1>
         <p className="compass-body text-[15px] mb-8" style={{ color: '#86868b' }}>
-          This is the only community seat. Owner /login stays owner-only. Staff /login stays fail-closed. A
-          house code maps to one <span className="font-mono">operator_id</span>. No PIN, no staff name, no
-          marketplace password. Live issuance stays blocked until the first code is issued.
+          This is the community house-code door. Owner email at /login stays owner-only. Staff /login stays
+          fail-closed. A house code maps to one <span className="font-mono">operator_id</span>. No PIN, no staff
+          name, no marketplace password. Live issuance stays blocked until the first code is issued.
         </p>
         <PortalHouseForm />
         <p className="compass-body text-[13px] mt-8" style={{ color: '#86868b' }}>
-          Strangers claim the free owner seat by email at{' '}
+          Strangers and the Community Tap owner claim the free owner seat by email at{' '}
           <Link href="/onboard" className="underline" style={{ textDecorationColor: HOUSE_CODE_BRAND_BLUE }}>
             /onboard
           </Link>
-          .
+          . That is the 1-seat door. House code is not the stranger funnel.
         </p>
       </section>
     </main>

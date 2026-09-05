@@ -30,7 +30,7 @@ The bar for `Verified`: either (a) a primary source we own and can re-pull, OR (
 
 ## Myke Mueller Logic — the veto
 
-Even if 3 sources agree, the operator's judgment overrides. The `myke-mueller-logic` agent (`agents/myke-mueller-logic.md`) holds the veto. Its rulings get encoded back into the platform over time. The platform learns from him; he doesn't learn from it.
+Even if 3 sources agree, the operator's judgment overrides. The `myke-mueller-logic` veto lives in `archive/agents-v0/myke-mueller-logic.md`. Canonical seats are supervisor → labor / vendor / voids / action-shift / memory. The platform learns from him; he doesn't learn from it.
 
 ## The signed-only rule
 

@@ -8,6 +8,7 @@ import {
   seatLocations,
   seatOperators,
 } from '../db/schema';
+import { restaurantNameForSeatClaim } from './ctapSeat1';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import { hashPassword, verifyPassword } from './operatorAuth';
 import { databaseUrlPresent } from './persistHealth';
@@ -128,7 +129,7 @@ export async function requestOperatorActivation(
   }
 
   const email = normalizeEmail(input.email);
-  const restaurantName = normalizeRestaurant(input.restaurantName || 'My restaurant');
+  const restaurantName = restaurantNameForSeatClaim(email, input.restaurantName);
   if (!email || !email.includes('@')) {
     return { ok: false, error: 'Enter a valid email.', status: 400 };
   }
@@ -292,7 +293,7 @@ export async function activateOperatorSeat(
       }
 
       const email = normalizeEmail(row.email);
-      const restaurantName = normalizeRestaurant(row.restaurantName);
+      const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName);
       const operatorName = (row.operatorName?.trim() || restaurantName).slice(0, 200);
 
       const priorCred = await tx

@@ -40,7 +40,7 @@ export default function OperatorLoginPage() {
             <p className="font-serif text-[24px] leading-none text-ink-800">
               Never 86&apos;d <span className="italic text-ink-600">· operator login</span>
             </p>
-            <p className="compass-eyebrow-dim mt-2">Payroll · Prices · Process</p>
+            <p className="compass-eyebrow-dim mt-2">Community Tap seat 1 · magic link</p>
           </span>
         </Link>
       </div>
@@ -49,14 +49,14 @@ export default function OperatorLoginPage() {
         <p className="compass-eyebrow mb-4">— One field. That&apos;s it.</p>
         <h1 className="compass-display text-4xl md:text-5xl mb-3">Open your operator.</h1>
         <p className="compass-body text-[15px] mb-8" style={{ color: '#86868b' }}>
-          Enter your email. We&apos;ll send a private link that opens your restaurant workspace—no password and no sales call.
+          Community Tap seat 1 opens with <span className="font-mono">communitypizza2026@gmail.com</span>. Same magic link for return visits. No password. No sales call.
         </p>
 
         <form onSubmit={onSubmit} className="compass-card space-y-3">
           <input
             type="email"
             autoComplete="email"
-            placeholder="you@restaurant.com"
+            placeholder="communitypizza2026@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -75,12 +75,17 @@ export default function OperatorLoginPage() {
           New or returning operator—the same email link handles both.
         </p>
         <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
-          Have a house code?{' '}
-          <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
-            Open the community seat
+          New here?{' '}
+          <Link href="/onboard" className="underline" style={{ color: '#0066ff' }}>
+            Claim the free owner seat
           </Link>
           {' '}
-          — fail-closed until the first code is issued. No PIN, no staff name.
+          with email. Seat 1 is Community Tap — use the shop email already on file. House-code seats stay at{' '}
+          <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
+            /portal
+          </Link>
+          {' '}
+          and fail-closed until a code is issued. No PIN, no staff name.
         </p>
       </section>
     </main>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Find the leak. Run the fix. | Never 86'd",
     description:
-      'Payroll. Prices. Process. Open play on the home page — claim a free seat when you are ready.',
+      'Payroll. Prices. Process. Claim the free owner seat with email. House-code /portal is for issued community seats only.',
     url: 'https://www.never86.ai/product',
   },
 };

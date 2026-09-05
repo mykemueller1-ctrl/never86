@@ -10,6 +10,7 @@ import { isStationSeatKey, type StationSeatKey } from './staffSeatAuth';
  */
 
 export const ONE_SEAT_CLAIM_ENABLED_ENV = 'ONE_SEAT_CLAIM_ENABLED';
+export const ONE_SEAT_ALLOW_LIVE_EMAIL_ENV = 'ONE_SEAT_ALLOW_LIVE_EMAIL';
 export const ONE_SEAT_CLAIM_STATUS = 'drafted' as const;
 
 export const CLAIM_PROVIDERS = ['email', 'google'] as const;
@@ -125,13 +126,22 @@ export function hashIdentifier(raw: string): string {
   return createHash('sha256').update(raw.trim().toLowerCase(), 'utf8').digest('hex');
 }
 
-export function normalizeEmail(raw: unknown): string | null {
+export type EnvMap = Record<string, string | undefined>;
+
+export function liveEmailAllowed(env: EnvMap = process.env): boolean {
+  return env[ONE_SEAT_ALLOW_LIVE_EMAIL_ENV] === 'true';
+}
+
+export function normalizeEmail(
+  raw: unknown,
+  env: EnvMap = process.env,
+): string | null {
   if (typeof raw !== 'string') return null;
   const email = raw.trim().toLowerCase();
   if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(email)) return null;
   if (email.endsWith('@example.test') || email.endsWith('@never86.test')) return email;
-  // Production emails stay off git. Tests and draft routes accept only synthetic domains
-  // unless ONE_SEAT_ALLOW_LIVE_EMAIL=true is set in the private operator plane.
+  // Live shop emails (CTAP seat 1) only when ONE_SEAT_ALLOW_LIVE_EMAIL=true.
+  if (liveEmailAllowed(env)) return email;
   return null;
 }
 
@@ -344,6 +354,7 @@ export function startEmailClaim(input: {
   store: OneSeatStore;
   now?: string;
   allowLiveEmail?: boolean;
+  env?: EnvMap;
   /** Test-only. HTTP routes must omit this. */
   testToken?: string;
 }): {
@@ -356,9 +367,9 @@ export function startEmailClaim(input: {
 } {
   const at = nowIso(input.now);
   const atMs = nowMs(input.now);
-  const email = input.allowLiveEmail && typeof input.email === 'string' && input.email.includes('@')
-    ? input.email.trim().toLowerCase()
-    : normalizeEmail(input.email);
+  const env: EnvMap = { ...(input.env ?? process.env) };
+  if (input.allowLiveEmail) env[ONE_SEAT_ALLOW_LIVE_EMAIL_ENV] = 'true';
+  const email = normalizeEmail(input.email, env);
   if (!email) {
     return { ok: false, error: 'Use a valid work email. Phone and X are not available yet.', mailSent: false, challengeIssued: false };
   }

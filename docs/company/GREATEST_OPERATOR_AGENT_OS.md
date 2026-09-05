@@ -1,8 +1,10 @@
 # Greatest Operator Agent OS — research synthesis
 
+**Superseded as the live seat map.** Canonical orchestration is [`ORCHESTRATION_V1.md`](ORCHESTRATION_V1.md): supervisor → labor / vendor / voids / action-shift / memory. Orange `#E66B27` is not the brand.
+
 **Promise:** Find the leak. Assign the fix. Keep the receipt.  
 **Rule:** One agent · one job. LLM ranks. Human sends. Shared MCP math — no forks.  
-**Code:** `src/lib/agentGovernance/` · MCP `list_specialists` · resources `never86://specialist/*` · prompts `specialist_brief`
+**Code:** `src/lib/orchestration/` · MCP `list_specialists` · resources `never86://specialist/*` · prompts `specialist_brief`
 
 This doc consolidates a specialist research swarm (labor, human factors, multi-agent systems, MCP architecture, beverage, truth/QA, design) plus live literature pointers. It does **not** invent restaurant formulas.
 

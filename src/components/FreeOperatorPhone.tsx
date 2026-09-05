@@ -13,6 +13,8 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
+import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
+import { OPERATOR_V2_PLATES, type OperatorV2Plate } from '@/lib/operatorV2';
 
 type DeskView = 'home' | 'labor' | 'food' | 'bev';
 
@@ -116,6 +118,13 @@ export function FreeOperatorPhone() {
     }
   }
 
+  function openPlate(plate: OperatorV2Plate) {
+    setAsk(plate.ask);
+    onTray(plate.tray);
+    trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id } });
+    void goAsk(plate.ask, 'type');
+  }
+
   function onTray(next: OwnerDeskTrayId) {
     setTray(next);
     if (next === 'action') setView('home');
@@ -208,7 +217,7 @@ export function FreeOperatorPhone() {
             <p className="font-serif text-[1.85rem] leading-none tracking-[-0.03em] text-white">
               {greeting()}, operator.
             </p>
-            <p className="mt-2 text-sm text-white/80">Demo restaurant · Owner desk · 1–3 unit ICP</p>
+            <p className="mt-2 text-sm text-white/80">{CTAP_SEAT1_PUBLIC_LABEL} · Owner desk</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -248,6 +257,21 @@ export function FreeOperatorPhone() {
           <p className="mt-3 text-[15px] leading-relaxed text-white/85">
             Talk, type, take a picture, or add a file. Every ask and file is stored on this seat.
           </p>
+
+          <div className="owner-v2-plates mt-6" aria-label="Missing folders">
+            {OPERATOR_V2_PLATES.map((plate) => (
+              <button
+                key={plate.id}
+                type="button"
+                className="owner-v2-plate"
+                onClick={() => openPlate(plate)}
+              >
+                <span className="owner-v2-plate-kicker">{plate.folder}</span>
+                <span className="owner-v2-plate-label">{plate.label}</span>
+                <span className="owner-v2-plate-miss">Missing · {plate.missingUntil}</span>
+              </button>
+            ))}
+          </div>
 
           <article className="owner-desk-card mt-6">
             <div className="flex items-start gap-3">

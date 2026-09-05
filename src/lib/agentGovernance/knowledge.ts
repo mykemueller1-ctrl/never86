@@ -97,7 +97,7 @@ export function handleListAgentJobs(teamRaw?: unknown) {
 
 export function handleListSpecialists() {
   return {
-    discovery: 'get_operator_system → list_agent_jobs → list_specialists → domain tools',
+    discovery: 'get_operator_system → list_specialists → one specialist tool. Supervisor routes. House-code /portal is the only seat door.',
     orchestration: orchestrationRule(),
     specialists: listSpecialists().map((pack) => ({
       id: pack.id,
@@ -118,7 +118,7 @@ export function handleGetSpecialist(idRaw?: unknown) {
   if (typeof idRaw !== 'string' || !idRaw.trim()) {
     return {
       ok: false as const,
-      error: 'Pass specialist_id (labor, beverage, food-invoice, recipe-cost, human-coach, design-qa, truth-qa).',
+      error: 'Pass specialist_id (labor, vendor, voids, action-shift, memory). Supervisor aliases: truth-qa, store-chief-of-staff.',
     };
   }
   const pack = getSpecialist(idRaw.trim());
@@ -148,7 +148,7 @@ export const MCP_PROMPTS = [
     arguments: [
       {
         name: 'specialist_id',
-        description: 'labor | beverage | food-invoice | recipe-cost | human-coach | design-qa | truth-qa',
+        description: 'labor | vendor | voids | action-shift | memory | supervisor',
         required: true,
       },
     ],
@@ -189,14 +189,14 @@ export function getMcpPrompt(
     if (!brief) {
       return {
         ok: false,
-        error: 'Pass specialist_id: labor | beverage | food-invoice | recipe-cost | human-coach | design-qa | truth-qa',
+        error: 'Pass specialist_id: labor | vendor | voids | action-shift | memory | supervisor',
       };
     }
     return { ok: true, text: brief };
   }
   if (name === 'truth_gate_check') {
     const claim = typeof args.claim === 'string' ? args.claim.trim() : '';
-    const critic = specialistBriefPrompt('truth-qa') ?? '';
+    const critic = specialistBriefPrompt('supervisor') ?? '';
     return {
       ok: true,
       text: [

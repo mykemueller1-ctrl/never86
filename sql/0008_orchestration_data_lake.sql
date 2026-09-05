@@ -1,7 +1,7 @@
--- DRAFT. Do not apply to live Neon or live Supabase from a factory job
--- unless DATABASE_URL is present in the worker env and this file is reviewed.
--- Orchestration v1 tenant lake + house-code hashes.
+-- Orchestration tenant lake + house-code hashes.
 -- Tenant key is operator_id. Memory is append-only. Never store plaintext house codes.
+-- Include this file only if the CTAP house-code lake is wanted on the 1-seat Neon.
+-- Email-claim free seat does not require these tables.
 --
 -- Apply command (secrets stay in env, never in git or chat):
 --   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/0007_simple_owner_demo.sql

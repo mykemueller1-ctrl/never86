@@ -2,12 +2,13 @@
 
 **HQ chat:** [Cursor agents: You talk, I run](https://grok.com/project/d3f103b5-2add-4fc1-9cd7-aabbc6a3484f?chat=3f690a7c-b2e5-4101-be38-89cc8b5df3f6)
 **Mind dump:** `docs/company/MYKE_MIND_DUMP_60_90_DAYS.md`  
-**Last updated:** 2026-09-03 6:15 AM CT
+**Last updated:** 2026-09-05 1:50 AM CT
 
 ## Status
 
 | Job | Status | Intake file |
 |---|---|---|
+| **Rebuild resume v2** | **DRAFTED — PR THIS BRANCH** | [`AGENT_REGISTRY.md`](../AGENT_REGISTRY.md) · [`ARCHITECTURE.md`](../ARCHITECTURE.md). House-code `/portal` only seat door. Email-first home. SimpleOwnerDemo already wired on main `#205`. Not merged/deployed/live. |
 | **YouTube desk swarm v1** | **MERGED #179 — SLATE DRAFTED** | [2026-08-31-youtube-desk-swarm.md](2026-08-31-youtube-desk-swarm.md) · first slate [../grok-bots/batches/2026-09-03-youtube-slate.md](../grok-bots/batches/2026-09-03-youtube-slate.md). MCP org 2.1.0 live. Desk not pasted. No upload. All assets `approve: N`. |
 | **Command-center specialist swarm v1** | **MERGING NOW** | [2026-08-30-command-center-swarm.md](2026-08-30-command-center-swarm.md) — Store + company specialists, 10 CSV-first free agents, Sample Store One Action Shift, `/action-shift/swarm`. No send, no portal login |
 | **Shareable Grok Bot swarm** | **MERGED #172** | [2026-08-30-grok-shareable-86-swarm.md](2026-08-30-grok-shareable-86-swarm.md) — 15 ranked public bots; no branded 86 operator exists; team/workflow/API notes in `docs/company/grok-bots/`. Not added to the live desk. |
