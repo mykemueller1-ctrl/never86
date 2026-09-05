@@ -1,5 +1,6 @@
 import type { TagLevel } from '@/lib/sourceTags';
 import type { OwnerDeskTrayId, PrimeCostEvidence } from '@/lib/freeOperatorDemo';
+import type { DailyCompareChip, LaborRoleCard, OperatorV2FolderState } from '@/lib/operatorV2';
 
 export const SIMPLE_OWNER_DEMO_ID = 'simple-owner-demo-v1';
 export const SIMPLE_OWNER_COOKIE = 'n86_simple_owner';
@@ -9,6 +10,9 @@ export type EvidenceKind =
   | 'schedule'
   | 'hourly'
   | 'timeclock'
+  | 'labor-cards'
+  | 'menu'
+  | 'order-guide'
   | 'z'
   | 'void'
   | 'invoice'
@@ -55,6 +59,9 @@ export type SimpleOwnerAskRecord = {
 export type SimpleOwnerReadiness = {
   operatorId: string;
   evidence: PrimeCostEvidence[];
+  folders: OperatorV2FolderState[];
+  laborCards: LaborRoleCard[];
+  dailyCompare: DailyCompareChip[];
   readyCount: number;
   uploadCount: number;
   askCount: number;
