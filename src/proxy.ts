@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyOperatorSession, OPERATOR_COOKIE } from '@/lib/operatorSession';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 export const config = {
   matcher: [
@@ -39,7 +40,12 @@ export async function proxy(req: NextRequest) {
     if (session || adminOk) return NextResponse.next();
     const url = req.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('next', pathname);
+    url.searchParams.set(
+      'next',
+      pathname === '/dashboard' || pathname === '/dashboard/'
+        ? OWNER_DESK_POST_AUTH_REDIRECT
+        : pathname,
+    );
     return NextResponse.redirect(url);
   }
 

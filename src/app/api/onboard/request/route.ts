@@ -7,9 +7,9 @@ import {
   requestOperatorActivation,
 } from '@/lib/operatorActivation';
 import { Resend } from 'resend';
-import { escapeHtml } from '@/lib/escapeHtml';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowAuthAttempt } from '@/lib/authThrottle';
+import { activationEmailPayload, buildOwnerDeskActivationLink } from '@/lib/ownerDeskAuth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,42 +21,13 @@ const bodySchema = z.object({
   sourcePage: z.string().optional(),
 });
 
-function activationEmailHtml(link: string, expiresAt: Date): string {
-  return `
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#111;font-family:system-ui,sans-serif;">
-  <div style="max-width:600px;margin:0 auto;padding:40px 24px;">
-    <p style="color:#d4a017;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;">Never 86'd · Free seat</p>
-    <h1 style="color:#fff;font-size:28px;margin:12px 0;">Open your Never 86'd operator.</h1>
-    <p style="color:#ddd;font-size:16px;line-height:1.6;">
-      Payroll. Prices. Process. Click once to find the leak, see the receipt, and get the next move.
-      No password. No sales call.
-    </p>
-    <p style="margin:28px 0;">
-      <a href="${escapeHtml(link)}" style="background:#0066ff;color:#fff;text-decoration:none;padding:14px 22px;border-radius:999px;font-weight:600;">
-        Open Never 86'd →
-      </a>
-    </p>
-    <p style="color:#888;font-size:13px;line-height:1.5;">
-      Link expires ${escapeHtml(expiresAt.toUTCString())}. If you didn’t ask for this, ignore it.
-    </p>
-  </div>
-</body></html>`;
-}
-
 async function sendActivationEmail(email: string, link: string, expiresAt: Date) {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key) {
     throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
   }
   const resend = new Resend(key);
-  const sent = await resend.emails.send({
-    from: "Never 86'd <hello@never86.ai>",
-    to: email,
-    subject: "Your secure Never 86'd sign-in link",
-    html: activationEmailHtml(link, expiresAt),
-  });
+  const sent = await resend.emails.send(activationEmailPayload(email, link, expiresAt));
   if (sent.error) {
     throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
   }
@@ -94,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
 
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.never86.ai';
-    const link = `${base.replace(/\/$/, '')}/activate?token=${encodeURIComponent(result.rawToken)}`;
+    const link = buildOwnerDeskActivationLink(base, result.rawToken);
 
     try {
       if (!activationEmailConfigured()) {

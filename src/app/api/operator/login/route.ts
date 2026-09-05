@@ -18,6 +18,7 @@ import {
 } from '@/lib/operatorSession';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowDurableLoginAttempt } from '@/lib/authThrottle';
+import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     touchFreeSeatLogin(free.operatorId, free.email).catch(() => {});
     const res = NextResponse.json({
       success: true,
-      redirect: '/dashboard',
+      redirect: OWNER_DESK_POST_AUTH_REDIRECT,
       name: free.name,
       seat: 'free',
     });
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
 
   touchOperatorLogin(cred.operatorId, cred.email).catch(() => {});
 
-  const res = NextResponse.json({ success: true, redirect: '/dashboard', name: cred.name });
+  const res = NextResponse.json({ success: true, redirect: OWNER_DESK_POST_AUTH_REDIRECT, name: cred.name });
   res.cookies.set(OPERATOR_COOKIE, token, OPERATOR_COOKIE_OPTS);
   return res;
 }

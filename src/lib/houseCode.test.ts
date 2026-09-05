@@ -60,7 +60,7 @@ describe('house-code door', () => {
   });
 
   it('reads env hashes and stays fail-closed in an empty env', () => {
-    const closed = verifyHouseCodeFromEnv(SYNTHETIC_HOUSE_CODE, {});
+    const closed = verifyHouseCodeFromEnv(SYNTHETIC_HOUSE_CODE, {} as NodeJS.ProcessEnv);
     expect(closed.ok).toBe(false);
     if (!closed.ok) expect(closed.status).toBe(401);
   });
