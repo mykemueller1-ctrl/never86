@@ -16,6 +16,13 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
   const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
   const config = readFileSync(resolve('next.config.js'), 'utf8');
 
+  it('names schedule, labor cards, menu, and order guide as the operator OS', () => {
+    expect(home).toMatch(/Paper-shop folders first: schedule, labor cards, menu, order guide/);
+    expect(home).toMatch(/Labor cards name roles/);
+    expect(home).toMatch(/Daily compare to the clock/);
+    expect(home).toMatch(/punch ≠ schedule/);
+  });
+
   it('makes the homepage primary button claim the free owner seat', () => {
     expect(home).toMatch(/human-button human-button-primary/);
     expect(firstHref(home, 'human-button-primary')).toBe('/onboard');
