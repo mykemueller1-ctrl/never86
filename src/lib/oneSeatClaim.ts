@@ -126,13 +126,15 @@ export function hashIdentifier(raw: string): string {
   return createHash('sha256').update(raw.trim().toLowerCase(), 'utf8').digest('hex');
 }
 
-export function liveEmailAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
+export type EnvMap = Record<string, string | undefined>;
+
+export function liveEmailAllowed(env: EnvMap = process.env): boolean {
   return env[ONE_SEAT_ALLOW_LIVE_EMAIL_ENV] === 'true';
 }
 
 export function normalizeEmail(
   raw: unknown,
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvMap = process.env,
 ): string | null {
   if (typeof raw !== 'string') return null;
   const email = raw.trim().toLowerCase();
@@ -352,7 +354,7 @@ export function startEmailClaim(input: {
   store: OneSeatStore;
   now?: string;
   allowLiveEmail?: boolean;
-  env?: NodeJS.ProcessEnv;
+  env?: EnvMap;
   /** Test-only. HTTP routes must omit this. */
   testToken?: string;
 }): {
@@ -365,7 +367,7 @@ export function startEmailClaim(input: {
 } {
   const at = nowIso(input.now);
   const atMs = nowMs(input.now);
-  const env: NodeJS.ProcessEnv = { ...(input.env ?? process.env) };
+  const env: EnvMap = { ...(input.env ?? process.env) };
   if (input.allowLiveEmail) env[ONE_SEAT_ALLOW_LIVE_EMAIL_ENV] = 'true';
   const email = normalizeEmail(input.email, env);
   if (!email) {
