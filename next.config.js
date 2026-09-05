@@ -8,6 +8,11 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  async redirects() {
+    return [
+      { source: '/communities', destination: '/portal', permanent: false },
+    ];
+  },
 };
 
 module.exports = nextConfig;

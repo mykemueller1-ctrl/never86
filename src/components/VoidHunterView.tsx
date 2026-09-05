@@ -86,13 +86,13 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
                     <span className="flex items-center gap-2">
                       {s.name}
                       {s.flagged ? (
-                        <span className="text-[10px] uppercase tracking-wide text-warning-500 bg-amber-500/15 rounded-full px-2 py-0.5">flag</span>
+                        <span className="text-[10px] uppercase tracking-wide text-void-500 bg-void-500/15 rounded-full px-2 py-0.5">flag</span>
                       ) : null}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-right text-warning-500 tabular-nums">{usd(s.net)}</td>
+                  <td className="px-4 py-2 text-right text-void-500 tabular-nums">{usd(s.net)}</td>
                   <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{usd(s.voids)}</td>
-                  <td className={`px-4 py-2 text-right tabular-nums ${s.flagged ? 'text-warning-500 font-semibold' : 'text-ink-800'}`}>{pct(s.voidRate)}</td>
+                  <td className={`px-4 py-2 text-right tabular-nums ${s.flagged ? 'text-void-500 font-semibold' : 'text-ink-800'}`}>{pct(s.voidRate)}</td>
                   <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{s.excessYr > 0 ? `${usd(s.excessYr)}` : '—'}</td>
                 </tr>
               ))}
@@ -124,14 +124,14 @@ export function VoidHunterBody({ data: d, sample }: { data: VoidHunter; sample?:
                     <span className="flex items-center gap-2">
                       {e.name}
                       {e.flagged ? (
-                        <span className="text-[10px] uppercase tracking-wide text-warning-500 bg-amber-500/15 rounded-full px-2 py-0.5">flag</span>
+                        <span className="text-[10px] uppercase tracking-wide text-void-500 bg-void-500/15 rounded-full px-2 py-0.5">flag</span>
                       ) : null}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-dark-200">{e.store}</td>
-                  <td className="px-4 py-2 text-right text-warning-500 tabular-nums">{usd(e.voidAmount)}</td>
+                  <td className="px-4 py-2 text-right text-void-500 tabular-nums">{usd(e.voidAmount)}</td>
                   <td className="px-4 py-2 text-right text-ink-700 tabular-nums">{e.voidedItems}</td>
-                  <td className={`px-4 py-2 text-right tabular-nums ${e.flagged ? 'text-warning-500 font-semibold' : 'text-ink-800'}`}>{pct(e.voidRate)}</td>
+                  <td className={`px-4 py-2 text-right tabular-nums ${e.flagged ? 'text-void-500 font-semibold' : 'text-ink-800'}`}>{pct(e.voidRate)}</td>
                 </tr>
               ))}
             </tbody>

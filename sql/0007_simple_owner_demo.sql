@@ -1,7 +1,11 @@
 -- Simple Owner Demo persistence.
--- Drafted only. Do not apply to production from a factory job.
--- Neon is the D1 equivalent on this Vercel/never86 stack.
+-- Drafted only. Do not apply to production from a factory job unless DATABASE_URL
+-- is present in the worker env. Neon is the D1 equivalent on this Vercel/never86 stack.
 -- R2 holds file bytes when R2_* env is present; otherwise neon-object-fallback.
+--
+-- Apply command (secrets stay in env, never in git or chat):
+--   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/0007_simple_owner_demo.sql
+--   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/0008_orchestration_data_lake.sql
 
 create table if not exists simple_owner_uploads (
   id text primary key,

@@ -16,12 +16,12 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
   const network = d.network;
   return (
     <div className="mb-8">
-      <h3 className="text-gold-500 text-xs uppercase tracking-wider font-semibold mb-3">
+      <h3 className="text-void-500 text-xs uppercase tracking-wider font-semibold mb-3">
         Void Hunter — {d.totalFindings} measured findings
       </h3>
 
-      <div className="logic-only bg-amber-500/5 border border-amber-500/30 rounded-lg p-3 mb-3 text-xs font-mono text-amber-200">
-        <div className="text-amber-300 uppercase tracking-wider font-semibold mb-1">🔍 logic · provenance</div>
+      <div className="logic-only bg-void-500/5 border border-void-500/30 rounded-lg p-3 mb-3 text-xs font-mono text-void-200">
+        <div className="text-void-300 uppercase tracking-wider font-semibold mb-1">🔍 logic · provenance</div>
         <div>source: <code>void_hunter_findings</code> · analysis {prettyDate(d.analysisDate)}</div>
         <div>buckets: network_rollup({network ? 1 : 0}) · location_voids_measured({d.byLocation.length}) · top_employee_offenders({d.topOffenders ? 1 : 0}) · data_gap_note({d.dataGaps.length})</div>
         {network ? <div>network row: id={network.id} · ${network.dollarAmount} · {network.count} events · top={network.topOffender}</div> : null}
@@ -56,8 +56,8 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
         </div>
       ) : null}
 
-      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4">
-        <p className="text-amber-300 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
+      <div className="bg-void-500/10 border border-void-500/30 rounded-xl p-4 mb-4">
+        <p className="text-void-300 text-sm font-semibold mb-1">This flags patterns, not verdicts.</p>
         <p className="text-dark-200 text-sm">
           Top-offender rows are the highest measured void totals — not accusations. Some are channel buckets,
           some are shared tills, some are real. Start at the top, pull the void reasons, then decide.
@@ -85,19 +85,19 @@ export function VoidFindingsSection({ data: d }: { data: VoidFindings }) {
                 return (
                   <tr key={row.id} className="border-b border-dark-600/60 last:border-0">
                     <td className="px-4 py-2 text-white">
-                      <span className="logic-only-inline mr-2 text-[10px] font-mono text-amber-300/70">id={row.id}</span>
+                      <span className="logic-only-inline mr-2 text-[10px] font-mono text-void-300/70">id={row.id}</span>
                       {row.location ?? '—'}
                     </td>
                     <td className="px-4 py-2">
                       <span className="flex items-center gap-3">
                         <span className="relative inline-block h-1.5 w-20 sm:w-28 rounded bg-white/5 overflow-hidden align-middle">
-                          <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-amber-700 to-amber-400" style={{ width: `${w}%` }} />
+                          <span className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-void-700 to-void-400" style={{ width: `${w}%` }} />
                         </span>
-                        <span className="text-gold-300 tabular-nums font-semibold">{usd(amt)}</span>
+                        <span className="text-void-300 tabular-nums font-semibold">{usd(amt)}</span>
                       </span>
                     </td>
                     <td className="px-4 py-2 text-right text-dark-200 tabular-nums">{count(row.count ?? 0)}</td>
-                    <td className={`px-4 py-2 text-xs break-words ${isHot ? 'text-amber-300 font-semibold' : 'text-dark-200'}`}>{offender}</td>
+                    <td className={`px-4 py-2 text-xs break-words ${isHot ? 'text-void-300 font-semibold' : 'text-dark-200'}`}>{offender}</td>
                   </tr>
                 );
               });

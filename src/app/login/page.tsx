@@ -75,12 +75,12 @@ export default function OperatorLoginPage() {
           New or returning operator—the same email link handles both.
         </p>
         <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
-          Want to play first?{' '}
-          <Link href="/communities" className="underline" style={{ color: '#0066ff' }}>
+          Have a house code?{' '}
+          <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
             Open the community seat
           </Link>
           {' '}
-          — any operator can try the owner desk and Action Shift now, no invite.
+          — fail-closed until the first code is issued. No PIN, no staff name.
         </p>
       </section>
     </main>
