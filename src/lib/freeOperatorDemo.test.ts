@@ -210,7 +210,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     }
     expect(ui).toContain('FreeOperatorAnswerCard');
     expect(ui).toContain('owner-desk');
-    expect(ui).toContain('Prime Cost Coach');
+    expect(ui).toContain('Snap photo');
+    expect(ui).toContain('DAY1_HOOK_PLATE_ID');
+    expect(ui).not.toContain('Prime Cost Coach');
     expect(ui).toContain('/api/ask');
     expect(ui).toContain('/api/upload');
     expect(ui).not.toMatch(/router\.push/);

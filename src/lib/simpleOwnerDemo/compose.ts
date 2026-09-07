@@ -5,11 +5,14 @@ import {
   type OwnerDeskTrayId,
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
+import { day1HookCoach, firstPhotoWinLine, looksLikeDay1VendorAsk } from '@/lib/day1Coach';
 import {
   dailyCompareFromEvidence,
+  filledPlateIds,
   projectFoldersFromKinds,
   spawnLaborRoleCards,
 } from '@/lib/operatorV2';
+import { vendorBabysitLine } from '@/lib/vendorCadenceConfig';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -85,19 +88,23 @@ export function composeAskAnswer(input: {
 
   const evidenceFact =
     input.uploads.length === 0
-      ? 'No files are on this seat yet. Prime Cost Coach stays NEED until schedule, hourly, and time clock land.'
+      ? 'No files are on this seat yet. Snap one paper folder — order guide first if you can — and you are winning.'
       : `This seat has ${input.uploads.length} source-tagged upload(s). Ready: ${ready.join(', ') || 'none'}. Still NEED: ${missing.join(', ') || 'none'}.`;
 
+  const filled = filledPlateIds(input.readiness.folders ?? []);
+  const hook = day1HookCoach(filled);
+  const lastReady = (input.readiness.folders ?? []).filter((row) => row.state === 'READY').at(-1);
   const folderFact =
-    folderReady.length || folderNeed.length
-      ? `First-class folders — Ready: ${folderReady.join(', ') || 'none'}. Still Missing: ${folderNeed.join(', ') || 'none'}. Schedule and labor cards are OCR inputs, same as menu and order guide.`
-      : 'Schedule, labor cards, menu, and order guide stay first-class Missing chips until a photo or file lands.';
+    filled.size === 0
+      ? `Day-1 hook: ${hook.ask} ${hook.attachHint}`
+      : `Ready: ${folderReady.join(', ')}. Still Missing: ${folderNeed.join(', ') || 'none'}. Next snap: ${hook.ask}`;
 
   const laborFact = laborAsk
     ? 'Labor cards name roles (FOH, Line, Dish, Run). Daily compare to the clock flags early leave, late leave, and labor drift. Punch ≠ schedule. No invented overtime.'
     : 'This desk answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.';
 
   const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
+  const vendorFact = looksLikeDay1VendorAsk(input.question) ? vendorBabysitLine({ question: input.question }) : null;
 
   const facts = [
     evidenceFact,
@@ -105,11 +112,15 @@ export function composeAskAnswer(input: {
     persistFact,
     sample?.facts[0] ?? laborFact,
     laborAsk ? laborFact : 'No dollar is verified from an upload or a typed guess. Missing Evidence stays open.',
+    ...(vendorFact ? [vendorFact] : []),
   ];
 
   return {
     slug,
-    headline: sample?.headline ?? 'Ask is stored. I will not invent a close from an empty seat.',
+    headline:
+      lastReady && filled.size > 0
+        ? firstPhotoWinLine(lastReady.id)
+        : (sample?.headline ?? 'Ask is stored. I will not invent a close from an empty seat.'),
     facts,
     coachTomorrow:
       sample?.coachTomorrow ??

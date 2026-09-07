@@ -37,7 +37,7 @@ export function FreeOperatorAnswerCard({
       {chip ? (
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#0066ff]">{chip.label}</p>
       ) : null}
-      {tags?.length ? (
+      {tags?.length && !compact ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {tags.map((tag) => (
             <span key={tag} className="owner-desk-tag">

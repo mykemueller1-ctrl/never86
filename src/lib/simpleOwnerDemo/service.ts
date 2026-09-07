@@ -1,4 +1,14 @@
 import { findFreeOperatorPrivacyHits, type OwnerDeskTrayId } from '@/lib/freeOperatorDemo';
+import {
+  flagInvoiceDuplicates,
+  invoiceIdentityFromTags,
+  invoiceIdentityKey,
+  normalizeInvoiceNumber,
+  normalizeVendorKey,
+  parseLabeledInvoiceTotalCents,
+  vendorTotalKey,
+} from '@/lib/invoiceIdentity';
+import { decodeInvoiceSource, looksLikeVendorInvoice, parseVendorInvoice } from '@/lib/vendorInvoiceParse';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -9,8 +19,54 @@ import type {
   SimpleOwnerReadiness,
   SimpleOwnerRepository,
   SimpleOwnerUploadRecord,
+  SourceTag,
 } from './types';
 import { SIMPLE_OWNER_MAX_BYTES } from './types';
+
+function invoiceIdentityTags(
+  filename: string,
+  contentType: string,
+  bytes: Uint8Array,
+  existing: readonly SimpleOwnerUploadRecord[],
+): SourceTag[] {
+  const textish =
+    /text|csv|pdf/i.test(contentType) || /\.(csv|txt|pdf)$/i.test(filename);
+  if (!textish) return [];
+  let text = '';
+  try {
+    text = decodeInvoiceSource(bytes, filename);
+  } catch {
+    return [];
+  }
+  if (!looksLikeVendorInvoice(text, filename)) return [];
+
+  const parsed = parseVendorInvoice(text, filename);
+  const invoiceNumber = normalizeInvoiceNumber(parsed.invoiceNumber);
+  const totalCents = parseLabeledInvoiceTotalCents(text);
+  const vendorKey = normalizeVendorKey(parsed.vendor);
+  const tags: SourceTag[] = [];
+  if (invoiceIdentityKey(invoiceNumber)) {
+    tags.push({ tag: 'unverified', source: `invoice-id:${invoiceNumber}` });
+  }
+  if (vendorKey && vendorTotalKey(parsed.vendor, totalCents)) {
+    tags.push({ tag: 'unverified', source: `invoice-vendor-total:${vendorKey}:${totalCents}` });
+  }
+  if (tags.length === 0) return [];
+
+  const prior = existing.map((row) => ({
+    id: row.id,
+    filename: row.filename,
+    ...invoiceIdentityFromTags(row.sourceTags),
+  }));
+  const hits = flagInvoiceDuplicates([
+    ...prior,
+    { id: 'incoming', filename, invoiceNumber, vendor: parsed.vendor, totalCents },
+  ]);
+  for (const hit of hits) {
+    tags.push({ tag: 'unverified', source: `invoice-dup-flag:${hit.flag}` });
+  }
+  return tags;
+}
 
 export type SimpleOwnerDemoService = {
   upload(input: {
@@ -77,6 +133,8 @@ export function createSimpleOwnerDemoService(deps: {
 
       const createdAt = now();
       const classified = classifyUpload(filename, contentType, folder);
+      const existing = await deps.repo.listUploads(operatorId);
+      const identityTags = invoiceIdentityTags(filename, contentType, bytes, existing);
       const objectKey = buildObjectKey(operatorId, filename, createdAt);
       const stored = await deps.objects.put({
         operatorId,
@@ -92,7 +150,7 @@ export function createSimpleOwnerDemoService(deps: {
         contentType: contentType || 'application/octet-stream',
         byteLength: bytes.byteLength,
         evidenceKind: classified.kind,
-        sourceTags: classified.sourceTags,
+        sourceTags: [...classified.sourceTags, ...identityTags],
         objectKey: stored.objectKey,
         storageBackend: stored.storageBackend,
         createdAt: createdAt.toISOString(),

@@ -63,8 +63,10 @@ describe('owner desk post-auth redirect', () => {
     const operator = read('src/app/operator/page.tsx');
     const phone = read('src/components/FreeOperatorPhone.tsx');
     expect(operator).toContain('SimpleOwnerDemo');
-    expect(phone).toContain("What&apos;s going on in your restaurant?");
-    expect(phone).toContain('Prime Cost Coach');
+    expect(phone).toContain('Snap photo');
+    expect(phone).toContain('DAY1_HOOK_PLATE_ID');
+    expect(phone).toContain('firstPhotoWinLine');
+    expect(phone).not.toContain('Prime Cost Coach');
     expect(phone).toContain('PUBLIC_PREVIEW_COPY');
     expect(phone).not.toMatch(/UPLOAD PAYROLL CSV/);
     expect(phone).not.toMatch(/RUN SAMPLE/);
