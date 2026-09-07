@@ -165,8 +165,10 @@ export function FreeOperatorPhone() {
   function openPlate(plate: OperatorV2Plate, attach: 'photo' | 'file' | 'ask' = 'photo') {
     const coach = day1CoachById(plate.id);
     setActiveFolder(plate.id);
-    setAsk(coach?.ask ?? plate.ask);
-    onTray(plate.tray);
+    if (!firstScreen) {
+      setAsk(coach?.ask ?? plate.ask);
+      onTray(plate.tray);
+    }
     const folder = folders.find((row) => row.id === plate.id);
     const needPhoto = !folder || folder.state === 'NEED';
     trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id, ocr: needPhoto, attach } });
