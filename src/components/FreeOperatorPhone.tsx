@@ -15,8 +15,15 @@ import {
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
 import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
 import {
+  DAY1_HOOK_PLATE_ID,
+  day1CoachById,
+  day1HookCoach,
+  firstPhotoWinLine,
+} from '@/lib/day1Coach';
+import {
   OPERATOR_V2_PLATES,
   dailyCompareFromEvidence,
+  filledPlateIds,
   projectFoldersFromKinds,
   spawnLaborRoleCards,
   type DailyCompareChip,
@@ -65,25 +72,27 @@ function emptyDailyCompare(): DailyCompareChip[] {
 }
 
 export function FreeOperatorPhone() {
-  const [ask, setAsk] = useState('');
+  const [ask, setAsk] = useState(() => day1CoachById(DAY1_HOOK_PLATE_ID)?.ask ?? '');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
-  const [evidence, setEvidence] = useState<PrimeCostEvidence[]>(emptyEvidence);
+  const [, setEvidence] = useState<PrimeCostEvidence[]>(emptyEvidence);
   const [folders, setFolders] = useState<OperatorV2FolderState[]>(emptyFolders);
   const [roleCards, setRoleCards] = useState<LaborRoleCard[]>(emptyRoleCards);
   const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
-  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
+  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId>(DAY1_HOOK_PLATE_ID);
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+  const [winLine, setWinLine] = useState<string | null>(null);
   const [answer, setAnswer] = useState<SimpleOwnerAskAnswer | null>(null);
   const [localName, setLocalName] = useState<string | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
 
-  const readyCount = useMemo(() => evidence.filter((row) => row.state === 'READY').length, [evidence]);
-  const coachReady = readyCount >= 2;
+  const filled = useMemo(() => filledPlateIds(folders), [folders]);
+  const hook = useMemo(() => day1HookCoach(filled), [filled]);
+  const hookAsk = day1CoachById(activeFolder)?.ask ?? hook.ask;
 
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
@@ -147,15 +156,20 @@ export function FreeOperatorPhone() {
     }
   }
 
-  function openPlate(plate: OperatorV2Plate) {
+  function openPlate(plate: OperatorV2Plate, attach: 'photo' | 'file' | 'ask' = 'photo') {
+    const coach = day1CoachById(plate.id);
     setActiveFolder(plate.id);
-    setAsk(plate.ask);
+    setAsk(coach?.ask ?? plate.ask);
     onTray(plate.tray);
     const folder = folders.find((row) => row.id === plate.id);
     const needPhoto = !folder || folder.state === 'NEED';
-    trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id, ocr: needPhoto } });
-    if (needPhoto) photoRef.current?.click();
-    void goAsk(plate.ask, needPhoto ? 'photo' : 'type');
+    trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id, ocr: needPhoto, attach } });
+    if (attach === 'file') {
+      fileRef.current?.click();
+      return;
+    }
+    if (attach === 'ask') return;
+    photoRef.current?.click();
   }
 
   function onTray(next: OwnerDeskTrayId) {
@@ -232,8 +246,16 @@ export function FreeOperatorPhone() {
       }
       setLocalName(body.upload?.filename ?? file.name);
       applyReadiness(body.readiness);
-      setFlash(`${body.upload?.filename ?? file.name} stored on this seat with a source tag.`);
-      trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true } });
+      const readyFolder = body.upload?.evidenceKind;
+      const win = readyFolder ? firstPhotoWinLine(readyFolder) : null;
+      setWinLine(win);
+      setFlash(win ?? `${body.upload?.filename ?? file.name} is on this seat.`);
+      if (body.readiness?.folders) {
+        const nextHook = day1HookCoach(filledPlateIds(body.readiness.folders));
+        setActiveFolder(nextHook.id);
+        setAsk(nextHook.ask);
+      }
+      trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true, win: Boolean(win) } });
     } catch {
       setFlash('Upload did not reach the seat. Try again.');
     } finally {
@@ -268,90 +290,64 @@ export function FreeOperatorPhone() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2" aria-label="Missing folders">
-          {folders.map((folder) => (
-            <button
-              key={folder.id}
-              type="button"
-              className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'}`}
-              onClick={() => {
-                const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
-                if (plate) openPlate(plate);
-              }}
-            >
-              {folder.state === 'READY' ? `${folder.label} ✓` : `Missing · ${folder.label}`}
-            </button>
-          ))}
+        <div className="mt-4 flex flex-wrap gap-2" aria-label="Day-1 coach chips">
+          {folders.map((folder) => {
+            const coach = day1CoachById(folder.id);
+            return (
+              <button
+                key={folder.id}
+                type="button"
+                className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : ''} ${activeFolder === folder.id ? 'is-hook' : 'is-need'}`}
+                onClick={() => {
+                  const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                  if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
+                }}
+              >
+                {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? `Missing · ${folder.label}`}
+              </button>
+            );
+          })}
         </div>
       </header>
 
       {view === 'home' ? (
         <section className="mt-7">
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white">
-            Action Shift · {weekdayLabel()}
+            Action Shift · {weekdayLabel()} · one ask
           </p>
           <h1 className="mt-3 font-serif text-[2.35rem] leading-[0.95] tracking-[-0.04em] text-white">
-            What&apos;s going on in your restaurant?
+            {hookAsk}
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-white/85">
-            Paper-shop folders first: schedule, labor cards, menu, order guide. Photo the week. Labor cards name
-            roles. Daily compare to the clock finds early leave, late leave, and labor drift.
+            {winLine ??
+              (filled.size === 0
+                ? 'One photo. Then you are winning. Not a tour. Not a dashboard.'
+                : hook.attachHint)}
           </p>
-
-          <div className="owner-v2-plates mt-6" aria-label="Project folders">
-            {folders.map((folder) => {
-              const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
-              return (
-                <button
-                  key={folder.id}
-                  type="button"
-                  className={`owner-v2-plate ${folder.state === 'READY' ? 'is-ready' : ''}`}
-                  onClick={() => plate && openPlate(plate)}
-                >
-                  <span className="owner-v2-plate-kicker">{folder.folder}</span>
-                  <span className="owner-v2-plate-label">{folder.label}</span>
-                  <span className="owner-v2-plate-miss">
-                    {folder.state === 'READY' ? 'On this seat · named is not a close' : folder.reason}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="owner-desk-lom-actions mt-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="owner-desk-primary"
+              disabled={busy}
+              onClick={() => {
+                const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+                openPlate(plate, 'photo');
+              }}
+            >
+              Snap photo
+            </button>
+            <button
+              type="button"
+              className="owner-desk-secondary"
+              disabled={busy}
+              onClick={() => {
+                const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+                openPlate(plate, 'file');
+              }}
+            >
+              Add file
+            </button>
           </div>
-
-          <article className="owner-desk-card mt-6">
-            <div className="flex items-start gap-3">
-              <span className="owner-desk-bolt" aria-hidden>
-                ⚡
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold text-[#06122b]">
-                      {coachReady ? 'Prime Cost Coach is warming up' : 'Let’s finish your Prime Cost Coach.'}
-                    </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-[#3d4d73]">
-                      {coachReady
-                        ? 'Two reports are on this seat. Add the third so labor vs demand can be checked without inventing the percentage.'
-                        : 'Readiness is live from stored files. I still need the matching reports before I show where labor outran demand.'}
-                    </p>
-                  </div>
-                  <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-[#003bb5]">
-                    {readyCount} of 3 ready
-                  </span>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {evidence.map((row) => (
-                    <span
-                      key={`chip-${row.id}`}
-                      className={`owner-desk-chip ${row.state === 'READY' ? 'is-ready' : 'is-need'}`}
-                    >
-                      {row.state === 'READY' ? `${row.short} ✓` : `Need ${row.short.toLowerCase()}`}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </article>
         </section>
       ) : null}
 

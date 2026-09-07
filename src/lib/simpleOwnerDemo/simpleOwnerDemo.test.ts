@@ -146,6 +146,7 @@ describe('simple owner demo service persist', () => {
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.facts.some((fact) => fact.includes('demo:alpha'))).toBe(true);
     expect(asked.answer.facts.join(' ')).toMatch(/Ready: Schedule/);
+    expect(asked.answer.headline).toMatch(/you’re winning/i);
     expect(asked.record.question).toBe('Why did labor feel wrong last night?');
     expect(repo.asks).toHaveLength(1);
     expect(asked.readiness.askCount).toBe(1);
@@ -203,6 +204,53 @@ describe('R2 put signer', () => {
     expect(headers.Authorization).not.toContain('super-secret-do-not-leak');
     expect(headers['x-amz-content-sha256']).toHaveLength(64);
     expect(JSON.stringify(headers)).not.toMatch(/super-secret/);
+  });
+});
+
+describe('day-1 photo win + invoice identity', () => {
+  it('flips the order-guide folder Ready from a camera photo', async () => {
+    const { svc } = service();
+    const result = await svc.upload({
+      operatorId: 'demo:hook',
+      filename: 'IMG_9001.jpg',
+      contentType: 'image/jpeg',
+      bytes: new TextEncoder().encode('jpeg-bytes'),
+      folder: 'order-guide',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.upload.evidenceKind).toBe('order-guide');
+    expect(result.readiness.folders.find((row) => row.id === 'order-guide')?.state).toBe('READY');
+    expect(result.upload.sourceTags.join(' ')).not.toMatch(/invoice-dup-flag/);
+  });
+
+  it('tags invoice-number identity and vendor+total collisions without blocking the upload', async () => {
+    const { svc } = service();
+    const body = [
+      'SYSCO',
+      'Invoice Number: INV-88',
+      'Grand Total: $184.50',
+      'SKU CHICKEN Case Price 50.00',
+    ].join('\n');
+    const first = await svc.upload({
+      operatorId: 'demo:inv',
+      filename: 'sysco-inv-88.txt',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(body),
+    });
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    expect(first.upload.sourceTags.some((tag) => tag.source === 'invoice-id:INV-88')).toBe(true);
+
+    const second = await svc.upload({
+      operatorId: 'demo:inv',
+      filename: 'sysco-inv-88-again.txt',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(body),
+    });
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.upload.sourceTags.some((tag) => tag.source === 'invoice-dup-flag:identity')).toBe(true);
   });
 });
 

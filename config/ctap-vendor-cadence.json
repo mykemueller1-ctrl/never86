@@ -1,0 +1,95 @@
+{
+  "id": "ctap-vendor-cadence-v1",
+  "store": "Community Tap",
+  "timezone": "America/Chicago",
+  "customizable": true,
+  "boundary": {
+    "notPaymentWorkflow": true,
+    "notLivePurchaseOrder": true,
+    "noInventedDollars": true,
+    "noCo2Lecture": true,
+    "missingIsForgetToSnap": true
+  },
+  "vendors": [
+    {
+      "id": "fort-dodge-distributing",
+      "label": "Fort Dodge Distributing",
+      "aliases": ["FDD", "Fort Dodge Dist", "Fort Dodge Distributing"],
+      "days": ["Tue"],
+      "frequency": "weekly",
+      "capture": ["photo"],
+      "notes": ["photo-only"],
+      "missingNudge": "Usually Fort Dodge Tuesday — forget to snap the ticket?"
+    },
+    {
+      "id": "humes",
+      "label": "Humes",
+      "aliases": ["Humes"],
+      "days": ["Tue", "Fri"],
+      "frequency": "twice-weekly",
+      "capture": ["email", "photo"],
+      "notes": ["email preferred", "photo backup"],
+      "missingNudge": "Humes is usually Tue and Fri. Email the invoice if it landed — or snap the ticket."
+    },
+    {
+      "id": "confluence",
+      "label": "Confluence",
+      "aliases": ["Confluence"],
+      "days": ["Mon", "Tue", "Fri"],
+      "frequency": "varies",
+      "capture": ["photo"],
+      "notes": ["kegs", "reconcile empties credits"],
+      "missingNudge": "Confluence is roughly weekly — Mon, Tue, or Fri. Snap the keg ticket so empties credits can match later."
+    },
+    {
+      "id": "hy-vee-wine",
+      "label": "Hy-Vee Wine",
+      "aliases": ["Hy-Vee", "Hy-Vee Wine", "HyVee"],
+      "days": ["Mon"],
+      "frequency": "weekly",
+      "capture": ["email", "photo"],
+      "notes": ["email order", "yellow slips", "invoice glue"],
+      "missingNudge": "Hy-Vee wine: email the order, keep the yellow slip, glue it to the invoice. Snap the slip if the email is missing."
+    },
+    {
+      "id": "pepsi",
+      "label": "Pepsi",
+      "aliases": ["Pepsi", "PepsiCo"],
+      "days": [],
+      "frequency": "every-other-week",
+      "capture": ["photo"],
+      "notes": ["photo"],
+      "missingNudge": "Pepsi is about every other week. Forget to snap the ticket?"
+    },
+    {
+      "id": "northern-lights",
+      "label": "Northern Lights",
+      "aliases": ["Northern Lights", "NL"],
+      "days": [],
+      "frequency": "frequent",
+      "capture": ["email", "photo"],
+      "notes": ["multi-sender", "dedup invoice number"],
+      "missingNudge": "Northern Lights hits often and from more than one sender. Same invoice number is the same ticket — snap once."
+    },
+    {
+      "id": "performance-foodservice",
+      "label": "Performance Foodservice",
+      "aliases": ["Performance", "PFG", "Performance Food Group", "Performance Foodservice"],
+      "days": ["Tue", "Fri"],
+      "frequency": "twice-weekly",
+      "capture": ["email", "photo"],
+      "notes": ["order email must match invoice", "EFT 21-day framing in coach copy only"],
+      "missingNudge": "Performance trucks are usually Tue and Fri. Match the order email to the invoice. EFT often lands on a 21-day clock — this is a reminder, not a pay screen."
+    },
+    {
+      "id": "sysco",
+      "label": "Sysco",
+      "aliases": ["Sysco"],
+      "days": ["Tue", "Fri"],
+      "frequency": "weekly",
+      "capture": ["photo"],
+      "notes": ["once weekly Tue or Fri"],
+      "missingNudge": "Usually Sysco Tue/Fri — forget to snap?"
+    }
+  ]
+}

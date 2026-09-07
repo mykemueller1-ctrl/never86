@@ -840,6 +840,21 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   background: #ececec;
   color: #4d4d4d;
 }
+.owner-desk-pill.is-hook {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  background: #ffffff;
+  color: #003bb5;
+}
+.owner-desk-lom-actions .owner-desk-primary {
+  background: #ffffff;
+  color: #0066ff;
+}
+.owner-desk-lom-actions .owner-desk-secondary {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.55);
+}
 .owner-desk-pill.is-need,
 .owner-desk-chip.is-need {
   background: #dce8ff;
