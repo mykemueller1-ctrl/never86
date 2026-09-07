@@ -212,6 +212,7 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('owner-desk');
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
+    expect(ui).toContain('ICP_WEDGE_FIRST_PAINT');
     expect(ui).not.toContain('Prime Cost Coach');
     expect(ui).toContain('/api/ask');
     expect(ui).toContain('/api/upload');
