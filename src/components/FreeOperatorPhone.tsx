@@ -110,7 +110,6 @@ export function FreeOperatorPhone() {
         const body = (await res.json()) as { success?: boolean; readiness?: SimpleOwnerReadiness; error?: string };
         if (cancelled) return;
         if (!res.ok || !body.success) {
-          setFlash(body.error ?? 'Readiness is not live yet. Persist may be unconfigured.');
           return;
         }
         applyReadiness(body.readiness);
@@ -266,44 +265,32 @@ export function FreeOperatorPhone() {
   }
 
   return (
-    <div className="owner-desk">
+    <div className={`owner-desk ${filled.size === 0 ? 'is-first-win' : 'is-winning'}`}>
       <header className="owner-desk-top">
-        <div className="flex items-start justify-between gap-3">
+        <div className="owner-desk-hello">
           <div>
-            <p className="font-serif text-[1.85rem] leading-none tracking-[-0.03em] text-white">
-              {greeting()}, operator.
-            </p>
-            <p className="mt-2 text-sm text-white/80">{CTAP_SEAT1_PUBLIC_LABEL} · Owner desk</p>
+            <p className="owner-desk-hello-line">{greeting()}.</p>
+            <p className="owner-desk-hello-store">{CTAP_SEAT1_PUBLIC_LABEL}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="owner-desk-icon-btn"
-              aria-label="Add evidence"
-              onClick={() => onMouth('file')}
-            >
-              +
-            </button>
-            <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
-              1
-            </Link>
-          </div>
+          <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
+            1
+          </Link>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2" aria-label="Day-1 coach chips">
+        <div className="owner-desk-chips" aria-label="Day-1 coach chips">
           {folders.map((folder) => {
             const coach = day1CoachById(folder.id);
             return (
               <button
                 key={folder.id}
                 type="button"
-                className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : ''} ${activeFolder === folder.id ? 'is-hook' : 'is-need'}`}
+                className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'} ${activeFolder === folder.id ? 'is-hook' : ''}`}
                 onClick={() => {
                   const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
                   if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
                 }}
               >
-                {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? `Missing · ${folder.label}`}
+                {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
               </button>
             );
           })}
@@ -311,43 +298,46 @@ export function FreeOperatorPhone() {
       </header>
 
       {view === 'home' ? (
-        <section className="mt-7">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white">
-            Action Shift · {weekdayLabel()} · one ask
-          </p>
-          <h1 className="mt-3 font-serif text-[2.35rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {hookAsk}
-          </h1>
-          <p className="mt-3 text-[15px] leading-relaxed text-white/85">
-            {winLine ??
-              (filled.size === 0
-                ? 'One photo. Then you are winning. Not a tour. Not a dashboard.'
-                : hook.attachHint)}
-          </p>
-          <div className="owner-desk-lom-actions mt-5 flex flex-wrap gap-2">
-            <button
-              type="button"
-              className="owner-desk-primary"
-              disabled={busy}
-              onClick={() => {
-                const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
-                openPlate(plate, 'photo');
-              }}
-            >
-              Snap photo
-            </button>
-            <button
-              type="button"
-              className="owner-desk-secondary"
-              disabled={busy}
-              onClick={() => {
-                const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
-                openPlate(plate, 'file');
-              }}
-            >
-              Add file
-            </button>
-          </div>
+        <section className="owner-desk-lom">
+          <p className="owner-desk-kicker">{weekdayLabel()}</p>
+          <h1 className="owner-desk-ask-title">{hookAsk}</h1>
+          {winLine ? (
+            <div className="owner-desk-win" role="status">
+              <p className="owner-desk-win-mark">Ready</p>
+              <p className="owner-desk-win-line">{winLine}</p>
+            </div>
+          ) : (
+            <p className="owner-desk-poetry">
+              {filled.size === 0
+                ? 'One photo. Then you’re winning. Not a tour.'
+                : hook.attachHint}
+            </p>
+          )}
+          <button
+            type="button"
+            className="owner-desk-snap-hero"
+            disabled={busy}
+            onClick={() => {
+              const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+              openPlate(plate, 'photo');
+            }}
+          >
+            <span className="owner-desk-snap-hero-mark" aria-hidden>
+              ⌖
+            </span>
+            {busy ? 'Snapping…' : 'Snap photo'}
+          </button>
+          <button
+            type="button"
+            className="owner-desk-file-quiet"
+            disabled={busy}
+            onClick={() => {
+              const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+              openPlate(plate, 'file');
+            }}
+          >
+            Add file
+          </button>
         </section>
       ) : null}
 
@@ -559,11 +549,15 @@ export function FreeOperatorPhone() {
             </div>
           </div>
         </form>
-        <p className="mt-2 text-center text-[11px] leading-relaxed text-white/75">{PUBLIC_PREVIEW_COPY}</p>
-        {flash ? <p className="mt-2 text-center text-sm text-white">{flash}</p> : null}
+        <p className="owner-desk-legal">{PUBLIC_PREVIEW_COPY}</p>
+        {flash ? <p className="owner-desk-flash">{flash}</p> : null}
       </div>
 
-      <nav className="owner-desk-tray" aria-label="Owner desk sections">
+      <nav
+        className={`owner-desk-tray ${filled.size === 0 && view === 'home' ? 'is-quiet' : ''}`}
+        aria-label="Owner desk sections"
+        hidden={filled.size === 0 && view === 'home'}
+      >
         {OWNER_DESK_TRAY.map((item) => (
           <button
             key={item.id}
