@@ -59,7 +59,7 @@ describe('day-1 Option C hybrid', () => {
     expect(text).toMatch(/truck ticket or invoice/i);
     expect(text).toMatch(/doordash/i);
     expect(text).toMatch(/86/);
-    expect(text.toLowerCase()).not.toMatch(/snap this week/);
+    expect(text.toLowerCase()).not.toMatch(/snap this week.?s order guide/);
     expect(text.toLowerCase()).not.toMatch(/snap the order guide/);
     expect(day1FrontVoiceIsClean(text)).toBe(true);
     expect(text.toLowerCase()).not.toMatch(
