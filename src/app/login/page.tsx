@@ -8,18 +8,25 @@ const inputClass =
 
 export default function OperatorLoginPage() {
   const [email, setEmail] = useState('');
+  const [storeName, setStoreName] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const restaurantName = storeName.trim().replace(/\s+/g, ' ');
+    if (!restaurantName) {
+      setStatus('error');
+      setMessage('Enter your store name.');
+      return;
+    }
     setStatus('loading');
     setMessage('');
     try {
       const res = await fetch('/api/onboard/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, sourcePage: '/login' }),
+        body: JSON.stringify({ email, restaurantName, storeName: restaurantName, sourcePage: '/login' }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
@@ -40,26 +47,37 @@ export default function OperatorLoginPage() {
             <p className="font-serif text-[24px] leading-none text-ink-800">
               Never 86&apos;d <span className="italic text-ink-600">· operator login</span>
             </p>
-            <p className="compass-eyebrow-dim mt-2">Community Tap seat 1 · magic link</p>
+            <p className="compass-eyebrow-dim mt-2">Work email + store name · magic link</p>
           </span>
         </Link>
       </div>
 
       <section className="max-w-md mx-auto px-6 pt-20 md:pt-28">
-        <p className="compass-eyebrow mb-4">— One field. That&apos;s it.</p>
+        <p className="compass-eyebrow mb-4">— Two fields. That&apos;s it.</p>
         <h1 className="compass-display text-4xl md:text-5xl mb-3">Open your operator.</h1>
         <p className="compass-body text-[15px] mb-8" style={{ color: '#86868b' }}>
-          Community Tap seat 1 opens with <span className="font-mono">communitypizza2026@gmail.com</span>. Same magic link for return visits. No password. No sales call.
+          Same path as claiming the seat: work email + store name. We send a secure link. Click it — you&apos;re in. No password. No sales call.
         </p>
 
         <form onSubmit={onSubmit} className="compass-card space-y-3">
           <input
             type="email"
             autoComplete="email"
-            placeholder="communitypizza2026@gmail.com"
+            placeholder="you@restaurant.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className={inputClass}
+          />
+          <input
+            type="text"
+            autoComplete="organization"
+            placeholder="Store name"
+            value={storeName}
+            onChange={(e) => setStoreName(e.target.value)}
+            required
+            minLength={1}
+            maxLength={120}
             className={inputClass}
           />
           <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
@@ -67,7 +85,7 @@ export default function OperatorLoginPage() {
           </button>
           {message ? <p className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
           <p className="text-center text-[11px] leading-relaxed text-[#86868b]">
-            Account email only. No marketing list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
+            Account email only — access plus essential product help. No marketing list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
           </p>
         </form>
 
@@ -80,7 +98,7 @@ export default function OperatorLoginPage() {
             Claim the free owner seat
           </Link>
           {' '}
-          with email. Seat 1 is Community Tap — use the shop email already on file. House-code seats stay at{' '}
+          with email + store name. House-code seats stay at{' '}
           <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
             /portal
           </Link>

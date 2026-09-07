@@ -13,8 +13,12 @@ const PLATES = [
   { title: 'Order guides', line: 'What is Missing before the next truck.' },
 ] as const;
 
+const inputClass =
+  'w-full rounded-xl border border-[#d2d2d7] bg-white px-4 py-3 text-ink-800 placeholder-[#a1a1a6] outline-none transition-colors focus:border-[#0066ff]';
+
 export default function OnboardPage() {
   const [email, setEmail] = useState('');
+  const [storeName, setStoreName] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
 
@@ -22,25 +26,31 @@ export default function OnboardPage() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    const restaurantName = storeName.trim().replace(/\s+/g, ' ');
+    if (!restaurantName) {
+      setStatus('error');
+      setMessage('Enter your store name.');
+      return;
+    }
     setStatus('loading');
     setMessage('');
-    trackEvent('onboard_submit', { meta: { path: 'email_only' } });
+    trackEvent('onboard_submit', { meta: { path: 'email_store' } });
     try {
       const res = await fetch('/api/onboard/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, sourcePage: '/onboard' }),
+        body: JSON.stringify({ email, restaurantName, storeName: restaurantName, sourcePage: '/onboard' }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
       setStatus('sent');
       setMessage(data.message || 'Check your email for a secure sign-in link.');
-      trackEvent('onboard_submit_success', { meta: { path: 'email_only' } });
+      trackEvent('onboard_submit_success', { meta: { path: 'email_store' } });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Could not send the link.';
       setStatus('error');
       setMessage(error);
-      trackEvent('onboard_submit_error', { meta: { path: 'email_only', error } });
+      trackEvent('onboard_submit_error', { meta: { path: 'email_store', error } });
     }
   }
 
@@ -65,12 +75,12 @@ export default function OnboardPage() {
         <div className="mx-auto max-w-5xl">
           <div className="grid items-start gap-10 lg:grid-cols-[1.15fr_.85fr]">
             <div>
-              <p className="compass-eyebrow mb-5">— Seat 1 · Community Tap · Operator V2 plates</p>
+              <p className="compass-eyebrow mb-5">— Free owner seat · two fields</p>
               <h1 className="compass-display text-5xl md:text-7xl mb-5">
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Seat 1 is Community Tap — the canary shop. Email opens the chat desk. First-class folders: schedule, labor cards, menu, order guide. Photo the paper. Labor cards name roles. Daily compare to the clock. Not a dashboard. Not Command Center.
+                Work email + store name. We email a secure link. Click it — you&apos;re in Seat 1. No password. No paperwork. First-class folders: schedule, labor cards, menu, order guide.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -85,8 +95,8 @@ export default function OnboardPage() {
 
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
-              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Click. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. No password. Community Tap seat 1 uses the shop email already on file. Extra seats stay locked.</p>
+              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Store. You&apos;re in.</h2>
+              <p className="compass-body mt-3 text-sm">No card. No password. Same magic link for return visits. Extra seats stay locked.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <input
                   type="email"
@@ -95,7 +105,18 @@ export default function OnboardPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
-                  className="w-full rounded-xl border border-[#d2d2d7] bg-white px-4 py-3 text-ink-800 placeholder-[#a1a1a6] outline-none transition-colors focus:border-[#0066ff]"
+                  className={inputClass}
+                />
+                <input
+                  type="text"
+                  autoComplete="organization"
+                  placeholder="Store name"
+                  value={storeName}
+                  onChange={(event) => setStoreName(event.target.value)}
+                  required
+                  minLength={1}
+                  maxLength={120}
+                  className={inputClass}
                 />
                 <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                   {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your email ✓' : 'Open Never 86’d →'}
@@ -103,7 +124,7 @@ export default function OnboardPage() {
                 {message ? <p className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
               </form>
               <p className="mt-4 text-[11px] leading-relaxed text-[#86868b]">
-                We use this email only for account access and essential product messages. No marketing list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
+                We use this email for account access and essential product help — thank-you, tips, education. No hard sales list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
               </p>
               <div className="mt-6 border-t border-[#e8e8ed] pt-5">
                 <Link href="/llm-shells" className="font-semibold text-[#0066ff] hover:underline">

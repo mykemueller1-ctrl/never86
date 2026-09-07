@@ -17,7 +17,8 @@ export const dynamic = 'force-dynamic';
 const bodySchema = z.object({
   email: z.string().email(),
   name: z.string().optional(),
-  restaurantName: z.string().optional(),
+  restaurantName: z.string().min(1).max(120).optional(),
+  storeName: z.string().min(1).max(120).optional(),
   sourcePage: z.string().optional(),
 });
 
@@ -48,6 +49,14 @@ export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const data = bodySchema.parse(json);
+    const restaurantName = (data.restaurantName || data.storeName || '').trim().replace(/\s+/g, ' ');
+    if (!restaurantName) {
+      return NextResponse.json(
+        { success: false, error: 'Enter your email and store name.' },
+        { status: 400 },
+      );
+    }
+
     const requestIp = pickTrustedClientIp(req.headers);
     const email = normalizeEmail(data.email);
 
@@ -61,7 +70,7 @@ export async function POST(req: NextRequest) {
     const result = await requestOperatorActivation({
       email: data.email,
       name: data.name,
-      restaurantName: data.restaurantName || 'My restaurant',
+      restaurantName,
       sourcePage: data.sourcePage ?? '/onboard',
       requestIp,
       userAgent: req.headers.get('user-agent') ?? undefined,
@@ -96,7 +105,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(publicActivationAccepted(result.expiresAt));
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: 'Enter a valid email.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Enter a valid email and store name.' }, { status: 400 });
     }
     const msg = err instanceof Error ? err.message : 'Activation request failed';
     if (/seat_activation_tokens|relation .* does not exist/i.test(msg)) {
