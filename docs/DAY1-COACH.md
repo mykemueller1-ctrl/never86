@@ -3,17 +3,26 @@
 **Surface:** `/operator` · Seat 1 · Community Tap  
 **Auth:** existing email + store magic link (PR 222). Do not rebuild login.
 
+## Review Fail (includes the 10-minute hook)
+
+Fail the review if any of these break. Stream A locks live in `STREAM_A_LOCKS` (`src/lib/day1Coach.ts`).
+
+1. **10-minute hook** — first win is one folder Ready from a photo. Prefer Order guide. No dashboard-first. No module tour.
+2. **Silo names are optional cues only** — 7shifts / Toast may be named as “that print is fine.” Never86 does **not** replace them on day 1. No hardcoded vendor path.
+3. **Order guide OCR is outside the POS** — paper / photo / MarginEdge-class print. Do **not** assume a native Toast order guide.
+4. **Ask system-of-record** for schedule, labor cards, and menu: POS, app, Sheets, or paper. Never invent usage %.
+
 ## 10-minute hook (do not miss)
 
 First session must feel human and quick. Not a SaaS tour.
 
 1. Operator lands on `/operator`.
-2. One ask is already filled: **snap this week’s order guide** (or the liquor / truck ticket).
+2. One ask is already filled: **snap this week’s order guide** — paper, a photo, or the print they hang (liquor / truck ticket counts).
 3. They tap **Snap photo** (or a coach chip). Camera opens.
 4. One paper lands. Chip flips Ready. Copy says **you’re winning**.
 5. That is the win. Stop. No module map. No KPI tiles.
 
-Prefer Order guide for the first photo. Schedule → Labor cards → Menu stay chips, not a walkthrough.
+Prefer Order guide for the first photo. Schedule → Labor cards → Menu stay chips, not a walkthrough. After the first snap, those folders ask **where the paper lives** (POS, app, Sheets, paper).
 
 ## LOM
 
@@ -27,10 +36,10 @@ One screen. Ask → one action before dinner.
 
 | Folder | Chip | Ask |
 |---|---|---|
-| Order guide | Snap the order guide | Snap this week’s order guide — or the liquor / truck ticket. One photo and you’re winning. |
-| Schedule | Snap the week schedule | Can you snap this week’s schedule? We’ll see who’s posted in and out. Labor lives on that grid. |
-| Labor cards | Snap labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats. |
-| Menu | Snap the menu | Picture of the menu — top money plates first. Recipes suck; we figure the chaos. |
+| Order guide | Snap the order guide | Snap this week’s order guide — paper, a photo, or the print you hang. Liquor / truck ticket counts. One photo and you’re winning. |
+| Schedule | Snap the week schedule | Can you snap this week’s schedule? Where does that live — POS, an app, Sheets, or the paper on the wall? |
+| Labor cards | Snap labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats — POS, app, Sheets, or paper. |
+| Menu | Snap the menu | Picture of the menu — top money plates first. Paper, POS print, Sheets, or the app — wherever it lives. |
 
 Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads.
 
@@ -65,7 +74,7 @@ No CO2 lecture. No invented dollar savings.
 
 | Lock | File |
 |---|---|
-| Hook + folder asks | `src/lib/day1Coach.ts` |
+| Hook + folder asks + Stream A locks | `src/lib/day1Coach.ts` |
 | LOM UI | `src/components/FreeOperatorPhone.tsx` |
 | Vendor cadence | `config/ctap-vendor-cadence.json` · `src/lib/vendorCadenceConfig.ts` |
 | Dedup | `src/lib/invoiceIdentity.ts` |
@@ -73,4 +82,4 @@ No CO2 lecture. No invented dollar savings.
 
 ## Anti-patterns (cut)
 
-Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1.
+Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Native Toast order-guide scrape. “We replace 7shifts.” Invented “73% of Toast shops” usage. One hardcoded silo path.
