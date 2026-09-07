@@ -15,10 +15,14 @@ import {
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
 import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
 import {
+  DAY1_FRONT_PICKS,
   DAY1_HOOK_PLATE_ID,
+  DAY1_OPEN_ASK,
+  DAY1_SOFT_DEFAULT,
   day1CoachById,
   day1HookCoach,
   firstPhotoWinLine,
+  type Day1FrontPick,
 } from '@/lib/day1Coach';
 import {
   OPERATOR_V2_PLATES,
@@ -72,14 +76,14 @@ function emptyDailyCompare(): DailyCompareChip[] {
 }
 
 export function FreeOperatorPhone() {
-  const [ask, setAsk] = useState(() => day1CoachById(DAY1_HOOK_PLATE_ID)?.ask ?? '');
+  const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
   const [, setEvidence] = useState<PrimeCostEvidence[]>(emptyEvidence);
   const [folders, setFolders] = useState<OperatorV2FolderState[]>(emptyFolders);
   const [roleCards, setRoleCards] = useState<LaborRoleCard[]>(emptyRoleCards);
   const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
-  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId>(DAY1_HOOK_PLATE_ID);
+  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(DAY1_HOOK_PLATE_ID);
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -92,7 +96,10 @@ export function FreeOperatorPhone() {
 
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
-  const hookAsk = day1CoachById(activeFolder)?.ask ?? hook.ask;
+  const firstScreen = filled.size === 0 && view === 'home' && !winLine;
+  const hookAsk = firstScreen
+    ? DAY1_OPEN_ASK
+    : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
 
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
@@ -169,6 +176,17 @@ export function FreeOperatorPhone() {
     }
     if (attach === 'ask') return;
     photoRef.current?.click();
+  }
+
+  function onFrontPick(pick: Day1FrontPick) {
+    setAsk(pick.ask);
+    trackEvent('operator_day1_front_pick', { pagePath: '/operator', meta: { pick: pick.id, action: pick.action } });
+    if (pick.action === 'photo') {
+      setActiveFolder(null);
+      photoRef.current?.click();
+      return;
+    }
+    void goAsk(pick.ask, 'type');
   }
 
   function onTray(next: OwnerDeskTrayId) {
@@ -277,23 +295,34 @@ export function FreeOperatorPhone() {
           </Link>
         </div>
 
-        <div className="owner-desk-chips" aria-label="Day-1 coach chips">
-          {folders.map((folder) => {
-            const coach = day1CoachById(folder.id);
-            return (
-              <button
-                key={folder.id}
-                type="button"
-                className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'} ${activeFolder === folder.id ? 'is-hook' : ''}`}
-                onClick={() => {
-                  const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
-                  if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
-                }}
-              >
-                {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
-              </button>
-            );
-          })}
+        <div className="owner-desk-chips" aria-label={firstScreen ? 'Floor asks' : 'Day-1 coach chips'}>
+          {firstScreen
+            ? DAY1_FRONT_PICKS.map((pick) => (
+                <button
+                  key={pick.id}
+                  type="button"
+                  className="owner-desk-pill is-need"
+                  onClick={() => onFrontPick(pick)}
+                >
+                  {pick.chip}
+                </button>
+              ))
+            : folders.map((folder) => {
+                const coach = day1CoachById(folder.id);
+                return (
+                  <button
+                    key={folder.id}
+                    type="button"
+                    className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'} ${activeFolder === folder.id ? 'is-hook' : ''}`}
+                    onClick={() => {
+                      const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                      if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
+                    }}
+                  >
+                    {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
+                  </button>
+                );
+              })}
         </div>
       </header>
 
@@ -308,9 +337,7 @@ export function FreeOperatorPhone() {
             </div>
           ) : (
             <p className="owner-desk-poetry">
-              {filled.size === 0
-                ? 'One photo. Then you’re winning. Not a tour.'
-                : hook.attachHint}
+              {firstScreen ? DAY1_SOFT_DEFAULT : hook.attachHint}
             </p>
           )}
           <button
@@ -318,7 +345,9 @@ export function FreeOperatorPhone() {
             className="owner-desk-snap-hero"
             disabled={busy}
             onClick={() => {
-              const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+              const plate =
+                OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
+                OPERATOR_V2_PLATES[3];
               openPlate(plate, 'photo');
             }}
           >
@@ -332,7 +361,9 @@ export function FreeOperatorPhone() {
             className="owner-desk-file-quiet"
             disabled={busy}
             onClick={() => {
-              const plate = OPERATOR_V2_PLATES.find((row) => row.id === activeFolder) ?? OPERATOR_V2_PLATES[3];
+              const plate =
+                OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
+                OPERATOR_V2_PLATES[3];
               openPlate(plate, 'file');
             }}
           >
@@ -528,7 +559,7 @@ export function FreeOperatorPhone() {
               }}
               rows={2}
               disabled={busy}
-              placeholder={listening ? 'Listening…' : "Ask what's happening in your restaurant..."}
+              placeholder={listening ? 'Listening…' : DAY1_OPEN_ASK}
               className="owner-desk-ask"
             />
             <div className="mt-2 flex items-center justify-between gap-2">
@@ -554,9 +585,9 @@ export function FreeOperatorPhone() {
       </div>
 
       <nav
-        className={`owner-desk-tray ${filled.size === 0 && view === 'home' ? 'is-quiet' : ''}`}
+        className={`owner-desk-tray ${firstScreen ? 'is-quiet' : ''}`}
         aria-label="Owner desk sections"
-        hidden={filled.size === 0 && view === 'home'}
+        hidden={firstScreen}
       >
         {OWNER_DESK_TRAY.map((item) => (
           <button
@@ -566,7 +597,7 @@ export function FreeOperatorPhone() {
             aria-label={item.label}
             onClick={() => onTray(item.id)}
           >
-            <span aria-hidden>{item.icon}</span>
+            <span className="owner-desk-tray-label">{item.label}</span>
           </button>
         ))}
       </nav>

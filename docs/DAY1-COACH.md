@@ -1,38 +1,50 @@
 # Day-1 coach locks — Community Tap seat 1
 
 **Surface:** `/operator` · Seat 1 · Community Tap  
-**Auth:** existing email + store magic link (PR 222). Do not rebuild login.
+**Auth:** existing email + store magic link (PR 222). Do not rebuild login.  
+**Front screen:** Option C hybrid. Open ask + soft default physical artifact.
 
-## 10-minute hook (do not miss)
+## Option C hybrid (do not miss)
 
-First session must feel human and quick. Not a SaaS tour.
+First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the plate. Not a tour.
 
 1. Operator lands on `/operator`.
-2. One ask is already filled: **snap this week’s order guide** (or the liquor / truck ticket).
-3. They tap **Snap photo** (or a coach chip). Camera opens.
-4. One paper lands. Chip flips Ready. Copy says **you’re winning**.
-5. That is the win. Stop. No module map. No KPI tiles.
+2. Open ask, floor voice: **How can we help you?**
+3. Soft default under it: **Got a truck ticket or invoice? Snap it.** Liquor / distributor invoice, truck ticket, or a handwritten short.
+4. They tap **Snap photo**. Camera opens. One paper lands.
+5. That is the win. Stop. No module map. No KPI tiles. No order-guide ownership as the first aha.
 
-Prefer Order guide for the first photo. Schedule → Labor cards → Menu stay chips, not a walkthrough.
+Secondary choices stay floor nouns only. One pick → one action.
+
+| Pick | Action |
+|---|---|
+| DoorDash statement | Snap the statement |
+| Fee line | Ask the DoorDash take on the fee line |
+| What's 86'd | Ask what's 86'd |
+
+Do **not** default to “snap this week’s order guide.” Order guide is a later folder, not day-1 ownership.
 
 ## LOM
 
 One screen. Ask → one action before dinner.
 
-- Home is the ask + Snap photo / Add file.
+- Home is the open ask + soft default + Snap photo / Add file.
 - Prime Cost Coach / “3 of 3 ready” stays off this screen (dashboard creep).
 - Labor / food trays are progressive disclosure after the first snap.
+- Bottom chrome is quiet adult ops (Desk / Food / Labor / Pop / Beer / Liquor). Hidden on the empty first screen. Never a consumer emoji bar.
 
 ## Folder coach (operator words)
 
+Shown after the first snap — not as the first-screen sitemap.
+
 | Folder | Chip | Ask |
 |---|---|---|
-| Order guide | Snap the order guide | Snap this week’s order guide — or the liquor / truck ticket. One photo and you’re winning. |
-| Schedule | Snap the week schedule | Can you snap this week’s schedule? We’ll see who’s posted in and out. Labor lives on that grid. |
-| Labor cards | Snap labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats. |
-| Menu | Snap the menu | Picture of the menu — top money plates first. Recipes suck; we figure the chaos. |
+| Invoice / truck | Invoice / truck | Got a truck ticket or invoice? Snap it. |
+| Schedule | Week schedule | Can you snap this week’s schedule? We’ll see who’s posted in and out. Labor lives on that grid. |
+| Labor cards | Labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats. |
+| Menu | Menu | Picture of the menu — top money plates first. Recipes suck; we figure the chaos. |
 
-Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads.
+Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads. Soft-default snap still files to the invoice / truck folder (`order-guide` id). Copy says invoice / truck / short — not order-guide ownership.
 
 ## Vendor babysit (not on the first screen)
 
@@ -53,7 +65,7 @@ Missing invoice = **forget to snap the ticket?** Never “you didn’t order.”
 
 Does **not** redesign vendor payment, Hy-Vee / beer / PFG / Sysco / NL / Pepsi / Confluence workflows, or staff lab cadence in `ctapLabPack`.
 
-No CO2 lecture. No invented dollar savings.
+No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 ## Invoice identity
 
@@ -65,12 +77,19 @@ No CO2 lecture. No invented dollar savings.
 
 | Lock | File |
 |---|---|
-| Hook + folder asks | `src/lib/day1Coach.ts` |
+| Open ask + soft default + floor picks | `src/lib/day1Coach.ts` |
 | LOM UI | `src/components/FreeOperatorPhone.tsx` |
+| Adult tray chrome | `src/lib/freeOperatorDemo.ts` · `src/app/globals.css` |
 | Vendor cadence | `config/ctap-vendor-cadence.json` · `src/lib/vendorCadenceConfig.ts` |
 | Dedup | `src/lib/invoiceIdentity.ts` |
 | Ask copy | `src/lib/simpleOwnerDemo/compose.ts` |
 
+## Voice
+
+Prefer: invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
+
+Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem.
+
 ## Anti-patterns (cut)
 
-Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1.
+Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Order-guide-as-first-aha. Toy emoji bottom nav.

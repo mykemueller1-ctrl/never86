@@ -117,12 +117,12 @@ export const OWNER_PRIME_COST_EVIDENCE: readonly PrimeCostEvidence[] = [
 ];
 
 export const OWNER_DESK_TRAY = [
-  { id: 'action', label: 'Action Shift', icon: '⚡' },
-  { id: 'food', label: 'Food', icon: '🍽' },
-  { id: 'labor', label: 'Labor', icon: '◷' },
-  { id: 'pop', label: 'Pop', icon: '🥤' },
-  { id: 'beer', label: 'Beer', icon: '🍺' },
-  { id: 'liquor', label: 'Liquor', icon: '🥃' },
+  { id: 'action', label: 'Desk', icon: 'Desk' },
+  { id: 'food', label: 'Food', icon: 'Food' },
+  { id: 'labor', label: 'Labor', icon: 'Labor' },
+  { id: 'pop', label: 'Pop', icon: 'Pop' },
+  { id: 'beer', label: 'Beer', icon: 'Beer' },
+  { id: 'liquor', label: 'Liquor', icon: 'Liquor' },
 ] as const;
 
 export type OwnerDeskTrayId = (typeof OWNER_DESK_TRAY)[number]['id'];
@@ -340,10 +340,23 @@ export function chipForSlug(slug: string): (typeof FREE_OPERATOR_CHIPS)[number] 
 
 const CHIP_HINTS: Record<FreeOperatorChipId, readonly string[]> = {
   foh: ['front of house', 'foh', 'void', 'till', 'comp', 'guest', 'cash drawer'],
-  boh: ['back of house', 'boh', 'invoice', 'food cost', 'prep', 'count', 'cogs'],
+  boh: ['back of house', 'boh', 'invoice', 'food cost', 'prep', 'count', 'cogs', '86', 'eighty six'],
   schedule: ['schedule', 'labor', 'hours', 'clock', 'overtime', 'shift'],
   vendor: ['vendor', 'silence', 'truck', 'cadence', 'delivery', 'sysco', 'us foods'],
-  merchant: ['merchant', 'processing', 'card rate', 'interchange', 'terminal', 'free pos', 'merchant account', 'iso'],
+  merchant: [
+    'merchant',
+    'processing',
+    'card rate',
+    'interchange',
+    'terminal',
+    'free pos',
+    'merchant account',
+    'iso',
+    'doordash',
+    'door dash',
+    'fee line',
+    'statement',
+  ],
 };
 
 export type ResolveAskResult =

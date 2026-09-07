@@ -86,6 +86,13 @@ describe('free operator demo pack', () => {
     expect(other.ok).toBe(false);
     if (!other.ok) expect(other.reason).toMatch(/does not invent a close/i);
 
+    const doordash = resolveFreeOperatorAsk('DoorDash statement — what is the take on the fee line?');
+    expect(doordash.ok).toBe(true);
+    if (doordash.ok) expect(doordash.chipId).toBe('merchant');
+    const eightySix = resolveFreeOperatorAsk("What's 86'd?");
+    expect(eightySix.ok).toBe(true);
+    if (eightySix.ok) expect(eightySix.chipId).toBe('boh');
+
     const typedBeatsChip = resolveFreeOperatorAsk('vendor cadence', 'foh');
     expect(typedBeatsChip.ok).toBe(true);
     if (typedBeatsChip.ok) {
@@ -130,6 +137,8 @@ describe('free operator demo pack', () => {
     expect(OWNER_PRIME_COST_EVIDENCE.every((row) => row.state === 'NEED' || row.state === 'READY')).toBe(true);
     expect(OWNER_PRIME_COST_EVIDENCE.filter((row) => row.state === 'READY')).toEqual([]);
     expect(OWNER_DESK_TRAY.map((row) => row.id)).toEqual(['action', 'food', 'labor', 'pop', 'beer', 'liquor']);
+    expect(OWNER_DESK_TRAY.map((row) => row.label)).toEqual(['Desk', 'Food', 'Labor', 'Pop', 'Beer', 'Liquor']);
+    expect(OWNER_DESK_TRAY.every((row) => !/[⚡🍽🥤🍺🥃]/.test(row.icon))).toBe(true);
   });
 
   it('labels every sample dollar fictional and never claims verified money', () => {
@@ -212,7 +221,13 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('owner-desk');
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
+    expect(ui).toContain('DAY1_OPEN_ASK');
+    expect(ui).toContain('DAY1_SOFT_DEFAULT');
+    expect(ui).toContain('DAY1_FRONT_PICKS');
+    expect(ui).toContain('owner-desk-tray-label');
     expect(ui).not.toContain('Prime Cost Coach');
+    expect(ui).not.toMatch(/Snap this week’s order guide/);
+    expect(ui).not.toMatch(/Snap the order guide/);
     expect(ui).toContain('/api/ask');
     expect(ui).toContain('/api/upload');
     expect(ui).not.toMatch(/router\.push/);
@@ -229,6 +244,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(deskCss).toMatch(/#0066ff/);
     expect(deskCss).toMatch(/#003bb5/);
+    expect(deskCss).toMatch(/\.owner-desk-tray\[hidden\]/);
+    expect(deskCss).toMatch(/display:\s*none\s*!important/);
+    expect(deskCss).toMatch(/\.owner-desk-tray-label/);
     expect(deskCss).not.toMatch(/#e66b27|#fff5f0|#faf6|#fffaf2|#fffdf9|#ffe4d4/);
     expect(page).toContain('SimpleOwnerDemo');
     expect(page).toContain('owner-desk-page');
