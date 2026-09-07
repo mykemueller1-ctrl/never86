@@ -25,6 +25,8 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('labor-cards.jpg').kind).toBe('labor-cards');
     expect(classifyUpload('menu-photo.png').kind).toBe('menu');
     expect(classifyUpload('order-guide.pdf').kind).toBe('order-guide');
+    expect(classifyUpload('truck-ticket.jpg').kind).toBe('order-guide');
+    expect(classifyUpload('liquor-ticket.jpg').kind).toBe('order-guide');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
@@ -146,7 +148,7 @@ describe('simple owner demo service persist', () => {
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.facts.some((fact) => fact.includes('demo:alpha'))).toBe(true);
     expect(asked.answer.facts.join(' ')).toMatch(/Ready: Schedule/);
-    expect(asked.answer.headline).toMatch(/you’re winning/i);
+    expect(asked.answer.headline).toMatch(/Schedule is on this seat/i);
     expect(asked.record.question).toBe('Why did labor feel wrong last night?');
     expect(repo.asks).toHaveLength(1);
     expect(asked.readiness.askCount).toBe(1);
@@ -255,6 +257,22 @@ describe('day-1 photo win + invoice identity', () => {
 });
 
 describe('compose never invents a close', () => {
+  it('opens an empty seat on invoice / truck — not order-guide ownership', () => {
+    const readiness = readinessFromUploads('seat:7', []);
+    const answer = composeAskAnswer({
+      question: 'How can we help you?',
+      tray: 'action',
+      readiness,
+      uploads: [],
+    });
+    const facts = answer.facts.join(' ');
+    expect(facts).toMatch(/truck ticket or invoice/i);
+    expect(facts).not.toMatch(/order guide first/i);
+    expect(facts).not.toMatch(/Snap this week/i);
+    expect(answer.inventedClose).toBe(false);
+    expect(answer.verifiedClose).toBe(false);
+  });
+
   it('keeps sample dollars unverified even when all three reports are named', () => {
     const readiness = readinessFromUploads('seat:7', [
       fakeUpload('seat:7', 'schedule', 'schedule.pdf'),

@@ -787,6 +787,9 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   background: transparent;
   color: #f7f9ff;
 }
+.owner-desk.is-first-win {
+  padding-bottom: 8.5rem;
+}
 @media (min-width: 880px) {
   .owner-desk {
     width: min(42rem, 100%);
@@ -1172,6 +1175,9 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   margin-top: 1.5rem;
   padding-top: 0.35rem;
 }
+.owner-desk.is-first-win .owner-desk-mouth {
+  bottom: 1.1rem;
+}
 .owner-desk-ask-shell {
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 1.45rem;
@@ -1222,25 +1228,37 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   bottom: 0.65rem;
   z-index: 30;
   transform: translateX(-50%);
-  width: min(26.5rem, calc(100% - 1.2rem));
+  width: min(28rem, calc(100% - 1.2rem));
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.35rem;
-  padding: 0.45rem;
-  border-radius: 1.35rem;
-  background: #041433;
-  box-shadow: 0 12px 28px rgba(0, 59, 181, 0.35);
+  gap: 0.2rem;
+  padding: 0.35rem;
+  border-radius: 0.85rem;
+  background: rgba(4, 14, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px rgba(0, 20, 60, 0.28);
+}
+.owner-desk-tray[hidden],
+.owner-desk-tray.is-quiet {
+  display: none !important;
 }
 .owner-desk-tray-btn {
-  height: 2.75rem;
-  border-radius: 0.95rem;
+  min-height: 2.35rem;
+  border-radius: 0.55rem;
   border: 0;
   background: transparent;
-  color: #e8efff;
-  font-size: 1.15rem;
+  color: rgba(232, 239, 255, 0.72);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.owner-desk-tray-label {
+  line-height: 1.1;
 }
 .owner-desk-tray-btn.is-active {
   background: #0066ff;
+  color: #ffffff;
 }
 @media (prefers-reduced-motion: reduce) {
   .owner-desk-icon-btn,
