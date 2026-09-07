@@ -36,6 +36,21 @@ export const STREAM_A_LOCKS = {
   reviewFailIncludesTenMinuteHook: true,
 } as const;
 
+/** ICP wedge — do not blur. Review Fail if day-1 copy sells the wrong shop. */
+export const ICP_WEDGE_LOCK = {
+  id: 'icp-wedge-v1',
+  primary: '1-3-unit-independents',
+  shopClass: 'community-tap',
+  concepts: ['sports-bar', 'pizza', 'casual-tavern'] as const,
+  problems: ['paper-invoices', 'labor-schedule-chaos', 'menu-86-drift', 'fee-fatigue'] as const,
+  notPrimary: ['fine-dining-tasting-menu', 'enterprise-franchise-command-center', 'pure-qsr-drive-thru'] as const,
+  tenMinuteHook: true,
+  firstWin: 'order-guide-photo',
+} as const;
+
+/** Empty-desk line. 1–3 owner should feel this gets their mess. */
+export const ICP_WEDGE_FIRST_PAINT = 'Paper invoices. One photo. This gets your mess. Not a tour.';
+
 export type Day1AttachKind = 'photo' | 'file';
 
 export type Day1FolderCoach = {
@@ -55,7 +70,7 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
     id: 'schedule',
     label: 'Schedule',
     chip: 'Snap the week schedule',
-    ask: 'Can you snap this week’s schedule? Where does that live — POS, an app, Sheets, or the paper on the wall? We’ll see who’s posted in and out. Labor lives on that grid.',
+    ask: 'Schedule chaos this week? Snap the grid — POS, an app, Sheets, or the paper on the wall. We’ll see who’s posted in and out. Labor lives on that grid.',
     attach: 'photo',
     attachHint:
       'Photo the posted week — paper, Sheets print, or app screen. 7shifts or Toast is a cue only. We don’t replace them on day 1.',
@@ -76,7 +91,7 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
     id: 'menu',
     label: 'Menu',
     chip: 'Snap the menu',
-    ask: 'Picture of the menu — top money plates first. Paper, POS print, Sheets, or the app — wherever it lives. Recipes suck; we figure the chaos.',
+    ask: 'Picture of the menu — 86s and top money plates first. Paper, POS print, Sheets, or the app — wherever it lives. Recipes suck; we figure the chaos.',
     attach: 'photo',
     attachHint: 'One menu photo. No recipe book week 1. No invented plate mix.',
     winning: 'Menu is on this seat. You’re winning. Top plates only — no food-cost from a photo.',
@@ -86,9 +101,10 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
     id: 'order-guide',
     label: 'Order guide',
     chip: 'Snap the order guide',
-    ask: 'Snap this week’s order guide — paper, a photo, or the print you hang. Liquor / truck ticket counts. One photo and you’re winning.',
+    ask: 'Snap this week’s order guide — paper invoice, liquor ticket, or the truck print you hang. One photo and you’re winning.',
     attach: 'photo',
-    attachHint: 'Photo the paper guide, binder, or MarginEdge-class print. Outside the POS. Invoice ≠ COGS.',
+    attachHint:
+      'Photo the paper guide, binder, or MarginEdge-class print. Outside the POS. Invoice ≠ COGS. Fee fatigue later — ticket first.',
     winning: 'Order guide is on this seat. You’re winning. Missing a truck later is “forget to snap?” — not “you didn’t order.”',
     askSystemOfRecord: false,
   },

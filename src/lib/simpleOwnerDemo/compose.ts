@@ -88,7 +88,7 @@ export function composeAskAnswer(input: {
 
   const evidenceFact =
     input.uploads.length === 0
-      ? 'No files are on this seat yet. Snap one paper order guide — outside the POS — and you are winning.'
+      ? 'No files are on this seat yet. Snap one paper order guide — liquor or truck ticket, outside the POS — and you are winning.'
       : `This seat has ${input.uploads.length} source-tagged upload(s). Ready: ${ready.join(', ') || 'none'}. Still NEED: ${missing.join(', ') || 'none'}.`;
 
   const filled = filledPlateIds(input.readiness.folders ?? []);

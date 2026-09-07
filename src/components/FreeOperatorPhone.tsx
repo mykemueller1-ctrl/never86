@@ -16,6 +16,7 @@ import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwn
 import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
 import {
   DAY1_HOOK_PLATE_ID,
+  ICP_WEDGE_FIRST_PAINT,
   day1CoachById,
   day1HookCoach,
   firstPhotoWinLine,
@@ -309,7 +310,7 @@ export function FreeOperatorPhone() {
           ) : (
             <p className="owner-desk-poetry">
               {filled.size === 0
-                ? 'One photo. Then you’re winning. Not a tour.'
+                ? ICP_WEDGE_FIRST_PAINT
                 : hook.attachHint}
             </p>
           )}

@@ -4,6 +4,8 @@ import {
   DAY1_FOLDER_COACH,
   DAY1_HOOK_PLATE_ID,
   DAY1_SOR_OPTIONS,
+  ICP_WEDGE_FIRST_PAINT,
+  ICP_WEDGE_LOCK,
   STREAM_A_LOCKS,
   day1CoachById,
   day1CoachCorpus,
@@ -110,5 +112,44 @@ describe('Research Stream A must-not-violate', () => {
     for (const coach of DAY1_FOLDER_COACH) {
       expect(plateById(coach.id)?.ask).toBe(coach.ask);
     }
+  });
+});
+
+describe('ICP wedge lock — do not blur', () => {
+  it('locks day-1 to 1–3 unit independents in the Community Tap class', () => {
+    expect(ICP_WEDGE_LOCK.primary).toBe('1-3-unit-independents');
+    expect(ICP_WEDGE_LOCK.shopClass).toBe('community-tap');
+    expect([...ICP_WEDGE_LOCK.concepts]).toEqual(['sports-bar', 'pizza', 'casual-tavern']);
+    expect([...ICP_WEDGE_LOCK.problems]).toEqual([
+      'paper-invoices',
+      'labor-schedule-chaos',
+      'menu-86-drift',
+      'fee-fatigue',
+    ]);
+    expect(ICP_WEDGE_LOCK.tenMinuteHook).toBe(true);
+    expect(ICP_WEDGE_LOCK.firstWin).toBe('order-guide-photo');
+    expect(DAY1_HOOK_PLATE_ID).toBe('order-guide');
+  });
+
+  it('speaks paper invoices, schedule chaos, 86s, and fee fatigue — without inventing dollars', () => {
+    const corpus = `${day1CoachCorpus()}\n${ICP_WEDGE_FIRST_PAINT}`;
+    expect(corpus).toMatch(/paper invoice/i);
+    expect(corpus).toMatch(/schedule chaos/i);
+    expect(corpus).toMatch(/86s/i);
+    expect(corpus).toMatch(/fee fatigue/i);
+    expect(corpus).toMatch(/this gets your mess/i);
+    expect(corpus).not.toMatch(/\$\d/);
+    expect(day1CoachById('order-guide')?.ask).toMatch(/liquor ticket|truck print/i);
+  });
+
+  it('does not make fine dining, franchise Command Center, or QSR drive-thru the day-1 hook', () => {
+    expect([...ICP_WEDGE_LOCK.notPrimary]).toEqual([
+      'fine-dining-tasting-menu',
+      'enterprise-franchise-command-center',
+      'pure-qsr-drive-thru',
+    ]);
+    const corpus = `${day1CoachCorpus()}\n${ICP_WEDGE_FIRST_PAINT}`;
+    expect(corpus).not.toMatch(/tasting[- ]menu|fine dining/i);
+    expect(corpus).not.toMatch(/franchise|command center|drive-?thru|qsr/i);
   });
 });
