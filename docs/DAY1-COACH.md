@@ -12,7 +12,7 @@ First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the 
 2. Open ask, floor voice: **How can we help you?**
 3. Soft default under it: **Got a truck ticket or invoice? Snap it.** Liquor / distributor invoice, truck ticket, or a handwritten short.
 4. They tap **Snap photo**. Camera opens. One paper lands.
-5. That is the win. Stop. No module map. No KPI tiles. No order-guide ownership as the first aha.
+5. That is the win. Stop. Home hero stays **How can we help you?** plus the Ready line. Do not jump to Food or auto-ask the week schedule. No module map. No KPI tiles. No order-guide ownership as the first aha.
 
 Secondary choices stay floor nouns only. One pick → one action.
 
