@@ -23,6 +23,7 @@ const AUTH_FILES = [
   'src/app/portal/login/page.tsx',
   'src/app/api/admin/person-password/route.ts',
   'src/app/api/admin/person-access/route.ts',
+  'src/lib/adminBearerAuth.ts',
   'src/lib/personAuth.ts',
   'src/components/OperatorStoreSwitcher.tsx',
 ] as const;
@@ -68,6 +69,9 @@ describe('email+password live door', () => {
     expect(read('src/lib/personAuth.ts')).toContain('isPlusAliasEmail');
     expect(read('src/lib/personAuth.ts')).toContain('Do not mint plus-alias seats');
     expect(read('src/app/api/admin/person-access/route.ts')).toContain('grantPersonAccess');
+    expect(read('src/app/api/admin/person-access/route.ts')).toContain('revokePersonAccess');
+    expect(read('src/app/api/admin/person-password/route.ts')).toContain('copyPersonPasswordHash');
+    expect(read('src/lib/adminBearerAuth.ts')).toContain('ADMIN_API_SECRET');
     expect(read('src/app/api/onboard/request/route.ts')).toContain("purpose: z.enum(['activate', 'reset'])");
     expect(read('sql/0010_person_password.sql')).toContain('drop constraint if exists seat_operators_email_key');
   });

@@ -204,6 +204,15 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
     setup: 'High-entropy string in Vercel.',
   },
   {
+    name: 'ADMIN_API_SECRET',
+    purpose: 'Same Bearer as CRON_SECRET for /api/admin/person-access and person-password.',
+    surfaces: ['vercel'],
+    kind: 'secret',
+    required: false,
+    placeholder: 'your-random-admin-secret-here',
+    setup: 'Already on Vercel Production. Do not paste the live value into chat or git.',
+  },
+  {
     name: 'OWNER_EMAIL',
     purpose: 'Notification recipient. Use a deliverable inbox (Gmail or myke@never86.ai). Never myke@n86.app — Resend bounce-suppressed since 2026-07-25.',
     surfaces: ['vercel', 'local-env'],
