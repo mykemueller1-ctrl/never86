@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  HYVEE_MONDAY_PAY_LOCK,
   answerHyveeDeskQuestion,
   collectHyveeFacts,
   detectHyveeFamily,
@@ -94,8 +95,25 @@ describe('Hy-Vee desk honesty', () => {
     const monday = answerHyveeDeskQuestion('What is the Hy-Vee Monday one check?', facts);
     expect(monday?.headline).toMatch(/Verified Monday lock — check total Missing/);
     expect(monday?.verifiedClose).toBe(false);
+    expect(monday?.sampleDollars).toBe('none-verified');
     expect(monday?.facts.join(' ')).toMatch(/Verified · Monday lock: one check/);
     expect(monday?.facts.join(' ')).toMatch(/no partial invented/i);
+  });
+
+  it('Monday one-check is Verified only from the labeled check paper', () => {
+    const mondayPaper = parseHyveeWineReport(load('monday-batch.txt'), 'monday-batch.txt');
+    const invoice = parseHyveeWineReport(load('delivery-invoice.txt'), 'delivery-invoice.txt');
+    const facts = collectHyveeFacts([
+      { filename: 'monday-batch.txt', sourceTags: [{ tag: 'verified', source: `hyvee-parse:v1:${JSON.stringify(mondayPaper)}` }] },
+      { filename: 'delivery-invoice.txt', sourceTags: [{ tag: 'verified', source: `hyvee-parse:v1:${JSON.stringify(invoice)}` }] },
+    ]);
+    const monday = answerHyveeDeskQuestion('What is the Hy-Vee Monday one check?', facts);
+    expect(monday?.headline).toBe('Verified Monday one check $120.00');
+    expect(monday?.verifiedClose).toBe(true);
+    expect(monday?.sampleDollars).toBe('hyvee-verified');
+    expect(monday?.facts.join(' ')).toContain(HYVEE_MONDAY_PAY_LOCK);
+    expect(monday?.facts.join(' ')).toMatch(/Verified · Monday one check \$120\.00 \(labeled check total\)/);
+    expect(monday?.facts.join(' ')).not.toMatch(/check total is not on this seat|30\/60|pay now/i);
   });
 
   it('Wave 0b refuses AP / 30-60-90', () => {

@@ -17,6 +17,10 @@ function load(name: string): string {
   return readFileSync(path.join(process.cwd(), 'tests/fixtures/toast', name), 'utf8');
 }
 
+function registeredPos(pack: ReturnType<typeof parseRegisteredReport>): string {
+  return pack && 'pos' in pack && typeof pack.pos === 'string' ? pack.pos : '';
+}
+
 describe('report adapter registry', () => {
   afterEach(() => {
     unregisterReportAdapter('square', 'sales-summary');
@@ -79,12 +83,12 @@ describe('report adapter registry', () => {
 
   it('Fails if a Toast pack is used as CTAP sales', () => {
     const toast = parseRegisteredReport(load('SalesSummary_2026-08-31.csv'), 'SalesSummary_2026-08-31.csv');
-    expect(toast && 'pos' in toast ? toast.pos : null).toBe('toast');
-    expect(() => assertNoToastPosForCtapSales(toast && 'pos' in toast && toast.pos ? toast.pos : '')).toThrow(/PDQ POS only/);
+    expect(registeredPos(toast)).toBe('toast');
+    expect(() => assertNoToastPosForCtapSales(registeredPos(toast))).toThrow(/PDQ POS only/);
     const zText = readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-large-pizzas.txt'), 'utf8');
     const z = parseRegisteredReport(zText, '8-24-2026 ZReport_Summary.pdf');
-    expect(z && 'pos' in z ? z.pos : null).toBe('pdq');
-    expect(() => assertNoToastPosForCtapSales(z && 'pos' in z && z.pos ? z.pos : '')).not.toThrow();
+    expect(registeredPos(z)).toBe('pdq');
+    expect(() => assertNoToastPosForCtapSales(registeredPos(z))).not.toThrow();
   });
 
   it('lets the next POS register without rewriting the desk, and parse=null invents no $', () => {

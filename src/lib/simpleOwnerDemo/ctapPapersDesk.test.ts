@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CTAP_TOAST_CONTAMINANT_FAIL } from '@/lib/ctapPosLock';
+import { HYVEE_MONDAY_PAY_LOCK } from '@/lib/hyveeWineParse';
 import { NAG_TOAST_GT } from '@/lib/reportAdapters/nagToastGt';
 import { PDQ_INGEST_PRIMARY_EMAIL, PDQ_INGEST_SECONDARY_EMAIL } from '@/lib/pdqIngest';
 import { createMemoryObjectStore } from './objectStore';
@@ -442,13 +443,18 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
   it('Monday one-check is Verified when the labeled check paper is on the seat', async () => {
     const svc = service();
     const operatorId = 'demo:ctap-hyvee-monday-verified';
-    const uploaded = await svc.upload({
+    expect((await svc.upload({
       operatorId,
       filename: 'hyvee-monday-batch.txt',
       contentType: 'text/plain',
       bytes: loadHyvee('monday-batch.txt'),
-    });
-    expect(uploaded.ok).toBe(true);
+    })).ok).toBe(true);
+    expect((await svc.upload({
+      operatorId,
+      filename: 'hyvee-delivery-invoice.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('delivery-invoice.txt'),
+    })).ok).toBe(true);
     const asked = await svc.ask({
       operatorId,
       question: 'What is the Hy-Vee Monday one check?',
@@ -456,10 +462,14 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     });
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
-    expect(asked.answer.headline).toMatch(/Verified Monday one check \$120\.00/);
+    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
+    expect(asked.answer.headline).toBe('Verified Monday one check $120.00');
     expect(asked.answer.verifiedClose).toBe(true);
-    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Monday lock: one check/);
-    expect(asked.answer.facts.join(' ')).toMatch(/labeled check total/);
+    expect(asked.answer.inventedClose).toBe(false);
+    expect(asked.answer.sampleDollars).toBe('hyvee-verified');
+    expect(body).toContain(HYVEE_MONDAY_PAY_LOCK);
+    expect(body).toMatch(/Verified · Monday one check \$120\.00 \(labeled check total\)/);
+    expect(body).not.toMatch(/check total is not on this seat|30\/60|\bTom\b|Humes is on this path/i);
   });
 
   it('Monday one-check is Missing when pay pattern is only invoices', async () => {
