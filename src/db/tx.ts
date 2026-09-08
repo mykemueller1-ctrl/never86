@@ -11,7 +11,7 @@ if (typeof WebSocket !== 'undefined') {
   neonConfig.webSocketConstructor = WebSocket;
 }
 
-type SeatTxDb = NeonDatabase<typeof schema>;
+export type SeatTxDb = NeonDatabase<typeof schema>;
 
 let _pool: Pool | null = null;
 let _wsDb: SeatTxDb | null = null;

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { and, eq, gt, isNull, sql as dsql } from 'drizzle-orm';
 import { db } from '../db';
-import { withSeatTransaction } from '../db/tx';
+import { withSeatTransaction, type SeatTxDb } from '../db/tx';
 import {
   seatActivationTokens,
   seatCredentials,
@@ -297,7 +297,7 @@ export async function requestOperatorActivation(
 }
 
 async function attachPersonAccessTx(
-  tx: typeof db,
+  tx: SeatTxDb,
   email: string,
   operatorId: number,
   nowMs: number,
