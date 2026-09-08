@@ -69,6 +69,9 @@ describe('free operator demo pack', () => {
 
   it('routes typed asks and refuses an invented close', () => {
     expect(resolveFreeOperatorAsk('voids on the floor').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('bartender leak').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('behind on the books').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('wearing too many hats').ok).toBe(true);
     expect(resolveFreeOperatorAsk('invoice and food cost').ok).toBe(true);
     expect(resolveFreeOperatorAsk('schedule hours').ok).toBe(true);
     expect(resolveFreeOperatorAsk('vendor cadence').ok).toBe(true);

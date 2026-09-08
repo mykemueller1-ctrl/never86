@@ -59,6 +59,9 @@ describe('Operator V2 first-class paper-shop folders', () => {
     expect(afterSchedule.find((folder) => folder.id === 'labor-cards')?.state).toBe('NEED');
     expect(afterSchedule.find((folder) => folder.id === 'menu')?.state).toBe('NEED');
     expect(filledPlateIds(afterSchedule).has('schedule')).toBe(true);
+
+    const legacyTicket = projectFoldersFromKinds(new Set(['order-guide']));
+    expect(legacyTicket.find((folder) => folder.id === 'invoice-truck')?.state).toBe('READY');
   });
 
   it('spawns role-named labor cards from the schedule and keeps punch Missing until the clock', () => {

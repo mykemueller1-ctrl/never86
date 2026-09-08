@@ -150,11 +150,17 @@ export function nextMissingPlate(filled: ReadonlySet<OperatorV2PlateId>): Operat
   return OPERATOR_V2_PLATES.find((plate) => !filled.has(plate.id)) ?? OPERATOR_V2_PLATES[0];
 }
 
+function folderKindIsReady(plate: OperatorV2Plate, kinds: ReadonlySet<string>): boolean {
+  if (kinds.has(plate.evidenceKind)) return true;
+  if (plate.id === 'invoice-truck') {
+    return kinds.has('order-guide') || kinds.has('invoice');
+  }
+  return false;
+}
+
 export function projectFoldersFromKinds(kinds: ReadonlySet<string>): OperatorV2FolderState[] {
   return OPERATOR_V2_PLATES.map((plate) => {
-    const ready =
-      kinds.has(plate.evidenceKind) ||
-      (plate.id === 'invoice-truck' && kinds.has(LEGACY_ORDER_GUIDE_PLATE_ID));
+    const ready = folderKindIsReady(plate, kinds);
     return {
       id: plate.id,
       label: plate.label,

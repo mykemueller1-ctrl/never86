@@ -4,13 +4,16 @@ import {
   DAY1_FOLDER_COACH,
   DAY1_FRONT_PICKS,
   DAY1_HOOK_PLATE_ID,
+  DAY1_INVOICE_PLATE_ID,
   DAY1_OPEN_ASK,
   DAY1_SOFT_DEFAULT,
+  ICP_WEDGE_LOCK,
   day1CoachById,
   day1FrontCopyBlob,
   day1FrontVoiceIsClean,
   day1HookCoach,
   day1HookPlate,
+  day1IcpWedgeHolds,
   firstPhotoWinLine,
   looksLikeDay1VendorAsk,
 } from './day1Coach';
@@ -21,6 +24,7 @@ describe('day-1 Option C hybrid', () => {
     expect(DAY1_OPEN_ASK).toBe('How can we help you?');
     expect(DAY1_SOFT_DEFAULT).toBe('Got a truck ticket or invoice? Snap it.');
     expect(DAY1_HOOK_PLATE_ID).toBe('invoice-truck');
+    expect(DAY1_INVOICE_PLATE_ID).toBe('invoice-truck');
     expect(day1HookPlate(new Set()).id).toBe('invoice-truck');
     expect(day1HookCoach(new Set()).ask).toBe(DAY1_SOFT_DEFAULT);
     expect(day1HookCoach(new Set()).chip).toMatch(/invoice|truck/i);
@@ -70,6 +74,29 @@ describe('day-1 Option C hybrid', () => {
     expect(firstPhotoWinLine('invoice-truck')).toMatch(/ticket is on this seat/i);
     expect(firstPhotoWinLine('order-guide')).toMatch(/ticket is on this seat/i);
     expect(day1CoachById('menu')?.ask).toMatch(/picture of the menu/i);
+  });
+
+  it('holds the 1–3 unit independent wedge without reviving order-guide as the lead', () => {
+    expect(ICP_WEDGE_LOCK.primary).toBe('1-3-unit-independents');
+    expect(ICP_WEDGE_LOCK.shopClass).toBe('community-tap');
+    expect(ICP_WEDGE_LOCK.concepts).toEqual(['sports-bar', 'pizza', 'casual-tavern']);
+    expect(ICP_WEDGE_LOCK.problems).toEqual([
+      'paper-invoices',
+      'labor-schedule-chaos',
+      'menu-86-drift',
+      'fee-fatigue',
+    ]);
+    expect(ICP_WEDGE_LOCK.notPrimary).toEqual([
+      'fine-dining-tasting-menu',
+      'enterprise-franchise-command-center',
+      'pure-qsr-drive-thru',
+    ]);
+    expect(ICP_WEDGE_LOCK.firstWin).toBe('truck-invoice-snap');
+    expect(ICP_WEDGE_LOCK.firstWin).not.toBe('order-guide-photo');
+    expect(day1IcpWedgeHolds()).toBe(true);
+    const text = day1FrontCopyBlob().toLowerCase();
+    expect(text).not.toMatch(/tasting[- ]menu|fine dining|command center|drive-?thru/);
+    expect(text).not.toMatch(/this gets your mess/);
   });
 
   it('only opens vendor babysit when they asked about a truck', () => {

@@ -10,13 +10,29 @@ import {
 /**
  * Day-1 Option C hybrid. Open ask + soft default physical artifact.
  * Not order-guide ownership. Not a SaaS tour. Not a module sitemap.
+ * Stream A first-win (order-guide photo) stays HOLD — do not revive it here.
  */
-export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = 'invoice-truck';
+export const DAY1_INVOICE_PLATE_ID: OperatorV2PlateId = 'invoice-truck';
+export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = DAY1_INVOICE_PLATE_ID;
 export const DAY1_COACH_ID = 'day1-coach-option-c';
 export const DAY1_OPEN_ASK = 'How can we help you?';
 export const DAY1_SOFT_DEFAULT = 'Got a truck ticket or invoice? Snap it.';
 export const DAY1_SOFT_DEFAULT_HINT =
   'Liquor invoice, distributor truck ticket, or a handwritten short. One photo. Task off the plate.';
+
+/**
+ * Non-conflicting ICP wedge from Stream A / locks.
+ * Shop class only. First win is the truck / invoice snap — not order-guide ownership.
+ */
+export const ICP_WEDGE_LOCK = {
+  id: 'icp-wedge-v1',
+  primary: '1-3-unit-independents',
+  shopClass: 'community-tap',
+  concepts: ['sports-bar', 'pizza', 'casual-tavern'] as const,
+  problems: ['paper-invoices', 'labor-schedule-chaos', 'menu-86-drift', 'fee-fatigue'] as const,
+  notPrimary: ['fine-dining-tasting-menu', 'enterprise-franchise-command-center', 'pure-qsr-drive-thru'] as const,
+  firstWin: 'truck-invoice-snap',
+} as const;
 
 export type Day1AttachKind = 'photo' | 'file';
 
@@ -103,7 +119,10 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
 ] as const;
 
 const BANNED_FRONT_VOICE =
-  /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem)\b/i;
+  /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem|prime cost coach|all-in-one dashboard)\b/i;
+
+const BLURRED_ICP =
+  /\b(tasting[- ]menu|fine dining|command center|drive-?thru|franchise cc|qsr)\b/i;
 
 export function day1CoachById(id: string): Day1FolderCoach | undefined {
   const resolved = resolveOperatorV2PlateId(id) ?? id;
@@ -154,5 +173,16 @@ export function day1FrontCopyBlob(): string {
 }
 
 export function day1FrontVoiceIsClean(text = day1FrontCopyBlob()): boolean {
-  return !BANNED_FRONT_VOICE.test(text) && !/\$\d/.test(text);
+  return !BANNED_FRONT_VOICE.test(text) && !/\$\d/.test(text) && !BLURRED_ICP.test(text);
+}
+
+export function day1IcpWedgeHolds(): boolean {
+  return (
+    ICP_WEDGE_LOCK.primary === '1-3-unit-independents' &&
+    ICP_WEDGE_LOCK.shopClass === 'community-tap' &&
+    ICP_WEDGE_LOCK.firstWin === 'truck-invoice-snap' &&
+    ICP_WEDGE_LOCK.firstWin !== 'order-guide-photo' &&
+    !day1FrontCopyBlob().toLowerCase().includes('order guide') &&
+    !BLURRED_ICP.test(day1FrontCopyBlob())
+  );
 }

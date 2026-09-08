@@ -50,7 +50,7 @@ Optional leftover: `sql/0009_ctap_seat1_seed.sql` seeds operator_id `1000000` fo
 1. `https://www.never86.ai/login` or `/onboard`
 2. Enter `communitypizza2026@gmail.com`
 3. Open the Resend mail **Open owner desk**
-4. Land on `/operator` — plates: schedule, labor cards, menu, order guide + chat composer
+4. Land on `/operator` — plates: schedule, labor cards, menu, invoice / truck + chat composer
 
 ## Honest leftovers
 

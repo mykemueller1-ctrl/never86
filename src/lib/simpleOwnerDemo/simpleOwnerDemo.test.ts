@@ -292,6 +292,7 @@ describe('compose never invents a close', () => {
     expect(facts).toMatch(/truck ticket or invoice/i);
     expect(facts).not.toMatch(/order guide first/i);
     expect(facts).not.toMatch(/Snap this week/i);
+    expect(facts).not.toMatch(/tasting[- ]menu|command center|drive-?thru/i);
     expect(answer.inventedClose).toBe(false);
     expect(answer.verifiedClose).toBe(false);
   });

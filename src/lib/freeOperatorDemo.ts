@@ -339,9 +339,9 @@ export function chipForSlug(slug: string): (typeof FREE_OPERATOR_CHIPS)[number] 
 }
 
 const CHIP_HINTS: Record<FreeOperatorChipId, readonly string[]> = {
-  foh: ['front of house', 'foh', 'void', 'till', 'comp', 'guest', 'cash drawer'],
-  boh: ['back of house', 'boh', 'invoice', 'food cost', 'prep', 'count', 'cogs', '86', 'eighty six'],
-  schedule: ['schedule', 'labor', 'hours', 'clock', 'overtime', 'shift'],
+  foh: ['front of house', 'foh', 'void', 'till', 'comp', 'guest', 'cash drawer', 'bartender', 'drawer', 'leak', 'theft'],
+  boh: ['back of house', 'boh', 'invoice', 'food cost', 'prep', 'count', 'cogs', '86', 'eighty six', 'books', 'p&l', 'pnl', '30-60-90', '30 60 90'],
+  schedule: ['schedule', 'labor', 'hours', 'clock', 'overtime', 'shift', 'hats', 'too many hats'],
   vendor: ['vendor', 'silence', 'truck', 'cadence', 'delivery', 'sysco', 'us foods'],
   merchant: [
     'merchant',

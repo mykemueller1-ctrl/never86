@@ -22,7 +22,15 @@ Secondary choices stay floor nouns only. One pick → one action.
 | Fee line | Ask the DoorDash take on the fee line |
 | What's 86'd | Ask what's 86'd |
 
-Do **not** default to “snap this week’s order guide.” Order guide is a later folder, not day-1 ownership.
+Do **not** default to “snap this week’s order guide.” Order guide is a later folder, not day-1 ownership. Internal plate id is `invoice-truck`. Leftover `order-guide` normalizes to it.
+
+## ICP wedge (shop class only)
+
+Primary desk is for **1–3 unit independents** — sports bar / pizza / casual tavern (Community Tap class). Coach speaks paper invoices, labor schedule chaos, menu/86 drift, and fee fatigue.
+
+**Not primary:** fine dining tasting-menu, enterprise franchise Command Center, pure QSR drive-thru.
+
+First win stays the truck / invoice snap. Do **not** revive Stream A’s “first win = order-guide photo” or “Paper invoices. One photo. This gets your mess.” as the lead ask.
 
 ## LOM
 
@@ -77,19 +85,25 @@ No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 | Lock | File |
 |---|---|
-| Open ask + soft default + floor picks | `src/lib/day1Coach.ts` |
+| Open ask + soft default + floor picks + ICP wedge | `src/lib/day1Coach.ts` |
+| Invoice / truck plate (legacy `order-guide`) | `src/lib/operatorV2.ts` |
 | LOM UI | `src/components/FreeOperatorPhone.tsx` |
 | Adult tray chrome | `src/lib/freeOperatorDemo.ts` · `src/app/globals.css` |
 | Vendor cadence | `config/ctap-vendor-cadence.json` · `src/lib/vendorCadenceConfig.ts` |
 | Dedup | `src/lib/invoiceIdentity.ts` |
 | Ask copy | `src/lib/simpleOwnerDemo/compose.ts` |
+| Resend invalid-recipient → HTTP 400 | `src/lib/email.ts` · `src/app/api/onboard/request/route.ts` |
 
 ## Voice
 
 Prefer: invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
 
-Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem.
+Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem, Prime Cost Coach, order-guide lead, SaaS tour.
 
 ## Anti-patterns (cut)
 
-Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Order-guide-as-first-aha. Toy emoji bottom nav.
+Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Order-guide-as-first-aha. Conversation-first hero that hides Snap. Toy emoji bottom nav.
+
+## Hold
+
+PR #224 Stream A locks stay on HOLD. Shop-class wedge (1–3 unit independent / Community Tap) may be absorbed. Do **not** merge Stream A’s order-guide-as-first-aha or “This gets your mess” lead into this screen.

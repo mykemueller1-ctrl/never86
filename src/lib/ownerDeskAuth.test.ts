@@ -70,6 +70,7 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('firstPhotoWinLine');
     expect(phone).not.toContain('Prime Cost Coach');
     expect(phone).not.toMatch(/Snap this week’s order guide/);
+    expect(phone).not.toMatch(/Snap this week’s order guide/);
     expect(phone).toContain('PUBLIC_PREVIEW_COPY');
     expect(phone).not.toMatch(/UPLOAD PAYROLL CSV/);
     expect(phone).not.toMatch(/RUN SAMPLE/);

@@ -850,6 +850,14 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.82);
 }
+.owner-desk-identity {
+  margin-top: 0.85rem;
+  max-width: 28rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.46);
+}
 .owner-desk-win {
   margin-top: 1.15rem;
   padding: 1rem 1.1rem 1.05rem;

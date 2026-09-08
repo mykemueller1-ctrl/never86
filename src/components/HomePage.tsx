@@ -41,7 +41,7 @@ export default function Home() {
               <span className="block italic text-[#005de8]">Run the fix.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#514b43] md:text-xl">
-              Paper-shop folders first: schedule, labor cards, menu, order guide. Photo the week. Labor cards name roles. Daily compare to the clock. Never 86&apos;d reads the evidence and gives you one move with the receipt attached.
+              Paper-shop folders first: schedule, labor cards, menu, invoice / truck. Photo the week. Labor cards name roles. Daily compare to the clock. Never 86&apos;d reads the evidence and gives you one move with the receipt attached.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>

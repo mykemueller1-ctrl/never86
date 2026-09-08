@@ -16,8 +16,8 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
   const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
   const config = readFileSync(resolve('next.config.js'), 'utf8');
 
-  it('names schedule, labor cards, menu, and order guide as the operator OS', () => {
-    expect(home).toMatch(/Paper-shop folders first: schedule, labor cards, menu, order guide/);
+  it('names schedule, labor cards, menu, and invoice / truck as the operator OS', () => {
+    expect(home).toMatch(/Paper-shop folders first: schedule, labor cards, menu, invoice \/ truck/);
     expect(home).toMatch(/Labor cards name roles/);
     expect(home).toMatch(/Daily compare to the clock/);
     expect(home).toMatch(/punch ≠ schedule/);
