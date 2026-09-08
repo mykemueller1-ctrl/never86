@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminBearerOk } from '@/lib/adminBearerAuth';
+import { adminOk } from '@/lib/adminBearerAuth';
 import { ensureFreeSeatSchema } from '@/lib/ensureFreeSeatSchema';
 
 export const runtime = 'nodejs';
@@ -7,10 +7,11 @@ export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/apply-free-seat
- * Explicit Neon DDL apply. Auth: Bearer CRON_SECRET or Bearer ADMIN_API_SECRET.
+ * Explicit Neon DDL apply. Auth: Bearer CRON_SECRET, Bearer ADMIN_API_SECRET,
+ * n86_admin_auth cookie, or signed owner n86_operator session.
  */
 export async function POST(req: NextRequest) {
-  if (!adminBearerOk(req)) {
+  if (!(await adminOk(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {

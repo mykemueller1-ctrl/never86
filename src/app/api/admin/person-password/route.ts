@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminBearerOk } from '@/lib/adminBearerAuth';
+import { adminOk } from '@/lib/adminBearerAuth';
 import { copyPersonPasswordHash, setAdminPersonPassword } from '@/lib/personAuth';
 import { neonConfigured } from '@/lib/operatorActivation';
 
@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 // CoS/Build: set the ONE shared password for an existing person email.
 // Does not mint plus-alias seats. Does not create a new store.
 export async function POST(req: NextRequest) {
-  if (!adminBearerOk(req)) {
+  if (!(await adminOk(req))) {
     return NextResponse.json({ success: false, error: 'Not authorized.' }, { status: 401 });
   }
   if (!neonConfigured()) {
