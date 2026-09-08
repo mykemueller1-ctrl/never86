@@ -40,7 +40,7 @@ export type PickSeatResult =
   | { ok: false; code: 'none' | 'pick_store' | 'unknown_store'; seats: AccessibleSeat[] };
 
 export type SetSharedPasswordResult =
-  | { ok: true }
+  | { ok: true; retiredEmail?: string; nativeRetired?: boolean }
   | { ok: false; error: string; status: number };
 
 export function isPlusAliasEmail(email: string): boolean {

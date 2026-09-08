@@ -33,14 +33,15 @@ export async function POST(req: NextRequest) {
   if (!result.ok) {
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });
   }
+  const retiredEmail: string | undefined = result.retiredEmail;
   return NextResponse.json({
     success: true,
     email: email.trim().toLowerCase(),
     operatorId,
     detached: detach || retire,
     retired: retire,
-    ...('nativeRetired' in result
-      ? { nativeRetired: result.nativeRetired, retiredEmail: result.retiredEmail }
+    ...(retiredEmail
+      ? { nativeRetired: result.nativeRetired === true, retiredEmail }
       : {}),
   });
 }
