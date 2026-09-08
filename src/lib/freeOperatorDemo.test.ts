@@ -225,7 +225,8 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
     expect(ui).toContain('DAY1_OPEN_ASK');
-    expect(ui).toContain('DAY1_OPEN_ENERGY');
+    expect(ui).toContain('DAY1_SUBLINE');
+    expect(ui).toContain('DAY1_MISSING_SPINE');
     expect(ui).toContain('DAY1_HELP_ENERGY');
     expect(ui).toContain('DAY1_IDENTITY_LINE');
     expect(ui).toContain('DAY1_PREVIEW_CONTRACT');
@@ -249,8 +250,13 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).not.toMatch(/\$[\d,]+/);
     expect(ui).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
-    expect(deskCss).toMatch(/#0066ff/);
-    expect(deskCss).toMatch(/#003bb5/);
+    expect(deskCss).toMatch(/#0B0D10/);
+    expect(deskCss).toMatch(/#1A1F26/);
+    expect(deskCss).toMatch(/#C9A46B/);
+    expect(deskCss).not.toMatch(/#0066ff|#003bb5/);
+    expect(deskCss).toMatch(/owner-desk-watermark/);
+    expect(deskCss).toMatch(/owner-desk-missing-rail/);
+    expect(deskCss).toMatch(/owner-desk-store/);
     expect(deskCss).toMatch(/\.owner-desk-tray\[hidden\]/);
     expect(deskCss).toMatch(/display:\s*none\s*!important/);
     expect(deskCss).toMatch(/\.owner-desk-tray-label/);

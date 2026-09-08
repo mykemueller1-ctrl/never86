@@ -13,22 +13,26 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
-import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
+import { CTAP_SEAT1_PUBLIC_LABEL, CTAP_SEAT1_RESTAURANT_DEFAULT } from '@/lib/ctapSeat1';
 import {
   DAY1_FRONT_PICKS,
   DAY1_HELP_ENERGY,
   DAY1_HOOK_PLATE_ID,
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PLATE_ID,
+  DAY1_MISSING_SPINE,
   DAY1_OPEN_ASK,
-  DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
+  DAY1_STORE_NAME_FALLBACK,
+  DAY1_SUBLINE,
   day1CoachById,
   day1FrontNeedsPhoto,
   day1HookCoach,
+  day1MissingSpineCopy,
   firstPhotoWinLine,
   type Day1FrontPick,
   type Day1FrontPickId,
+  type Day1MissingSpine,
 } from '@/lib/day1Coach';
 import {
   OPERATOR_V2_PLATES,
@@ -91,6 +95,8 @@ export function FreeOperatorPhone() {
   const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
   const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
+  const [paperPath, setPaperPath] = useState(false);
+  const [storeName, setStoreName] = useState(DAY1_STORE_NAME_FALLBACK);
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -104,7 +110,7 @@ export function FreeOperatorPhone() {
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
   const firstScreen = filled.size === 0 && view === 'home' && !winLine;
-  const needsPhoto = !firstScreen || day1FrontNeedsPhoto(frontPath);
+  const needsPhoto = !firstScreen || paperPath || day1FrontNeedsPhoto(frontPath);
   const hookAsk = firstScreen
     ? DAY1_OPEN_ASK
     : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
@@ -130,6 +136,15 @@ export function FreeOperatorPhone() {
         applyReadiness(body.readiness);
       } catch {
         if (!cancelled) setFlash('Readiness could not load. Try again.');
+      }
+      try {
+        const desk = await fetch('/api/desk', { method: 'GET' });
+        const body = (await desk.json()) as { success?: boolean; restaurantName?: string | null };
+        if (cancelled) return;
+        const named = body.restaurantName?.trim();
+        if (desk.ok && body.success && named) setStoreName(named);
+      } catch {
+        /* public seat keeps Community Tap */
       }
     })();
     return () => {
@@ -189,6 +204,7 @@ export function FreeOperatorPhone() {
   function onFrontPick(pick: Day1FrontPick) {
     setFrontPath(pick.id);
     setAsk(pick.followUp ?? pick.ask);
+    if (pick.action === 'photo') setPaperPath(true);
     trackEvent('operator_day1_front_pick', { pagePath: '/operator', meta: { pick: pick.id, action: pick.action } });
     if (pick.action === 'photo') {
       setActiveFolder(DAY1_INVOICE_PLATE_ID);
@@ -196,6 +212,14 @@ export function FreeOperatorPhone() {
       return;
     }
     void goAsk(pick.ask, 'type');
+  }
+
+  function onMissingSpine(row: Day1MissingSpine) {
+    setPaperPath(true);
+    setActiveFolder(row.plateId);
+    setAsk(`Bring the paper for ${row.label}.`);
+    if (!firstScreen) onTray(row.tray);
+    trackEvent('operator_day1_missing_spine', { pagePath: '/operator', meta: { spine: row.id, tray: row.tray } });
   }
 
   function onTray(next: OwnerDeskTrayId) {
@@ -293,20 +317,68 @@ export function FreeOperatorPhone() {
 
   return (
     <div className={`owner-desk ${filled.size === 0 ? 'is-first-win' : 'is-winning'}`}>
+      <div className="owner-desk-watermark" aria-hidden>
+        <img src="/brand/n86-mark.svg" alt="" className="owner-desk-watermark-mark" />
+        <span className="owner-desk-watermark-word">Never86</span>
+      </div>
+
       <header className="owner-desk-top">
         <div className="owner-desk-hello">
           <div>
-            <p className="owner-desk-hello-line">{greeting()}.</p>
-            <p className="owner-desk-hello-store">{CTAP_SEAT1_PUBLIC_LABEL}</p>
+            <p className="owner-desk-store" title={CTAP_SEAT1_PUBLIC_LABEL}>
+              {storeName || CTAP_SEAT1_RESTAURANT_DEFAULT}
+            </p>
+            <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>
           <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
             1
           </Link>
         </div>
+      </header>
 
-        <div className="owner-desk-chips" aria-label={firstScreen ? 'Floor asks' : 'Day-1 coach chips'}>
-          {firstScreen
-            ? DAY1_FRONT_PICKS.map((pick) => (
+      <div className="owner-desk-stage">
+        <aside className="owner-desk-missing-rail" aria-label="Missing honesty spine">
+          <p className="owner-desk-missing-kicker">Missing</p>
+          {DAY1_MISSING_SPINE.map((row) => {
+            const copy = day1MissingSpineCopy(row.id, filled);
+            const isMissing = copy === 'Missing / bring a paper';
+            return (
+              <button
+                key={row.id}
+                type="button"
+                className={`owner-desk-missing-row ${isMissing ? 'is-missing' : 'is-paper'}`}
+                onClick={() => onMissingSpine(row)}
+              >
+                <span className="owner-desk-missing-label">{row.label}</span>
+                <span className="owner-desk-missing-state">{copy}</span>
+              </button>
+            );
+          })}
+        </aside>
+
+        <div className="owner-desk-main">
+      {view === 'home' ? (
+        <section className="owner-desk-lom">
+          <p className="owner-desk-kicker">{firstScreen ? 'Operator desk' : weekdayLabel()}</p>
+          <h1 className="owner-desk-ask-title">{hookAsk}</h1>
+          {winLine ? (
+            <div className="owner-desk-win" role="status">
+              <p className="owner-desk-win-mark">Ready</p>
+              <p className="owner-desk-win-line">{winLine}</p>
+            </div>
+          ) : (
+            <p className="owner-desk-poetry">
+              {firstScreen
+                ? frontPath && !needsPhoto
+                  ? DAY1_PREVIEW_CONTRACT
+                  : DAY1_SUBLINE
+                : hook.attachHint}
+            </p>
+          )}
+          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+          {firstScreen && !paperPath ? (
+            <div className="owner-desk-chips" aria-label="Floor asks">
+              {DAY1_FRONT_PICKS.filter((pick) => pick.action !== 'photo').map((pick) => (
                 <button
                   key={pick.id}
                   type="button"
@@ -315,8 +387,11 @@ export function FreeOperatorPhone() {
                 >
                   {pick.chip}
                 </button>
-              ))
-            : folders.map((folder) => {
+              ))}
+            </div>
+          ) : !firstScreen ? (
+            <div className="owner-desk-chips" aria-label="Day-1 coach chips">
+              {folders.map((folder) => {
                 const coach = day1CoachById(folder.id);
                 return (
                   <button
@@ -332,28 +407,8 @@ export function FreeOperatorPhone() {
                   </button>
                 );
               })}
-        </div>
-      </header>
-
-      {view === 'home' ? (
-        <section className="owner-desk-lom">
-          <p className="owner-desk-kicker">{weekdayLabel()}</p>
-          <h1 className="owner-desk-ask-title">{hookAsk}</h1>
-          {winLine ? (
-            <div className="owner-desk-win" role="status">
-              <p className="owner-desk-win-mark">Ready</p>
-              <p className="owner-desk-win-line">{winLine}</p>
             </div>
-          ) : (
-            <p className="owner-desk-poetry">
-              {firstScreen
-                ? frontPath && !needsPhoto
-                  ? DAY1_PREVIEW_CONTRACT
-                  : DAY1_OPEN_ENERGY
-                : hook.attachHint}
-            </p>
-          )}
-          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+          ) : null}
           {needsPhoto ? (
             <>
               <button
@@ -420,8 +475,8 @@ export function FreeOperatorPhone() {
           </div>
 
           <article className="owner-desk-card mt-5">
-            <h2 className="text-lg font-semibold text-[#06122b]">Roles on the card</h2>
-            <p className="mt-1 text-sm text-[#3d4d73]">
+            <h2 className="text-lg font-semibold text-[#f4f1ea]">Roles on the card</h2>
+            <p className="mt-1 text-sm text-[#8B949E]">
               Labor cards name seats, not people. FOH, Line, Dish, Run spawn from the week schedule.
             </p>
             <div className="owner-v2-roles mt-4">
@@ -448,8 +503,8 @@ export function FreeOperatorPhone() {
           </article>
 
           <article className="owner-desk-card owner-desk-card-peach mt-4">
-            <h2 className="text-lg font-semibold text-[#06122b]">Daily compare</h2>
-            <p className="mt-1 text-sm text-[#3d4d73]">
+            <h2 className="text-lg font-semibold text-[#f4f1ea]">Daily compare</h2>
+            <p className="mt-1 text-sm text-[#8B949E]">
               Early leave, late leave, and labor drift vs the posted card. No invented overtime.
             </p>
             <ul className="mt-4 space-y-2">
@@ -460,9 +515,9 @@ export function FreeOperatorPhone() {
                       {chip.state === 'READY' ? '✓' : '◷'}
                     </span>
                     <span className="text-left">
-                      <span className="block font-semibold text-[#06122b]">{chip.label}</span>
-                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.rule}</span>
-                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.reason}</span>
+                      <span className="block font-semibold text-[#f4f1ea]">{chip.label}</span>
+                      <span className="mt-1 block text-sm text-[#8B949E]">{chip.rule}</span>
+                      <span className="mt-1 block text-sm text-[#8B949E]">{chip.reason}</span>
                     </span>
                   </div>
                 </li>
@@ -529,7 +584,7 @@ export function FreeOperatorPhone() {
                 N86
               </span>
               <div>
-                <p className="text-sm leading-relaxed text-[#06122b]">
+                <p className="text-sm leading-relaxed text-[#f4f1ea]">
                   {view === 'food'
                     ? 'Picture the menu and a truck ticket or invoice. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
@@ -553,6 +608,8 @@ export function FreeOperatorPhone() {
           {localName} · stored on this seat · source-tagged
         </p>
       ) : null}
+        </div>
+      </div>
 
       <div className="owner-desk-mouth">
         <form
