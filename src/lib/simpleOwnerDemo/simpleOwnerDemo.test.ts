@@ -99,7 +99,8 @@ describe('simple owner demo readiness', () => {
   it('treats leftover stored order-guide evidence as invoice / truck Ready', () => {
     const leftover = readinessFromUploads('demo:a', [fakeUpload('demo:a', 'order-guide', 'old-ticket.jpg')]);
     expect(leftover.folders.find((folder) => folder.id === 'invoice-truck')?.state).toBe('READY');
-    expect(leftover.folders.find((folder) => folder.id === 'order-guide')).toBeUndefined();
+    const folderIds: string[] = leftover.folders.map((folder) => folder.id);
+    expect(folderIds).not.toContain('order-guide');
   });
 });
 
