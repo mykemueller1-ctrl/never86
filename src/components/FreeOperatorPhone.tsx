@@ -97,9 +97,7 @@ export function FreeOperatorPhone() {
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
   const firstScreen = filled.size === 0 && view === 'home' && !winLine;
-  const hookAsk = firstScreen
-    ? DAY1_OPEN_ASK
-    : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
+  const hookAsk = view === 'home' ? DAY1_OPEN_ASK : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
 
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
@@ -270,9 +268,11 @@ export function FreeOperatorPhone() {
       setWinLine(win);
       setFlash(win ?? `${body.upload?.filename ?? file.name} is on this seat.`);
       if (body.readiness?.folders) {
-        const nextHook = day1HookCoach(filledPlateIds(body.readiness.folders));
-        setActiveFolder(nextHook.id);
-        setAsk(nextHook.ask);
+        const ready = filledPlateIds(body.readiness.folders);
+        if (ready.size > 1) {
+          const nextHook = day1HookCoach(ready);
+          setActiveFolder(nextHook.id);
+        }
       }
       trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true, win: Boolean(win) } });
     } catch {
@@ -321,7 +321,7 @@ export function FreeOperatorPhone() {
                       if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
                     }}
                   >
-                    {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
+                    {folder.state === 'READY' ? `${coach?.label ?? folder.label} ✓` : coach?.chip ?? folder.label}
                   </button>
                 );
               })}
@@ -481,7 +481,7 @@ export function FreeOperatorPhone() {
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Menu & order guides' : 'Beverage margin'}
+            {view === 'food' ? 'Menu & invoices' : 'Beverage margin'}
           </h1>
           <p className="mt-2 text-sm text-white/80">
             Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
@@ -515,7 +515,7 @@ export function FreeOperatorPhone() {
               <div>
                 <p className="text-sm leading-relaxed text-[#06122b]">
                   {view === 'food'
-                    ? 'Picture the menu and the order guide. Top plates first. Missing count stays Missing Evidence.'
+                    ? 'Picture the menu and the ticket. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">

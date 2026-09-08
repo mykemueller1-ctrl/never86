@@ -60,8 +60,8 @@ export const OPERATOR_V2_PLATES: readonly OperatorV2Plate[] = [
   },
   {
     id: 'order-guide',
-    label: 'Order guide',
-    folder: 'Order guides',
+    label: 'Invoice / truck',
+    folder: 'Invoices / truck',
     ask: 'Got a truck ticket or invoice? Snap it.',
     tray: 'food',
     missingUntil: 'A truck ticket, liquor invoice, or handwritten short lands. Invoice ≠ COGS.',
