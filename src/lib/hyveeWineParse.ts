@@ -2,7 +2,8 @@
  * Hy-Vee Wine & Spirits papers-in (CTAP liquor silo).
  *
  * Loop: order email ↔ yellow CUSTOMER CHARGE slips ↔ delivery invoice.
- * Monday = one check covering that week’s slips + invoice batch.
+ * Monday = owner-email order + one check covering that week’s slips +
+ * invoice batch. M/W/F = photo. Roles, not names, on the desk.
  *
  * Invoice OCR alone → Verified delivered $ / what got.
  * Without email and/or yellow slip → Missing order-match / slip recon.
@@ -289,6 +290,7 @@ export function answerHyveeDeskQuestion(
       ? lineFor(facts.chargeSlip, 'Yellow CUSTOMER CHARGE slip')
       : 'Missing · slip reconciliation stays Missing without the yellow CUSTOMER CHARGE slip.',
     HYVEE_MONDAY_PAY_LOCK,
+    'Monday is the owner-email order. M/W/F is photo. Roles, not names, on the desk.',
     mondayClear
       ? `Verified · Monday one check ${usd(monday!.labeledTotal!)} (labeled check total).`
       : 'Missing · Monday check total is not on this seat. No partial invented from invoices or slips.',

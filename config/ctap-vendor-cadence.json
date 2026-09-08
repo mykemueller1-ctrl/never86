@@ -8,7 +8,8 @@
     "notLivePurchaseOrder": true,
     "noInventedDollars": true,
     "noCo2Lecture": true,
-    "missingIsForgetToSnap": true
+    "missingIsForgetToSnap": true,
+    "posPayoutsUntrustedUntilReceipt": true
   },
   "vendors": [
     {
@@ -18,7 +19,7 @@
       "days": ["Tue"],
       "frequency": "weekly",
       "capture": ["photo"],
-      "notes": ["Miller/Coors", "Tue photo-only", "never emails", "MOD Tue/Wed snap flag", "later wave hook"],
+      "notes": ["Miller/Coors beer", "Tuesday", "Tue photo-only", "never emails", "MOD Tue/Wed snap flag", "later wave hook"],
       "missingNudge": "Fort Dodge (Miller/Coors) is Tuesday photo-only — they never email. MOD: snap Tue, flag Wed if the ticket is still Missing."
     },
     {
@@ -28,8 +29,8 @@
       "days": ["Tue", "Fri"],
       "frequency": "twice-weekly",
       "capture": ["email", "photo"],
-      "notes": ["later wave after PDQ/Hy-Vee", "Tue+Fri", "AP email inbox", "photo OCR backup", "not this draft"],
-      "missingNudge": "Humes is later wave (Tue/Fri). Email the invoice to the AP inbox — or snap the ticket as OCR backup."
+      "notes": ["later wave after PDQ/Hy-Vee", "Tue+Fri", "company AP inbox", "primary vendor-AP inbox", "photo OCR backup", "not this draft"],
+      "missingNudge": "Humes is later wave (Tue/Fri). Email the invoice to the AP inbox — or snap the ticket as OCR backup. Do not print the mailbox."
     },
     {
       "id": "confluence",
@@ -45,11 +46,11 @@
       "id": "hy-vee-wine",
       "label": "Hy-Vee Wine",
       "aliases": ["Hy-Vee", "Hy-Vee Wine", "HyVee"],
-      "days": ["Mon"],
+      "days": ["Mon", "Wed", "Fri"],
       "frequency": "weekly",
       "capture": ["email", "photo"],
-      "notes": ["Wave 0b", "email order", "yellow slips", "invoice OCR", "Monday one check", "not AP"],
-      "missingNudge": "Hy-Vee wine: OCR the order, yellow slip, and invoice into the mess — forget to snap? Monday is one check. Not AP."
+      "notes": ["Wave 0b", "Monday owner-email order", "M/W/F photo", "yellow slips", "invoice OCR", "Monday one check", "not AP"],
+      "missingNudge": "Hy-Vee wine: Monday is the owner-email order. M/W/F is photo. OCR the order, yellow slip, and invoice into the mess — forget to snap? Monday is one check. Not AP."
     },
     {
       "id": "pepsi",
@@ -65,10 +66,10 @@
       "id": "northern-lights",
       "label": "Northern Lights",
       "aliases": ["Northern Lights", "NL"],
-      "days": [],
-      "frequency": "frequent",
+      "days": ["Tue", "Fri"],
+      "frequency": "twice-weekly",
       "capture": ["email", "photo"],
-      "notes": ["inv# dedup primary", "vendor+total red flag", "multi-sender ignore", "later wave hook"],
+      "notes": ["Tue+Fri", "inv# dedup primary", "vendor+total red flag", "multi-sender ignore", "later wave hook"],
       "missingNudge": "Northern Lights: same invoice number is the same ticket — dedup on inv#. Multi-sender copies are ignore. Vendor+total mismatch is a red flag, not a new bill."
     },
     {

@@ -5,6 +5,7 @@ import {
   BOH_SEAT2,
   CTAP_PAPERS_WAVES,
   HUMES_LATER_WAVE,
+  HYVEE_CAPTURE,
   HYVEE_MONDAY_CONFIRMED,
   bohSeat2RequiredForHyvee,
   ctapPapersWaveOrder,
@@ -12,6 +13,7 @@ import {
   humesApInboxLane,
   humesIsThisDraft,
   pdqSalesPrimaryInbox,
+  vendorInvoiceApInboxForTests,
 } from './ctapPapersWave';
 
 describe('CTAP papers wave lock', () => {
@@ -27,9 +29,11 @@ describe('CTAP papers wave lock', () => {
 
   it('locks Humes as later Tue+Fri AP email + photo OCR backup', () => {
     expect([...HUMES_LATER_WAVE.days]).toEqual(['Tue', 'Fri']);
-    expect(humesApInboxLane()).toBe('secondary');
+    expect(humesApInboxLane()).toBe('company-ap');
+    expect(HUMES_LATER_WAVE.vendorInvoiceInboxLane).toBe('primary-vendor-ap');
     expect(HUMES_LATER_WAVE.photoOcrBackup).toBe(true);
     expect(humesApInboxForTests()).toMatch(/@/);
+    expect(vendorInvoiceApInboxForTests()).toMatch(/@/);
   });
 
   it('locks PDQ sales to the primary inbox', () => {
@@ -48,5 +52,7 @@ describe('CTAP papers wave lock', () => {
     expect(HYVEE_MONDAY_CONFIRMED.lock).toBe('one-check');
     expect(HYVEE_MONDAY_CONFIRMED.covers).toMatch(/yellow slips/);
     expect(HYVEE_MONDAY_CONFIRMED.defaultGuess).toBe(false);
+    expect(HYVEE_CAPTURE.mondayOrder).toBe('owner-email');
+    expect([...HYVEE_CAPTURE.photoDays]).toEqual(['Mon', 'Wed', 'Fri']);
   });
 });
