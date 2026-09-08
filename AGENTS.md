@@ -4,27 +4,12 @@ Public site: https://www.never86.ai
 MCP: `https://www.never86.ai/api/mcp`
 `.cursor/mcp.json` already points here. Enable it in Cursor Settings if the cloud agent has not loaded it.
 
-Keys / xAI / Grok factory env: `docs/company/KEYS_ACCESS.md`. Placeholders in `.env.example`. Never commit live secrets. Probe: `npm run keys:probe`.
-
-## WEEK LOCK (2026-09-07) — BINDING
-Read `docs/HARD-TRUTH-PACKET-2026-09-07.md` before any other job.
-Issue: #235.
-One Cursor job: **C1 week-lock-returning-owner**.
-Do not restyle the WOW desk. Do not merge CTap #67/#78 from this repo. Do not open a GPT-6 rewrite. Frozen: peptides, Mad Rat, scout features, Dip Day, fourth repo.
-
-## How we work (locked)
-- **Grok** is the founder front door. Myke talks to Grok on the phone. Grok dispatches Cursor.
-- **Cursor** runs agents, bots, code, tests, and PRs. Cursor does not wait for Myke to merge from a laptop.
-- **Codex** sits outside the factory: reviews Cursor work, keeps logical rails, ships safe branches Cursor may branch from (e.g. `codex/action-shift-122-safe`).
-- One active Cursor factory job at a time. Stop/Archive stuck chats before starting the next.
-- Do **not** merge `cursor/grok-sales-org` dumps or +40k-line reviews into product work.
-
 ## Product
 - Find the leak. Assign the fix. Keep the receipt.
-- **One location + one seat is free.** Extra seats paid. No role controls on free.
+- **One location + one seat is free.** Extra seats paid.
 - Free seat goes **past MarginEdge**. Action Shift: yesterday → one action → night proof.
 - Surface: Z/POS, voids, labor, tips, invoices, vendors, beverage, catering, 3P, shift.
-- **3P is the Google door.** Homepage is the OS. `/trial` is the seat. `/audit` is the 60-second proof.
+- **3P is the Google door.** Homepage is the OS.
 - Not R365's GL. Not Voosh (no merchant portal login).
 
 ## Loop
@@ -36,11 +21,12 @@ capture → parse → truth-gate → normalize → decide (formulas first) → a
 - Shrink the brand to a fee calculator
 - Start a fourth Never86 repo
 - Auto-send mail or post
-- Invent DB columns — confirm live schema first
-- Bundle hunter / sales-org MCP into the operator path
+- Invent $ when a rail is empty (Missing only)
+- Paint Community Tap or Fun on a Max / New American Grill seat
 
-## Active job
-**#235 / C1** — returning owner lands on `/operator`, not Claim Seat.
-Monday gate #118 still stands underneath that: stranger can join → verify email → activate one store → submit yesterday's close → ≤3 source-labeled actions → night proof.
+## Binding this week
+- `docs/MAX-NAG-HALLUCINATION-TEST.md` — Max/NAG load-and-break. Myke drops files. No bot Toast dump.
+- `docs/MAIN-BOT-PASTE-MAX-NAG.md` / `docs/CURSOR-PASTE-MAX-NAG.md`
+- One Cursor job: returning-owner desk. #234 draft. #224 HOLD. #214 is login, not magic links.
 
-Free seat runs on **Neon**. Do not paste `DATABASE_URL`.
+Active job: issue #122 plus the Max/NAG test issue. docs/CURSOR-GTM.md. docs/STACK-MAP.md.
