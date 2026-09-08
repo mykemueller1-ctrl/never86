@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SimpleOwnerDemo } from '@/components/FreeOperatorPhone';
+import OperatorStoreSwitcher from '@/components/OperatorStoreSwitcher';
 import { isCtapSeat1Email } from '@/lib/ctapSeat1';
 import { readOperatorSession } from '@/lib/readOperatorSession';
 import { deskSeatLabel } from '@/lib/seatIsolation';
@@ -29,6 +30,7 @@ export default async function OperatorPhonePage() {
 
   return (
     <main className="owner-desk-page min-h-screen">
+      <OperatorStoreSwitcher />
       <SimpleOwnerDemo initialRestaurantName={initialRestaurantName} signedIn={Boolean(session)} />
     </main>
   );

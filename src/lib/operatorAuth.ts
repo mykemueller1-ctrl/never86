@@ -90,3 +90,25 @@ export async function operatorExists(operatorId: number): Promise<boolean> {
     select true as ok from operator_users where id = ${operatorId} limit 1`;
   return rows.length > 0;
 }
+
+/** OPS restaurant label for an operator id. Null if OPS is off or missing. */
+export async function findOpsOperatorName(operatorId: number): Promise<string | null> {
+  if (!opsDbConfigured()) return null;
+  const sql = opsDb();
+  const rows = await sql<{ name: string | null }[]>`
+    select coalesce(restaurant_name, name) as name
+    from operator_users where id = ${operatorId} limit 1`;
+  return rows[0]?.name ?? null;
+}
+
+/** Update the OPS hash for an existing email. Does not mint a new OPS row. */
+export async function updateOpsPasswordByEmail(email: string, password: string): Promise<boolean> {
+  if (!opsDbConfigured()) return false;
+  const sql = opsDb();
+  const hash = hashPassword(password);
+  const rows = await sql<{ id: number }[]>`
+    update operator_credentials set password_hash = ${hash}
+    where lower(email) = lower(${email})
+    returning id`;
+  return rows.length > 0;
+}

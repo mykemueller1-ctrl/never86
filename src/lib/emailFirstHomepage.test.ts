@@ -34,6 +34,9 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
 
   it('tells strangers to watch the recorded demo, then give their email', () => {
     expect(home).toMatch(/Watch the recorded demo, then give your email/);
+    expect(home).toMatch(/Set a password once/);
+    expect(home).toMatch(/\/login is the daily door/);
+    expect(home).not.toMatch(/The magic link is the door/);
     expect(home).toMatch(/id="demo"/);
     expect(home).toMatch(/homeDemoVideoReady/);
     expect(home).toContain('/onboard');

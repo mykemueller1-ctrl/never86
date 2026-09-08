@@ -3,17 +3,27 @@ import { escapeHtml } from './escapeHtml';
 /** Void Hunter blue. Magic-link mail and owner-desk first paint use this only. */
 export const VOID_HUNTER_BLUE = '#0066ff';
 
+/**
+ * Shared client/server minimum for a self-service person password.
+ * Import this everywhere a password length is validated so the form and
+ * setters never drift.
+ */
+export const MIN_FREE_SEAT_PASSWORD_LEN = 8;
+
+/** Upper bound so an oversized password cannot burn CPU in scrypt (DoS). */
+export const MAX_FREE_SEAT_PASSWORD_LEN = 128;
+
 /** Signed-in owner first paint — SimpleOwnerDemo chat, not the card picker. */
 export const OWNER_DESK_PATH = '/operator' as const;
 
 export const OWNER_DESK_POST_AUTH_REDIRECT = OWNER_DESK_PATH;
 
-export const OWNER_DESK_EMAIL_SUBJECT = 'Open your owner desk.';
-export const OWNER_DESK_EMAIL_CTA = 'Open owner desk';
+export const OWNER_DESK_EMAIL_SUBJECT = 'Set your password once.';
+export const OWNER_DESK_EMAIL_CTA = 'Set your password';
 export const OWNER_DESK_EMAIL_KICKER = "Never 86'd · Owner desk";
-export const OWNER_DESK_EMAIL_HEADLINE = 'Open your owner desk.';
+export const OWNER_DESK_EMAIL_HEADLINE = 'Set your password once.';
 export const OWNER_DESK_EMAIL_BODY =
-  "Your free owner seat is ready. Ask what's going on in your restaurant — talk, type, photo, or file. Seat 1 stays free. No password. No sales call.";
+  'Click the link and choose a password. After that, sign in at /login with this email and that password. Same login opens every store on this email. Seat 1 stays free. No sales call.';
 
 const FORBIDDEN_EMAIL_COLORS = [
   '#d4a017',

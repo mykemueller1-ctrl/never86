@@ -603,14 +603,16 @@ export const seatActivationTokens = pgTable('seat_activation_tokens', {
 
 export const seatOperators = pgTable('seat_operators', {
   id: serial('id').primaryKey(),
-  email: text('email').notNull().unique(),
+  email: text('email').notNull(),
   name: text('name'),
   restaurantName: text('restaurant_name').notNull(),
   sourcePage: text('source_page'),
   consentAt: timestamp('consent_at').defaultNow().notNull(),
   activatedAt: timestamp('activated_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('seat_operators_email_idx').on(table.email),
+]);
 
 export const seatLocations = pgTable('seat_locations', {
   id: serial('id').primaryKey(),
@@ -624,11 +626,40 @@ export const seatLocations = pgTable('seat_locations', {
 export const seatCredentials = pgTable('seat_credentials', {
   id: serial('id').primaryKey(),
   operatorId: integer('operator_id').notNull(),
-  email: text('email').notNull().unique(),
+  email: text('email').notNull(),
   passwordHash: text('password_hash').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   lastLoginAt: timestamp('last_login_at'),
+  // Null until the person sets their own password. Activation writes an
+  // unusable random placeholder, so this column gates email+password vs link.
+  passwordSetAt: timestamp('password_set_at'),
+}, (table) => [
+  uniqueIndex('seat_credentials_one_per_operator_idx').on(table.operatorId),
+  index('seat_credentials_email_idx').on(table.email),
+]);
+
+/** One password hash per person email. Shared across every attached store. */
+export const seatPersonPasswords = pgTable('seat_person_passwords', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  passwordSetAt: timestamp('password_set_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  lastLoginAt: timestamp('last_login_at'),
 });
+
+/**
+ * Extra isolated operator seats this email may open. Does not merge stores.
+ * CTAP stays its operatorId; Max Grill stays its operatorId.
+ */
+export const seatPersonAccess = pgTable('seat_person_access', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull(),
+  operatorId: integer('operator_id').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('seat_person_access_email_operator_idx').on(table.email, table.operatorId),
+]);
 
 export const seatAuthAttempts = pgTable('seat_auth_attempts', {
   id: serial('id').primaryKey(),
@@ -683,6 +714,8 @@ export type SeatActivationToken = typeof seatActivationTokens.$inferSelect;
 export type SeatOperator = typeof seatOperators.$inferSelect;
 export type SeatLocation = typeof seatLocations.$inferSelect;
 export type SeatCredential = typeof seatCredentials.$inferSelect;
+export type SeatPersonPassword = typeof seatPersonPasswords.$inferSelect;
+export type SeatPersonAccess = typeof seatPersonAccess.$inferSelect;
 export type SeatIntakeEvent = typeof seatIntakeEvents.$inferSelect;
 export type SeatClose = typeof seatCloses.$inferSelect;
 export type SeatProof = typeof seatProofs.$inferSelect;

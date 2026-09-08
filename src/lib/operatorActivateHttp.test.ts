@@ -73,12 +73,12 @@ describe('activate HTTP cookie plane', () => {
     const poisonedRedirect = decideActivateClientOutcome({
       httpOk: false,
       success: false,
-      error: 'This email already has a free seat at Community Tap. Extra stores are paid expansion.',
+      error: 'This activation link is invalid.',
       redirect: '/operator',
     });
     expect(poisonedRedirect).toEqual({
       kind: 'error',
-      message: 'This email already has a free seat at Community Tap. Extra stores are paid expansion.',
+      message: 'This activation link is invalid.',
     });
 
     const alreadyUsed = decideActivateClientOutcome({
@@ -101,7 +101,8 @@ describe('activate HTTP cookie plane', () => {
     expect(client).toContain('ACTIVATE_FAILURE_LOGOUT_PATH');
     expect(http).toContain(`'${ACTIVATE_FAILURE_LOGOUT_PATH}'`);
     expect(client).toMatch(/if \(outcome\.kind === 'error'\)/);
-    expect(client).toMatch(/window\.location\.replace\(outcome\.href\)/);
+    expect(client).toMatch(/setRedirect\(outcome\.href\)/);
+    expect(client).toMatch(/window\.location\.replace\(redirect\)/);
     expect(client).not.toMatch(/window\.location\.replace\(data\.redirect/);
     expect(client).not.toMatch(/window\.location\.assign/);
     expect(ACTIVATE_FAILURE_LOGOUT_PATH).toBe('/api/operator/logout');

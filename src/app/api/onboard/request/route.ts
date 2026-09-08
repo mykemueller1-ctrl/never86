@@ -4,6 +4,8 @@ import {
   activationEmailConfigured,
   activationEmailUnavailable,
   classifyActivationEmailFailure,
+  isResetActivationSource,
+  listNeonOperatorsForEmail,
   normalizeEmail,
   publicActivationAccepted,
   requestOperatorActivation,
@@ -23,6 +25,7 @@ const bodySchema = z.object({
   restaurantName: z.string().min(1).max(120).optional(),
   storeName: z.string().min(1).max(120).optional(),
   sourcePage: z.string().optional(),
+  purpose: z.enum(['activate', 'reset']).optional(),
 });
 
 class ActivationEmailSendError extends Error {
@@ -62,8 +65,18 @@ export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const data = bodySchema.parse(json);
-    const restaurantName = (data.restaurantName || data.storeName || '').trim().replace(/\s+/g, ' ');
-    if (!restaurantName) {
+    const resetOnly = data.purpose === 'reset' || isResetActivationSource(data.sourcePage);
+    let restaurantName = (data.restaurantName || data.storeName || '').trim().replace(/\s+/g, ' ');
+    if (resetOnly) {
+      const existing = await listNeonOperatorsForEmail(data.email);
+      if (existing.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'No seat on this email yet. Claim one at /onboard.', code: 'no_seat' },
+          { status: 404 },
+        );
+      }
+      if (!restaurantName) restaurantName = existing[0].restaurantName;
+    } else if (!restaurantName) {
       return NextResponse.json(
         { success: false, error: 'Enter your email and store name.' },
         { status: 400 },
@@ -84,7 +97,7 @@ export async function POST(req: NextRequest) {
       email: data.email,
       name: data.name,
       restaurantName,
-      sourcePage: data.sourcePage ?? '/onboard',
+      sourcePage: resetOnly ? '/login/reset' : (data.sourcePage ?? '/onboard'),
       requestIp,
       userAgent: req.headers.get('user-agent') ?? undefined,
     });

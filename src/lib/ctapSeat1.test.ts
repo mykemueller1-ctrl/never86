@@ -31,6 +31,10 @@ describe('CTAP seat 1 canary', () => {
     expect(restaurantNameForSeatClaim('grill@example.com', 'New American Grill')).toBe(
       'New American Grill',
     );
+    expect(restaurantNameForSeatClaim('mykemueller1@gmail.com', 'New American Grill')).toBe(
+      'New American Grill',
+    );
+    expect(restaurantNameForSeatClaim('ktmaduna@gmail.com', 'Community Tap')).toBe('Community Tap');
   });
 
   it('applies the CTAP restaurant override on exact-match email only', () => {
