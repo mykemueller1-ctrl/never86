@@ -106,11 +106,42 @@ export function composeAskAnswer(input: {
   uploads: readonly SimpleOwnerUploadRecord[];
 }): SimpleOwnerAskAnswer {
   const qLower = input.question.toLowerCase();
-  const hyveeFacts = collectHyveeFacts(input.uploads);
-  const hyveeKind = routeHyveeDeskQuestion(input.question);
+  const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId);
   const clearlyHyvee = /hy[\s-]*vee|winespirits|wine & spirits|yellow slip|customer charge|monday batch|monday check|one check/.test(
     qLower,
   );
+  const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown|food today|net sales yesterday|yesterday(?:'s)? (?:net )?sales/.test(
+    qLower,
+  );
+
+  // Wave 0: PDQ mornings first. Hy-Vee 0b is next. Not Humes-first.
+  const pdqFacts = collectPdqFacts(input.uploads);
+  const pdqKind = routePdqDeskQuestion(input.question);
+  const takePdqMorning = Boolean(pdqKind) && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
+    && (!clearlyHyvee || clearlyPdq);
+  const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts) : null;
+  if (pdqAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...pdqAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: pdqAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${pdqAnswer.slug}` },
+    ];
+    return {
+      slug: pdqAnswer.slug,
+      headline: pdqAnswer.headline,
+      facts: [...pdqAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: pdqAnswer.coachTomorrow,
+      needs: pdqAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: pdqAnswer.sampleDollars,
+      verifiedClose: pdqAnswer.verifiedClose,
+    };
+  }
+
+  const hyveeFacts = collectHyveeFacts(input.uploads);
+  const hyveeKind = routeHyveeDeskQuestion(input.question);
   const hyveeAnswer =
     hyveeKind && (hyveeFacts.hasHyvee || clearlyHyvee)
       ? answerHyveeDeskQuestion(input.question, hyveeFacts)
@@ -132,36 +163,6 @@ export function composeAskAnswer(input: {
       inventedClose: false,
       sampleDollars: hyveeAnswer.sampleDollars,
       verifiedClose: hyveeAnswer.verifiedClose,
-    };
-  }
-
-  const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId);
-  const pdqFacts = collectPdqFacts(input.uploads);
-  const pdqKind = routePdqDeskQuestion(input.question);
-  const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown|food today|net sales yesterday|yesterday(?:'s)? (?:net )?sales/.test(
-    qLower,
-  );
-  const pdqAnswer =
-    pdqKind && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
-      ? answerPdqDeskQuestion(input.question, pdqFacts)
-      : null;
-  if (pdqAnswer) {
-    const sourceTags: SourceTag[] = [
-      ...pdqAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
-      { tag: pdqAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${pdqAnswer.slug}` },
-    ];
-    return {
-      slug: pdqAnswer.slug,
-      headline: pdqAnswer.headline,
-      facts: [...pdqAnswer.facts, persistFactFor(input.readiness.operatorId)],
-      coachTomorrow: pdqAnswer.coachTomorrow,
-      needs: pdqAnswer.needs,
-      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
-      sourceTags,
-      inventedClose: false,
-      sampleDollars: pdqAnswer.sampleDollars,
-      verifiedClose: pdqAnswer.verifiedClose,
     };
   }
 

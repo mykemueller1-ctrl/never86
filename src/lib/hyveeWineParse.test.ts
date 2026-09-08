@@ -34,6 +34,14 @@ describe('Hy-Vee Wine papers-in parse', () => {
   it('does not detect Humes as Hy-Vee', () => {
     expect(detectHyveeFamily('humes-inv.pdf', 'From: accountspayable@humesdist.com\nInvoice total: $88.00')).toBeNull();
   });
+
+  it('uses the bar-manager order email, not Seat 2 / PFG', () => {
+    const order = parseHyveeWineReport(load('order-email.txt'), 'order-email.txt');
+    expect(order?.family).toBe('order-email');
+    expect(load('order-email.txt')).toMatch(/winespiritsmgr@hy-vee/);
+    expect(load('order-email.txt')).not.toMatch(/pfg|performance food|seat 2|\bTom\b/i);
+    expect(routeHyveeDeskQuestion('What is the Hy-Vee order email total?')).toBe('order');
+  });
 });
 
 describe('Hy-Vee desk honesty', () => {

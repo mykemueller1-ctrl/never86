@@ -28,8 +28,8 @@
       "days": ["Tue", "Fri"],
       "frequency": "twice-weekly",
       "capture": ["email", "photo"],
-      "notes": ["email preferred", "photo backup"],
-      "missingNudge": "Humes is usually Tue and Fri. Email the invoice if it landed — or snap the ticket."
+      "notes": ["later wave", "Tue+Fri", "AP email inbox", "photo OCR backup", "not this draft"],
+      "missingNudge": "Humes is later wave (Tue/Fri). Email the invoice to the AP inbox — or snap the ticket as OCR backup."
     },
     {
       "id": "confluence",

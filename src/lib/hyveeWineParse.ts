@@ -8,6 +8,8 @@
  * Without email and/or yellow slip → Missing order-match / slip recon.
  * Unclear Monday pay pattern → Missing (no partials).
  * Wave 0b: OCR into the mess, not AP / 30-60-90.
+ * Bar-manager email path. Seat 2 / BOH / PFG day-before is not required.
+ * Humes is a later wave — not this path.
  *
  * Labeled totals only. Never invent $. Never echo a customer account
  * number in desk copy. Humes and other beer houses are hooks only.

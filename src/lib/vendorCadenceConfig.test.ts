@@ -32,6 +32,9 @@ describe('CTAP vendor cadence config', () => {
     expect(missingInvoiceNudge('PFG')).toMatch(/21-day/);
     expect(missingInvoiceNudge('PFG')).not.toMatch(/pay now|ACH|remit/i);
     expect(missingInvoiceNudge('Humes')).toMatch(/Email the invoice|snap the ticket/);
+    expect(missingInvoiceNudge('Humes')).toMatch(/later wave/);
+    expect(matchVendorCadence('Humes')?.days).toEqual(['Tue', 'Fri']);
+    expect(matchVendorCadence('Humes')?.notes.join(' ')).toMatch(/photo OCR backup/);
     expect(vendorsExpectedOn('Tue').map((row) => row.id)).toContain('sysco');
     expect(vendorBabysitLine({ question: 'Where is the Sysco invoice?' })).toMatch(/forget to snap/i);
     expect(JSON.stringify(CTAP_VENDOR_CADENCE.vendors)).not.toMatch(/you didn’t order|you did not order|theft/i);

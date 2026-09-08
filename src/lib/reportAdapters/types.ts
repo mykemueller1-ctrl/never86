@@ -86,5 +86,5 @@ export const PLANNED_REPORT_ADAPTERS: readonly {
   { pos: 'lightspeed', family: 'sales-summary', status: 'hook', note: 'Next adapter: Lightspeed sales. Not in this PR.' },
   { pos: 'sysco', family: 'invoice', status: 'hook', note: 'Vendor silo: Sysco invoice/catalog. Not in this PR.' },
   { pos: 'us-foods', family: 'invoice', status: 'hook', note: 'Vendor silo: US Foods invoice/catalog. Not in this PR.' },
-  { pos: 'humes', family: 'invoice', status: 'hook', note: 'Humes INV PDFs — out of this PR. Hy-Vee first. No parse, no $.' },
+  { pos: 'humes', family: 'invoice', status: 'hook', note: 'Later wave (Tue+Fri AP email + photo OCR). PDQ Wave 0 then Hy-Vee 0b first. No parse, no $.' },
 ];

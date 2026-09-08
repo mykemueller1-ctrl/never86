@@ -298,6 +298,8 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     expect(asked.answer.sampleDollars).toBe('hyvee-verified');
     expect(asked.answer.facts.join(' ')).toMatch(/\$120\.00/);
     expect(asked.answer.facts.join(' ')).not.toMatch(/94016902/);
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).toMatch(/Humes is not on this path/);
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\bTom\b|seat 2|PFG day-before/i);
   });
 
   it('Missing when Hy-Vee invoice paper is absent', async () => {
@@ -380,5 +382,80 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     expect(asked.answer.headline).toMatch(/OCR into the mess, not AP/);
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.sampleDollars).toBe('none-verified');
+  });
+
+  it('does not need Seat 2 / PFG paper to answer Hy-Vee', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-hyvee-no-seat2';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'hyvee-delivery-invoice.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('delivery-invoice.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What got delivered on the Hy-Vee invoice?',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Verified delivered \$120\.00/);
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\bTom\b|seat 2|PFG day-before/i);
+  });
+});
+
+describe('CTAP papers wave order on a mixed seat', () => {
+  it('answers food today from PDQ even when Hy-Vee papers are also on the seat', async () => {
+    const { svc, operatorId } = await loadCtapMorningPack();
+    const hyvee = await svc.upload({
+      operatorId,
+      filename: 'hyvee-delivery-invoice.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('delivery-invoice.txt'),
+    });
+    expect(hyvee.ok).toBe(true);
+    const food = await svc.ask({
+      operatorId,
+      question: 'food today',
+      tray: 'food',
+    });
+    expect(food.ok).toBe(true);
+    if (!food.ok) return;
+    expect(food.answer.headline).toBe('Verified Food $400.00');
+    expect(food.answer.sampleDollars).toBe('pdq-verified');
+
+    const liquor = await svc.ask({
+      operatorId,
+      question: 'What got delivered on the Hy-Vee invoice?',
+      tray: 'food',
+    });
+    expect(liquor.ok).toBe(true);
+    if (!liquor.ok) return;
+    expect(liquor.answer.headline).toMatch(/Verified delivered \$120\.00/);
+    expect(liquor.answer.sampleDollars).toBe('hyvee-verified');
+  });
+
+  it('does not invent a Humes dollar on this draft', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-humes-later';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'humes-inv.pdf',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode('From: accountspayable@humesdist.com\nInvoice total: $88.00\n'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What is the Humes invoice total?',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.sampleDollars).toBe('none-verified');
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\$88/);
   });
 });
