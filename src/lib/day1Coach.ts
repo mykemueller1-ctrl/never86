@@ -19,16 +19,18 @@ export const DAY1_COACH_ID = 'day1-coach-operator-wow';
 /** Default A open — do not soften to “what’s your problem.” */
 export const DAY1_OPEN_ASK =
   "You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.";
-/** Positioning only. Not a Prime Cost Coach KPI tile. */
-export const DAY1_SUBLINE = 'Your prime coach is finally here. No back-office homework.';
+/** Positioning only. Not a Prime Cost Coach KPI tile. Not “prime coach is finally here.” */
+export const DAY1_SUBLINE = 'Weight off the plate. No back-office homework.';
 /** Kept for compose / chat energy. Not the first-paint hero. */
 export const DAY1_OPEN_ENERGY = DAY1_SUBLINE;
 export const DAY1_WEIRD_ASK = 'What got weird at the shop?';
-export const DAY1_HELP_ENERGY = 'How can we help you?';
-export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first · was you";
+/** Peer operator mouth. Never help-desk, never “what’s the problem today,” never SaaS CTA. */
+export const DAY1_HELP_ENERGY = "What's still on the plate?";
+export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first";
 export const DAY1_PROMISE_LINE = 'Find the leak. Assign the fix. Keep the receipt.';
 export const DAY1_STORE_NAME_FALLBACK = 'Community Tap';
-export const DAY1_MISSING_EMPTY = 'Missing / bring a paper';
+/** Toy / first-run junk titles. Empty desk never paints these. */
+export const DAY1_TOY_STORE_TITLES = ['fun'] as const;
 export const DAY1_MISSING_PAPER = 'Paper in';
 export const DAY1_PREVIEW_CONTRACT =
   'Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.';
@@ -60,16 +62,27 @@ export type Day1MissingSpine = {
   label: string;
   tray: Day1MissingTray;
   plateId: OperatorV2PlateId;
+  emptyCopy: string;
+  paperCopy: string;
 };
 
-/** Honesty spine. Empty categories stay Missing — never a fake dollar. */
+/** Honesty spine. Empty categories stay Missing — never a fake dollar. Distinct per tray. */
 export const DAY1_MISSING_SPINE: readonly Day1MissingSpine[] = [
-  { id: 'schedules', label: 'Schedules', tray: 'labor', plateId: 'schedule' },
-  { id: 'food', label: 'Food', tray: 'food', plateId: 'menu' },
-  { id: 'pop', label: 'Drinks/Pop', tray: 'pop', plateId: 'invoice-truck' },
-  { id: 'beer', label: 'Beer', tray: 'beer', plateId: 'invoice-truck' },
-  { id: 'liquor', label: 'Liquor', tray: 'liquor', plateId: 'invoice-truck' },
+  { id: 'schedules', label: 'Schedules', tray: 'labor', plateId: 'schedule', emptyCopy: 'Missing — posted week', paperCopy: 'Week is on' },
+  { id: 'food', label: 'Food', tray: 'food', plateId: 'menu', emptyCopy: 'Missing — menu paper', paperCopy: 'Menu paper in' },
+  { id: 'pop', label: 'Drinks/Pop', tray: 'pop', plateId: 'invoice-truck', emptyCopy: 'Missing — pop invoice', paperCopy: 'Pop paper in' },
+  { id: 'beer', label: 'Beer', tray: 'beer', plateId: 'invoice-truck', emptyCopy: 'Missing — beer ticket', paperCopy: 'Beer paper in' },
+  { id: 'liquor', label: 'Liquor', tray: 'liquor', plateId: 'invoice-truck', emptyCopy: 'Missing — liquor ticket', paperCopy: 'Liquor paper in' },
 ];
+
+export function day1StoreTitle(restaurantName?: string | null): string {
+  const named = restaurantName?.trim().replace(/\s+/g, ' ') ?? '';
+  if (!named) return DAY1_STORE_NAME_FALLBACK;
+  if ((DAY1_TOY_STORE_TITLES as readonly string[]).includes(named.toLowerCase())) {
+    return DAY1_STORE_NAME_FALLBACK;
+  }
+  return named;
+}
 
 export type Day1FrontPick = {
   id: Day1FrontPickId;
@@ -153,6 +166,9 @@ const BANNED_FRONT_VOICE =
 
 const STIFF_TRUCK_LEAD = /got a truck ticket or invoice\?\s*snap it/i;
 
+const HELP_DESK_MOUTH =
+  /how can we help you|what's the problem today|what is the problem today|book a demo|get started/i;
+
 export function day1CoachById(id: string): Day1FolderCoach | undefined {
   const resolved = resolveOperatorV2PlateId(id) ?? id;
   return DAY1_FOLDER_COACH.find((row) => row.id === resolved);
@@ -219,7 +235,11 @@ export function day1MissingSpineCopy(
   id: Day1MissingSpineId,
   filled: ReadonlySet<string>,
 ): string {
-  return day1MissingSpineState(id, filled) === 'paper' ? DAY1_MISSING_PAPER : DAY1_MISSING_EMPTY;
+  const row = DAY1_MISSING_SPINE.find((item) => item.id === id);
+  if (day1MissingSpineState(id, filled) === 'paper') {
+    return row?.paperCopy ?? DAY1_MISSING_PAPER;
+  }
+  return row?.emptyCopy ?? 'Missing';
 }
 
 export function day1FrontLeadBlob(): string {
@@ -233,7 +253,7 @@ export function day1FrontLeadBlob(): string {
     DAY1_PROMISE_LINE,
     DAY1_PREVIEW_CONTRACT,
     DAY1_STORE_NAME_FALLBACK,
-    ...DAY1_MISSING_SPINE.map((row) => `${row.label} ${DAY1_MISSING_EMPTY}`),
+    ...DAY1_MISSING_SPINE.map((row) => `${row.label} ${row.emptyCopy} ${row.paperCopy}`),
   ].join(' ');
 }
 
@@ -246,17 +266,31 @@ export function day1FrontCopyBlob(): string {
 }
 
 export function day1FrontVoiceIsClean(text = day1FrontCopyBlob()): boolean {
-  return !BANNED_FRONT_VOICE.test(text) && !/\$\d/.test(text) && !STIFF_TRUCK_LEAD.test(day1FrontLeadBlob());
+  return (
+    !BANNED_FRONT_VOICE.test(text) &&
+    !HELP_DESK_MOUTH.test(text) &&
+    !/\$\d/.test(text) &&
+    !STIFF_TRUCK_LEAD.test(day1FrontLeadBlob())
+  );
 }
 
 export function day1LeadIsConversationFirst(text = day1FrontLeadBlob()): boolean {
   return (
     /you're not crazy\. the stack is/i.test(text) &&
-    /prime coach is finally here/i.test(text) &&
+    /weight off the plate/i.test(text) &&
     /no back-office homework/i.test(text) &&
+    /what's still on the plate/i.test(text) &&
     /schedules/i.test(text) &&
     /drinks\/pop/i.test(text) &&
-    /missing \/ bring a paper/i.test(text) &&
+    /missing — posted week/i.test(text) &&
+    /missing — menu paper/i.test(text) &&
+    /missing — pop invoice/i.test(text) &&
+    /missing — beer ticket/i.test(text) &&
+    /missing — liquor ticket/i.test(text) &&
+    !HELP_DESK_MOUTH.test(text) &&
+    !/prime coach is finally here/i.test(text) &&
+    !/was you/i.test(text) &&
+    !/missing \/ bring a paper/i.test(text) &&
     !STIFF_TRUCK_LEAD.test(text) &&
     !/order guide/i.test(text) &&
     !/all-in-one dashboard/i.test(text) &&

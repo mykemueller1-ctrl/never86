@@ -10,9 +10,9 @@ First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the 
 
 1. Operator lands on `/operator`.
 2. Open (default A): **You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.**
-3. Subline: **Your prime coach is finally here. No back-office homework.** (“prime coach” is positioning, not a KPI tile.)
-4. Header: restaurant / store name up top (active seat name, e.g. Community Tap).
-5. Left rail — Missing honesty spine: **Schedules · Food · Drinks/Pop · Beer · Liquor**. Empty ones say **Missing / bring a paper**. Never fake $.
+3. Subline: **Weight off the plate. No back-office homework.** Not “prime coach is finally here.” Not a KPI tile.
+4. Header: restaurant / store name up top (session `restaurantName`, else Community Tap). Never the toy title **Fun**.
+5. Left rail — Missing honesty spine: **Schedules · Food · Drinks/Pop · Beer · Liquor**. Empty lines stay Missing and are distinct per tray (`Missing — posted week` / `menu paper` / `pop invoice` / `beer ticket` / `liquor ticket`). Never fake $.
 6. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
 7. Snap photo exists when they choose a paper path. It is not the first CTA.
 
@@ -28,7 +28,9 @@ Fail this visual: toy Void Hunter blue CTAs, emoji cheer, Prime Cost Coach tile.
 
 Do **not** default to “snap this week’s order guide.” Internal plate id is `invoice-truck`. Leftover `order-guide` normalizes to it.
 
-Quiet identity, not a SaaS tour: **built by Myke Mueller · Never86'd · operator first · was you**
+Quiet identity, not a SaaS tour or brand manifesto: **built by Myke Mueller · Never86'd · operator first**
+
+Composer placeholder (peer, not help-desk): **What's still on the plate?**
 
 After first choice, preview contract: **Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.**
 
@@ -99,7 +101,7 @@ No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 ## Voice
 
-Prefer: not crazy, the stack, weight, run your shop, win, prime coach, missing, bring a paper, bartender, drawer, Z, books, 30-60-90, P&L, hats, invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
+Prefer: not crazy, the stack, weight off the plate, run your shop, win, missing, posted week, menu paper, pop invoice, beer ticket, liquor ticket, bartender, drawer, Z, books, 30-60-90, P&L, hats, invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
 
 Ban: layer, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem, Prime Cost Coach tile, order-guide lead, SaaS tour, toy blue CTAs.
 

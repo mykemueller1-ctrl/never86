@@ -70,6 +70,11 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('DAY1_MISSING_SPINE');
     expect(phone).toContain('DAY1_HELP_ENERGY');
     expect(phone).toContain('DAY1_IDENTITY_LINE');
+    expect(phone).toContain('day1StoreTitle');
+    expect(phone).not.toMatch(/How can we help you/);
+    expect(phone).not.toMatch(/prime coach is finally here/);
+    expect(phone).not.toMatch(/was you/);
+    expect(phone).not.toMatch(/Missing \/ bring a paper/);
     expect(phone).toContain('DAY1_PREVIEW_CONTRACT');
     expect(phone).toContain('firstPhotoWinLine');
     expect(phone).not.toContain('DAY1_SOFT_DEFAULT');

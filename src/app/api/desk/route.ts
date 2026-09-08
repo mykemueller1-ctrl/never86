@@ -3,6 +3,7 @@ import { readOperatorSession } from '@/lib/readOperatorSession';
 import { findFreeSeatOperator, isFreeSeatOperatorId } from '@/lib/operatorActivation';
 import { loadLatestClose, loadUnattendedGate } from '@/lib/seatCloseStore';
 import { intakeMailboxAddress } from '@/lib/closeIntake';
+import { day1StoreTitle } from '@/lib/day1Coach';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,7 @@ export async function GET() {
 
   return NextResponse.json({
     success: true,
-    restaurantName: operator?.restaurantName ?? null,
+    restaurantName: operator ? day1StoreTitle(operator.restaurantName) : null,
     locationId: operator?.locationId ?? null,
     secondStore: 'paid',
     secondSeat: 'paid',
