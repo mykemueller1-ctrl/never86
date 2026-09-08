@@ -117,7 +117,7 @@ export const OWNER_PRIME_COST_EVIDENCE: readonly PrimeCostEvidence[] = [
 ];
 
 export const OWNER_DESK_TRAY = [
-  { id: 'action', label: 'Desk', icon: 'Desk' },
+  { id: 'action', label: 'Shift', icon: 'Shift' },
   { id: 'food', label: 'Food', icon: 'Food' },
   { id: 'labor', label: 'Labor', icon: 'Labor' },
   { id: 'pop', label: 'Pop', icon: 'Pop' },

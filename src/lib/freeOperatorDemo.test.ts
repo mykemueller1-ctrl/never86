@@ -140,7 +140,7 @@ describe('free operator demo pack', () => {
     expect(OWNER_PRIME_COST_EVIDENCE.every((row) => row.state === 'NEED' || row.state === 'READY')).toBe(true);
     expect(OWNER_PRIME_COST_EVIDENCE.filter((row) => row.state === 'READY')).toEqual([]);
     expect(OWNER_DESK_TRAY.map((row) => row.id)).toEqual(['action', 'food', 'labor', 'pop', 'beer', 'liquor']);
-    expect(OWNER_DESK_TRAY.map((row) => row.label)).toEqual(['Desk', 'Food', 'Labor', 'Pop', 'Beer', 'Liquor']);
+    expect(OWNER_DESK_TRAY.map((row) => row.label)).toEqual(['Shift', 'Food', 'Labor', 'Pop', 'Beer', 'Liquor']);
     expect(OWNER_DESK_TRAY.every((row) => !/[⚡🍽🥤🍺🥃]/.test(row.icon))).toBe(true);
   });
 

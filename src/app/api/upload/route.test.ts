@@ -88,6 +88,21 @@ describe('POST /api/upload and POST /api/ask', () => {
     ]);
   });
 
+  it('receives multiple images in one post', async () => {
+    const form = new FormData();
+    form.append('file', new File([new Uint8Array([1, 2])], 'ticket-a.jpg', { type: 'image/jpeg' }));
+    form.append('file', new File([new Uint8Array([3, 4])], 'ticket-b.jpg', { type: 'image/jpeg' }));
+    form.set('folder', 'invoice-truck');
+    const uploadRes = await uploadPost(
+      new NextRequest('http://localhost/api/upload', { method: 'POST', body: form }),
+    );
+    const uploadBody = await uploadRes.json();
+    expect(uploadRes.status).toBe(200);
+    expect(uploadBody.receivedCount).toBe(2);
+    expect(uploadBody.uploads).toHaveLength(2);
+    expect(uploadBody.readiness.uploadCount).toBe(2);
+  });
+
   it('tags a camera photo to the open schedule folder', async () => {
     const form = new FormData();
     form.set('file', new File([new Uint8Array([9, 8, 7])], 'IMG_1234.jpg', { type: 'image/jpeg' }));
@@ -118,6 +133,6 @@ describe('POST /api/upload and POST /api/ask', () => {
     const body = await res.json();
     expect(res.status).toBe(200);
     expect(JSON.stringify(body)).not.toMatch(/stays on this phone/i);
-    expect(body.answer.facts.join(' ')).toMatch(/stored for operator_id/);
+    expect(body.answer.facts.join(' ')).toMatch(/stored on this seat/);
   });
 });

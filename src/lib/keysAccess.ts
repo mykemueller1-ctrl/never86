@@ -224,7 +224,7 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   },
   {
     name: 'GOOGLE_CLIENT_ID',
-    purpose: 'Google one-seat claim. Fail-closed until present with secret + state.',
+    purpose: 'Google one-seat claim and Gmail/Drive papers inbox. Fail-closed until present with secret + state.',
     surfaces: ['vercel'],
     kind: 'public',
     required: false,

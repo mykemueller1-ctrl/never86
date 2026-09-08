@@ -70,13 +70,27 @@ const FAMILY_PAPER: Record<LastWeekPrimeFamilyId, string> = {
 
 const COGS_TAG = /^(cogs):(food|pop|liquor|beer):(\d+(?:\.\d+)?)$/i;
 
+function normalizeWeekAsk(question: string): string {
+  return question.toLowerCase().replace(/[^a-z0-9\s/%-]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export function routeLastWeekPrimeQuestion(question: string): boolean {
-  const q = question.toLowerCase().replace(/[^a-z0-9\s/%-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const q = normalizeWeekAsk(question);
   if (!q) return false;
   if (/prime\s*cost|last[\s-]*week\s*(cogs|prime|cost)|load last[\s-]*week/.test(q)) return true;
   if (/making money|under\s*60|60\s*65|week\s*cogs|cogs\s*(this\s*)?week/.test(q)) return true;
   if (/food cost/.test(q) && /week|prime/.test(q)) return true;
   return false;
+}
+
+/** "What were my sales last week?" — closed loop, not wallpaper. Leaves dated Toast Q8 alone. */
+export function routeWeekSalesQuestion(question: string): boolean {
+  const q = normalizeWeekAsk(question);
+  if (!q) return false;
+  if (/strongest day|busiest day/.test(q)) return false;
+  if (/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+\d{1,2}\b/.test(q)) return false;
+  if (/load last[\s-]*week|last[\s-]*week\s*(cogs|prime)|prime\s*cost/.test(q)) return false;
+  return /what were my sales|sales last week|last weeks sales|how (?:did|were) (?:we|sales)/.test(q);
 }
 
 function cogsFromTags(tags: readonly SourceTag[]): Partial<Record<'food' | 'pop' | 'liquor' | 'beer', { amount: number; honesty: LastWeekHonesty }>> {
@@ -224,5 +238,58 @@ export function answerLastWeekPrime(snapshot: LastWeekPrimeSnapshot): {
         : snapshot.honesty === 'Estimated'
           ? 'prime-estimated'
           : 'none-verified',
+  };
+}
+
+export function answerWeekSalesLoop(snapshot: LastWeekPrimeSnapshot): {
+  slug: 'action-shift';
+  headline: string;
+  facts: string[];
+  coachTomorrow: string;
+  needs: string;
+  sourceTags: SourceTag[];
+  verifiedClose: boolean;
+  sampleDollars: 'none-verified' | 'prime-verified' | 'prime-estimated';
+} {
+  const week = snapshot.families.find((row) => row.id === 'week-sales') ?? snapshot.families[0];
+  if (week.amount != null) {
+    const stillMissing = snapshot.missingIds.filter((id) => id !== 'week-sales');
+    return {
+      slug: 'action-shift',
+      headline: `${week.honesty} · last-week sales ${usd(week.amount)}`,
+      facts: [
+        `${week.honesty} from the week sales file on this seat. Incomplete week stays Open.`,
+        `${week.honesty} · ${week.label} ${usd(week.amount)}`,
+        'I will not invent a stronger day or a prime % from this one file.',
+      ],
+      coachTomorrow: stillMissing.length
+        ? `Week sales landed. Next Action Shift: add ${stillMissing.map((id) => FAMILY_LABEL[id]).join(', ')}.`
+        : 'Keep the same-store week file. Incomplete week stays Open if the dates do not match.',
+      needs: stillMissing.length
+        ? `Week sales is on. Still Missing: ${stillMissing.map((id) => FAMILY_LABEL[id]).join(', ')}.`
+        : 'Week sales file is on this seat.',
+      sourceTags: [
+        {
+          tag: week.honesty === 'Verified' ? 'verified' : 'estimated',
+          source: 'last-week-prime:week-sales',
+        },
+      ],
+      verifiedClose: week.honesty === 'Verified',
+      sampleDollars: week.honesty === 'Verified' ? 'prime-verified' : 'prime-estimated',
+    };
+  }
+
+  return {
+    slug: 'action-shift',
+    headline: 'Missing — last-week sales.',
+    facts: [
+      'Missing · Week sales. I will not invent a dollar.',
+      'Action Shift: add last week’s SalesSummary, a complete Z week, or connect Gmail so Never86 can go get that paper.',
+    ],
+    coachTomorrow: 'Add the last-week sales file. I will answer from that paper — then confirm it landed.',
+    needs: 'One last-week sales file (SalesSummary or a complete week of Zs).',
+    sourceTags: [{ tag: 'unverified', source: 'last-week-prime:week-sales:missing' }],
+    verifiedClose: false,
+    sampleDollars: 'none-verified',
   };
 }
