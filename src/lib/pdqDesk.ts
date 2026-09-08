@@ -10,7 +10,7 @@
  * on this seat is contaminant = Fail. Those dollars never answer CTAP.
  */
 
-import { CTAP_TOAST_CONTAMINANT_FAIL } from '@/lib/ctapPosLock';
+import { CTAP_TOAST_CONTAMINANT_SOURCE } from '@/lib/reportAdapters/sourceTags';
 import {
   PDQ_PARSE_PREFIX,
   packFromPdqSourceTag,
@@ -121,9 +121,16 @@ function formatDay(iso: string | null): string {
   return `${months[m - 1]} ${d}, ${y}`;
 }
 
-function contaminateLine(facts: PdqSeatFacts): string | null {
-  if (!facts.heldOffNagToast) return null;
-  return CTAP_TOAST_CONTAMINANT_FAIL;
+function withContaminantTag(answer: PdqDeskAnswer, facts: PdqSeatFacts): PdqDeskAnswer {
+  if (!facts.heldOffNagToast) return answer;
+  if (answer.sourceTags.some((tag) => tag.source === CTAP_TOAST_CONTAMINANT_SOURCE)) return answer;
+  return {
+    ...answer,
+    sourceTags: [
+      ...answer.sourceTags,
+      { tag: 'unverified', source: CTAP_TOAST_CONTAMINANT_SOURCE },
+    ],
+  };
 }
 
 function missingZ(
@@ -140,7 +147,6 @@ function missingZ(
     facts: [
       ...thinEodMissingFacts({ askedDate, hasVoids }),
       ...extra,
-      ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
     ],
     coachTomorrow: 'Forward the pdqreports@pdqpos.com ZReport_Summary for the same store and business date.',
     needs: 'PDQ ZReport_Summary (native PDF) for the asked business date.',
@@ -166,7 +172,7 @@ function verifiedMixLines(z: PdqFactPack): string[] {
   ));
 }
 
-export function answerPdqDeskQuestion(
+function answerPdqDeskQuestionUnwrapped(
   question: string,
   facts: PdqSeatFacts,
   now: Date = new Date(),
@@ -187,7 +193,6 @@ export function answerPdqDeskQuestion(
         headline: 'Missing — Hourly_Sales_Report is not on this seat for that business date.',
         facts: [
           'Hourly sales stay Missing. No peak hour invented.',
-          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Land Hourly_Sales_Report from the same pdqreports morning pack.',
         needs: 'PDQ Hourly_Sales_Report for the asked business date.',
@@ -204,7 +209,6 @@ export function answerPdqDeskQuestion(
         `Verified · ${hourly.filename} · ${formatDay(hourly.businessDate)} peak ${hourly.hourlyPeak.hour} ${usd(hourly.hourlyPeak.sales)}`,
         hourly.hourlyPeak.guests != null ? `Guests on that hour: ${hourly.hourlyPeak.guests}` : 'Guest count Missing on the peak row.',
         `${hourly.hourlyRowCount} hourly rows on the report.`,
-        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Keep Hourly with the same-date Z so mix and peak stay on one pack.',
       needs: 'Hourly_Sales_Report is on this seat.',
@@ -225,7 +229,6 @@ export function answerPdqDeskQuestion(
         facts: [
           'Voids / Spec Instruction / Neg Menu / Neg Special Instruction / Promo / UKNOWN stay Missing.',
           'No average. No theft narrative. No person named.',
-          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Land Void_Promo_Report from the same morning pack. I will quote labeled lines only.',
         needs: 'PDQ Void_Promo_Report (and Discount lines) for the asked business date.',
@@ -260,7 +263,6 @@ export function answerPdqDeskQuestion(
         `Verified · ${voids.filename} · ${formatDay(voids.businessDate)}`,
         ...lines,
         'Line amounts from Void_Promo + Discount. Pattern, not a verdict. No person named.',
-        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Review fat promo / spec lines on the same report. Do not invent a save.',
       needs: 'Void_Promo_Report is on this seat.',
@@ -290,7 +292,6 @@ export function answerPdqDeskQuestion(
             ? `Verified · Menu Category · Large Pizzas ${usd(pizzas)}`
             : 'Missing · Menu Category · Large Pizzas is not on this Z.',
           'Large Pizzas ≠ Food even if Action Shift rolls them together. No silent merge. No invented combined total.',
-          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Need both Food and Large Pizzas Menu Category lines on the Z before an Estimated bucket.',
         needs: 'Both Menu Category · Food and Menu Category · Large Pizzas on ZReport_Summary.',
@@ -308,7 +309,6 @@ export function answerPdqDeskQuestion(
         `Estimated · combined food bucket ${usd(combined)} = Verified Food ${usd(food)} + Verified Large Pizzas ${usd(pizzas)}.`,
         `Math: ${food} + ${pizzas} = ${combined}. Large Pizzas ≠ Food even if Action Shift rolls them together. Never silently merged.`,
         `Verified · ${z.filename} · ${formatDay(z.businessDate)}`,
-        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Keep quoting Large Pizzas on its own line unless you ask for the combined bucket.',
       needs: 'Z Menu Category Food + Large Pizzas are on this seat.',
@@ -339,7 +339,6 @@ export function answerPdqDeskQuestion(
       'Default food today is the Food line alone. Large Pizzas ≠ Food even if Action Shift rolls them together. Combined Food+Large is Estimated only when you ask.',
       lane,
       ...(secondaryFallback ? [secondaryFallback] : []),
-      ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
     ];
     return {
       kind,
@@ -382,7 +381,6 @@ export function answerPdqDeskQuestion(
     'POS payouts stay untrusted until a receipt match. A Z Pay Outs line is not verified cash-out.',
     lane,
     ...(secondaryFallback ? [secondaryFallback] : []),
-    ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
   ];
 
   return {
@@ -400,6 +398,15 @@ export function answerPdqDeskQuestion(
     verifiedClose: true,
     sampleDollars: 'pdq-verified',
   };
+}
+
+export function answerPdqDeskQuestion(
+  question: string,
+  facts: PdqSeatFacts,
+  now: Date = new Date(),
+): PdqDeskAnswer | null {
+  const answer = answerPdqDeskQuestionUnwrapped(question, facts, now);
+  return answer ? withContaminantTag(answer, facts) : null;
 }
 
 export function isPdqParseDisplayTag(tag: SourceTag): boolean {

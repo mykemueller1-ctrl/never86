@@ -13,7 +13,7 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
-import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
+import { deskSeatLabel, deskSeatTitle } from '@/lib/seatIsolation';
 import {
   DAY1_FRONT_PICKS,
   DAY1_HELP_ENERGY,
@@ -86,7 +86,13 @@ function emptyDailyCompare(): DailyCompareChip[] {
   return dailyCompareFromEvidence({ scheduleReady: false, clockReady: false });
 }
 
-export function FreeOperatorPhone() {
+export function FreeOperatorPhone({
+  initialRestaurantName = null,
+  signedIn = false,
+}: {
+  initialRestaurantName?: string | null;
+  signedIn?: boolean;
+}) {
   const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
@@ -97,7 +103,11 @@ export function FreeOperatorPhone() {
   const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
   const [paperPath, setPaperPath] = useState(false);
-  const [storeName, setStoreName] = useState(() => day1StoreTitle(null));
+  const [storeName, setStoreName] = useState(() => {
+    if (initialRestaurantName?.trim()) return deskSeatLabel(initialRestaurantName);
+    if (signedIn) return '';
+    return day1StoreTitle(null);
+  });
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -143,9 +153,9 @@ export function FreeOperatorPhone() {
         const body = (await desk.json()) as { success?: boolean; restaurantName?: string | null };
         if (cancelled) return;
         const named = body.restaurantName?.trim();
-        if (desk.ok && body.success) setStoreName(day1StoreTitle(named));
+        if (desk.ok && body.success && named) setStoreName(deskSeatLabel(named));
       } catch {
-        /* public seat keeps Community Tap */
+        /* signed-in NAG never falls back to Community Tap */
       }
     })();
     return () => {
@@ -326,8 +336,8 @@ export function FreeOperatorPhone() {
       <header className="owner-desk-top">
         <div className="owner-desk-hello">
           <div>
-            <p className="owner-desk-store" title={CTAP_SEAT1_PUBLIC_LABEL}>
-              {day1StoreTitle(storeName)}
+            <p className="owner-desk-store" title={deskSeatTitle(storeName || initialRestaurantName)}>
+              {storeName.trim() ? deskSeatLabel(storeName) : signedIn ? 'Owner desk' : deskSeatLabel(null)}
             </p>
             <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>

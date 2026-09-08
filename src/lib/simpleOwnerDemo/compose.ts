@@ -37,11 +37,12 @@ import {
   routeHyveeDeskQuestion,
 } from '@/lib/hyveeWineParse';
 import {
-  CTAP_TOAST_CONTAMINANT_FAIL,
   ctapSeatHasToastContaminant,
   isCtapSeat1Id,
   toastMayAnswerSeat,
 } from '@/lib/ctapPosLock';
+import { CTAP_TOAST_CONTAMINANT_SOURCE } from '@/lib/reportAdapters/sourceTags';
+import { restaurantNameHintFromOperatorId } from '@/lib/seatIsolation';
 import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
@@ -96,8 +97,20 @@ function persistFactFor(operatorId: string): string {
   return `Question and answer are stored for operator_id ${operatorId}. Files go to object storage with the same seat key.`;
 }
 
-function isHiddenParseTag(tag: SourceTag): boolean {
-  return isToastParseDisplayTag(tag) || isPdqParseDisplayTag(tag) || tag.source.startsWith('hyvee-parse:v1:');
+function isHiddenParseTag(tag: SourceTag, hideToastCopy = false): boolean {
+  return (
+    isToastParseDisplayTag(tag)
+    || isPdqParseDisplayTag(tag)
+    || tag.source.startsWith('hyvee-parse:v1:')
+    || tag.source === CTAP_TOAST_CONTAMINANT_SOURCE
+    || /toast-contaminant/i.test(tag.source)
+    || (hideToastCopy && /toast/i.test(`${tag.tag}:${tag.source}`))
+  );
+}
+
+function contaminantLockTag(uploads: readonly SimpleOwnerUploadRecord[]): SourceTag | null {
+  if (!ctapSeatHasToastContaminant(uploads)) return null;
+  return { tag: 'unverified', source: CTAP_TOAST_CONTAMINANT_SOURCE };
 }
 
 export function composeAskAnswer(input: {
@@ -106,9 +119,13 @@ export function composeAskAnswer(input: {
   readiness: SimpleOwnerReadiness;
   uploads: readonly SimpleOwnerUploadRecord[];
   now?: Date;
+  restaurantName?: string | null;
 }): SimpleOwnerAskAnswer {
   const qLower = input.question.toLowerCase();
-  const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId);
+  const restaurantName =
+    input.restaurantName ?? restaurantNameHintFromOperatorId(input.readiness.operatorId);
+  const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId, restaurantName);
+  const nagToastOk = toastMayAnswerSeat(input.readiness.operatorId, restaurantName);
   const clearlyHyvee = /hy[\s-]*vee|winespirits|wine & spirits|yellow slip|customer charge|monday batch|monday check|one check/.test(
     qLower,
   );
@@ -116,25 +133,56 @@ export function composeAskAnswer(input: {
     qLower,
   );
 
-  // Wave 0: PDQ mornings first. Hy-Vee 0b is next. Not Humes-first.
+  const toastFacts = nagToastOk ? collectToastFacts(input.uploads) : null;
+  const toastKind = toastFacts ? routeToastDeskQuestion(input.question) : null;
+  const toastAnswer =
+    toastFacts && toastKind && (toastFacts.hasToast || toastKind === 'payables' || toastFacts.packs.length > 0)
+      ? answerToastDeskQuestion(input.question, toastFacts)
+      : null;
+  if (toastAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...toastAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      { tag: toastAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${toastAnswer.slug}` },
+    ];
+    return {
+      slug: toastAnswer.slug,
+      headline: toastAnswer.headline,
+      facts: [...toastAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: toastAnswer.coachTomorrow,
+      needs: toastAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: toastAnswer.sampleDollars,
+      verifiedClose: toastAnswer.verifiedClose,
+    };
+  }
+
+  // Wave 0: PDQ mornings on CTAP. NAG Toast already returned above.
   const pdqFacts = collectPdqFacts(input.uploads);
   const pdqKind = routePdqDeskQuestion(input.question);
   const takePdqMorning = Boolean(pdqKind) && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
     && (!clearlyHyvee || clearlyPdq);
   const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts, input.now ?? new Date()) : null;
   if (pdqAnswer) {
+    const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
     const sourceTags: SourceTag[] = [
       ...pdqAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      ...(lock ? [lock] : []),
       { tag: pdqAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${pdqAnswer.slug}` },
     ];
     return {
       slug: pdqAnswer.slug,
       headline: pdqAnswer.headline,
-      facts: [...pdqAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      facts: [
+        ...pdqAnswer.facts.filter((line) => !/toast|taco\s*bamb|new american grill|max grill/i.test(line)),
+        persistFactFor(input.readiness.operatorId),
+      ],
       coachTomorrow: pdqAnswer.coachTomorrow,
       needs: pdqAnswer.needs,
-      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
       sourceTags,
       inventedClose: false,
       sampleDollars: pdqAnswer.sampleDollars,
@@ -149,9 +197,11 @@ export function composeAskAnswer(input: {
       ? answerHyveeDeskQuestion(input.question, hyveeFacts)
       : null;
   if (hyveeAnswer) {
+    const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
     const sourceTags: SourceTag[] = [
       ...hyveeAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      ...(lock ? [lock] : []),
       { tag: hyveeAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${hyveeAnswer.slug}` },
     ];
     return {
@@ -160,7 +210,7 @@ export function composeAskAnswer(input: {
       facts: [...hyveeAnswer.facts, persistFactFor(input.readiness.operatorId)],
       coachTomorrow: hyveeAnswer.coachTomorrow,
       needs: hyveeAnswer.needs,
-      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
       sourceTags,
       inventedClose: false,
       sampleDollars: hyveeAnswer.sampleDollars,
@@ -170,9 +220,11 @@ export function composeAskAnswer(input: {
 
   const vendorSpine = answerVendorSpineQuestion(input.question);
   if (vendorSpine) {
+    const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
     const sourceTags: SourceTag[] = [
       { tag: 'unverified', source: `vendor-spine:${vendorSpine.vendorId}:hook` },
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      ...(lock ? [lock] : []),
       { tag: 'unverified', source: `simple-owner-ask:${vendorSpine.slug}` },
     ];
     return {
@@ -181,59 +233,11 @@ export function composeAskAnswer(input: {
       facts: [...vendorSpine.facts, persistFactFor(input.readiness.operatorId)],
       coachTomorrow: vendorSpine.coachTomorrow,
       needs: vendorSpine.needs,
-      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
       sourceTags,
       inventedClose: false,
       sampleDollars: vendorSpine.sampleDollars,
       verifiedClose: vendorSpine.verifiedClose,
-    };
-  }
-
-  if (onCtapSeat1 && ctapSeatHasToastContaminant(input.uploads)) {
-    return {
-      slug: 'foh-voids',
-      headline: CTAP_TOAST_CONTAMINANT_FAIL,
-      facts: [
-        CTAP_TOAST_CONTAMINANT_FAIL,
-        'CTAP Wave 0 reads PDQ Signature PDFs only (ZReport_Summary, Void_Promo_Report, Hourly_Sales_Report).',
-        'Toast Wave 0 stays NAG / lab. Contaminant path = Fail. No Toast dollar used.',
-        persistFactFor(input.readiness.operatorId),
-      ],
-      coachTomorrow: 'Remove the Toast / NAG / Taco Bamba file. Land the PDQ morning pack.',
-      needs: 'PDQ Signature PDFs on CTAP Seat 1. Not a Toast CSV.',
-      tags: ['unverified:ctap-pos-lock:toast-contaminant:fail'],
-      sourceTags: [{ tag: 'unverified', source: 'ctap-pos-lock:toast-contaminant:fail' }],
-      inventedClose: false,
-      sampleDollars: 'none-verified',
-      verifiedClose: false,
-    };
-  }
-
-  const toastFacts = toastMayAnswerSeat(input.readiness.operatorId)
-    ? collectToastFacts(input.uploads)
-    : null;
-  const toastKind = toastFacts ? routeToastDeskQuestion(input.question) : null;
-  const toastAnswer =
-    toastFacts && toastKind && (toastFacts.hasToast || toastKind === 'payables')
-      ? answerToastDeskQuestion(input.question, toastFacts)
-      : null;
-  if (toastAnswer) {
-    const sourceTags: SourceTag[] = [
-      ...toastAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
-      { tag: toastAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${toastAnswer.slug}` },
-    ];
-    return {
-      slug: toastAnswer.slug,
-      headline: toastAnswer.headline,
-      facts: [...toastAnswer.facts, persistFactFor(input.readiness.operatorId)],
-      coachTomorrow: toastAnswer.coachTomorrow,
-      needs: toastAnswer.needs,
-      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
-      sourceTags,
-      inventedClose: false,
-      sampleDollars: toastAnswer.sampleDollars,
-      verifiedClose: toastAnswer.verifiedClose,
     };
   }
 
@@ -242,8 +246,10 @@ export function composeAskAnswer(input: {
   const sample = routed.ok ? getFreeOperatorAnswer(routed.slug) : null;
   const ready = input.readiness.evidence.filter((row) => row.state === 'READY').map((row) => row.short);
   const missing = input.readiness.evidence.filter((row) => row.state === 'NEED').map((row) => row.short);
+  const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
   const sourceTags: SourceTag[] = [
-    ...input.readiness.sourceTags.filter((tag) => !isHiddenParseTag(tag)),
+    ...input.readiness.sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+    ...(lock ? [lock] : []),
     { tag: 'unverified', source: `simple-owner-ask:${slug}` },
   ];
 

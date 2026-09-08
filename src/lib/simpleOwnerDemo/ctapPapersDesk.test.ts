@@ -159,7 +159,9 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     if (!asked.ok) return;
     const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
     expect(body).toMatch(/Verified · Menu Category · Food \$400\.00/);
-    expect(body).toMatch(/Fail/);
+    expect(body).not.toMatch(/Toast|Taco Bamba|New American Grill|Max Grill/i);
+    expect(asked.answer.sourceTags.some((tag) => tag.source.includes('toast-contaminant'))).toBe(true);
+    expect(asked.answer.tags.join(' ')).not.toMatch(/toast/i);
     expect(asked.answer.sampleDollars).toBe('pdq-verified');
     assertNoToastLeak(body, asked.answer.sampleDollars);
   });
@@ -331,7 +333,7 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
 describe('CTAP Seat 1 hard lock — Toast packs cannot answer CTAP sales', () => {
   it('Toast-only CTAP seat + net sales stays Fail/Missing — no NAG Toast $', async () => {
     const svc = service();
-    const operatorId = 'demo:ctap-toast-poison';
+    const operatorId = 'demo:ctap-pos-poison';
     const uploaded = await svc.upload({
       operatorId,
       filename: 'SalesSummary_2026-08-31.csv',
@@ -352,12 +354,14 @@ describe('CTAP Seat 1 hard lock — Toast packs cannot answer CTAP sales', () =>
     });
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
-    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
+    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')} ${asked.answer.coachTomorrow} ${asked.answer.needs} ${asked.answer.tags.join(' ')}`;
     expect(asked.answer.sampleDollars).toBe('none-verified');
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.sampleDollars).not.toMatch(/^toast-/);
-    expect(body).toContain(CTAP_TOAST_CONTAMINANT_FAIL);
-    expect(body).toMatch(/PDQ|ZReport/);
+    expect(asked.answer.sourceTags.some((tag) => tag.source.includes('toast-contaminant'))).toBe(true);
+    expect(body).not.toContain(CTAP_TOAST_CONTAMINANT_FAIL);
+    expect(body).not.toMatch(/\bToast\b|Taco Bamba|New American Grill|Max Grill/i);
+    expect(body).toMatch(/PDQ|ZReport|Missing/);
     assertNoToastLeak(body, asked.answer.sampleDollars);
   });
 });

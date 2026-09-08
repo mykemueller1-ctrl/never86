@@ -51,7 +51,8 @@ describe('rebuild resume v2 locks', () => {
     expect(phone).toContain("fetch('/api/ask'");
     expect(phone).toContain("fetch('/api/upload'");
     expect(phone).toContain('OPERATOR_V2_PLATES');
-    expect(phone).toContain('CTAP_SEAT1_PUBLIC_LABEL');
+    expect(phone).toContain('deskSeatTitle');
+    expect(phone).not.toMatch(/title=\{CTAP_SEAT1_PUBLIC_LABEL\}/);
     expect(read('src/app/operator/page.tsx')).toContain('SimpleOwnerDemo');
     expect(read('src/app/api/ask/route.ts')).toMatch(/getSimpleOwnerDemoService/);
     expect(read('src/app/api/upload/route.ts')).toMatch(/getSimpleOwnerDemoService/);

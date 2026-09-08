@@ -8,6 +8,10 @@
 
 import { CTAP_SEAT1_OPERATOR_ID } from '@/lib/ctapSeat1';
 import { isToastTrainingCorpusOnly } from '@/lib/reportAdapters/trainingCorpus';
+import {
+  isCtapSeat,
+  toastMayAnswerSeat as toastMayAnswerIsolatedSeat,
+} from '@/lib/seatIsolation';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
 import { detectToastFamily } from '@/lib/toastParse';
 
@@ -18,20 +22,20 @@ export const CTAP_SEAT1_POS = 'pdq' as const;
 export const CTAP_TOAST_CONTAMINANT_FAIL =
   'Fail — CTAP Seat 1 is PDQ POS only. Toast / NAG / Taco Bamba cannot answer Community Tap dollars.';
 
-export function isCtapSeat1Id(operatorId: string): boolean {
-  const id = operatorId.trim().toLowerCase();
-  if (!id) return false;
-  if (id.includes('ctap')) return true;
-  if (/community[\s._-]*tap/.test(id)) return true;
-  if (id === String(CTAP_SEAT1_OPERATOR_ID)) return true;
-  if (id.endsWith(`:${CTAP_SEAT1_OPERATOR_ID}`)) return true;
-  return false;
+/**
+ * Legacy id check. Prefer `isCtapSeat(operatorId, restaurantName)` —
+ * `seat:1000000` is the free-seat floor, not automatically Community Tap.
+ */
+export function isCtapSeat1Id(operatorId: string, restaurantName?: string | null): boolean {
+  return isCtapSeat(operatorId, restaurantName);
 }
 
 /** Toast desk may run on NAG/lab seats only — never CTAP Seat 1. */
-export function toastMayAnswerSeat(operatorId: string): boolean {
-  return !isCtapSeat1Id(operatorId);
+export function toastMayAnswerSeat(operatorId: string, restaurantName?: string | null): boolean {
+  return toastMayAnswerIsolatedSeat(operatorId, restaurantName);
 }
+
+export { CTAP_SEAT1_OPERATOR_ID };
 
 export function uploadLooksLikeToastContaminant(
   filename: string,

@@ -114,7 +114,9 @@ describe('day-1 operator-first WOW coach', () => {
     expect(DAY1_STORE_NAME_FALLBACK.toLowerCase()).not.toBe('fun');
     const phone = readFileSync(resolve('src/components/FreeOperatorPhone.tsx'), 'utf8');
     expect(phone).toContain('day1StoreTitle');
-    expect(phone).toMatch(/useState\(\(\) => day1StoreTitle\(null\)\)/);
+    expect(phone).toContain('deskSeatLabel');
+    expect(phone).toContain('deskSeatTitle');
+    expect(phone).not.toMatch(/title=\{CTAP_SEAT1_PUBLIC_LABEL\}/);
     expect(phone).not.toMatch(/['"]Fun['"]/);
     const desk = readFileSync(resolve('src/app/api/desk/route.ts'), 'utf8');
     expect(desk).toContain('day1StoreTitle');

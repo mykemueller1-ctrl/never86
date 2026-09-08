@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  return withSimpleOwnerTenant(req, async (operatorId) => {
+  return withSimpleOwnerTenant(req, async (operatorId, restaurantName) => {
     const service = getSimpleOwnerDemoService();
     if (isServiceError(service)) {
       return jsonError(service.status, service.error, service.code);
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       contentType: file.type || 'application/octet-stream',
       bytes,
       folder,
+      restaurantName,
     });
     if (!result.ok) {
       return jsonError(result.status, result.error, result.code);
