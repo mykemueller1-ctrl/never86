@@ -17,7 +17,7 @@ Grok Bot shareable templates copy prompts, not keys. Official xAI rule: strip AP
 ## Honest status (this factory worker)
 
 | Check | State |
-|---|---|
+|---|---|---|
 | Public operator MCP | **live-verified** — `initialize` + `tools/list` HTTP 200, server `never86`, **16** tools |
 | Private factory MCP without credentials | **fail-closed** — HTTP 401, no tools leaked |
 | `XAI_API_KEY` in this Cursor cloud worker | **absent** — xAI `GET /v1/models` not attempted; status `not-configured` |
@@ -74,7 +74,7 @@ Canonical Cursor MCP file: `.cursor/mcp.json` → `never86-operator-system` → 
 
 See `.env.example`. Names used by the site:
 
-- `DATABASE_URL` · `OPS_DATABASE_URL` · `ANTHROPIC_API_KEY` · `RESEND_API_KEY` · `CRON_SECRET` · `OWNER_EMAIL`
+- `DATABASE_URL` · `OPS_DATABASE_URL` · `ANTHROPIC_API_KEY` · `RESEND_API_KEY` · `CRON_SECRET` · `ADMIN_API_SECRET` · `OWNER_EMAIL`
 - Staff claim (fail-closed until Myke enables): `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `STAFF_SEAT_LOGIN_ENABLED`
 
 Do not set `STAFF_SEAT_LOGIN_ENABLED=true` from a factory job. Do not apply Neon from here.

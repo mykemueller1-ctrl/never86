@@ -290,6 +290,93 @@ export async function grantPersonAccess(
   return { ok: true };
 }
 
+/** Detach one isolated operator from this person email. Does not delete the store. */
+export async function revokePersonAccess(
+  email: string,
+  operatorId: number,
+): Promise<SetSharedPasswordResult> {
+  const normalized = normalizeEmail(email);
+  if (!normalized || !normalized.includes('@')) {
+    return { ok: false, error: 'Enter a valid email.', status: 400 };
+  }
+  if (isPlusAliasEmail(normalized)) {
+    return {
+      ok: false,
+      error: 'Do not mint plus-alias seats. Use the real person email.',
+      status: 400,
+    };
+  }
+  if (!Number.isInteger(operatorId) || operatorId <= 0) {
+    return { ok: false, error: 'Pick a valid operator.', status: 400 };
+  }
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
+  }
+  await ensureFreeSeatSchema();
+  await db
+    .delete(seatPersonAccess)
+    .where(and(eq(seatPersonAccess.email, normalized), eq(seatPersonAccess.operatorId, operatorId)));
+  return { ok: true };
+}
+
+/**
+ * Copy the existing person password hash from one real email to another.
+ * No plaintext. Used when CoS cannot paste a live password.
+ */
+export async function copyPersonPasswordHash(
+  fromEmail: string,
+  toEmail: string,
+  nowMs = Date.now(),
+): Promise<SetSharedPasswordResult> {
+  const from = normalizeEmail(fromEmail);
+  const to = normalizeEmail(toEmail);
+  if (!from || !from.includes('@') || !to || !to.includes('@')) {
+    return { ok: false, error: 'Enter a valid email.', status: 400 };
+  }
+  if (isPlusAliasEmail(from) || isPlusAliasEmail(to)) {
+    return {
+      ok: false,
+      error: 'Do not mint plus-alias seats. Use the real person email.',
+      status: 400,
+    };
+  }
+  if (from === to) {
+    return { ok: false, error: 'Source and destination emails must differ.', status: 400 };
+  }
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
+  }
+  await ensureFreeSeatSchema();
+  const source = await findPersonPassword(from);
+  if (!source?.passwordHash) {
+    return { ok: false, error: 'No person password hash on the source email.', status: 404 };
+  }
+  const setAt = new Date(nowMs);
+  const existing = await db
+    .select({ id: seatPersonPasswords.id })
+    .from(seatPersonPasswords)
+    .where(eq(seatPersonPasswords.email, to))
+    .limit(1);
+  if (existing[0]) {
+    await db
+      .update(seatPersonPasswords)
+      .set({ passwordHash: source.passwordHash, passwordSetAt: setAt })
+      .where(eq(seatPersonPasswords.email, to));
+  } else {
+    await db.insert(seatPersonPasswords).values({
+      email: to,
+      passwordHash: source.passwordHash,
+      passwordSetAt: setAt,
+      createdAt: setAt,
+    });
+  }
+  await db
+    .update(seatCredentials)
+    .set({ passwordHash: source.passwordHash, passwordSetAt: setAt })
+    .where(eq(seatCredentials.email, to));
+  return { ok: true };
+}
+
 /** Session-gated set: this email may only write the password it already owns. */
 export async function setFreeSeatPassword(
   operatorId: number,
