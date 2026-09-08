@@ -1,4 +1,4 @@
-import { plateById } from '@/lib/operatorV2';
+import { plateById, resolveOperatorV2PlateId } from '@/lib/operatorV2';
 import type { EvidenceKind, SourceTag } from './types';
 
 const KIND_PATTERNS: readonly { kind: EvidenceKind; pattern: RegExp; source: string }[] = [
@@ -31,12 +31,14 @@ export function classifyUpload(
     }
   }
 
-  const plate = folderHint ? plateById(folderHint) : undefined;
-  if (plate) {
-    return {
-      kind: plate.evidenceKind,
-      sourceTags: [{ tag: 'unverified', source: `operator-upload:${plate.evidenceKind}:folder` }],
-    };
+  if (folderHint && resolveOperatorV2PlateId(folderHint)) {
+    const plate = plateById(folderHint);
+    if (plate) {
+      return {
+        kind: plate.evidenceKind,
+        sourceTags: [{ tag: 'unverified', source: `operator-upload:${plate.evidenceKind}:folder` }],
+      };
+    }
   }
 
   return {

@@ -9,9 +9,9 @@ import {
   filledPlateIds,
   isOperatorV2PlateId,
   nextMissingPlate,
-  normalizePlateId,
   plateById,
   projectFoldersFromKinds,
+  resolveOperatorV2PlateId,
   spawnLaborRoleCards,
 } from './operatorV2';
 
@@ -25,17 +25,28 @@ describe('Operator V2 first-class paper-shop folders', () => {
       'invoice-truck',
     ]);
     expect(OPERATOR_V2_PLATES.find((plate) => plate.id === 'invoice-truck')?.label).toBe('Invoice / truck');
-    expect(JSON.stringify(OPERATOR_V2_PLATES)).not.toMatch(/Order guide/);
+    expect(OPERATOR_V2_PLATES.find((plate) => plate.id === 'invoice-truck')?.folder).toBe('Invoice / truck');
+    expect(JSON.stringify(OPERATOR_V2_PLATES)).not.toMatch(/Order guide/i);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.ocrInput === true)).toBe(true);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.firstClass === true)).toBe(true);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.deferred === false)).toBe(true);
     expect(nextMissingPlate(new Set()).id).toBe('schedule');
     expect(nextMissingPlate(new Set(['schedule'])).id).toBe('labor-cards');
     expect(isOperatorV2PlateId('labor-cards')).toBe(true);
-    expect(isOperatorV2PlateId('timeclock')).toBe(false);
     expect(isOperatorV2PlateId('invoice-truck')).toBe(true);
-    expect(normalizePlateId('order-guide')).toBe('invoice-truck');
+    expect(isOperatorV2PlateId('order-guide')).toBe(false);
+    expect(isOperatorV2PlateId('timeclock')).toBe(false);
+  });
+
+  it('still files a leftover order-guide folder hint to invoice / truck', () => {
+    expect(resolveOperatorV2PlateId('order-guide')).toBe('invoice-truck');
     expect(plateById('order-guide')?.id).toBe('invoice-truck');
+    expect(projectFoldersFromKinds(new Set(['order-guide'])).find((row) => row.id === 'invoice-truck')?.state).toBe(
+      'READY',
+    );
+    expect(projectFoldersFromKinds(new Set(['invoice-truck'])).find((row) => row.id === 'invoice-truck')?.state).toBe(
+      'READY',
+    );
   });
 
   it('flips folder chips only when that OCR file lands', () => {

@@ -9,7 +9,7 @@
 First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the plate. Not a tour.
 
 1. Operator lands on `/operator`.
-2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** Chat mouth keeps **How can we help you?**
+2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** (also OK: **What got weird at the shop?**) Chat mouth keeps **How can we help you?**
 3. Branch by what they say. Floor nouns, not a sitemap.
 4. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
 5. Snap photo exists when a path needs a photo. It is not the robotic soft default.
@@ -20,12 +20,16 @@ Fail this line as the hero subhead: **Got a truck ticket or invoice? Snap it.**
 |---|---|
 | Bartender leak | Ask for the name. Drawer and Z stay on that seat. Do not name a thief from a guess. |
 | Behind on books | 30-60-90 or a P&L surprise. Conversation. |
-| Too many hats | What's the one thing off the plate tonight. |
+| Too many hats | That's why we're here. What's the one thing off the plate tonight. |
 | Invoice / truck | Snap when they choose this path. |
 
 Do **not** default to “snap this week’s order guide.” Internal plate id is `invoice-truck`. Leftover `order-guide` normalizes to it.
 
 Quiet identity, not a SaaS tour: **built by Myke Mueller · Never86'd · operator first · was you**
+
+After first choice, preview contract: **Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.**
+
+Promise (not a tour): **Find the leak. Assign the fix. Keep the receipt.**
 
 ## LOM
 

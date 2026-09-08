@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import {
   activationEmailConfigured,
+  activationEmailUnavailable,
+  classifyActivationEmailFailure,
   normalizeEmail,
   publicActivationAccepted,
   requestOperatorActivation,
+  type ActivationEmailFailure,
 } from '@/lib/operatorActivation';
 import { Resend } from 'resend';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowAuthAttempt } from '@/lib/authThrottle';
-import { activationEmailFailure } from '@/lib/email';
 import { activationEmailPayload, buildOwnerDeskActivationLink } from '@/lib/ownerDeskAuth';
 
 export const runtime = 'nodejs';
@@ -23,10 +25,20 @@ const bodySchema = z.object({
   sourcePage: z.string().optional(),
 });
 
+class ActivationEmailSendError extends Error {
+  readonly failure: ActivationEmailFailure;
+
+  constructor(failure: ActivationEmailFailure) {
+    super(failure.error);
+    this.name = 'ActivationEmailSendError';
+    this.failure = failure;
+  }
+}
+
 async function sendActivationEmail(email: string, link: string, expiresAt: Date) {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key) {
-    throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
+    throw new ActivationEmailSendError(activationEmailUnavailable());
   }
   const resend = new Resend(key);
   const sent = await resend.emails.send(activationEmailPayload(email, link, expiresAt));
@@ -36,12 +48,11 @@ async function sendActivationEmail(email: string, link: string, expiresAt: Date)
       name: sent.error.name,
       message: sent.error.message,
     });
-    const failure = activationEmailFailure(sent.error);
-    throw Object.assign(new Error(failure.code), failure);
+    throw new ActivationEmailSendError(classifyActivationEmailFailure(sent.error));
   }
   if (!sent.data?.id) {
     console.error('[onboard/request] Resend returned no message id', { to: email });
-    throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
+    throw new ActivationEmailSendError(activationEmailUnavailable());
   }
   console.info('[onboard/request] activation email queued', { to: email, resendId: sent.data.id });
 }
@@ -90,17 +101,14 @@ export async function POST(req: NextRequest) {
 
     try {
       if (!activationEmailConfigured()) {
-        throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
+        throw new ActivationEmailSendError(activationEmailUnavailable());
       }
       await sendActivationEmail(data.email, link, result.expiresAt);
     } catch (err) {
-      const failure = activationEmailFailure(err);
+      const failure =
+        err instanceof ActivationEmailSendError ? err.failure : activationEmailUnavailable();
       return NextResponse.json(
-        {
-          success: false,
-          error: failure.error,
-          code: failure.code,
-        },
+        { success: false, error: failure.error, code: failure.code },
         { status: failure.status },
       );
     }

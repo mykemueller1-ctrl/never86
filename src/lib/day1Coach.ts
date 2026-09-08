@@ -1,8 +1,8 @@
 import {
   OPERATOR_V2_PLATES,
   nextMissingPlate,
-  normalizePlateId,
   plateById,
+  resolveOperatorV2PlateId,
   type OperatorV2Plate,
   type OperatorV2PlateId,
 } from './operatorV2';
@@ -13,13 +13,17 @@ import {
  * Not order-guide ownership. Not a SaaS tour. Not a module sitemap.
  */
 export const DAY1_INVOICE_PLATE_ID: OperatorV2PlateId = 'invoice-truck';
-/** @deprecated Use DAY1_INVOICE_PLATE_ID. Kept so leftover order-guide hooks compile during rename. */
+/** Photo folder after they choose invoice / truck. Not the empty-desk hero. */
 export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = DAY1_INVOICE_PLATE_ID;
 export const DAY1_COACH_ID = 'day1-coach-conversation';
 export const DAY1_OPEN_ASK = "What's the problem today?";
 export const DAY1_OPEN_ENERGY = "What's going on?";
+export const DAY1_WEIRD_ASK = 'What got weird at the shop?';
 export const DAY1_HELP_ENERGY = 'How can we help you?';
 export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first · was you";
+export const DAY1_PROMISE_LINE = 'Find the leak. Assign the fix. Keep the receipt.';
+export const DAY1_PREVIEW_CONTRACT =
+  'Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.';
 export const DAY1_INVOICE_PATH_ASK =
   'Truck ticket or invoice — snap it when you want that paper off the plate.';
 export const DAY1_INVOICE_PATH_HINT =
@@ -67,7 +71,7 @@ export const DAY1_FRONT_PICKS: readonly Day1FrontPick[] = [
   {
     id: 'too-many-hats',
     chip: 'Too many hats',
-    ask: "Wearing too many hats? What's the one thing that should be off your plate tonight?",
+    ask: "Wearing too many hats? That's why we're here. What's the one thing off your plate tonight?",
     action: 'ask',
   },
   {
@@ -119,13 +123,13 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
 ] as const;
 
 const BANNED_FRONT_VOICE =
-  /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem|prime cost coach)\b/i;
+  /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem|prime cost coach|all-in-one dashboard)\b/i;
 
 const STIFF_TRUCK_LEAD = /got a truck ticket or invoice\?\s*snap it/i;
 
 export function day1CoachById(id: string): Day1FolderCoach | undefined {
-  const normalized = normalizePlateId(id);
-  return DAY1_FOLDER_COACH.find((row) => row.id === (normalized ?? id));
+  const resolved = resolveOperatorV2PlateId(id) ?? id;
+  return DAY1_FOLDER_COACH.find((row) => row.id === resolved);
 }
 
 export function day1FrontPickById(id: string): Day1FrontPick | undefined {
@@ -137,12 +141,19 @@ export function day1FrontNeedsPhoto(pickId: string | null | undefined): boolean 
   return day1FrontPickById(pickId)?.action === 'photo';
 }
 
+function filledHasPlate(filled: ReadonlySet<string>, id: OperatorV2PlateId): boolean {
+  if (filled.has(id)) return true;
+  return [...filled].some((row) => resolveOperatorV2PlateId(row) === id);
+}
+
 /** Photo folder after they choose invoice / truck — never the empty-desk hero. */
-export function day1HookPlate(filled: ReadonlySet<OperatorV2PlateId>): OperatorV2Plate {
-  if (!filled.has(DAY1_INVOICE_PLATE_ID)) {
+export function day1HookPlate(filled: ReadonlySet<OperatorV2PlateId | 'order-guide'>): OperatorV2Plate {
+  if (!filledHasPlate(filled, DAY1_INVOICE_PLATE_ID)) {
     return plateById(DAY1_INVOICE_PLATE_ID) ?? OPERATOR_V2_PLATES[3];
   }
-  return nextMissingPlate(filled);
+  return nextMissingPlate(
+    new Set([...filled].map((id) => resolveOperatorV2PlateId(id) ?? id) as OperatorV2PlateId[]),
+  );
 }
 
 export function day1HookCoach(filled: ReadonlySet<OperatorV2PlateId>): Day1FolderCoach {
@@ -166,7 +177,15 @@ export function looksLikeDay1BartenderAsk(question: string): boolean {
 }
 
 export function day1FrontLeadBlob(): string {
-  return [DAY1_OPEN_ASK, DAY1_OPEN_ENERGY, DAY1_HELP_ENERGY, DAY1_IDENTITY_LINE].join(' ');
+  return [
+    DAY1_OPEN_ASK,
+    DAY1_OPEN_ENERGY,
+    DAY1_WEIRD_ASK,
+    DAY1_HELP_ENERGY,
+    DAY1_IDENTITY_LINE,
+    DAY1_PROMISE_LINE,
+    DAY1_PREVIEW_CONTRACT,
+  ].join(' ');
 }
 
 export function day1FrontCopyBlob(): string {
@@ -184,8 +203,9 @@ export function day1FrontVoiceIsClean(text = day1FrontCopyBlob()): boolean {
 export function day1LeadIsConversationFirst(text = day1FrontLeadBlob()): boolean {
   return (
     /what's the problem today/i.test(text) &&
-    /what's going on/i.test(text) &&
+    /what's going on|what got weird/i.test(text) &&
     !STIFF_TRUCK_LEAD.test(text) &&
-    !/order guide/i.test(text)
+    !/order guide/i.test(text) &&
+    !/all-in-one dashboard/i.test(text)
   );
 }

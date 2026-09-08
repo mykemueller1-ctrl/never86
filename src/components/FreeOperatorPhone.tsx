@@ -22,6 +22,7 @@ import {
   DAY1_INVOICE_PLATE_ID,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
+  DAY1_PREVIEW_CONTRACT,
   day1CoachById,
   day1FrontNeedsPhoto,
   day1HookCoach,
@@ -345,7 +346,11 @@ export function FreeOperatorPhone() {
             </div>
           ) : (
             <p className="owner-desk-poetry">
-              {firstScreen ? DAY1_OPEN_ENERGY : hook.attachHint}
+              {firstScreen
+                ? frontPath && !needsPhoto
+                  ? DAY1_PREVIEW_CONTRACT
+                  : DAY1_OPEN_ENERGY
+                : hook.attachHint}
             </p>
           )}
           {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
@@ -492,7 +497,7 @@ export function FreeOperatorPhone() {
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Menu & invoices' : 'Beverage margin'}
+            {view === 'food' ? 'Menu & invoice / truck' : 'Beverage margin'}
           </h1>
           <p className="mt-2 text-sm text-white/80">
             Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
@@ -526,7 +531,7 @@ export function FreeOperatorPhone() {
               <div>
                 <p className="text-sm leading-relaxed text-[#06122b]">
                   {view === 'food'
-                    ? 'Picture the menu and the truck ticket. Top plates first. Missing count stays Missing Evidence.'
+                    ? 'Picture the menu and a truck ticket or invoice. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">

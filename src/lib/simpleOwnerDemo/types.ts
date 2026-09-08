@@ -14,6 +14,7 @@ export type EvidenceKind =
   | 'menu'
   | 'invoice-truck'
   | 'order-guide'
+  | 'invoice-truck'
   | 'z'
   | 'void'
   | 'invoice'

@@ -108,8 +108,58 @@ export type ActivationRequestInput = {
 
 export type ActivationRequestCode =
   | 'activation_email_unavailable'
+  | 'invalid_recipient'
   | 'neon_unavailable'
   | 'rate_limited';
+
+export type ActivationEmailFailure = {
+  status: 400 | 503;
+  error: string;
+  code: Extract<ActivationRequestCode, 'activation_email_unavailable' | 'invalid_recipient'>;
+};
+
+export function activationEmailUnavailable(): ActivationEmailFailure {
+  return {
+    status: 503,
+    error: 'Activation email is unavailable. Try again later.',
+    code: 'activation_email_unavailable',
+  };
+}
+
+/** Resend rejected the address. Not a downed mail provider. */
+export function isResendInvalidRecipientError(error: { name?: string; message?: string } | null | undefined): boolean {
+  if (!error) return false;
+  const name = (error.name ?? '').toLowerCase();
+  const message = (error.message ?? '').toLowerCase();
+  if (
+    name === 'invalid_from_address' ||
+    name === 'missing_api_key' ||
+    name === 'invalid_api_key' ||
+    name === 'internal_server_error' ||
+    name === 'application_error'
+  ) {
+    return false;
+  }
+  if (name === 'validation_error' || name === 'invalid_parameter' || name === 'missing_required_field') {
+    return /to|recipient|email|address/.test(message) || name === 'validation_error';
+  }
+  return /invalid[`\s'-]*to|invalid recipient|not a valid email|undeliverable|email address is invalid/.test(
+    message,
+  );
+}
+
+export function classifyActivationEmailFailure(
+  error: { name?: string; message?: string } | null | undefined,
+): ActivationEmailFailure {
+  if (isResendInvalidRecipientError(error)) {
+    return {
+      status: 400,
+      error: 'Use a real work email',
+      code: 'invalid_recipient',
+    };
+  }
+  return activationEmailUnavailable();
+}
 
 export type ActivationRequestResult =
   | { ok: true; rawToken: string; expiresAt: Date; alreadyPending: boolean }

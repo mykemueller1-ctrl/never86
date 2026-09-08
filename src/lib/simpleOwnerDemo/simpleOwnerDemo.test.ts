@@ -27,8 +27,6 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('order-guide.pdf').kind).toBe('invoice-truck');
     expect(classifyUpload('truck-ticket.jpg').kind).toBe('invoice-truck');
     expect(classifyUpload('liquor-ticket.jpg').kind).toBe('invoice-truck');
-    expect(classifyUpload('IMG_9001.jpg', 'image/jpeg', 'order-guide').kind).toBe('invoice-truck');
-    expect(classifyUpload('IMG_9001.jpg', 'image/jpeg', 'invoice-truck').kind).toBe('invoice-truck');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
@@ -41,6 +39,8 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'schedule').kind).toBe('schedule');
     expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'labor-cards').kind).toBe('labor-cards');
     expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'menu').kind).toBe('menu');
+    expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'invoice-truck').kind).toBe('invoice-truck');
+    expect(classifyUpload('IMG_1234.jpg', 'image/jpeg', 'order-guide').kind).toBe('invoice-truck');
     expect(classifyUpload('time-clock.csv', 'text/csv', 'schedule').kind).toBe('timeclock');
   });
 
@@ -94,6 +94,12 @@ describe('simple owner demo readiness', () => {
     expect(clocked.folders.find((folder) => folder.id === 'labor-cards')?.state).toBe('READY');
     expect(clocked.laborCards.map((card) => card.role)).toEqual(['FOH', 'Line', 'Dish', 'Run']);
     expect(clocked.dailyCompare.every((chip) => chip.state === 'READY')).toBe(true);
+  });
+
+  it('treats leftover stored order-guide evidence as invoice / truck Ready', () => {
+    const leftover = readinessFromUploads('demo:a', [fakeUpload('demo:a', 'order-guide', 'old-ticket.jpg')]);
+    expect(leftover.folders.find((folder) => folder.id === 'invoice-truck')?.state).toBe('READY');
+    expect(leftover.folders.find((folder) => folder.id === 'order-guide')).toBeUndefined();
   });
 });
 
@@ -228,6 +234,21 @@ describe('day-1 photo win + invoice identity', () => {
     expect(result.upload.sourceTags.join(' ')).not.toMatch(/invoice-dup-flag/);
   });
 
+  it('still flips invoice / truck Ready from a leftover order-guide folder hint', async () => {
+    const { svc } = service();
+    const result = await svc.upload({
+      operatorId: 'demo:legacy-hook',
+      filename: 'IMG_9002.jpg',
+      contentType: 'image/jpeg',
+      bytes: new TextEncoder().encode('jpeg-bytes'),
+      folder: 'order-guide',
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.upload.evidenceKind).toBe('invoice-truck');
+    expect(result.readiness.folders.find((row) => row.id === 'invoice-truck')?.state).toBe('READY');
+  });
+
   it('tags invoice-number identity and vendor+total collisions without blocking the upload', async () => {
     const { svc } = service();
     const body = [
@@ -300,7 +321,7 @@ describe('compose never invents a close', () => {
 
 function fakeUpload(
   operatorId: string,
-  evidenceKind: 'schedule' | 'hourly' | 'timeclock' | 'labor-cards' | 'menu' | 'invoice-truck',
+  evidenceKind: 'schedule' | 'hourly' | 'timeclock' | 'labor-cards' | 'menu' | 'order-guide' | 'invoice-truck',
   filename: string,
 ) {
   return {
