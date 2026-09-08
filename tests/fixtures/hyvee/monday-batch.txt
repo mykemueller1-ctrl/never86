@@ -1,7 +1,7 @@
-Monday batch pay
-Hy-Vee Wine & Spirits
-Fort Dodge
+Monday liquor batch — Fort Dodge Hy-Vee Wine & Spirits
 Batch date: 8/25/2026
-Batch total: $120.00
-Invoices: HV-LAB-1001
-Do not invent a pay amount. This is the Monday batch paper.
+Yellow slips this week: 1
+Delivery invoices this week: 1
+Check total: $120.00
+One check covers this week's yellow slips + delivery invoices
+Do not invent a pay amount. This is the Monday one-check paper.

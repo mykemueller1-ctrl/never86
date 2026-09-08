@@ -1,9 +1,21 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { CTAP_TOAST_CONTAMINANT_FAIL } from '@/lib/ctapPosLock';
+import { NAG_TOAST_GT } from '@/lib/reportAdapters/nagToastGt';
+import { PDQ_INGEST_PRIMARY_EMAIL, PDQ_INGEST_SECONDARY_EMAIL } from '@/lib/pdqIngest';
 import { createMemoryObjectStore } from './objectStore';
 import { createMemoryRepository } from './repository';
 import { createSimpleOwnerDemoService } from './service';
+
+const TOAST_GT_LEAK = /1,211\.85|3,408\.15|36,827\.34|6,619(?:\.00)?|3,570\.50|44,444\.44|99,999\.01/;
+
+function assertNoToastLeak(body: string, sampleDollars?: string) {
+  expect(body).not.toMatch(TOAST_GT_LEAK);
+  expect(body).not.toContain(String(NAG_TOAST_GT.dayNetSales));
+  expect(body).not.toContain(String(NAG_TOAST_GT.laborCost));
+  if (sampleDollars) expect(sampleDollars).not.toMatch(/^toast-/);
+}
 
 function loadPdq(name: string): Uint8Array {
   return new Uint8Array(readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq', name)));
@@ -128,7 +140,7 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     expect(body.toLowerCase()).not.toMatch(/thief|theft|steal|caught/);
   });
 
-  it('never lets Kristin NAG Toast / Taco Bomba answer CTAP dollars', async () => {
+  it('Fails contaminant and never lets Toast / NAG / Taco Bamba answer CTAP dollars', async () => {
     const { svc, operatorId } = await loadCtapMorningPack();
     const nag = await svc.upload({
       operatorId,
@@ -144,10 +156,116 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     });
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
-    const body = asked.answer.facts.join(' ');
+    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
     expect(body).toMatch(/Verified · Menu Category · Food \$400\.00/);
-    expect(body).not.toMatch(/44,444\.44|99,999\.01|1,211\.85/);
-    expect(body).toMatch(/Taco Bomba|NAG|Toast/);
+    expect(body).toMatch(/Fail/);
+    expect(asked.answer.sampleDollars).toBe('pdq-verified');
+    assertNoToastLeak(body, asked.answer.sampleDollars);
+  });
+
+  it('Wave 0: net sales yesterday + ZReport → Verified Grand Total; voids from Void_Promo', async () => {
+    const { svc, operatorId } = await loadCtapMorningPack();
+    const asked = await svc.ask({
+      operatorId,
+      question: 'net sales yesterday',
+      tray: 'action',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Verified Grand Total \$1,123\.50/);
+    expect(asked.answer.verifiedClose).toBe(true);
+    expect(asked.answer.sampleDollars).toBe('pdq-verified');
+    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Void_Promo # Voids \$12\.00/);
+    assertNoToastLeak(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`, asked.answer.sampleDollars);
+  });
+
+  it('Wave 0: net sales yesterday with no pack → Missing', async () => {
+    const svc = service();
+    const asked = await svc.ask({
+      operatorId: 'demo:ctap-empty',
+      question: 'net sales yesterday',
+      tray: 'action',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Missing/);
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.sampleDollars).toBe('none-verified');
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\$\d/);
+  });
+
+  it('default food today is Verified Food alone — not combined', async () => {
+    const { svc, operatorId } = await loadCtapMorningPack();
+    const asked = await svc.ask({
+      operatorId,
+      question: 'food today',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toBe('Verified Food $400.00');
+    expect(asked.answer.sampleDollars).toBe('pdq-verified');
+    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Menu Category · Large Pizzas \$250\.00/);
+    expect(asked.answer.headline).not.toMatch(/\$650/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/400 \+ 250 = 650/);
+  });
+
+  it('prefers primary fuller EOD over secondary Z-only and does not print mailboxes', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-ingest-lanes';
+    const secondary = `To: ${PDQ_INGEST_SECONDARY_EMAIL}\n\n${readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-large-pizzas.txt'), 'utf8')}`;
+    const primary = `To: ${PDQ_INGEST_PRIMARY_EMAIL}\n\n${readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-summary.txt'), 'utf8')}`;
+    expect((await svc.upload({
+      operatorId,
+      filename: '8-24-2026 ZReport_Summary-secondary.pdf',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(secondary),
+    })).ok).toBe(true);
+    expect((await svc.upload({
+      operatorId,
+      filename: '8-24-2026 ZReport_Summary-primary.pdf',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(primary),
+    })).ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'food today',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toBe('Verified Food $600.00');
+    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
+    expect(body).toMatch(/primary inbox \(fuller EOD\)/);
+    expect(body).not.toMatch(/mykemueller1@gmail\.com|communitypizza2026@gmail\.com/);
+  });
+});
+
+describe('CTAP Seat 1 hard lock — Toast packs cannot answer CTAP sales', () => {
+  it('Toast-only CTAP seat + net sales stays Fail/Missing — no NAG Toast $', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-toast-poison';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'SalesSummary_2026-08-31.csv',
+      contentType: 'text/csv',
+      bytes: loadToast('SalesSummary_2026-08-31.csv'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What were net sales Aug 31?',
+      tray: 'action',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    const body = `${asked.answer.headline} ${asked.answer.facts.join(' ')}`;
+    expect(asked.answer.sampleDollars).toBe('none-verified');
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.sampleDollars).not.toMatch(/^toast-/);
+    expect(body).toContain(CTAP_TOAST_CONTAMINANT_FAIL);
+    expect(body).toMatch(/PDQ|ZReport/);
+    assertNoToastLeak(body, asked.answer.sampleDollars);
   });
 });
 
@@ -201,6 +319,66 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     if (!asked.ok) return;
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.headline).toMatch(/Missing/);
-    expect(asked.answer.facts.join(' ')).not.toMatch(/\$120\.00/);
+    expect(asked.answer.headline).not.toMatch(/\$120\.00/);
+    expect(asked.answer.facts.join(' ')).toMatch(/No delivered \$ invented|delivery invoice is not on this seat/);
+  });
+
+  it('invoice OCR alone Verifies delivered $ and leaves order-match / slip Missing', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-hyvee-invoice-only';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'hyvee-delivery-invoice.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('delivery-invoice.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What got delivered on the Hy-Vee invoice?',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Verified delivered \$120\.00/);
+    expect(asked.answer.facts.join(' ')).toMatch(/order-match stays Missing/);
+    expect(asked.answer.facts.join(' ')).toMatch(/slip reconciliation stays Missing/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/94016902/);
+  });
+
+  it('Monday one-check is Missing when pay pattern is only invoices', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-hyvee-monday-gap';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'hyvee-delivery-invoice.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('delivery-invoice.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What is the Hy-Vee Monday one check?',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Missing/);
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.facts.join(' ')).toMatch(/no partial invented/i);
+  });
+
+  it('Wave 0b: Hy-Vee AP / 30-60 is Missing — OCR the mess, not AP', async () => {
+    const svc = service();
+    const asked = await svc.ask({
+      operatorId: 'demo:ctap-hyvee-ap',
+      question: 'Show me Hy-Vee AP aging 30/60',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/OCR into the mess, not AP/);
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.sampleDollars).toBe('none-verified');
   });
 });

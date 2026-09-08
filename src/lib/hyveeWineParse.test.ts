@@ -26,6 +26,9 @@ describe('Hy-Vee Wine papers-in parse', () => {
     expect(invoice?.labeledTotal).toBe(120);
     expect(invoice?.invoiceNumber).toBe('HV-LAB-1001');
     expect(invoice?.location).toBe('Fort Dodge');
+    const monday = parseHyveeWineReport(load('monday-batch.txt'), 'monday-batch.txt');
+    expect(monday?.family).toBe('monday-batch');
+    expect(monday?.labeledTotal).toBe(120);
   });
 
   it('does not detect Humes as Hy-Vee', () => {
@@ -64,8 +67,34 @@ describe('Hy-Vee desk honesty', () => {
     expect(answer?.verifiedClose).toBe(true);
     expect(answer?.headline).toMatch(/Verified/);
     expect(answer?.facts.join(' ')).toMatch(/\$120\.00/);
-    expect(answer?.facts.join(' ')).toMatch(/four-leg glue/);
+    expect(answer?.facts.join(' ')).toMatch(/three-paper glue|order email ↔ yellow slip ↔ delivery invoice/);
     expect(answer?.facts.join(' ')).not.toMatch(/94016902/);
     expect(answer?.facts.join(' ').toLowerCase()).not.toMatch(/thief|theft/);
+  });
+
+  it('invoice OCR alone is Verified delivered $; order-match / slip stay Missing', () => {
+    const invoice = parseHyveeWineReport(load('delivery-invoice.txt'), 'delivery-invoice.txt');
+    const facts = collectHyveeFacts([
+      { filename: 'delivery-invoice.txt', sourceTags: [{ tag: 'verified', source: `hyvee-parse:v1:${JSON.stringify(invoice)}` }] },
+    ]);
+    const delivered = answerHyveeDeskQuestion('What got delivered on the Hy-Vee invoice?', facts);
+    expect(delivered?.headline).toMatch(/Verified delivered \$120\.00/);
+    expect(delivered?.verifiedClose).toBe(true);
+    expect(delivered?.facts.join(' ')).toMatch(/order-match stays Missing/);
+    expect(delivered?.facts.join(' ')).toMatch(/slip reconciliation stays Missing/);
+
+    const monday = answerHyveeDeskQuestion('What is the Hy-Vee Monday one check?', facts);
+    expect(monday?.headline).toMatch(/Missing/);
+    expect(monday?.verifiedClose).toBe(false);
+    expect(monday?.facts.join(' ')).toMatch(/no partial invented/i);
+  });
+
+  it('Wave 0b refuses AP / 30-60-90', () => {
+    expect(routeHyveeDeskQuestion('Show me Hy-Vee AP aging 30/60')).toBe('glue');
+    const facts = collectHyveeFacts([]);
+    const answer = answerHyveeDeskQuestion('Show me Hy-Vee AP aging 30/60', facts);
+    expect(answer?.headline).toMatch(/Missing — Hy-Vee is OCR into the mess, not AP/);
+    expect(answer?.facts.join(' ')).toMatch(/Not AP/);
+    expect(answer?.verifiedClose).toBe(false);
   });
 });

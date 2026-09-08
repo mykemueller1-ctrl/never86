@@ -4,14 +4,17 @@
  * Honesty: Verified | Estimated | Missing only. Never invent $.
  * Large Pizzas ≠ Food. Combined food bucket is Estimated and shows both
  * Verified inputs. Void_Promo negatives are line amounts — not theft.
- * Kristin NAG Toast / Taco Bomba never answers CTAP dollars.
+ * HARD LOCK: CTAP Seat 1 = PDQ POS only. Toast / NAG / Taco Bamba
+ * on this seat is contaminant = Fail. Those dollars never answer CTAP.
  */
 
+import { CTAP_TOAST_CONTAMINANT_FAIL } from '@/lib/ctapPosLock';
 import {
   PDQ_PARSE_PREFIX,
   packFromPdqSourceTag,
   type PdqFactPack,
 } from '@/lib/pdqEodParse';
+import { pdqIngestLaneLabel, pdqIngestLaneRank } from '@/lib/pdqIngest';
 import { isToastTrainingCorpusOnly } from '@/lib/reportAdapters/trainingCorpus';
 import { detectToastFamily } from '@/lib/toastParse';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
@@ -72,10 +75,19 @@ export function collectPdqFacts(
       hasPdq = true;
     }
   }
-  const z = packs.find((row) => row.family === 'z-summary') ?? null;
-  const hourly = packs.find((row) => row.family === 'hourly') ?? null;
-  const voids = packs.find((row) => row.family === 'void-promo') ?? null;
-  return { packs, hasPdq, heldOffNagToast, z, hourly, voids };
+  const pick = (family: PdqFactPack['family']) => {
+    const hits = packs.filter((row) => row.family === family);
+    hits.sort((a, b) => pdqIngestLaneRank(b.ingestLane) - pdqIngestLaneRank(a.ingestLane));
+    return hits[0] ?? null;
+  };
+  return {
+    packs,
+    hasPdq,
+    heldOffNagToast,
+    z: pick('z-summary'),
+    hourly: pick('hourly'),
+    voids: pick('void-promo'),
+  };
 }
 
 export function routePdqDeskQuestion(question: string): PdqDeskKind | null {
@@ -91,9 +103,9 @@ export function routePdqDeskQuestion(question: string): PdqDeskKind | null {
   ) {
     return 'combined-food';
   }
-  if (/large pizza|menu category|food\b|beer\b|liquor\b|pop\b/.test(q)) return 'food';
+  if (/food today|\bfood\b|large pizza|menu category|beer\b|liquor\b|pop\b/.test(q)) return 'food';
   if (
-    /\bpdq\b|z ?report|grand total|net sales|\bsales\b|channel mix|mix\b/.test(q)
+    /\bpdq\b|z ?report|grand total|net sales|\bsales\b|yesterday|channel mix|mix\b/.test(q)
   ) {
     return 'sales';
   }
@@ -113,7 +125,7 @@ function formatDay(iso: string | null): string {
 
 function contaminateLine(facts: PdqSeatFacts): string | null {
   if (!facts.heldOffNagToast) return null;
-  return 'A Toast / NAG / Taco Bomba file on this seat is not used for Community Tap dollars.';
+  return CTAP_TOAST_CONTAMINANT_FAIL;
 }
 
 function missingZ(kind: PdqDeskKind, facts: PdqSeatFacts, extra: string[]): PdqDeskAnswer {
@@ -304,7 +316,36 @@ export function answerPdqDeskQuestion(
     };
   }
 
-  const mixLines = verifiedMixLines(z);
+  const lane = `Ingest lane: ${pdqIngestLaneLabel(z.ingestLane)}.`;
+
+  if (kind === 'food') {
+    const factsOut = [
+      `Verified · ${z.filename} · ${formatDay(z.businessDate)}`,
+      z.mix.food != null
+        ? `Verified · Menu Category · Food ${usd(z.mix.food)}`
+        : 'Missing · Menu Category · Food is not on this Z. Not $0.',
+      z.mix.largePizzas != null
+        ? `Verified · Menu Category · Large Pizzas ${usd(z.mix.largePizzas)} — separate line, not Food.`
+        : 'Missing · Menu Category · Large Pizzas is not on this Z. Not $0.',
+      'Default food today is the Food line alone. Large Pizzas ≠ Food. Combined Food+Large is Estimated only when you ask.',
+      lane,
+      ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+    ];
+    return {
+      kind,
+      slug: 'foh-voids',
+      headline: z.mix.food != null
+        ? `Verified Food ${usd(z.mix.food)}`
+        : 'Missing — Menu Category · Food is not on this Z.',
+      facts: factsOut,
+      coachTomorrow: 'Ask for the combined food bucket only if you want Food + Large Pizzas as Estimated.',
+      needs: 'ZReport_Summary Menu Category · Food is on this seat.',
+      sourceTags: [{ tag: 'verified', source: `pdq:z-summary:food:${z.businessDate || z.filename}` }],
+      verifiedClose: z.mix.food != null,
+      sampleDollars: z.mix.food != null ? 'pdq-verified' : 'none-verified',
+    };
+  }
+
   const channelLines: string[] = [
     ['Pickup', z.channels.pickup],
     ['Delivery', z.channels.delivery],
@@ -316,30 +357,32 @@ export function answerPdqDeskQuestion(
       : `Missing · Channel · ${label} is not on this Z.`
   ));
 
+  const voidLine = facts.voids?.voids != null
+    ? `Verified · Void_Promo # Voids ${usd(facts.voids.voids)}`
+    : 'Missing · voids stay Missing until Void_Promo_Report lands.';
+
   const factsOut = [
     `Verified · ${z.filename} · ${formatDay(z.businessDate)}`,
-    z.netSales != null ? `Verified · Subtotal / net sales ${usd(z.netSales)}` : 'Missing · Subtotal is not on this Z.',
     z.grandTotal != null ? `Verified · Grand Total ${usd(z.grandTotal)}` : 'Missing · Grand Total is not on this Z.',
-    ...mixLines,
-    ...(kind === 'sales' ? channelLines : []),
-    'Large Pizzas ≠ Food. Combined food is Estimated only when you ask for that bucket.',
+    z.netSales != null ? `Verified · Subtotal ${usd(z.netSales)}` : 'Missing · Subtotal is not on this Z.',
+    voidLine,
+    ...verifiedMixLines(z),
+    ...channelLines,
+    'Wave 0: net sales yesterday quotes Grand Total from the Z. Voids come from Void_Promo. Missing if no pack.',
+    lane,
     ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
   ];
-
-  const headline = kind === 'food' && z.mix.food != null
-    ? `Verified Food ${usd(z.mix.food)}${z.mix.largePizzas != null ? ` · Large Pizzas ${usd(z.mix.largePizzas)}` : ''}`
-    : z.netSales != null
-      ? `Verified PDQ net sales ${usd(z.netSales)}`
-      : z.grandTotal != null
-        ? `Verified PDQ Grand Total ${usd(z.grandTotal)}`
-        : 'Verified PDQ Menu Category lines';
 
   return {
     kind,
     slug: 'foh-voids',
-    headline,
+    headline: z.grandTotal != null
+      ? `Verified Grand Total ${usd(z.grandTotal)}`
+      : z.netSales != null
+        ? `Verified Subtotal ${usd(z.netSales)}`
+        : 'Verified PDQ Menu Category lines',
     facts: factsOut,
-    coachTomorrow: 'Ask for the combined food bucket only if you want Food + Large Pizzas as Estimated.',
+    coachTomorrow: 'Keep Hourly and Void_Promo with the same-date Z. Secondary CC is often Z-only — primary inbox is the fuller pack.',
     needs: 'ZReport_Summary is on this seat.',
     sourceTags: [{ tag: 'verified', source: `pdq:z-summary:${z.businessDate || z.filename}` }],
     verifiedClose: true,

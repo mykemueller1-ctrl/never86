@@ -10,7 +10,10 @@
  * - $0 cash field = unentered POS, not a shortage.
  *
  * Fixtures are synthetic. Do not commit live restaurant totals or staff names.
+ * CoS lock: Large Pizzas ≠ Food. Primary ingest is the fuller EOD inbox.
  */
+
+import { detectPdqIngestLane } from '@/lib/pdqIngest';
 
 export type EvidenceState =
   | 'verified'
@@ -440,6 +443,7 @@ export type PdqFactPack = {
   pos: 'pdq';
   family: 'z-summary' | 'hourly' | 'void-promo';
   filename: string;
+  ingestLane?: 'primary' | 'secondary' | 'unknown';
   businessDate: string | null;
   store: string | null;
   netSales: number | null;
@@ -505,13 +509,15 @@ function emptyChannels() {
   };
 }
 
-export function toPdqFactPack(parsed: PdqParseResult, filename: string): PdqFactPack | null {
+export function toPdqFactPack(parsed: PdqParseResult, filename: string, text = ''): PdqFactPack | null {
   if (parsed.family === 'unknown') return null;
+  const ingestLane = detectPdqIngestLane(text, filename);
   if (parsed.family === 'z-summary') {
     return {
       pos: 'pdq',
       family: 'z-summary',
       filename,
+      ingestLane,
       businessDate: parsed.businessDate,
       store: parsed.store,
       netSales: moneyValue(parsed.netSales),
@@ -548,6 +554,7 @@ export function toPdqFactPack(parsed: PdqParseResult, filename: string): PdqFact
       pos: 'pdq',
       family: 'hourly',
       filename,
+      ingestLane,
       businessDate: parsed.businessDate,
       store: null,
       netSales: null,
@@ -565,6 +572,7 @@ export function toPdqFactPack(parsed: PdqParseResult, filename: string): PdqFact
     pos: 'pdq',
     family: 'void-promo',
     filename,
+    ingestLane,
     businessDate: parsed.businessDate,
     store: null,
     netSales: null,
@@ -587,7 +595,7 @@ export function toPdqFactPack(parsed: PdqParseResult, filename: string): PdqFact
 
 export function parsePdqReport(text: string, filename: string): PdqFactPack | null {
   if (detectPdqFamily(filename, text) === 'unknown') return null;
-  return toPdqFactPack(parsePdqNativeText(text, filename), filename);
+  return toPdqFactPack(parsePdqNativeText(text, filename), filename, text);
 }
 
 export function pdqPackHasNumber(pack: PdqFactPack): boolean {

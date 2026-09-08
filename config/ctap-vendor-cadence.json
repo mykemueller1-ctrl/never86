@@ -48,8 +48,8 @@
       "days": ["Mon"],
       "frequency": "weekly",
       "capture": ["email", "photo"],
-      "notes": ["email order", "yellow slips", "invoice glue"],
-      "missingNudge": "Hy-Vee wine: email the order, keep the yellow slip, glue it to the invoice. Snap the slip if the email is missing."
+      "notes": ["email order", "yellow slips", "invoice OCR", "Monday one check", "not AP"],
+      "missingNudge": "Hy-Vee wine: OCR the order, yellow slip, and invoice into the mess — forget to snap? Monday is one check. Not AP."
     },
     {
       "id": "pepsi",

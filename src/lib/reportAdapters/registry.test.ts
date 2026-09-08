@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { assertNoToastPosForCtapSales } from '@/lib/ctapPosLock';
 import { NAG_TOAST_GT } from './nagToastGt';
 import {
   detectReport,
@@ -74,6 +75,16 @@ describe('report adapter registry', () => {
       pos: 'pdq',
       family: 'z-summary',
     });
+  });
+
+  it('Fails if a Toast pack is used as CTAP sales', () => {
+    const toast = parseRegisteredReport(load('SalesSummary_2026-08-31.csv'), 'SalesSummary_2026-08-31.csv');
+    expect(toast?.pos).toBe('toast');
+    expect(() => assertNoToastPosForCtapSales(toast!.pos)).toThrow(/PDQ POS only/);
+    const zText = readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-large-pizzas.txt'), 'utf8');
+    const z = parseRegisteredReport(zText, '8-24-2026 ZReport_Summary.pdf');
+    expect(z?.pos).toBe('pdq');
+    expect(() => assertNoToastPosForCtapSales(z!.pos)).not.toThrow();
   });
 
   it('lets the next POS register without rewriting the desk, and parse=null invents no $', () => {
