@@ -28,8 +28,9 @@ describe('CTAP vendor cadence config', () => {
   });
 
   it('nudges a missing ticket as forget-to-snap, never you-did-not-order', () => {
-    expect(missingInvoiceNudge('Sysco')).toBe('Usually Sysco Tue/Fri — forget to snap?');
+    expect(missingInvoiceNudge('Sysco')).toBe('Usually Sysco Tue/Fri — nothing in. Forget to snap it?');
     expect(missingInvoiceNudge('PFG')).toMatch(/21-day/);
+    expect(missingInvoiceNudge('PFG')).toMatch(/Seat 2 orders the day before/);
     expect(missingInvoiceNudge('PFG')).not.toMatch(/pay now|ACH|remit/i);
     expect(missingInvoiceNudge('Humes')).toMatch(/Email the invoice|snap the ticket/);
     expect(missingInvoiceNudge('Humes')).toMatch(/later wave/);
@@ -37,6 +38,10 @@ describe('CTAP vendor cadence config', () => {
     expect(matchVendorCadence('Humes')?.notes.join(' ')).toMatch(/photo OCR backup/);
     expect(vendorsExpectedOn('Tue').map((row) => row.id)).toContain('sysco');
     expect(vendorBabysitLine({ question: 'Where is the Sysco invoice?' })).toMatch(/forget to snap/i);
+    expect(missingInvoiceNudge('Pepsi')).toMatch(/papers-in/);
+    expect(missingInvoiceNudge('Fort Dodge')).toMatch(/never email/);
+    expect(missingInvoiceNudge('Confluence')).toMatch(/empties photo/);
+    expect(missingInvoiceNudge('NL')).toMatch(/inv#/);
     expect(JSON.stringify(CTAP_VENDOR_CADENCE.vendors)).not.toMatch(/you didn’t order|you did not order|theft/i);
     expect(CTAP_VENDOR_CADENCE.vendors.map((row) => row.missingNudge).join(' ')).not.toMatch(/carbon|CO2 savings/i);
   });

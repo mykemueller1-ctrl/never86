@@ -209,7 +209,7 @@ export function firstPhotoWinLine(readyFolderId: string): string {
 }
 
 export function looksLikeDay1VendorAsk(question: string): boolean {
-  return /\b(vendor|invoice|truck|sysco|pepsi|humes|hy-?vee|pfg|performance|confluence|northern lights|\bnl\b|fort dodge|order guide|ticket)\b/i.test(
+  return /\b(vendor|invoice|truck|sysco|pepsi|humes|hy-?vee|pfg|performance|us foods|confluence|northern lights|\bnl\b|fort dodge|order guide|ticket)\b/i.test(
     question,
   );
 }

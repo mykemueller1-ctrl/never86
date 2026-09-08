@@ -42,6 +42,7 @@ import {
   isCtapSeat1Id,
   toastMayAnswerSeat,
 } from '@/lib/ctapPosLock';
+import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -164,6 +165,27 @@ export function composeAskAnswer(input: {
       inventedClose: false,
       sampleDollars: hyveeAnswer.sampleDollars,
       verifiedClose: hyveeAnswer.verifiedClose,
+    };
+  }
+
+  const vendorSpine = answerVendorSpineQuestion(input.question);
+  if (vendorSpine) {
+    const sourceTags: SourceTag[] = [
+      { tag: 'unverified', source: `vendor-spine:${vendorSpine.vendorId}:hook` },
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: 'unverified', source: `simple-owner-ask:${vendorSpine.slug}` },
+    ];
+    return {
+      slug: vendorSpine.slug,
+      headline: vendorSpine.headline,
+      facts: [...vendorSpine.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: vendorSpine.coachTomorrow,
+      needs: vendorSpine.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: vendorSpine.sampleDollars,
+      verifiedClose: vendorSpine.verifiedClose,
     };
   }
 

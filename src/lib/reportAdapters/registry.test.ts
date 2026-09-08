@@ -99,6 +99,12 @@ describe('report adapter registry', () => {
     expect(plannedReportAdapterHooks().some((row) => row.pos === 'square' && row.status === 'hook')).toBe(true);
     expect(plannedReportAdapterHooks().some((row) => row.pos === 'sysco')).toBe(true);
     expect(plannedReportAdapterHooks().some((row) => row.pos === 'humes' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'pfg' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'pepsi' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'fort-dodge' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'confluence' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'us-foods' && row.status === 'hook')).toBe(true);
+    expect(plannedReportAdapterHooks().some((row) => row.pos === 'northern-lights' && row.status === 'hook')).toBe(true);
     expect(plannedReportAdapterHooks().some((row) => row.pos === 'pdq' && row.status === 'registered')).toBe(true);
   });
 });

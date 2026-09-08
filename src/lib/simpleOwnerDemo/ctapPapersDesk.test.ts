@@ -523,6 +523,54 @@ describe('CTAP papers wave order on a mixed seat', () => {
     expect(liquor.answer.sampleDollars).toBe('hyvee-verified');
   });
 
+  it('coaches PFG / Sysco / Pepsi as Missing rhythms, not Verified AP $', async () => {
+    const svc = service();
+    const pfg = await svc.ask({
+      operatorId: 'demo:ctap-pfg-hook',
+      question: 'What is the PFG invoice total?',
+      tray: 'food',
+    });
+    expect(pfg.ok).toBe(true);
+    if (!pfg.ok) return;
+    expect(pfg.answer.verifiedClose).toBe(false);
+    expect(pfg.answer.sampleDollars).toBe('none-verified');
+    expect(pfg.answer.headline).toMatch(/Missing/);
+    expect(pfg.answer.facts.join(' ')).toMatch(/21-day/);
+    expect(pfg.answer.facts.join(' ')).toMatch(/Not AP automation/);
+    expect(pfg.answer.facts.join(' ')).not.toMatch(/\bTom\b|communitypizza2026|\$88/);
+
+    const sysco = await svc.ask({
+      operatorId: 'demo:ctap-sysco-hook',
+      question: 'Sysco invoice — nothing in this week',
+      tray: 'food',
+    });
+    expect(sysco.ok).toBe(true);
+    if (!sysco.ok) return;
+    expect(sysco.answer.facts.join(' ')).toMatch(/nothing in/);
+    expect(sysco.answer.facts.join(' ')).not.toMatch(/you did not order/i);
+
+    const pepsi = await svc.ask({
+      operatorId: 'demo:ctap-pepsi-hook',
+      question: 'Pepsi ticket for the first week',
+      tray: 'food',
+    });
+    expect(pepsi.ok).toBe(true);
+    if (!pepsi.ok) return;
+    expect(pepsi.answer.facts.join(' ')).toMatch(/papers-in/);
+    expect(pepsi.answer.facts.join(' ')).not.toMatch(/CO2 savings/i);
+
+    const usFoods = await svc.ask({
+      operatorId: 'demo:ctap-usfoods-hook',
+      question: 'US Foods invoice this week',
+      tray: 'food',
+    });
+    expect(usFoods.ok).toBe(true);
+    if (!usFoods.ok) return;
+    expect(usFoods.answer.verifiedClose).toBe(false);
+    expect(usFoods.answer.facts.join(' ')).toMatch(/same PFG pattern/);
+    expect(usFoods.answer.facts.join(' ')).toMatch(/21-day/);
+  });
+
   it('does not invent a Humes dollar on this draft', async () => {
     const svc = service();
     const operatorId = 'demo:ctap-humes-later';
@@ -542,6 +590,8 @@ describe('CTAP papers wave order on a mixed seat', () => {
     if (!asked.ok) return;
     expect(asked.answer.verifiedClose).toBe(false);
     expect(asked.answer.sampleDollars).toBe('none-verified');
+    expect(asked.answer.headline).toMatch(/Missing/);
+    expect(asked.answer.facts.join(' ')).toMatch(/later wave/);
     expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\$88/);
   });
 });

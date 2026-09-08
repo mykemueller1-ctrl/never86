@@ -24,6 +24,11 @@ export const REPORT_POS = [
   'us-foods',
   'hy-vee',
   'humes',
+  'pfg',
+  'pepsi',
+  'fort-dodge',
+  'confluence',
+  'northern-lights',
   'other',
 ] as const;
 
@@ -84,7 +89,12 @@ export const PLANNED_REPORT_ADAPTERS: readonly {
   { pos: 'clover', family: 'sales-summary', status: 'hook', note: 'Next adapter: Clover sales export. Not in this PR.' },
   { pos: 'aloha', family: 'sales-summary', status: 'hook', note: 'Next adapter: Aloha sales. Not in this PR.' },
   { pos: 'lightspeed', family: 'sales-summary', status: 'hook', note: 'Next adapter: Lightspeed sales. Not in this PR.' },
-  { pos: 'sysco', family: 'invoice', status: 'hook', note: 'Vendor silo: Sysco invoice/catalog. Not in this PR.' },
-  { pos: 'us-foods', family: 'invoice', status: 'hook', note: 'Vendor silo: US Foods invoice/catalog. Not in this PR.' },
-  { pos: 'humes', family: 'invoice', status: 'hook', note: 'Later wave (Tue+Fri AP email + photo OCR). PDQ Wave 0 then Hy-Vee 0b first. No parse, no $.' },
+  { pos: 'sysco', family: 'invoice', status: 'hook', note: 'Later wave: weekly Tue or Fri photo OCR. Soft zero-week nudge. No parse, no $.' },
+  { pos: 'us-foods', family: 'invoice', status: 'hook', note: 'At-scale same pattern as PFG (order match + 21-day EFT). Hook only.' },
+  { pos: 'pfg', family: 'invoice', status: 'hook', note: 'Later wave: Tue+Fri trucks, Seat 2 day-before, email↔invoice match, 21-day EFT. No parse, no $.' },
+  { pos: 'pepsi', family: 'invoice', status: 'hook', note: 'Later wave: every-other-week photo OCR. First week papers-in, not savings/CO2. No parse, no $.' },
+  { pos: 'fort-dodge', family: 'invoice', status: 'hook', note: 'Later wave: Miller/Coors Tue photo-only, never email. MOD Tue/Wed snap flag. No parse, no $.' },
+  { pos: 'confluence', family: 'invoice', status: 'hook', note: 'Later wave: kegs + empties photo credits. Photo proof, not empties-as-cash $. No parse, no $.' },
+  { pos: 'northern-lights', family: 'invoice', status: 'hook', note: 'Later wave: inv# dedup primary, vendor+total red flag, multi-sender ignore. No parse, no $.' },
+  { pos: 'humes', family: 'invoice', status: 'hook', note: 'Later wave after PDQ/Hy-Vee (Tue+Fri AP email + photo OCR). No parse, no $.' },
 ];
