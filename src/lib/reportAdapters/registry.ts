@@ -28,6 +28,18 @@ import {
 
 export type RegisteredFactPack = ToastFactPack | PdqFactPack | HyveeFactPack;
 
+export function isToastFactPack(pack: RegisteredFactPack): pack is ToastFactPack {
+  return pack.pos === 'toast';
+}
+
+export function isPdqFactPack(pack: RegisteredFactPack): pack is PdqFactPack {
+  return pack.pos === 'pdq';
+}
+
+export function isHyveeFactPack(pack: RegisteredFactPack): pack is HyveeFactPack {
+  return pack.pos === 'hy-vee';
+}
+
 const adapters: ReportAdapter<RegisteredFactPack>[] = [];
 
 function toastAdapter(family: ToastFamily): ReportAdapter<ToastFactPack> {

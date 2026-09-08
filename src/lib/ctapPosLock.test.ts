@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CTAP_SEAT1_POS,
@@ -8,6 +10,7 @@ import {
   toastMayAnswerSeat,
 } from './ctapPosLock';
 import { CTAP_SEAT1_OPERATOR_ID } from './ctapSeat1';
+import { CTAP_TOAST_CONTAMINANT_SOURCE, reportSourceTagsForSeat } from './reportAdapters';
 
 describe('CTAP Seat 1 POS lock', () => {
   it('locks Seat 1 to PDQ and refuses Toast on CTAP ids', () => {
@@ -37,5 +40,15 @@ describe('CTAP Seat 1 POS lock', () => {
     expect(ctapSeatHasToastContaminant([
       { filename: '8-24-2026 ZReport_Summary.pdf' },
     ])).toBe(false);
+  });
+
+  it('does not store Toast parse $ on a CTAP seat; NAG still can', () => {
+    const bytes = new Uint8Array(readFileSync(path.join(process.cwd(), 'tests/fixtures/toast', 'SalesSummary_2026-08-31.csv')));
+    const ctap = reportSourceTagsForSeat('demo:ctap-seat1', 'SalesSummary_2026-08-31.csv', bytes);
+    expect(ctap.map((tag) => tag.source)).toEqual([CTAP_TOAST_CONTAMINANT_SOURCE]);
+    expect(ctap.map((tag) => tag.source).join(' ')).not.toMatch(/1211\.85|36827\.34|toast-parse:v1:/);
+
+    const nag = reportSourceTagsForSeat('demo:nag-toast', 'SalesSummary_2026-08-31.csv', bytes);
+    expect(nag.some((tag) => tag.source.startsWith('toast-parse:v1:'))).toBe(true);
   });
 });

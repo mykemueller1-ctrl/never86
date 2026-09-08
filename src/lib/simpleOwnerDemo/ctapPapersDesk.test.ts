@@ -337,6 +337,12 @@ describe('CTAP Seat 1 hard lock — Toast packs cannot answer CTAP sales', () =>
       bytes: loadToast('SalesSummary_2026-08-31.csv'),
     });
     expect(uploaded.ok).toBe(true);
+    if (uploaded.ok) {
+      const blob = uploaded.upload.sourceTags.map((tag) => tag.source).join(' ');
+      expect(blob).toMatch(/ctap-pos-lock:toast-contaminant:fail/);
+      expect(blob).not.toMatch(/toast-parse:v1:/);
+      expect(blob).not.toMatch(TOAST_GT_LEAK);
+    }
     const asked = await svc.ask({
       operatorId,
       question: 'What were net sales Aug 31?',

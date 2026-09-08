@@ -26,7 +26,7 @@ export type ToastVoidItem = {
 };
 
 export type ToastFactPack = {
-  pos?: 'toast';
+  pos: 'toast';
   family: ToastFamily;
   filename: string;
   location?: string | null;

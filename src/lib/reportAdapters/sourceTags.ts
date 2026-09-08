@@ -1,22 +1,24 @@
-import { decodeToastText, packFromSourceTag, TOAST_PARSE_PREFIX, type ToastFactPack } from '@/lib/toastParse';
+import { decodeToastText, packFromSourceTag, TOAST_PARSE_PREFIX } from '@/lib/toastParse';
 import {
   decodePdqText,
   PDQ_PARSE_PREFIX,
   pdqPackHasNumber,
-  type PdqFactPack,
 } from '@/lib/pdqEodParse';
 import {
   HYVEE_PARSE_PREFIX,
   hyveePackHasNumber,
-  type HyveeFactPack,
 } from '@/lib/hyveeWineParse';
+import { isCtapSeat1Id, uploadLooksLikeToastContaminant } from '@/lib/ctapPosLock';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
-import { detectReport, parseRegisteredReport, type RegisteredFactPack } from './registry';
+import { detectReport, isHyveeFactPack, isPdqFactPack, isToastFactPack, parseRegisteredReport, type RegisteredFactPack } from './registry';
+
+export const CTAP_TOAST_CONTAMINANT_SOURCE = 'ctap-pos-lock:toast-contaminant:fail';
 
 function packHasNumber(pack: RegisteredFactPack): boolean {
-  if (pack.pos === 'pdq') return pdqPackHasNumber(pack as PdqFactPack);
-  if (pack.pos === 'hy-vee') return hyveePackHasNumber(pack as HyveeFactPack);
-  const toast = pack as ToastFactPack;
+  if (isPdqFactPack(pack)) return pdqPackHasNumber(pack);
+  if (isHyveeFactPack(pack)) return hyveePackHasNumber(pack);
+  if (!isToastFactPack(pack)) return false;
+  const toast = pack;
   return (
     toast.netSales != null
     || toast.laborCost != null
@@ -73,4 +75,20 @@ export function reportSourceTags(filename: string, bytes: Uint8Array): SourceTag
 
 export function hasParsedReportPack(tags: readonly SourceTag[]): boolean {
   return tags.some((tag) => packFromSourceTag(tag) != null || /[-]parse:v1:/.test(tag.source));
+}
+
+export function hasCtapToastContaminantTag(tags: readonly SourceTag[]): boolean {
+  return tags.some((tag) => tag.source === CTAP_TOAST_CONTAMINANT_SOURCE);
+}
+
+/** CTAP Seat 1 never stores Toast parse $ — Fail tag only. */
+export function reportSourceTagsForSeat(
+  operatorId: string,
+  filename: string,
+  bytes: Uint8Array,
+): SourceTag[] {
+  if (isCtapSeat1Id(operatorId) && uploadLooksLikeToastContaminant(filename)) {
+    return [{ tag: 'unverified', source: CTAP_TOAST_CONTAMINANT_SOURCE }];
+  }
+  return reportSourceTags(filename, bytes);
 }
