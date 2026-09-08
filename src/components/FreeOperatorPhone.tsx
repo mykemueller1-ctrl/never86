@@ -479,7 +479,7 @@ export function FreeOperatorPhone() {
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Menu & order guides' : 'Beverage margin'}
+            {view === 'food' ? 'Menu & invoice / truck' : 'Beverage margin'}
           </h1>
           <p className="mt-2 text-sm text-white/80">
             Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
@@ -487,7 +487,7 @@ export function FreeOperatorPhone() {
           {view === 'food' ? (
             <div className="owner-v2-plates mt-5" aria-label="Food folders">
               {folders
-                .filter((folder) => folder.id === 'menu' || folder.id === 'order-guide')
+                .filter((folder) => folder.id === 'menu' || folder.id === 'invoice-truck')
                 .map((folder) => {
                   const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
                   return (
@@ -513,7 +513,7 @@ export function FreeOperatorPhone() {
               <div>
                 <p className="text-sm leading-relaxed text-[#06122b]">
                   {view === 'food'
-                    ? 'Picture the menu and the order guide. Top plates first. Missing count stays Missing Evidence.'
+                    ? 'Picture the menu and a truck ticket or invoice. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">

@@ -1,4 +1,4 @@
-import { isOperatorV2PlateId, plateById } from '@/lib/operatorV2';
+import { plateById, resolveOperatorV2PlateId } from '@/lib/operatorV2';
 import type { EvidenceKind, SourceTag } from './types';
 
 const KIND_PATTERNS: readonly { kind: EvidenceKind; pattern: RegExp; source: string }[] = [
@@ -6,7 +6,7 @@ const KIND_PATTERNS: readonly { kind: EvidenceKind; pattern: RegExp; source: str
   { kind: 'timeclock', pattern: /time[_-\s]?clock|timesheet|punch|clock[_-\s]?in|clock[_-\s]?out/, source: 'operator-upload:timeclock' },
   { kind: 'labor-cards', pattern: /labor[_-\s]?card|role[_-\s]?card|shift[_-\s]?role/, source: 'operator-upload:labor-cards' },
   { kind: 'schedule', pattern: /schedule|roster|labor[_-\s]?plan/, source: 'operator-upload:schedule' },
-  { kind: 'order-guide', pattern: /order[_-\s]?guide|par[_-\s]?sheet|truck[_-\s]?ticket|liquor[_-\s]?ticket/, source: 'operator-upload:order-guide' },
+  { kind: 'invoice-truck', pattern: /order[_-\s]?guide|par[_-\s]?sheet|truck[_-\s]?ticket|liquor[_-\s]?ticket/, source: 'operator-upload:invoice-truck' },
   { kind: 'menu', pattern: /\bmenu\b|plate[_-\s]?list/, source: 'operator-upload:menu' },
   { kind: 'z', pattern: /\bz[_-\s]?report|zreport|end[_-\s]?of[_-\s]?day|\beod\b/, source: 'operator-upload:z' },
   { kind: 'void', pattern: /void|promo[_-\s]?report/, source: 'operator-upload:void' },
@@ -31,7 +31,7 @@ export function classifyUpload(
     }
   }
 
-  if (folderHint && isOperatorV2PlateId(folderHint)) {
+  if (folderHint && resolveOperatorV2PlateId(folderHint)) {
     const plate = plateById(folderHint);
     if (plate) {
       return {

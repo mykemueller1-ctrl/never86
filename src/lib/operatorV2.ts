@@ -5,8 +5,15 @@ import { ORCHESTRATION_BRAND_BLUE } from './orchestration/types';
 export const OPERATOR_V2_BLUE = ORCHESTRATION_BRAND_BLUE;
 export const OPERATOR_V2_SURFACE = 'plates-chat' as const;
 
-export type OperatorV2PlateId = 'schedule' | 'labor-cards' | 'menu' | 'order-guide';
+export type OperatorV2PlateId = 'schedule' | 'labor-cards' | 'menu' | 'invoice-truck';
 export type OperatorV2FolderStateId = 'NEED' | 'READY';
+
+/** Pre-Option C folder hint / stored evidence kind. Still files to invoice / truck. */
+export const LEGACY_ORDER_GUIDE_PLATE_ID = 'order-guide';
+
+const PLATE_ID_ALIASES: Readonly<Record<string, OperatorV2PlateId>> = {
+  [LEGACY_ORDER_GUIDE_PLATE_ID]: 'invoice-truck',
+};
 
 export type OperatorV2Plate = {
   id: OperatorV2PlateId;
@@ -59,16 +66,16 @@ export const OPERATOR_V2_PLATES: readonly OperatorV2Plate[] = [
     evidenceKind: 'menu',
   },
   {
-    id: 'order-guide',
-    label: 'Order guide',
-    folder: 'Order guides',
+    id: 'invoice-truck',
+    label: 'Invoice / truck',
+    folder: 'Invoice / truck',
     ask: 'Got a truck ticket or invoice? Snap it.',
     tray: 'food',
     missingUntil: 'A truck ticket, liquor invoice, or handwritten short lands. Invoice ≠ COGS.',
     ocrInput: true,
     firstClass: true,
     deferred: false,
-    evidenceKind: 'order-guide',
+    evidenceKind: 'invoice-truck',
   },
 ] as const;
 
@@ -125,8 +132,14 @@ export type DailyCompareChip = {
   reason: string;
 };
 
+export function resolveOperatorV2PlateId(id: string): OperatorV2PlateId | undefined {
+  if (OPERATOR_V2_PLATES.some((plate) => plate.id === id)) return id as OperatorV2PlateId;
+  return PLATE_ID_ALIASES[id];
+}
+
 export function plateById(id: string): OperatorV2Plate | undefined {
-  return OPERATOR_V2_PLATES.find((plate) => plate.id === id);
+  const resolved = resolveOperatorV2PlateId(id);
+  return resolved ? OPERATOR_V2_PLATES.find((plate) => plate.id === resolved) : undefined;
 }
 
 export function isOperatorV2PlateId(id: string): id is OperatorV2PlateId {
@@ -139,7 +152,9 @@ export function nextMissingPlate(filled: ReadonlySet<OperatorV2PlateId>): Operat
 
 export function projectFoldersFromKinds(kinds: ReadonlySet<string>): OperatorV2FolderState[] {
   return OPERATOR_V2_PLATES.map((plate) => {
-    const ready = kinds.has(plate.evidenceKind);
+    const ready =
+      kinds.has(plate.evidenceKind) ||
+      (plate.id === 'invoice-truck' && kinds.has(LEGACY_ORDER_GUIDE_PLATE_ID));
     return {
       id: plate.id,
       label: plate.label,

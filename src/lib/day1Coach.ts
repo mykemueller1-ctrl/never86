@@ -2,6 +2,7 @@ import {
   OPERATOR_V2_PLATES,
   nextMissingPlate,
   plateById,
+  resolveOperatorV2PlateId,
   type OperatorV2Plate,
   type OperatorV2PlateId,
 } from './operatorV2';
@@ -10,7 +11,7 @@ import {
  * Day-1 Option C hybrid. Open ask + soft default physical artifact.
  * Not order-guide ownership. Not a SaaS tour. Not a module sitemap.
  */
-export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = 'order-guide';
+export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = 'invoice-truck';
 export const DAY1_COACH_ID = 'day1-coach-option-c';
 export const DAY1_OPEN_ASK = 'How can we help you?';
 export const DAY1_SOFT_DEFAULT = 'Got a truck ticket or invoice? Snap it.';
@@ -90,7 +91,7 @@ export const DAY1_FOLDER_COACH: readonly Day1FolderCoach[] = [
     winning: 'Menu is on this seat. Top plates only — no food-cost % from a photo.',
   },
   {
-    id: 'order-guide',
+    id: 'invoice-truck',
     label: 'Invoice / truck',
     chip: 'Invoice / truck',
     ask: DAY1_SOFT_DEFAULT,
@@ -105,19 +106,25 @@ const BANNED_FRONT_VOICE =
   /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem)\b/i;
 
 export function day1CoachById(id: string): Day1FolderCoach | undefined {
-  return DAY1_FOLDER_COACH.find((row) => row.id === id);
+  const resolved = resolveOperatorV2PlateId(id) ?? id;
+  return DAY1_FOLDER_COACH.find((row) => row.id === resolved);
 }
 
 export function day1FrontPickById(id: string): Day1FrontPick | undefined {
   return DAY1_FRONT_PICKS.find((row) => row.id === id);
 }
 
+function filledHasPlate(filled: ReadonlySet<string>, id: OperatorV2PlateId): boolean {
+  if (filled.has(id)) return true;
+  return [...filled].some((row) => resolveOperatorV2PlateId(row) === id);
+}
+
 /** Empty desk → invoice / truck folder. After that, remaining folders in Schedule → Labor → Menu order. */
-export function day1HookPlate(filled: ReadonlySet<OperatorV2PlateId>): OperatorV2Plate {
-  if (!filled.has(DAY1_HOOK_PLATE_ID)) {
+export function day1HookPlate(filled: ReadonlySet<OperatorV2PlateId | 'order-guide'>): OperatorV2Plate {
+  if (!filledHasPlate(filled, DAY1_HOOK_PLATE_ID)) {
     return plateById(DAY1_HOOK_PLATE_ID) ?? OPERATOR_V2_PLATES[3];
   }
-  return nextMissingPlate(filled);
+  return nextMissingPlate(new Set([...filled].map((id) => resolveOperatorV2PlateId(id) ?? id) as OperatorV2PlateId[]));
 }
 
 export function day1HookCoach(filled: ReadonlySet<OperatorV2PlateId>): Day1FolderCoach {

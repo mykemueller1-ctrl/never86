@@ -40,13 +40,13 @@ describe('CTAP seat 1 canary', () => {
 });
 
 describe('Operator V2 plates', () => {
-  it('ships schedule, labor cards, menu, and order guide suck-in plates in blue', () => {
+  it('ships schedule, labor cards, menu, and invoice / truck suck-in plates in blue', () => {
     expect(OPERATOR_V2_BLUE).toBe('#0066ff');
     expect(OPERATOR_V2_PLATES.map((plate) => plate.id)).toEqual([
       'schedule',
       'labor-cards',
       'menu',
-      'order-guide',
+      'invoice-truck',
     ]);
     expect(nextMissingPlate(new Set()).id).toBe('schedule');
     expect(nextMissingPlate(new Set(['schedule'])).id).toBe('labor-cards');

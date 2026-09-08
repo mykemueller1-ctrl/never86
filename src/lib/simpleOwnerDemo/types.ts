@@ -13,6 +13,7 @@ export type EvidenceKind =
   | 'labor-cards'
   | 'menu'
   | 'order-guide'
+  | 'invoice-truck'
   | 'z'
   | 'void'
   | 'invoice'

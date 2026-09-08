@@ -3,6 +3,9 @@ import {
   FREE_SEAT_ID_FLOOR,
   SeatActivationAbort,
   activationEmailConfigured,
+  activationEmailUnavailable,
+  classifyActivationEmailFailure,
+  isResendInvalidRecipientError,
   activationTokenIsConsumable,
   chooseLoginPlane,
   hashActivationToken,
@@ -70,6 +73,38 @@ describe('operatorActivation pure helpers', () => {
     } else {
       throw new Error('expected refusal');
     }
+  });
+
+  it('maps Resend invalid-recipient and validation errors to 400, not 503', () => {
+    expect(
+      classifyActivationEmailFailure({
+        name: 'validation_error',
+        message: 'Invalid `to` field. The email address needs to follow the `email@example.com` format.',
+      }),
+    ).toEqual({
+      status: 400,
+      error: 'Use a real work email',
+      code: 'invalid_recipient',
+    });
+    expect(
+      classifyActivationEmailFailure({
+        name: 'invalid_parameter',
+        message: 'The `to` field must be a valid email address.',
+      }).status,
+    ).toBe(400);
+    expect(isResendInvalidRecipientError({ name: 'validation_error', message: 'Invalid email' })).toBe(true);
+    expect(classifyActivationEmailFailure({ name: 'internal_server_error', message: 'Resend is down' })).toEqual(
+      activationEmailUnavailable(),
+    );
+    expect(classifyActivationEmailFailure({ name: 'invalid_from_address', message: 'bad from' }).status).toBe(503);
+    expect(classifyActivationEmailFailure({ name: 'missing_api_key', message: 'no key' }).code).toBe(
+      'activation_email_unavailable',
+    );
+    expect(activationEmailUnavailable()).toEqual({
+      status: 503,
+      error: 'Activation email is unavailable. Try again later.',
+      code: 'activation_email_unavailable',
+    });
   });
 
   it('fails closed when activation email is not configured', () => {
