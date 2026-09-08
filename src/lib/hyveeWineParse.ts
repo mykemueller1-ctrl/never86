@@ -239,6 +239,10 @@ function lineFor(pack: HyveeFactPack | null, label: string): string {
 
 const NOT_AP = 'Wave 0b: Hy-Vee coach OCR into the mess (order email, yellow slip, delivery invoice). Not AP / 30-60-90.';
 
+/** Myke-confirmed. Not a default guess. Dollar still needs a labeled check total. */
+export const HYVEE_MONDAY_PAY_LOCK =
+  'Verified · Monday lock: one check covers that week’s yellow slips + delivery invoice batch.';
+
 export function answerHyveeDeskQuestion(
   question: string,
   facts: HyveeSeatFacts,
@@ -284,9 +288,10 @@ export function answerHyveeDeskQuestion(
     hasSlip
       ? lineFor(facts.chargeSlip, 'Yellow CUSTOMER CHARGE slip')
       : 'Missing · slip reconciliation stays Missing without the yellow CUSTOMER CHARGE slip.',
+    HYVEE_MONDAY_PAY_LOCK,
     mondayClear
-      ? `Verified · Monday one check ${usd(monday!.labeledTotal!)} covers that week’s yellow slips + delivery invoice batch.`
-      : 'Missing · Monday pay pattern is unclear. One check covers the week’s slips + invoices — no partial invented.',
+      ? `Verified · Monday one check ${usd(monday!.labeledTotal!)} (labeled check total).`
+      : 'Missing · Monday check total is not on this seat. No partial invented from invoices or slips.',
     'Prefer all three papers (email, yellow slip, invoice) when present. Invoice OCR alone is only delivered $ / what got.',
     NOT_AP,
     'Customer account digits stay off the desk copy. Humes is not on this path.',
@@ -316,7 +321,7 @@ export function answerHyveeDeskQuestion(
       facts: matchLines,
       coachTomorrow: (!hasOrder || !hasSlip)
         ? 'Land the order email and yellow slip to move order-match / slip recon from Missing to Verified.'
-        : 'Keep the three papers together. Monday is one check for the week — do not invent a partial.',
+        : 'Keep the three papers together. Monday lock is one check for the week — do not invent a partial.',
       needs: threePresent
         ? 'Invoice + order email + yellow slip are on this seat.'
         : 'Invoice is on this seat. Order-match / slip recon still Missing without email and/or yellow slip.',
@@ -359,15 +364,18 @@ export function answerHyveeDeskQuestion(
       return {
         kind,
         slug: 'boh-invoice',
-        headline: 'Missing — Monday one-check paper is not clear on this seat.',
+        headline: 'Verified Monday lock — check total Missing',
         facts: [
-          'Monday = one check covering that week’s yellow slips + delivery invoice batch.',
-          'Pay pattern unclear in evidence. No partial invented from invoices or slips.',
+          HYVEE_MONDAY_PAY_LOCK,
+          'Missing · Monday check total is not on this seat. No partial invented from invoices or slips.',
           ...matchLines,
         ],
-        coachTomorrow: 'Land the Monday one-check paper. Do not type a pay amount from invoices.',
+        coachTomorrow: 'Land the Monday one-check paper with a labeled check total. Do not type a pay from invoices.',
         needs: 'Monday one-check paper with a labeled check total.',
-        sourceTags: [{ tag: 'unverified', source: 'hyvee-desk:monday:missing' }],
+        sourceTags: [
+          { tag: 'verified', source: 'hyvee-desk:monday:lock' },
+          { tag: 'unverified', source: 'hyvee-desk:monday:amount-missing' },
+        ],
         verifiedClose: false,
         sampleDollars: 'none-verified',
       };

@@ -14,7 +14,8 @@ import {
   packFromPdqSourceTag,
   type PdqFactPack,
 } from '@/lib/pdqEodParse';
-import { pdqIngestLaneLabel, pdqIngestLaneRank } from '@/lib/pdqIngest';
+import { pdqIngestLaneLabel } from '@/lib/pdqIngest';
+import { pickPdqPackForDate, resolvePdqAskedDate, thinEodMissingFacts } from '@/lib/pdqThinEod';
 import { isToastTrainingCorpusOnly } from '@/lib/reportAdapters/trainingCorpus';
 import { detectToastFamily } from '@/lib/toastParse';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
@@ -75,18 +76,13 @@ export function collectPdqFacts(
       hasPdq = true;
     }
   }
-  const pick = (family: PdqFactPack['family']) => {
-    const hits = packs.filter((row) => row.family === family);
-    hits.sort((a, b) => pdqIngestLaneRank(b.ingestLane) - pdqIngestLaneRank(a.ingestLane));
-    return hits[0] ?? null;
-  };
   return {
     packs,
     hasPdq,
     heldOffNagToast,
-    z: pick('z-summary'),
-    hourly: pick('hourly'),
-    voids: pick('void-promo'),
+    z: pickPdqPackForDate(packs, 'z-summary', null),
+    hourly: pickPdqPackForDate(packs, 'hourly', null),
+    voids: pickPdqPackForDate(packs, 'void-promo', null),
   };
 }
 
@@ -128,14 +124,19 @@ function contaminateLine(facts: PdqSeatFacts): string | null {
   return CTAP_TOAST_CONTAMINANT_FAIL;
 }
 
-function missingZ(kind: PdqDeskKind, facts: PdqSeatFacts, extra: string[]): PdqDeskAnswer {
+function missingZ(
+  kind: PdqDeskKind,
+  facts: PdqSeatFacts,
+  extra: string[],
+  askedDate: string | null,
+  hasVoids: boolean,
+): PdqDeskAnswer {
   return {
     kind,
     slug: 'foh-voids',
-    headline: 'Missing — ZReport_Summary is not on this seat for that business date.',
+    headline: 'Missing — no ZReport_Summary for that business date.',
     facts: [
-      'PDQ sales, Grand Total, and Menu Category lines stay Missing until ZReport_Summary lands.',
-      'Hourly_Sales_Report or Void_Promo_Report is not a Z. No dollar invented.',
+      ...thinEodMissingFacts({ askedDate, hasVoids }),
       ...extra,
       ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
     ],
@@ -166,12 +167,17 @@ function verifiedMixLines(z: PdqFactPack): string[] {
 export function answerPdqDeskQuestion(
   question: string,
   facts: PdqSeatFacts,
+  now: Date = new Date(),
 ): PdqDeskAnswer | null {
   const kind = routePdqDeskQuestion(question);
   if (!kind) return null;
+  const askedDate = resolvePdqAskedDate(question, now);
+  const z = pickPdqPackForDate(facts.packs, 'z-summary', askedDate);
+  const hourly = pickPdqPackForDate(facts.packs, 'hourly', askedDate);
+  const voids = pickPdqPackForDate(facts.packs, 'void-promo', askedDate);
+  const scoped: PdqSeatFacts = { ...facts, z, hourly, voids };
 
   if (kind === 'hourly') {
-    const hourly = facts.hourly;
     if (!hourly || !hourly.hourlyPeak) {
       return {
         kind,
@@ -179,7 +185,7 @@ export function answerPdqDeskQuestion(
         headline: 'Missing — Hourly_Sales_Report is not on this seat for that business date.',
         facts: [
           'Hourly sales stay Missing. No peak hour invented.',
-          ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Land Hourly_Sales_Report from the same pdqreports morning pack.',
         needs: 'PDQ Hourly_Sales_Report for the asked business date.',
@@ -196,7 +202,7 @@ export function answerPdqDeskQuestion(
         `Verified · ${hourly.filename} · ${formatDay(hourly.businessDate)} peak ${hourly.hourlyPeak.hour} ${usd(hourly.hourlyPeak.sales)}`,
         hourly.hourlyPeak.guests != null ? `Guests on that hour: ${hourly.hourlyPeak.guests}` : 'Guest count Missing on the peak row.',
         `${hourly.hourlyRowCount} hourly rows on the report.`,
-        ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Keep Hourly with the same-date Z so mix and peak stay on one pack.',
       needs: 'Hourly_Sales_Report is on this seat.',
@@ -207,7 +213,6 @@ export function answerPdqDeskQuestion(
   }
 
   if (kind === 'negatives') {
-    const voids = facts.voids;
     if (!voids || (voids.voids == null && voids.promotions == null && voids.negatives.promo == null
       && voids.negatives.specInstruction == null && voids.negatives.negMenu == null
       && voids.negatives.negSpecialInstruction == null && voids.negatives.unknown == null)) {
@@ -218,7 +223,7 @@ export function answerPdqDeskQuestion(
         facts: [
           'Voids / Spec Instruction / Neg Menu / Neg Special Instruction / Promo / UKNOWN stay Missing.',
           'No average. No theft narrative. No person named.',
-          ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Land Void_Promo_Report from the same morning pack. I will quote labeled lines only.',
         needs: 'PDQ Void_Promo_Report (and Discount lines) for the asked business date.',
@@ -253,7 +258,7 @@ export function answerPdqDeskQuestion(
         `Verified · ${voids.filename} · ${formatDay(voids.businessDate)}`,
         ...lines,
         'Line amounts from Void_Promo + Discount. Pattern, not a verdict. No person named.',
-        ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Review fat promo / spec lines on the same report. Do not invent a save.',
       needs: 'Void_Promo_Report is on this seat.',
@@ -263,9 +268,8 @@ export function answerPdqDeskQuestion(
     };
   }
 
-  const z = facts.z;
   if (!z || (z.netSales == null && z.grandTotal == null && z.mix.food == null && z.mix.largePizzas == null)) {
-    return missingZ(kind, facts, []);
+    return missingZ(kind, scoped, [], askedDate, voids != null);
   }
 
   if (kind === 'combined-food') {
@@ -284,7 +288,7 @@ export function answerPdqDeskQuestion(
             ? `Verified · Menu Category · Large Pizzas ${usd(pizzas)}`
             : 'Missing · Menu Category · Large Pizzas is not on this Z.',
           'Large Pizzas ≠ Food. No silent merge. No invented combined total.',
-          ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+          ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Need both Food and Large Pizzas Menu Category lines on the Z before an Estimated bucket.',
         needs: 'Both Menu Category · Food and Menu Category · Large Pizzas on ZReport_Summary.',
@@ -302,7 +306,7 @@ export function answerPdqDeskQuestion(
         `Estimated · combined food bucket ${usd(combined)} = Verified Food ${usd(food)} + Verified Large Pizzas ${usd(pizzas)}.`,
         `Math: ${food} + ${pizzas} = ${combined}. Large Pizzas ≠ Food. Never silently merged.`,
         `Verified · ${z.filename} · ${formatDay(z.businessDate)}`,
-        ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+        ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
       coachTomorrow: 'Keep quoting Large Pizzas on its own line unless you ask for the combined bucket.',
       needs: 'Z Menu Category Food + Large Pizzas are on this seat.',
@@ -317,6 +321,9 @@ export function answerPdqDeskQuestion(
   }
 
   const lane = `Ingest lane: ${pdqIngestLaneLabel(z.ingestLane)}.`;
+  const secondaryFallback = z.ingestLane === 'secondary'
+    ? 'Verified from secondary CC ZReport for the same morning. Primary had no Z for that date.'
+    : null;
 
   if (kind === 'food') {
     const factsOut = [
@@ -329,7 +336,8 @@ export function answerPdqDeskQuestion(
         : 'Missing · Menu Category · Large Pizzas is not on this Z. Not $0.',
       'Default food today is the Food line alone. Large Pizzas ≠ Food. Combined Food+Large is Estimated only when you ask.',
       lane,
-      ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+      ...(secondaryFallback ? [secondaryFallback] : []),
+      ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
     ];
     return {
       kind,
@@ -357,8 +365,8 @@ export function answerPdqDeskQuestion(
       : `Missing · Channel · ${label} is not on this Z.`
   ));
 
-  const voidLine = facts.voids?.voids != null
-    ? `Verified · Void_Promo # Voids ${usd(facts.voids.voids)}`
+  const voidLine = voids?.voids != null
+    ? `Verified · Void_Promo # Voids ${usd(voids.voids)}`
     : 'Missing · voids stay Missing until Void_Promo_Report lands.';
 
   const factsOut = [
@@ -368,9 +376,10 @@ export function answerPdqDeskQuestion(
     voidLine,
     ...verifiedMixLines(z),
     ...channelLines,
-    'Wave 0: net sales yesterday quotes Grand Total from the Z. Voids come from Void_Promo. Missing if no pack.',
+    'Wave 0: net sales yesterday quotes Grand Total from the Z for that business date. Voids come from Void_Promo. Hard Missing if no same-date Z.',
     lane,
-    ...(contaminateLine(facts) ? [contaminateLine(facts)!] : []),
+    ...(secondaryFallback ? [secondaryFallback] : []),
+    ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
   ];
 
   return {

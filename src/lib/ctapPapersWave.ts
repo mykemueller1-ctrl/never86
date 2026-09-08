@@ -35,6 +35,12 @@ export const HUMES_LATER_WAVE = {
   thisDraft: false,
 };
 
+export const HYVEE_MONDAY_CONFIRMED = {
+  lock: 'one-check',
+  covers: 'that week’s yellow slips + delivery invoice batch',
+  defaultGuess: false,
+} as const;
+
 export const BOH_SEAT2 = {
   role: 'boh-seat-2',
   laterWork: 'pfg-day-before',

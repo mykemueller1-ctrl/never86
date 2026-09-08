@@ -33,7 +33,7 @@ function service() {
   return createSimpleOwnerDemoService({
     repo: createMemoryRepository(),
     objects: createMemoryObjectStore(),
-    now: () => new Date('2026-09-08T12:00:00.000Z'),
+    now: () => new Date('2026-08-25T17:00:00.000Z'),
   });
 }
 
@@ -177,6 +177,91 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     expect(asked.answer.sampleDollars).toBe('pdq-verified');
     expect(asked.answer.facts.join(' ')).toMatch(/Verified · Void_Promo # Voids \$12\.00/);
     assertNoToastLeak(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`, asked.answer.sampleDollars);
+  });
+
+  it('thin EOD: other-day Z does not answer yesterday', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-other-day';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: '8-23-2026 ZReport_Summary.pdf',
+      contentType: 'text/plain',
+      bytes: loadPdq('sample-z-missing-pop.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'net sales yesterday',
+      tray: 'action',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Missing — no ZReport_Summary for that business date/);
+    expect(asked.answer.facts.join(' ')).toMatch(/Hard Missing/);
+    expect(asked.answer.facts.join(' ')).toMatch(/regen|another business date/);
+    expect(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`).not.toMatch(/\$540\.00|\$1,123\.50/);
+  });
+
+  it('thin EOD: secondary same-morning Z is Verified before Missing', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-thin-secondary-z';
+    const voidOnly = await svc.upload({
+      operatorId,
+      filename: '8-24-2026 Void_Promo_Report.pdf',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(`To: ${PDQ_INGEST_PRIMARY_EMAIL}\n\n${readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-void-promo-negatives.txt'), 'utf8')}`),
+    });
+    expect(voidOnly.ok).toBe(true);
+    const secondaryZ = await svc.upload({
+      operatorId,
+      filename: '8-24-2026 ZReport_Summary.pdf',
+      contentType: 'text/plain',
+      bytes: new TextEncoder().encode(`To: ${PDQ_INGEST_SECONDARY_EMAIL}\n\n${readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-large-pizzas.txt'), 'utf8')}`),
+    });
+    expect(secondaryZ.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'net sales yesterday',
+      tray: 'action',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Verified Grand Total \$1,123\.50/);
+    expect(asked.answer.facts.join(' ')).toMatch(/secondary CC/);
+    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Void_Promo # Voids \$12\.00/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/mykemueller1@gmail\.com|communitypizza2026@gmail\.com/);
+  });
+
+  it('thin EOD: void-only pack Verifies voids and keeps totals Missing', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-void-thin';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: '8-24-2026 Void_Promo_Report.pdf',
+      contentType: 'text/plain',
+      bytes: loadPdq('sample-void-promo-negatives.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const totals = await svc.ask({
+      operatorId,
+      question: 'What were PDQ net sales and Grand Total?',
+      tray: 'action',
+    });
+    expect(totals.ok).toBe(true);
+    if (!totals.ok) return;
+    expect(totals.answer.headline).toMatch(/Missing/);
+    expect(totals.answer.facts.join(' ')).toMatch(/Void-only thin pack/);
+    expect(totals.answer.facts.join(' ')).not.toMatch(/\$1,123\.50|\$1,050\.00/);
+
+    const voids = await svc.ask({
+      operatorId,
+      question: 'What were voids on Void_Promo?',
+      tray: 'action',
+    });
+    expect(voids.ok).toBe(true);
+    if (!voids.ok) return;
+    expect(voids.answer.headline).toMatch(/Verified voids \$12\.00/);
+    expect(voids.answer.verifiedClose).toBe(true);
   });
 
   it('Wave 0: net sales yesterday with no pack → Missing', async () => {
@@ -365,8 +450,9 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     });
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
-    expect(asked.answer.headline).toMatch(/Missing/);
+    expect(asked.answer.headline).toMatch(/Verified Monday lock — check total Missing/);
     expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Monday lock: one check/);
     expect(asked.answer.facts.join(' ')).toMatch(/no partial invented/i);
   });
 

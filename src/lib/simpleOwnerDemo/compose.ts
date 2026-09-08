@@ -104,6 +104,7 @@ export function composeAskAnswer(input: {
   tray: OwnerDeskTrayId;
   readiness: SimpleOwnerReadiness;
   uploads: readonly SimpleOwnerUploadRecord[];
+  now?: Date;
 }): SimpleOwnerAskAnswer {
   const qLower = input.question.toLowerCase();
   const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId);
@@ -119,7 +120,7 @@ export function composeAskAnswer(input: {
   const pdqKind = routePdqDeskQuestion(input.question);
   const takePdqMorning = Boolean(pdqKind) && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
     && (!clearlyHyvee || clearlyPdq);
-  const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts) : null;
+  const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts, input.now ?? new Date()) : null;
   if (pdqAnswer) {
     const sourceTags: SourceTag[] = [
       ...pdqAnswer.sourceTags,

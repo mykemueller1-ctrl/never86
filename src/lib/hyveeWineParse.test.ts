@@ -92,8 +92,9 @@ describe('Hy-Vee desk honesty', () => {
     expect(delivered?.facts.join(' ')).toMatch(/slip reconciliation stays Missing/);
 
     const monday = answerHyveeDeskQuestion('What is the Hy-Vee Monday one check?', facts);
-    expect(monday?.headline).toMatch(/Missing/);
+    expect(monday?.headline).toMatch(/Verified Monday lock — check total Missing/);
     expect(monday?.verifiedClose).toBe(false);
+    expect(monday?.facts.join(' ')).toMatch(/Verified · Monday lock: one check/);
     expect(monday?.facts.join(' ')).toMatch(/no partial invented/i);
   });
 

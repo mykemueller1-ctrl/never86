@@ -204,7 +204,7 @@ export function createSimpleOwnerDemoService(deps: {
         deps.objects,
       );
       const readiness = readinessFromUploads(operatorId, uploads);
-      const answer = composeAskAnswer({ question: trimmed, tray, readiness, uploads });
+      const answer = composeAskAnswer({ question: trimmed, tray, readiness, uploads, now: now() });
       const record: SimpleOwnerAskRecord = {
         id: crypto.randomUUID(),
         operatorId,

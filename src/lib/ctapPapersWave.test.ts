@@ -5,6 +5,7 @@ import {
   BOH_SEAT2,
   CTAP_PAPERS_WAVES,
   HUMES_LATER_WAVE,
+  HYVEE_MONDAY_CONFIRMED,
   bohSeat2RequiredForHyvee,
   ctapPapersWaveOrder,
   humesApInboxForTests,
@@ -41,5 +42,11 @@ describe('CTAP papers wave lock', () => {
     expect(BOH_SEAT2.laterWork).toBe('pfg-day-before');
     expect(BOH_SEAT2.hyveePath).toBe('bar-manager-email');
     expect(bohSeat2RequiredForHyvee()).toBe(false);
+  });
+
+  it('locks Hy-Vee Monday as one check, not a default guess', () => {
+    expect(HYVEE_MONDAY_CONFIRMED.lock).toBe('one-check');
+    expect(HYVEE_MONDAY_CONFIRMED.covers).toMatch(/yellow slips/);
+    expect(HYVEE_MONDAY_CONFIRMED.defaultGuess).toBe(false);
   });
 });
