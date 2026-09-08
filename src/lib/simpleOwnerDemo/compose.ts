@@ -25,6 +25,17 @@ import {
   isToastParseDisplayTag,
   routeToastDeskQuestion,
 } from '@/lib/toastParse';
+import {
+  answerPdqDeskQuestion,
+  collectPdqFacts,
+  isPdqParseDisplayTag,
+  routePdqDeskQuestion,
+} from '@/lib/pdqDesk';
+import {
+  answerHyveeDeskQuestion,
+  collectHyveeFacts,
+  routeHyveeDeskQuestion,
+} from '@/lib/hyveeWineParse';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -74,12 +85,75 @@ export function readinessFromUploads(
   };
 }
 
+function persistFactFor(operatorId: string): string {
+  return `Question and answer are stored for operator_id ${operatorId}. Files go to object storage with the same seat key.`;
+}
+
+function isHiddenParseTag(tag: SourceTag): boolean {
+  return isToastParseDisplayTag(tag) || isPdqParseDisplayTag(tag) || tag.source.startsWith('hyvee-parse:v1:');
+}
+
 export function composeAskAnswer(input: {
   question: string;
   tray: OwnerDeskTrayId;
   readiness: SimpleOwnerReadiness;
   uploads: readonly SimpleOwnerUploadRecord[];
 }): SimpleOwnerAskAnswer {
+  const hyveeFacts = collectHyveeFacts(input.uploads);
+  const hyveeKind = routeHyveeDeskQuestion(input.question);
+  const hyveeAnswer =
+    hyveeKind && (hyveeFacts.hasHyvee || hyveeKind !== 'glue')
+      ? answerHyveeDeskQuestion(input.question, hyveeFacts)
+      : null;
+  if (hyveeAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...hyveeAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: hyveeAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${hyveeAnswer.slug}` },
+    ];
+    return {
+      slug: hyveeAnswer.slug,
+      headline: hyveeAnswer.headline,
+      facts: [...hyveeAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: hyveeAnswer.coachTomorrow,
+      needs: hyveeAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: hyveeAnswer.sampleDollars,
+      verifiedClose: hyveeAnswer.verifiedClose,
+    };
+  }
+
+  const pdqFacts = collectPdqFacts(input.uploads);
+  const pdqKind = routePdqDeskQuestion(input.question);
+  const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown/.test(
+    input.question.toLowerCase(),
+  );
+  const pdqAnswer =
+    pdqKind && (pdqFacts.hasPdq || clearlyPdq)
+      ? answerPdqDeskQuestion(input.question, pdqFacts)
+      : null;
+  if (pdqAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...pdqAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: pdqAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${pdqAnswer.slug}` },
+    ];
+    return {
+      slug: pdqAnswer.slug,
+      headline: pdqAnswer.headline,
+      facts: [...pdqAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: pdqAnswer.coachTomorrow,
+      needs: pdqAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: pdqAnswer.sampleDollars,
+      verifiedClose: pdqAnswer.verifiedClose,
+    };
+  }
+
   const toastFacts = collectToastFacts(input.uploads);
   const toastKind = routeToastDeskQuestion(input.question);
   const toastAnswer =
@@ -87,19 +161,18 @@ export function composeAskAnswer(input: {
       ? answerToastDeskQuestion(input.question, toastFacts)
       : null;
   if (toastAnswer) {
-    const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
     const sourceTags: SourceTag[] = [
       ...toastAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isToastParseDisplayTag(tag)),
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
       { tag: toastAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${toastAnswer.slug}` },
     ];
     return {
       slug: toastAnswer.slug,
       headline: toastAnswer.headline,
-      facts: [...toastAnswer.facts, persistFact],
+      facts: [...toastAnswer.facts, persistFactFor(input.readiness.operatorId)],
       coachTomorrow: toastAnswer.coachTomorrow,
       needs: toastAnswer.needs,
-      tags: sourceTags.filter((tag) => !isToastParseDisplayTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
       sourceTags,
       inventedClose: false,
       sampleDollars: toastAnswer.sampleDollars,
@@ -113,7 +186,7 @@ export function composeAskAnswer(input: {
   const ready = input.readiness.evidence.filter((row) => row.state === 'READY').map((row) => row.short);
   const missing = input.readiness.evidence.filter((row) => row.state === 'NEED').map((row) => row.short);
   const sourceTags: SourceTag[] = [
-    ...input.readiness.sourceTags.filter((tag) => !isToastParseDisplayTag(tag)),
+    ...input.readiness.sourceTags.filter((tag) => !isHiddenParseTag(tag)),
     { tag: 'unverified', source: `simple-owner-ask:${slug}` },
   ];
 

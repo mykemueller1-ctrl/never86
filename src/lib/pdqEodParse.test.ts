@@ -67,6 +67,37 @@ describe('PDQ ZReport_Summary native text', () => {
       state: 'missing-evidence',
     }));
   });
+
+  it('keeps Large Pizzas Missing when that Menu Category line is absent', () => {
+    expect(z.mix.largePizzas).toEqual(expect.objectContaining({
+      value: null,
+      state: 'missing-evidence',
+      sourceLabel: 'Menu Category · Large Pizzas',
+    }));
+  });
+
+  it('reads channel mix from Sales Summary trans types', () => {
+    expect(z.channels.pickup.value).toBe(180);
+    expect(z.channels.delivery.value).toBe(220);
+    expect(z.channels.bar.value).toBe(200);
+    expect(z.channels.table.value).toBe(400);
+  });
+});
+
+describe('PDQ Large Pizzas ≠ Food', () => {
+  const z = parsePdqZSummary(
+    load('sample-z-large-pizzas.txt'),
+    '8-24-2026 ZReport_Summary Sample Kitchen Lab.pdf',
+  );
+
+  it('quotes Food and Large Pizzas as separate Menu Category lines', () => {
+    expect(z.mix.food.value).toBe(400);
+    expect(z.mix.largePizzas.value).toBe(250);
+    expect(z.mix.food.sourceLabel).toBe('Menu Category · Food');
+    expect(z.mix.largePizzas.sourceLabel).toBe('Menu Category · Large Pizzas');
+    expect(z.grandTotal.value).toBe(1123.5);
+    expect(z.netSales.value).toBe(1050);
+  });
 });
 
 describe('PDQ missing category is not $0', () => {
@@ -105,6 +136,20 @@ describe('PDQ Void_Promo_Report', () => {
     );
     expect(voids.voids.value).toBe(12);
     expect(voids.promotions.value).toBe(8);
+  });
+
+  it('parses Spec Instruction / Neg Menu / Neg Special / Promo / UKNOWN without inventing', () => {
+    const voids = parsePdqVoidPromo(
+      load('sample-void-promo-negatives.txt'),
+      '8-24-2026 Void_Promo_Report Sample Kitchen Lab.pdf',
+    );
+    expect(voids.voids.value).toBe(12);
+    expect(voids.promotions.value).toBe(8);
+    expect(voids.negatives.specInstruction.value).toBe(5);
+    expect(voids.negatives.negMenu.value).toBe(3);
+    expect(voids.negatives.negSpecialInstruction.value).toBe(2);
+    expect(voids.negatives.promo.value).toBe(8);
+    expect(voids.negatives.unknown.value).toBe(1.5);
   });
 });
 

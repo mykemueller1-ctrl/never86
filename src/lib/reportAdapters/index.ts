@@ -17,6 +17,7 @@ export {
 export { hasParsedReportPack, reportSourceTags } from './sourceTags';
 export {
   PLANNED_REPORT_ADAPTERS,
+  PDQ_REPORT_FAMILIES,
   REPORT_POS,
   TOAST_REPORT_FAMILIES,
   type ReportAdapter,

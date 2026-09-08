@@ -56,6 +56,7 @@ export function zSummaryHasFields(z: PdqZSummary): boolean {
   return z.netSales.value != null
     || z.grandTotal.value != null
     || z.mix.food.value != null
+    || z.mix.largePizzas.value != null
     || z.mix.beer.value != null
     || z.mix.liquor.value != null
     || z.mix.pop.value != null;

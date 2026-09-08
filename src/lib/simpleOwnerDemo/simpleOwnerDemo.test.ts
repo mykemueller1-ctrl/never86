@@ -40,7 +40,11 @@ describe('simple owner demo classify + object keys', () => {
     });
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
       tag: 'unverified',
-      source: 'operator-upload:hourly',
+      source: 'operator-upload:pdq:hourly',
+    });
+    expect(classifyUpload('ZReport_Summary.pdf').sourceTags[0]).toEqual({
+      tag: 'unverified',
+      source: 'operator-upload:pdq:z-summary',
     });
   });
 
@@ -145,7 +149,7 @@ describe('simple owner demo service persist', () => {
     if (!result.ok) return;
     expect(result.upload.operatorId).toBe('demo:alpha');
     expect(result.upload.storageBackend).toBe('memory');
-    expect(result.upload.sourceTags[0]?.source).toBe('operator-upload:hourly');
+    expect(result.upload.sourceTags[0]?.source).toBe('operator-upload:pdq:hourly');
     expect(objects.objects.has(result.upload.objectKey)).toBe(true);
     expect(repo.uploads).toHaveLength(1);
     expect(result.readiness.readyCount).toBe(1);

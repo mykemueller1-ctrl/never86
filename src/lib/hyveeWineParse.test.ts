@@ -1,0 +1,71 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import {
+  answerHyveeDeskQuestion,
+  collectHyveeFacts,
+  detectHyveeFamily,
+  parseHyveeWineReport,
+  routeHyveeDeskQuestion,
+} from './hyveeWineParse';
+
+function load(name: string): string {
+  return readFileSync(path.join(process.cwd(), 'tests/fixtures/hyvee', name), 'utf8');
+}
+
+describe('Hy-Vee Wine papers-in parse', () => {
+  it('detects the four glue legs', () => {
+    expect(detectHyveeFamily('order-email.txt', load('order-email.txt'))).toBe('order-email');
+    expect(detectHyveeFamily('customer-charge-slip.txt', load('customer-charge-slip.txt'))).toBe('charge-slip');
+    expect(detectHyveeFamily('delivery-invoice.txt', load('delivery-invoice.txt'))).toBe('invoice');
+    expect(detectHyveeFamily('monday-batch.txt', load('monday-batch.txt'))).toBe('monday-batch');
+  });
+
+  it('quotes labeled totals and does not invent a blended number', () => {
+    const invoice = parseHyveeWineReport(load('delivery-invoice.txt'), 'delivery-invoice.txt');
+    expect(invoice?.labeledTotal).toBe(120);
+    expect(invoice?.invoiceNumber).toBe('HV-LAB-1001');
+    expect(invoice?.location).toBe('Fort Dodge');
+  });
+
+  it('does not detect Humes as Hy-Vee', () => {
+    expect(detectHyveeFamily('humes-inv.pdf', 'From: accountspayable@humesdist.com\nInvoice total: $88.00')).toBeNull();
+  });
+});
+
+describe('Hy-Vee desk honesty', () => {
+  it('Missing when the asked invoice paper is absent', () => {
+    const order = parseHyveeWineReport(load('order-email.txt'), 'order-email.txt');
+    const facts = collectHyveeFacts([
+      { filename: 'order-email.txt', sourceTags: [{ tag: 'verified', source: `hyvee-parse:v1:${JSON.stringify(order)}` }] },
+    ]);
+    expect(routeHyveeDeskQuestion('What is the Hy-Vee invoice total?')).toBe('invoice');
+    const answer = answerHyveeDeskQuestion('What is the Hy-Vee invoice total?', facts);
+    expect(answer?.headline).toMatch(/Missing/);
+    expect(answer?.facts.join(' ')).not.toMatch(/\$88/);
+    expect(answer?.verifiedClose).toBe(false);
+  });
+
+  it('glues four matching legs as Verified without inventing a fifth total', () => {
+    const uploads = [
+      ['order-email.txt', load('order-email.txt')],
+      ['customer-charge-slip.txt', load('customer-charge-slip.txt')],
+      ['delivery-invoice.txt', load('delivery-invoice.txt')],
+      ['monday-batch.txt', load('monday-batch.txt')],
+    ].map(([filename, text]) => {
+      const pack = parseHyveeWineReport(text, filename);
+      return {
+        filename,
+        sourceTags: [{ tag: 'verified' as const, source: `hyvee-parse:v1:${JSON.stringify(pack)}` }],
+      };
+    });
+    const facts = collectHyveeFacts(uploads);
+    const answer = answerHyveeDeskQuestion('Glue the Hy-Vee wine papers', facts);
+    expect(answer?.verifiedClose).toBe(true);
+    expect(answer?.headline).toMatch(/Verified/);
+    expect(answer?.facts.join(' ')).toMatch(/\$120\.00/);
+    expect(answer?.facts.join(' ')).toMatch(/four-leg glue/);
+    expect(answer?.facts.join(' ')).not.toMatch(/94016902/);
+    expect(answer?.facts.join(' ').toLowerCase()).not.toMatch(/thief|theft/);
+  });
+});

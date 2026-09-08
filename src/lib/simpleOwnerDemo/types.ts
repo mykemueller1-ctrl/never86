@@ -53,7 +53,7 @@ export type SimpleOwnerAskRecord = {
   needs: string;
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated';
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated';
   verifiedClose: boolean;
   createdAt: string;
 };
@@ -79,7 +79,7 @@ export type SimpleOwnerAskAnswer = {
   tags: string[];
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated';
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated';
   verifiedClose: boolean;
 };
 

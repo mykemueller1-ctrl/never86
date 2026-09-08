@@ -34,19 +34,39 @@ export type HourlyRow = {
   guests: number | null;
 };
 
+export type PdqMenuMix = {
+  food: MoneyEvidence;
+  largePizzas: MoneyEvidence;
+  beer: MoneyEvidence;
+  liquor: MoneyEvidence;
+  pop: MoneyEvidence;
+  wine: MoneyEvidence;
+};
+
+export type PdqChannelMix = {
+  pickup: MoneyEvidence;
+  delivery: MoneyEvidence;
+  bar: MoneyEvidence;
+  table: MoneyEvidence;
+};
+
+export type PdqNegatives = {
+  specInstruction: MoneyEvidence;
+  negMenu: MoneyEvidence;
+  negSpecialInstruction: MoneyEvidence;
+  promo: MoneyEvidence;
+  unknown: MoneyEvidence;
+};
+
 export type PdqZSummary = {
   family: 'z-summary';
   businessDate: string | null;
   store: string | null;
   netSales: MoneyEvidence;
   grandTotal: MoneyEvidence;
-  mix: {
-    food: MoneyEvidence;
-    beer: MoneyEvidence;
-    liquor: MoneyEvidence;
-    pop: MoneyEvidence;
-    wine: MoneyEvidence;
-  };
+  mix: PdqMenuMix;
+  channels: PdqChannelMix;
+  negatives: PdqNegatives;
   laborDollars: MoneyEvidence;
   expectedCash: MoneyEvidence;
   actualDeposit: MoneyEvidence;
@@ -71,6 +91,7 @@ export type PdqVoidPromo = {
   businessDate: string | null;
   voids: MoneyEvidence;
   promotions: MoneyEvidence;
+  negatives: PdqNegatives;
 };
 
 export type PdqParseResult = PdqZSummary | PdqHourly | PdqVoidPromo | {
@@ -161,6 +182,86 @@ function categoryMoney(text: string, category: string): MoneyEvidence {
   return missingMoney(`Menu Category · ${category}`);
 }
 
+function channelMoney(text: string, channel: string): MoneyEvidence {
+  const label = channel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const section = sliceSection(text, /Sales Summary/i, [
+    /Taxable/i,
+    /Grand Total/i,
+    /Labor Summary/i,
+    /Menu Category/i,
+    /Discount Summary/i,
+  ]);
+  const hay = section || text;
+  const patterns = [
+    new RegExp(`(?:^|\\n)\\s*${label}\\s+\\d+\\s+${MONEY}`, 'im'),
+    new RegExp(`(?:^|\\n)\\s*${label}\\s+${MONEY}`, 'im'),
+  ];
+  for (const re of patterns) {
+    const token = firstMatch(hay, re);
+    const value = parseMoneyToken(token);
+    if (value != null) return presentMoney(value, `Channel · ${channel}`);
+  }
+  return missingMoney(`Channel · ${channel}`);
+}
+
+function negativeMoney(text: string, labels: string[], sourceLabel: string): MoneyEvidence {
+  const section = sliceSection(text, /Discount Summary|Void Promo|Discount\b/i, [
+    /Menu Category/i,
+    /Labor Summary/i,
+    /Payout Summary/i,
+    /Cashier Summary/i,
+    /Report Generated/i,
+  ]);
+  const hay = section || text;
+  for (const label of labels) {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const patterns = [
+      new RegExp(`${escaped}\\s+\\d+\\s+${MONEY}`, 'i'),
+      new RegExp(`${escaped}\\s*[:\\-]?\\s*${MONEY}`, 'i'),
+    ];
+    for (const re of patterns) {
+      const token = firstMatch(hay, re);
+      const value = parseMoneyToken(token);
+      if (value != null) return presentMoney(value, sourceLabel);
+    }
+  }
+  return missingMoney(sourceLabel);
+}
+
+export function parsePdqNegatives(text: string): PdqNegatives {
+  return {
+    specInstruction: negativeMoney(text, ['Spec Instruction', 'Special Instruction'], 'Discount · Spec Instruction'),
+    negMenu: negativeMoney(text, ['Neg Menu', 'Neg. Menu', 'Negative Menu'], 'Discount · Neg Menu'),
+    negSpecialInstruction: negativeMoney(
+      text,
+      ['Neg Special Instruction', 'Neg. Special Instruction', 'Neg Special'],
+      'Discount · Neg Special Instruction',
+    ),
+    promo: negativeMoney(text, ['Promo'], 'Discount · Promo'),
+    unknown: negativeMoney(text, ['UKNOWN', 'UNKNOWN'], 'Discount · UKNOWN'),
+  };
+}
+
+export function parsePdqMenuMix(text: string): PdqMenuMix {
+  return {
+    food: categoryMoney(text, 'Food'),
+    largePizzas: categoryMoney(text, 'Large Pizzas'),
+    beer: categoryMoney(text, 'Beer'),
+    liquor: categoryMoney(text, 'Liquor'),
+    pop: categoryMoney(text, 'Pop'),
+    wine: categoryMoney(text, 'Wine'),
+  };
+}
+
+export function parsePdqChannels(text: string): PdqChannelMix {
+  return {
+    pickup: channelMoney(text, 'Pickup'),
+    delivery: channelMoney(text, 'Delivery'),
+    bar: channelMoney(text, 'Bar'),
+    table: channelMoney(text, 'Table'),
+  };
+}
+
 function parseBusinessDateFromBody(text: string): string | null {
   const m = text.match(/Business Date:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/i);
   if (!m) return null;
@@ -242,13 +343,9 @@ export function parsePdqZSummary(text: string, filename = ''): PdqZSummary {
     store: parseStore(text),
     netSales: labeledMoney(text, ['Subtotal'], 'Subtotal'),
     grandTotal: labeledMoney(text, ['Grand Total'], 'Grand Total'),
-    mix: {
-      food: categoryMoney(text, 'Food'),
-      beer: categoryMoney(text, 'Beer'),
-      liquor: categoryMoney(text, 'Liquor'),
-      pop: categoryMoney(text, 'Pop'),
-      wine: categoryMoney(text, 'Wine'),
-    },
+    mix: parsePdqMenuMix(text),
+    channels: parsePdqChannels(text),
+    negatives: parsePdqNegatives(text),
     laborDollars: laborTotal(text),
     expectedCash,
     actualDeposit,
@@ -289,11 +386,14 @@ export function parsePdqHourly(text: string, filename = ''): PdqHourly {
 }
 
 export function parsePdqVoidPromo(text: string, filename = ''): PdqVoidPromo {
+  const negatives = parsePdqNegatives(text);
+  const promotions = labeledMoney(text, ['Promo'], 'Promo');
   return {
     family: 'void-promo',
     businessDate: parseFilenameBusinessDate(filename) || parseBusinessDateFromBody(text),
     voids: labeledMoney(text, ['# Voids', 'Voids'], '# Voids'),
-    promotions: labeledMoney(text, ['Promo'], 'Promo'),
+    promotions: promotions.value != null ? promotions : negatives.promo,
+    negatives,
   };
 }
 
@@ -321,4 +421,201 @@ export function extractNativePdfText(bytes: Uint8Array): string {
     if (/[A-Za-z]/.test(inner)) chunks.push(inner);
   }
   return chunks.join('\n');
+}
+
+export function decodePdqText(bytes: Uint8Array): string | null {
+  if (bytes.byteLength === 0) return null;
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
+    const pdf = extractNativePdfText(bytes);
+    return pdf.trim() ? pdf : null;
+  }
+  if (bytes[0] === 0x50 && bytes[1] === 0x4b) return null;
+  const text = new TextDecoder('utf-8').decode(bytes);
+  return text.trim() ? text : null;
+}
+
+export const PDQ_PARSE_PREFIX = 'pdq-parse:v1:';
+
+export type PdqFactPack = {
+  pos: 'pdq';
+  family: 'z-summary' | 'hourly' | 'void-promo';
+  filename: string;
+  businessDate: string | null;
+  store: string | null;
+  netSales: number | null;
+  grandTotal: number | null;
+  mix: {
+    food: number | null;
+    largePizzas: number | null;
+    beer: number | null;
+    liquor: number | null;
+    pop: number | null;
+    wine: number | null;
+  };
+  channels: {
+    pickup: number | null;
+    delivery: number | null;
+    bar: number | null;
+    table: number | null;
+  };
+  hourlyPeak: HourlyRow | null;
+  hourlyRowCount: number;
+  voids: number | null;
+  promotions: number | null;
+  negatives: {
+    specInstruction: number | null;
+    negMenu: number | null;
+    negSpecialInstruction: number | null;
+    promo: number | null;
+    unknown: number | null;
+  };
+};
+
+function moneyValue(row: MoneyEvidence | undefined): number | null {
+  return row?.value ?? null;
+}
+
+function emptyNegatives() {
+  return {
+    specInstruction: null,
+    negMenu: null,
+    negSpecialInstruction: null,
+    promo: null,
+    unknown: null,
+  };
+}
+
+function emptyMix() {
+  return {
+    food: null,
+    largePizzas: null,
+    beer: null,
+    liquor: null,
+    pop: null,
+    wine: null,
+  };
+}
+
+function emptyChannels() {
+  return {
+    pickup: null,
+    delivery: null,
+    bar: null,
+    table: null,
+  };
+}
+
+export function toPdqFactPack(parsed: PdqParseResult, filename: string): PdqFactPack | null {
+  if (parsed.family === 'unknown') return null;
+  if (parsed.family === 'z-summary') {
+    return {
+      pos: 'pdq',
+      family: 'z-summary',
+      filename,
+      businessDate: parsed.businessDate,
+      store: parsed.store,
+      netSales: moneyValue(parsed.netSales),
+      grandTotal: moneyValue(parsed.grandTotal),
+      mix: {
+        food: moneyValue(parsed.mix.food),
+        largePizzas: moneyValue(parsed.mix.largePizzas),
+        beer: moneyValue(parsed.mix.beer),
+        liquor: moneyValue(parsed.mix.liquor),
+        pop: moneyValue(parsed.mix.pop),
+        wine: moneyValue(parsed.mix.wine),
+      },
+      channels: {
+        pickup: moneyValue(parsed.channels.pickup),
+        delivery: moneyValue(parsed.channels.delivery),
+        bar: moneyValue(parsed.channels.bar),
+        table: moneyValue(parsed.channels.table),
+      },
+      hourlyPeak: null,
+      hourlyRowCount: 0,
+      voids: moneyValue(parsed.voids),
+      promotions: moneyValue(parsed.promotions),
+      negatives: {
+        specInstruction: moneyValue(parsed.negatives.specInstruction),
+        negMenu: moneyValue(parsed.negatives.negMenu),
+        negSpecialInstruction: moneyValue(parsed.negatives.negSpecialInstruction),
+        promo: moneyValue(parsed.negatives.promo),
+        unknown: moneyValue(parsed.negatives.unknown),
+      },
+    };
+  }
+  if (parsed.family === 'hourly') {
+    return {
+      pos: 'pdq',
+      family: 'hourly',
+      filename,
+      businessDate: parsed.businessDate,
+      store: null,
+      netSales: null,
+      grandTotal: null,
+      mix: emptyMix(),
+      channels: emptyChannels(),
+      hourlyPeak: parsed.peak,
+      hourlyRowCount: parsed.rows.length,
+      voids: null,
+      promotions: null,
+      negatives: emptyNegatives(),
+    };
+  }
+  return {
+    pos: 'pdq',
+    family: 'void-promo',
+    filename,
+    businessDate: parsed.businessDate,
+    store: null,
+    netSales: null,
+    grandTotal: null,
+    mix: emptyMix(),
+    channels: emptyChannels(),
+    hourlyPeak: null,
+    hourlyRowCount: 0,
+    voids: moneyValue(parsed.voids),
+    promotions: moneyValue(parsed.promotions),
+    negatives: {
+      specInstruction: moneyValue(parsed.negatives.specInstruction),
+      negMenu: moneyValue(parsed.negatives.negMenu),
+      negSpecialInstruction: moneyValue(parsed.negatives.negSpecialInstruction),
+      promo: moneyValue(parsed.negatives.promo),
+      unknown: moneyValue(parsed.negatives.unknown),
+    },
+  };
+}
+
+export function parsePdqReport(text: string, filename: string): PdqFactPack | null {
+  if (detectPdqFamily(filename, text) === 'unknown') return null;
+  return toPdqFactPack(parsePdqNativeText(text, filename), filename);
+}
+
+export function pdqPackHasNumber(pack: PdqFactPack): boolean {
+  return (
+    pack.netSales != null
+    || pack.grandTotal != null
+    || pack.voids != null
+    || pack.promotions != null
+    || pack.hourlyRowCount > 0
+    || pack.mix.food != null
+    || pack.mix.largePizzas != null
+    || pack.mix.beer != null
+    || pack.mix.liquor != null
+    || pack.mix.pop != null
+    || pack.negatives.specInstruction != null
+    || pack.negatives.negMenu != null
+    || pack.negatives.negSpecialInstruction != null
+    || pack.negatives.promo != null
+    || pack.negatives.unknown != null
+  );
+}
+
+export function packFromPdqSourceTag(source: string): PdqFactPack | null {
+  if (!source.startsWith(PDQ_PARSE_PREFIX)) return null;
+  try {
+    const pack = JSON.parse(source.slice(PDQ_PARSE_PREFIX.length)) as PdqFactPack;
+    return pack?.pos === 'pdq' ? pack : null;
+  } catch {
+    return null;
+  }
 }

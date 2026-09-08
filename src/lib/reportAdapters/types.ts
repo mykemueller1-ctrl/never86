@@ -22,6 +22,8 @@ export const REPORT_POS = [
   'lightspeed',
   'sysco',
   'us-foods',
+  'hy-vee',
+  'humes',
   'other',
 ] as const;
 
@@ -34,9 +36,24 @@ export const TOAST_REPORT_FAMILIES = [
   'item-selection',
 ] as const;
 
-export type ToastReportFamily = (typeof TOAST_REPORT_FAMILIES)[number];
+export const PDQ_REPORT_FAMILIES = [
+  'z-summary',
+  'hourly',
+  'void-promo',
+] as const;
 
-export type ReportFamily = ToastReportFamily | 'z-summary' | 'hourly' | 'void-promo' | 'invoice' | 'catalog' | 'unknown';
+export type ToastReportFamily = (typeof TOAST_REPORT_FAMILIES)[number];
+export type PdqReportFamily = (typeof PDQ_REPORT_FAMILIES)[number];
+
+export type ReportFamily =
+  | ToastReportFamily
+  | PdqReportFamily
+  | 'invoice'
+  | 'catalog'
+  | 'order-email'
+  | 'charge-slip'
+  | 'monday-batch'
+  | 'unknown';
 
 export type ReportAdapterHit = {
   pos: ReportPos;
@@ -50,20 +67,24 @@ export type ReportAdapter<TPack> = {
   parse(text: string, filename: string): TPack | null;
 };
 
+export type ReportFactPack = { pos?: string; family: string; filename?: string };
+
 /** Planned seats — hooks only. Do not parse or invent dollars here. */
 export const PLANNED_REPORT_ADAPTERS: readonly {
   pos: ReportPos;
   family: ReportFamily;
-  status: 'hook' | 'existing-elsewhere';
+  status: 'hook' | 'registered';
   note: string;
 }[] = [
-  { pos: 'pdq', family: 'z-summary', status: 'existing-elsewhere', note: 'PDQ Z lives in pdqEodParse / deskClose. Do not fork it here.' },
-  { pos: 'pdq', family: 'hourly', status: 'existing-elsewhere', note: 'PDQ Hourly_Sales_Report — existing parser.' },
-  { pos: 'pdq', family: 'void-promo', status: 'existing-elsewhere', note: 'PDQ Void_Promo — existing parser. Toast ItemSelection wins on a Toast seat.' },
+  { pos: 'pdq', family: 'z-summary', status: 'registered', note: 'PDQ ZReport_Summary — pdqEodParse, registered this PR.' },
+  { pos: 'pdq', family: 'hourly', status: 'registered', note: 'PDQ Hourly_Sales_Report — pdqEodParse, registered this PR.' },
+  { pos: 'pdq', family: 'void-promo', status: 'registered', note: 'PDQ Void_Promo — pdqEodParse, registered this PR.' },
+  { pos: 'hy-vee', family: 'invoice', status: 'registered', note: 'Hy-Vee Wine papers-in (order/slip/invoice/Monday batch).' },
   { pos: 'square', family: 'sales-summary', status: 'hook', note: 'Next adapter: Square sales CSV. Not in this PR.' },
   { pos: 'clover', family: 'sales-summary', status: 'hook', note: 'Next adapter: Clover sales export. Not in this PR.' },
   { pos: 'aloha', family: 'sales-summary', status: 'hook', note: 'Next adapter: Aloha sales. Not in this PR.' },
   { pos: 'lightspeed', family: 'sales-summary', status: 'hook', note: 'Next adapter: Lightspeed sales. Not in this PR.' },
   { pos: 'sysco', family: 'invoice', status: 'hook', note: 'Vendor silo: Sysco invoice/catalog. Not in this PR.' },
   { pos: 'us-foods', family: 'invoice', status: 'hook', note: 'Vendor silo: US Foods invoice/catalog. Not in this PR.' },
+  { pos: 'humes', family: 'invoice', status: 'hook', note: 'Humes INV PDFs — out of this PR. Hy-Vee first. No parse, no $.' },
 ];

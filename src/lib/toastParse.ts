@@ -74,6 +74,9 @@ export type ToastDeskAnswer = {
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 export function detectToastFamily(filename: string, text = ''): ToastFamily | null {
+  if (/zreport_summary|hourly_sales_report|void_promo_report|\bpdq\b/i.test(filename)) {
+    return null;
+  }
   const hay = `${filename}\n${text.slice(0, 800)}`.toLowerCase();
   if (/sales[\s_-]*summary/.test(hay)) return 'sales-summary';
   if (/labor[\s_-]*break[\s_-]*down/.test(hay)) return 'labor-breakdown';
