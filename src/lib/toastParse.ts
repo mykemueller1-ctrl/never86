@@ -4,10 +4,12 @@
  * Families: SalesSummary, LaborBreakDown, TimeEntries, ItemSelectionDetails.
  * Numbers come from the file only. Missing stays Missing. Derived day
  * totals from item rows are Estimated with the math shown.
+ * Taco Bomba / related-not-nag sheets are training shapes only — off NAG Qs.
  * Never invent $. Never name staff. Never write a theft narrative.
  */
 
 import { bool, findColumn, parseCsv } from '@/lib/csv/core';
+import { isToastTrainingCorpusOnly } from '@/lib/reportAdapters/trainingCorpus';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
 
 export const TOAST_PARSE_PREFIX = 'toast-parse:v1:';
@@ -27,6 +29,8 @@ export type ToastFactPack = {
   pos?: 'toast';
   family: ToastFamily;
   filename: string;
+  location?: string | null;
+  corpus?: 'nag-seat' | 'training';
   businessDate: string | null;
   periodStart: string | null;
   periodEnd: string | null;
@@ -45,6 +49,7 @@ export type ToastFactPack = {
 export type ToastSeatFacts = {
   packs: ToastFactPack[];
   hasToast: boolean;
+  heldOffTraining: boolean;
   labor: ToastFactPack | null;
   salesDay: ToastFactPack | null;
   salesWeek: ToastFactPack | null;
@@ -149,6 +154,8 @@ function emptyPack(family: ToastFamily, filename: string): ToastFactPack {
     pos: 'toast',
     family,
     filename,
+    location: null,
+    corpus: 'nag-seat',
     businessDate: dates.start && dates.end && dates.start === dates.end ? dates.start : null,
     periodStart: dates.start,
     periodEnd: dates.end,
@@ -381,13 +388,47 @@ function parseItemSelection(text: string, filename: string): ToastFactPack {
   return pack;
 }
 
+function stampTrainingCorpus(pack: ToastFactPack, text: string, filename: string): ToastFactPack {
+  const { headers, rows } = parseTable(text);
+  const locIdx = look(headers, ['location', 'restaurant name', 'restaurant'], ['id', 'guid']);
+  if (locIdx >= 0) {
+    for (const row of rows) {
+      const loc = row[locIdx]?.trim();
+      if (loc) {
+        pack.location = loc;
+        break;
+      }
+    }
+  }
+  if (!pack.location) {
+    const map = labelValueMap([[...headers], ...rows]);
+    pack.location = pickLabel(map, 'location', 'restaurant') ?? null;
+  }
+  const hay = `${filename}\n${pack.filename}\n${pack.location ?? ''}\n${text.slice(0, 2500)}`;
+  pack.corpus = isToastTrainingCorpusOnly(hay) ? 'training' : 'nag-seat';
+  return pack;
+}
+
 export function parseToastReport(text: string, filename: string): ToastFactPack | null {
   const family = detectToastFamily(filename, text);
   if (!family) return null;
-  if (family === 'labor-breakdown') return parseLaborBreakdown(text, filename);
-  if (family === 'sales-summary') return parseSalesSummary(text, filename);
-  if (family === 'time-entries') return parseTimeEntries(text, filename);
-  return parseItemSelection(text, filename);
+  const pack =
+    family === 'labor-breakdown'
+      ? parseLaborBreakdown(text, filename)
+      : family === 'sales-summary'
+        ? parseSalesSummary(text, filename)
+        : family === 'time-entries'
+          ? parseTimeEntries(text, filename)
+          : parseItemSelection(text, filename);
+  return stampTrainingCorpus(pack, text, filename);
+}
+
+function isHeldOffTrainingPack(
+  pack: ToastFactPack,
+  uploadFilename: string,
+): boolean {
+  if (pack.corpus === 'training') return true;
+  return isToastTrainingCorpusOnly(`${uploadFilename}\n${pack.filename}\n${pack.location ?? ''}`);
 }
 
 export function toastSourceTags(filename: string, bytes: Uint8Array): SourceTag[] {
@@ -430,16 +471,27 @@ export function collectToastFacts(
 ): ToastSeatFacts {
   const packs: ToastFactPack[] = [];
   let hasToast = false;
+  let heldOffTraining = false;
   for (const upload of uploads) {
-    if (detectToastFamily(upload.filename)) hasToast = true;
+    const nameHeld = isToastTrainingCorpusOnly(upload.filename);
+    if (detectToastFamily(upload.filename)) {
+      if (nameHeld) heldOffTraining = true;
+      else hasToast = true;
+    } else if (nameHeld) {
+      heldOffTraining = true;
+    }
     for (const tag of upload.sourceTags ?? []) {
       const pack = packFromSourceTag(tag);
-      if (pack) {
-        packs.push(pack);
-        hasToast = true;
+      if (!pack) continue;
+      if (isHeldOffTrainingPack(pack, upload.filename)) {
+        heldOffTraining = true;
+        continue;
       }
+      packs.push(pack);
+      hasToast = true;
     }
   }
+  if (heldOffTraining && !hasToast) hasToast = true;
   const labor = packs.find((p) => p.family === 'labor-breakdown' && p.laborCost != null) ?? null;
   const salesPacks = packs.filter((p) => p.family === 'sales-summary' && p.netSales != null);
   const salesDay =
@@ -456,7 +508,7 @@ export function collectToastFacts(
     ?? null;
   const items = packs.find((p) => p.family === 'item-selection') ?? null;
   const time = packs.find((p) => p.family === 'time-entries') ?? null;
-  return { packs, hasToast, labor, salesDay, salesWeek, items, time };
+  return { packs, hasToast, heldOffTraining, labor, salesDay, salesWeek, items, time };
 }
 
 export function routeToastDeskQuestion(question: string): ToastDeskKind | null {
@@ -506,6 +558,11 @@ export function answerToastDeskQuestion(
   return voidsAnswer(facts);
 }
 
+function trainingHoldOffLine(facts: ToastSeatFacts): string | null {
+  if (!facts.heldOffTraining) return null;
+  return 'A Toast-shaped training-corpus file is on this seat and is not used for NAG answers.';
+}
+
 function payablesMissing(facts: ToastSeatFacts): ToastDeskAnswer {
   return {
     kind: 'payables',
@@ -539,6 +596,7 @@ function laborAnswer(facts: ToastSeatFacts): ToastDeskAnswer {
           ? `TimeEntries hours are on the seat (${laborHoursLine(facts.time)}). Hours are not labor cost. No wage invented.`
           : 'TimeEntries is not a substitute for LaborBreakDown labor cost.',
         'No dollar invented.',
+        ...(trainingHoldOffLine(facts) ? [trainingHoldOffLine(facts)!] : []),
       ],
       coachTomorrow: 'Upload LaborBreakDown for the same store and business date. I will cite the report totals only.',
       needs: 'Toast LaborBreakDown (labor cost, labor % of net, net sales) for the asked day.',
@@ -656,11 +714,12 @@ function salesAnswer(facts: ToastSeatFacts): ToastDeskAnswer {
   }
 
   if (!factsOut.some((line) => /Verified|Estimated/.test(line))) {
+    const hold = trainingHoldOffLine(facts);
     return {
       kind: 'sales',
       slug: 'foh-voids',
       headline: 'Missing — no SalesSummary (and no item-day estimate) on this seat.',
-      facts: factsOut,
+      facts: hold ? [...factsOut, hold] : factsOut,
       coachTomorrow: 'Drop SalesSummary for the day and the week. ItemSelectionDetails can only Estimate a strongest day.',
       needs: 'Toast SalesSummary day and/or week. Optional ItemSelectionDetails for an Estimated strongest day.',
       sourceTags: [{ tag: 'unverified', source: 'toast-desk:sales:missing' }],
@@ -711,6 +770,7 @@ function voidsAnswer(facts: ToastSeatFacts): ToastDeskAnswer {
           ? 'A Toast file is on this seat, but it is not ItemSelectionDetails. Do not invent a void count. Do not ask for a different POS void report when ItemSelectionDetails is the matching paper.'
           : 'No void report is stored. Toast ItemSelectionDetails (Void?=true) is the paper for a Toast seat.',
         'Line count only. No motive named.',
+        ...(trainingHoldOffLine(facts) ? [trainingHoldOffLine(facts)!] : []),
       ],
       coachTomorrow: 'Upload ItemSelectionDetails for the asked dates. I will count Void?=true lines and list items only.',
       needs: 'Toast ItemSelectionDetails with a Void? column.',

@@ -4,6 +4,7 @@
  * Toast ships first (NAG ground truth). Next POS is a new adapter in this
  * registry — not a fork of the desk. Honesty spine is enforced by the desk:
  * Verified | Estimated (show math) | Missing. Never invent $.
+ * Taco Bomba / related-not-nag sheets are training shapes only — off NAG Qs.
  *
  * Add a POS:
  * 1. registerReportAdapter({ pos, family, detect, parse })

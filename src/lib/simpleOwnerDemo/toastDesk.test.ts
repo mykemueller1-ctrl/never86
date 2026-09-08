@@ -115,6 +115,54 @@ describe('Toast seat desk — upload then ask', () => {
     expect(asked.answer.facts.join(' ')).not.toMatch(/\$\d/);
   });
 
+  it('ignores a Taco Bomba training-shape file on the same NAG seat', async () => {
+    const { svc, operatorId } = await loadToastSeat();
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'related-not-nag-tacobamba-LaborBreakDown.csv',
+      contentType: 'text/csv',
+      bytes: load('training-shape-LaborBreakDown.csv'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What was labor cost and labor percent on Aug 31?',
+      tray: 'labor',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.verifiedClose).toBe(true);
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.laborCost.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
+    expect(asked.answer.facts.join(' ')).not.toMatch(/44,444\.44/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/99,999\.01/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/125,273\.41/);
+  });
+
+  it('training-corpus-only upload does not unlock a NAG labor dollar', async () => {
+    const svc = service();
+    const operatorId = 'demo:nag-training-only';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'missions/kristin-nag/related-not-nag-tacobamba/LaborBreakDown.csv',
+      contentType: 'text/csv',
+      bytes: load('training-shape-LaborBreakDown.csv'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What was labor cost and labor percent on Aug 31?',
+      tray: 'labor',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.verifiedClose).toBe(false);
+    expect(asked.answer.headline).toMatch(/Missing/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/44,444\.44/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/1,211\.85/);
+  });
+
   it('re-parses a stored Toast file that was tagged but not fact-packed', async () => {
     const repo = createMemoryRepository();
     const objects = createMemoryObjectStore();

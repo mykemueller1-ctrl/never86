@@ -1,6 +1,11 @@
 export { evidenceKindForReport } from './evidenceKind';
 export { NAG_TOAST_GT } from './nagToastGt';
 export {
+  isToastTrainingCorpusOnly,
+  NAG_TOAST_SCORE_BOX,
+  TOAST_TRAINING_CORPUS_BOX,
+} from './trainingCorpus';
+export {
   detectReport,
   isRegisteredPosFamily,
   listReportAdapters,
