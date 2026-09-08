@@ -18,8 +18,8 @@
       "days": ["Tue"],
       "frequency": "weekly",
       "capture": ["photo"],
-      "notes": ["photo-only"],
-      "missingNudge": "Usually Fort Dodge Tuesday — forget to snap the ticket?"
+      "notes": ["Miller/Coors", "Tue photo-only", "never emails", "MOD Tue/Wed snap flag", "later wave hook"],
+      "missingNudge": "Fort Dodge (Miller/Coors) is Tuesday photo-only — they never email. MOD: snap Tue, flag Wed if the ticket is still Missing."
     },
     {
       "id": "humes",
@@ -28,8 +28,8 @@
       "days": ["Tue", "Fri"],
       "frequency": "twice-weekly",
       "capture": ["email", "photo"],
-      "notes": ["email preferred", "photo backup"],
-      "missingNudge": "Humes is usually Tue and Fri. Email the invoice if it landed — or snap the ticket."
+      "notes": ["later wave after PDQ/Hy-Vee", "Tue+Fri", "AP email inbox", "photo OCR backup", "not this draft"],
+      "missingNudge": "Humes is later wave (Tue/Fri). Email the invoice to the AP inbox — or snap the ticket as OCR backup."
     },
     {
       "id": "confluence",
@@ -38,8 +38,8 @@
       "days": ["Mon", "Tue", "Fri"],
       "frequency": "varies",
       "capture": ["photo"],
-      "notes": ["kegs", "reconcile empties credits"],
-      "missingNudge": "Confluence is roughly weekly — Mon, Tue, or Fri. Snap the keg ticket so empties credits can match later."
+      "notes": ["kegs", "empties photo credits", "photo proof not empties-as-cash", "later wave hook"],
+      "missingNudge": "Confluence kegs: snap the ticket and empties photo. Credits need photo proof — empties are not cash dollars."
     },
     {
       "id": "hy-vee-wine",
@@ -48,8 +48,8 @@
       "days": ["Mon"],
       "frequency": "weekly",
       "capture": ["email", "photo"],
-      "notes": ["email order", "yellow slips", "invoice glue"],
-      "missingNudge": "Hy-Vee wine: email the order, keep the yellow slip, glue it to the invoice. Snap the slip if the email is missing."
+      "notes": ["Wave 0b", "email order", "yellow slips", "invoice OCR", "Monday one check", "not AP"],
+      "missingNudge": "Hy-Vee wine: OCR the order, yellow slip, and invoice into the mess — forget to snap? Monday is one check. Not AP."
     },
     {
       "id": "pepsi",
@@ -58,8 +58,8 @@
       "days": [],
       "frequency": "every-other-week",
       "capture": ["photo"],
-      "notes": ["photo"],
-      "missingNudge": "Pepsi is about every other week. Forget to snap the ticket?"
+      "notes": ["every-other-week photo OCR", "first week papers-in quick wins", "not savings", "not CO2", "later wave hook"],
+      "missingNudge": "Pepsi is every other week — snap the ticket for photo OCR. First week is papers-in, not a savings or CO2 lecture."
     },
     {
       "id": "northern-lights",
@@ -68,8 +68,8 @@
       "days": [],
       "frequency": "frequent",
       "capture": ["email", "photo"],
-      "notes": ["multi-sender", "dedup invoice number"],
-      "missingNudge": "Northern Lights hits often and from more than one sender. Same invoice number is the same ticket — snap once."
+      "notes": ["inv# dedup primary", "vendor+total red flag", "multi-sender ignore", "later wave hook"],
+      "missingNudge": "Northern Lights: same invoice number is the same ticket — dedup on inv#. Multi-sender copies are ignore. Vendor+total mismatch is a red flag, not a new bill."
     },
     {
       "id": "performance-foodservice",
@@ -78,8 +78,8 @@
       "days": ["Tue", "Fri"],
       "frequency": "twice-weekly",
       "capture": ["email", "photo"],
-      "notes": ["order email must match invoice", "EFT 21-day framing in coach copy only"],
-      "missingNudge": "Performance trucks are usually Tue and Fri. Match the order email to the invoice. EFT often lands on a 21-day clock — this is a reminder, not a pay screen."
+      "notes": ["Tue+Fri trucks", "BOH/Seat 2 orders day-before", "purchase email must match invoice", "mismatch short/credit/OOS", "EFT ~21d behind", "statement pile ≠ weekly due", "same pattern Sysco/US Foods at scale", "later wave hook"],
+      "missingNudge": "PFG trucks are usually Tue and Fri. BOH / Seat 2 orders the day before. Match the purchase email to the invoice — mismatch is short, credit, or OOS. EFT often sits on a 21-day clock; do not treat the statement pile as this week’s due. Reminder only, not a pay screen."
     },
     {
       "id": "sysco",
@@ -88,8 +88,8 @@
       "days": ["Tue", "Fri"],
       "frequency": "weekly",
       "capture": ["photo"],
-      "notes": ["once weekly Tue or Fri"],
-      "missingNudge": "Usually Sysco Tue/Fri — forget to snap?"
+      "notes": ["weekly Tue or Fri varies", "photo OCR", "zero week soft nudge", "later wave hook"],
+      "missingNudge": "Usually Sysco Tue/Fri — nothing in. Forget to snap it?"
     }
   ]
 }

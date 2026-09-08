@@ -17,7 +17,11 @@ export function evidenceKindForReport(hit: ReportAdapterHit): EvidenceKind {
       return 'hourly';
     case 'invoice':
     case 'catalog':
+    case 'order-email':
+    case 'monday-batch':
       return 'invoice';
+    case 'charge-slip':
+      return 'invoice-truck';
     default:
       return 'other';
   }

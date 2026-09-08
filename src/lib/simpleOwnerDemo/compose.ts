@@ -25,6 +25,24 @@ import {
   isToastParseDisplayTag,
   routeToastDeskQuestion,
 } from '@/lib/toastParse';
+import {
+  answerPdqDeskQuestion,
+  collectPdqFacts,
+  isPdqParseDisplayTag,
+  routePdqDeskQuestion,
+} from '@/lib/pdqDesk';
+import {
+  answerHyveeDeskQuestion,
+  collectHyveeFacts,
+  routeHyveeDeskQuestion,
+} from '@/lib/hyveeWineParse';
+import {
+  CTAP_TOAST_CONTAMINANT_FAIL,
+  ctapSeatHasToastContaminant,
+  isCtapSeat1Id,
+  toastMayAnswerSeat,
+} from '@/lib/ctapPosLock';
+import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -74,32 +92,144 @@ export function readinessFromUploads(
   };
 }
 
+function persistFactFor(operatorId: string): string {
+  return `Question and answer are stored for operator_id ${operatorId}. Files go to object storage with the same seat key.`;
+}
+
+function isHiddenParseTag(tag: SourceTag): boolean {
+  return isToastParseDisplayTag(tag) || isPdqParseDisplayTag(tag) || tag.source.startsWith('hyvee-parse:v1:');
+}
+
 export function composeAskAnswer(input: {
   question: string;
   tray: OwnerDeskTrayId;
   readiness: SimpleOwnerReadiness;
   uploads: readonly SimpleOwnerUploadRecord[];
+  now?: Date;
 }): SimpleOwnerAskAnswer {
-  const toastFacts = collectToastFacts(input.uploads);
-  const toastKind = routeToastDeskQuestion(input.question);
+  const qLower = input.question.toLowerCase();
+  const onCtapSeat1 = isCtapSeat1Id(input.readiness.operatorId);
+  const clearlyHyvee = /hy[\s-]*vee|winespirits|wine & spirits|yellow slip|customer charge|monday batch|monday check|one check/.test(
+    qLower,
+  );
+  const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown|food today|net sales yesterday|yesterday(?:'s)? (?:net )?sales/.test(
+    qLower,
+  );
+
+  // Wave 0: PDQ mornings first. Hy-Vee 0b is next. Not Humes-first.
+  const pdqFacts = collectPdqFacts(input.uploads);
+  const pdqKind = routePdqDeskQuestion(input.question);
+  const takePdqMorning = Boolean(pdqKind) && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
+    && (!clearlyHyvee || clearlyPdq);
+  const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts, input.now ?? new Date()) : null;
+  if (pdqAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...pdqAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: pdqAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${pdqAnswer.slug}` },
+    ];
+    return {
+      slug: pdqAnswer.slug,
+      headline: pdqAnswer.headline,
+      facts: [...pdqAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: pdqAnswer.coachTomorrow,
+      needs: pdqAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: pdqAnswer.sampleDollars,
+      verifiedClose: pdqAnswer.verifiedClose,
+    };
+  }
+
+  const hyveeFacts = collectHyveeFacts(input.uploads);
+  const hyveeKind = routeHyveeDeskQuestion(input.question);
+  const hyveeAnswer =
+    hyveeKind && (hyveeFacts.hasHyvee || clearlyHyvee)
+      ? answerHyveeDeskQuestion(input.question, hyveeFacts)
+      : null;
+  if (hyveeAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...hyveeAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: hyveeAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${hyveeAnswer.slug}` },
+    ];
+    return {
+      slug: hyveeAnswer.slug,
+      headline: hyveeAnswer.headline,
+      facts: [...hyveeAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: hyveeAnswer.coachTomorrow,
+      needs: hyveeAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: hyveeAnswer.sampleDollars,
+      verifiedClose: hyveeAnswer.verifiedClose,
+    };
+  }
+
+  const vendorSpine = answerVendorSpineQuestion(input.question);
+  if (vendorSpine) {
+    const sourceTags: SourceTag[] = [
+      { tag: 'unverified', source: `vendor-spine:${vendorSpine.vendorId}:hook` },
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
+      { tag: 'unverified', source: `simple-owner-ask:${vendorSpine.slug}` },
+    ];
+    return {
+      slug: vendorSpine.slug,
+      headline: vendorSpine.headline,
+      facts: [...vendorSpine.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: vendorSpine.coachTomorrow,
+      needs: vendorSpine.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: vendorSpine.sampleDollars,
+      verifiedClose: vendorSpine.verifiedClose,
+    };
+  }
+
+  if (onCtapSeat1 && ctapSeatHasToastContaminant(input.uploads)) {
+    return {
+      slug: 'foh-voids',
+      headline: CTAP_TOAST_CONTAMINANT_FAIL,
+      facts: [
+        CTAP_TOAST_CONTAMINANT_FAIL,
+        'CTAP Wave 0 reads PDQ Signature PDFs only (ZReport_Summary, Void_Promo_Report, Hourly_Sales_Report).',
+        'Toast Wave 0 stays NAG / lab. Contaminant path = Fail. No Toast dollar used.',
+        persistFactFor(input.readiness.operatorId),
+      ],
+      coachTomorrow: 'Remove the Toast / NAG / Taco Bamba file. Land the PDQ morning pack.',
+      needs: 'PDQ Signature PDFs on CTAP Seat 1. Not a Toast CSV.',
+      tags: ['unverified:ctap-pos-lock:toast-contaminant:fail'],
+      sourceTags: [{ tag: 'unverified', source: 'ctap-pos-lock:toast-contaminant:fail' }],
+      inventedClose: false,
+      sampleDollars: 'none-verified',
+      verifiedClose: false,
+    };
+  }
+
+  const toastFacts = toastMayAnswerSeat(input.readiness.operatorId)
+    ? collectToastFacts(input.uploads)
+    : null;
+  const toastKind = toastFacts ? routeToastDeskQuestion(input.question) : null;
   const toastAnswer =
-    toastKind && (toastFacts.hasToast || toastKind === 'payables')
+    toastFacts && toastKind && (toastFacts.hasToast || toastKind === 'payables')
       ? answerToastDeskQuestion(input.question, toastFacts)
       : null;
   if (toastAnswer) {
-    const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
     const sourceTags: SourceTag[] = [
       ...toastAnswer.sourceTags,
-      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isToastParseDisplayTag(tag)),
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag)),
       { tag: toastAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${toastAnswer.slug}` },
     ];
     return {
       slug: toastAnswer.slug,
       headline: toastAnswer.headline,
-      facts: [...toastAnswer.facts, persistFact],
+      facts: [...toastAnswer.facts, persistFactFor(input.readiness.operatorId)],
       coachTomorrow: toastAnswer.coachTomorrow,
       needs: toastAnswer.needs,
-      tags: sourceTags.filter((tag) => !isToastParseDisplayTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
       sourceTags,
       inventedClose: false,
       sampleDollars: toastAnswer.sampleDollars,
@@ -113,7 +243,7 @@ export function composeAskAnswer(input: {
   const ready = input.readiness.evidence.filter((row) => row.state === 'READY').map((row) => row.short);
   const missing = input.readiness.evidence.filter((row) => row.state === 'NEED').map((row) => row.short);
   const sourceTags: SourceTag[] = [
-    ...input.readiness.sourceTags.filter((tag) => !isToastParseDisplayTag(tag)),
+    ...input.readiness.sourceTags.filter((tag) => !isHiddenParseTag(tag)),
     { tag: 'unverified', source: `simple-owner-ask:${slug}` },
   ];
 

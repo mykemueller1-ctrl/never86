@@ -1,0 +1,46 @@
+Z Report / End Of Day
+Sample Kitchen Lab
+Business Date: 8/24/2026
+
+Sales Summary
+Trans Type QTY Amount Avg Check % Last Year
+Pickup 8 $160.00 $20.00 15.24 $0.00
+Delivery 6 $190.00 $31.67 18.10 $0.00
+Bar 18 $200.00 $11.11 19.05 $0.00
+Table 14 $500.00 $35.71 47.62 $0.00
+Total: 46 $1,050.00 $22.83 100% $0.00
+
+Taxable: $850.00 Subtotal: $1,050.00
+Non Tax: $200.00 Tax: $73.50
+Grand Total: $1,123.50
+Pay Outs - $15.00
+Pay In + $0.00
+
+Expected Cash: $0.00
+
+Labor Summary
+Job Description QTY Total %
+Line 2 $180.00 0.17
+Close 1 $100.00 0.10
+Total: 3 $280.00 0.27
+
+Misc Summary
+Description Num Value
+# Voids 2 $12.00
+
+Discount Summary
+Type Description QTY Total %
+Promo 1 $8.00 0.76 %
+Spec Instruction 1 $5.00 0.48 %
+Total: 2 $13.00 1.24 %
+
+Menu Category
+Category Name QTY Total
+Food 25 $400.00
+Large Pizzas 10 $250.00
+Beer 20 $200.00
+Liquor 15 $150.00
+Pop 10 $50.00
+Total: 80 $1,050.00
+
+Report Generated At: 8/25/2026 6:57:00 AM
