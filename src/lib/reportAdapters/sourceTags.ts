@@ -9,6 +9,7 @@ import {
   hyveePackHasNumber,
 } from '@/lib/hyveeWineParse';
 import { isCtapSeat1Id, uploadLooksLikeToastContaminant } from '@/lib/ctapPosLock';
+import { isCtapSeat } from '@/lib/seatIsolation';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
 import { detectReport, isHyveeFactPack, isPdqFactPack, isToastFactPack, parseRegisteredReport, type RegisteredFactPack } from './registry';
 
@@ -77,6 +78,11 @@ export function hasParsedReportPack(tags: readonly SourceTag[]): boolean {
   return tags.some((tag) => packFromSourceTag(tag) != null || /[-]parse:v1:/.test(tag.source));
 }
 
+/** True only when a Toast fact pack can be rehydrated — prefix alone is not enough. */
+export function hasHydratedToastPack(tags: readonly SourceTag[]): boolean {
+  return tags.some((tag) => packFromSourceTag(tag) != null);
+}
+
 export function hasCtapToastContaminantTag(tags: readonly SourceTag[]): boolean {
   return tags.some((tag) => tag.source === CTAP_TOAST_CONTAMINANT_SOURCE);
 }
@@ -86,8 +92,12 @@ export function reportSourceTagsForSeat(
   operatorId: string,
   filename: string,
   bytes: Uint8Array,
+  restaurantName?: string | null,
 ): SourceTag[] {
-  if (isCtapSeat1Id(operatorId) && uploadLooksLikeToastContaminant(filename)) {
+  if (isCtapSeat(operatorId, restaurantName) && uploadLooksLikeToastContaminant(filename, [])) {
+    return [{ tag: 'unverified', source: CTAP_TOAST_CONTAMINANT_SOURCE }];
+  }
+  if (isCtapSeat1Id(operatorId, restaurantName) && uploadLooksLikeToastContaminant(filename)) {
     return [{ tag: 'unverified', source: CTAP_TOAST_CONTAMINANT_SOURCE }];
   }
   return reportSourceTags(filename, bytes);

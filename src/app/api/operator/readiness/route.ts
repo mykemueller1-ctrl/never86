@@ -6,12 +6,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  return withSimpleOwnerTenant(req, async (operatorId) => {
+  return withSimpleOwnerTenant(req, async (operatorId, restaurantName) => {
     const service = getSimpleOwnerDemoService();
     if (isServiceError(service)) {
       return jsonError(service.status, service.error, service.code);
     }
-    const readiness = await service.readiness(operatorId);
+    const readiness = await service.readiness(operatorId, restaurantName);
     return NextResponse.json({
       success: true,
       operatorId,

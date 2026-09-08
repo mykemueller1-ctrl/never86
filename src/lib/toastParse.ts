@@ -391,6 +391,14 @@ function parseItemSelection(text: string, filename: string): ToastFactPack {
   return pack;
 }
 
+function locationFromPreamble(text: string): string | null {
+  const head = text.slice(0, 2500);
+  if (/(?:--\s*)?(?:the\s+)?new american grill|max grill/i.test(head)) {
+    return 'New American Grill';
+  }
+  return null;
+}
+
 function stampTrainingCorpus(pack: ToastFactPack, text: string, filename: string): ToastFactPack {
   const { headers, rows } = parseTable(text);
   const locIdx = look(headers, ['location', 'restaurant name', 'restaurant'], ['id', 'guid']);
@@ -406,6 +414,9 @@ function stampTrainingCorpus(pack: ToastFactPack, text: string, filename: string
   if (!pack.location) {
     const map = labelValueMap([[...headers], ...rows]);
     pack.location = pickLabel(map, 'location', 'restaurant') ?? null;
+  }
+  if (!pack.location || /^(unit|store|location)\s*[a-z0-9-]*$/i.test(pack.location)) {
+    pack.location = locationFromPreamble(`${filename}\n${text}`) ?? pack.location;
   }
   const hay = `${filename}\n${pack.filename}\n${pack.location ?? ''}\n${text.slice(0, 2500)}`;
   pack.corpus = isToastTrainingCorpusOnly(hay) ? 'training' : 'nag-seat';
@@ -477,7 +488,11 @@ export function collectToastFacts(
   let heldOffTraining = false;
   for (const upload of uploads) {
     const nameHeld = isToastTrainingCorpusOnly(upload.filename);
-    if (detectToastFamily(upload.filename)) {
+    const confidence = (upload.sourceTags ?? []).some((tag) => (
+      (tag.tag === 'verified' || tag.tag === 'estimated')
+      && (tag.source.startsWith('toast:') || tag.source.startsWith(TOAST_PARSE_PREFIX))
+    ));
+    if (detectToastFamily(upload.filename) || confidence) {
       if (nameHeld) heldOffTraining = true;
       else hasToast = true;
     } else if (nameHeld) {
@@ -519,9 +534,9 @@ export function routeToastDeskQuestion(question: string): ToastDeskKind | null {
   if (!q) return null;
   if (/\b(payables?|accounts payable|\bap\b|30\s*\/?\s*60\s*\/?\s*90|aging)\b/.test(q)) return 'payables';
   if (/\bvoids?\b|\bvoided\b/.test(q)) return 'voids';
-  if (/\blabor\b|\blabor\s*%|\blabor percent/.test(q)) return 'labor';
+  if (/\blabor\b|\blabor\s*%|\blabor percent|\blabor cost/.test(q)) return 'labor';
   if (
-    /\bnet sales\b|\bsales\b|\bstrongest day\b|\bbusiest day\b|\bweek\b|\bweekly\b/.test(q)
+    /\bnet sales\b|\btotal net\b|\bsales\b|\bstrongest day\b|\bbusiest day\b|\bweek\b|\bweekly\b/.test(q)
   ) {
     return 'sales';
   }

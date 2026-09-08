@@ -198,4 +198,79 @@ describe('Toast seat desk — upload then ask', () => {
     expect(asked.answer.verifiedClose).toBe(true);
     expect(asked.answer.facts.join(' ')).toMatch(/1,211\.85/);
   });
+
+  it('New American Grill on the free-seat floor id is Toast Verified, not CTAP Missing', async () => {
+    const svc = service();
+    const operatorId = 'seat:1000000';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'LaborBreakDown_2026-08-31.csv',
+      contentType: 'text/csv',
+      bytes: load('LaborBreakDown_2026-08-31.csv'),
+      restaurantName: 'New American Grill',
+    });
+    expect(uploaded.ok).toBe(true);
+    if (uploaded.ok) {
+      expect(uploaded.upload.sourceTags.some((tag) => tag.source.startsWith('toast-parse:v1:'))).toBe(true);
+      expect(uploaded.upload.sourceTags.map((tag) => tag.source).join(' ')).not.toMatch(/toast-contaminant/);
+    }
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What was labor cost and labor percent on Aug 31?',
+      tray: 'labor',
+      restaurantName: 'New American Grill',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.verifiedClose).toBe(true);
+    expect(asked.answer.sampleDollars).toBe('toast-verified');
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.laborCost.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
+    expect(asked.answer.headline).not.toMatch(/Missing/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/Community Tap|PDQ/);
+  });
+
+  it('high-confidence Toast tag plus stored file answers Verified, not stuck Missing', async () => {
+    const repo = createMemoryRepository();
+    const objects = createMemoryObjectStore();
+    const svc = createSimpleOwnerDemoService({ repo, objects });
+    const operatorId = 'demo:nag-confidence';
+    const filename = 'LaborBreakDown_2026-08-31.csv';
+    const bytes = load(filename);
+    const put = await objects.put({
+      operatorId,
+      objectKey: 'simple-owner/demo:nag-confidence/labor.csv',
+      bytes,
+      contentType: 'text/csv',
+    });
+    await repo.insertUpload({
+      id: 'conf-1',
+      operatorId,
+      filename,
+      contentType: 'text/csv',
+      byteLength: bytes.byteLength,
+      evidenceKind: 'other',
+      sourceTags: [
+        { tag: 'verified', source: 'toast:labor-breakdown:2026-08-31' },
+        { tag: 'unverified', source: 'ctap-pos-lock:toast-contaminant:fail' },
+      ],
+      objectKey: put.objectKey,
+      storageBackend: 'memory',
+      createdAt: '2026-09-07T12:00:00.000Z',
+    });
+    const asked = await svc.ask({
+      operatorId,
+      question: 'Labor cost Aug 31?',
+      tray: 'labor',
+      restaurantName: 'New American Grill',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.verifiedClose).toBe(true);
+    expect(asked.answer.sampleDollars).toBe('toast-verified');
+    expect(asked.answer.sourceTags.some((tag) => tag.tag === 'verified' && tag.source.startsWith('toast:'))).toBe(true);
+    expect(asked.answer.facts.join(' ')).toMatch(/1,211\.85/);
+  });
 });
+

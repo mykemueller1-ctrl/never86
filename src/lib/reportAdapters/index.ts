@@ -20,6 +20,7 @@ export {
 export {
   CTAP_TOAST_CONTAMINANT_SOURCE,
   hasCtapToastContaminantTag,
+  hasHydratedToastPack,
   hasParsedReportPack,
   reportSourceTags,
   reportSourceTagsForSeat,

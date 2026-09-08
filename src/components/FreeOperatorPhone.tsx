@@ -13,7 +13,13 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
-import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
+import {
+  LAST_WEEK_PRIME_LOAD_ASK,
+  emptyLastWeekPrime,
+  type LastWeekPrimeSnapshot,
+} from '@/lib/lastWeekPrimeCost';
+import { deskSeatLabel, deskSeatTitle } from '@/lib/seatIsolation';
+import { usd } from '@/lib/toastParse';
 import {
   DAY1_FRONT_PICKS,
   DAY1_HELP_ENERGY,
@@ -86,7 +92,13 @@ function emptyDailyCompare(): DailyCompareChip[] {
   return dailyCompareFromEvidence({ scheduleReady: false, clockReady: false });
 }
 
-export function FreeOperatorPhone() {
+export function FreeOperatorPhone({
+  initialRestaurantName = null,
+  signedIn = false,
+}: {
+  initialRestaurantName?: string | null;
+  signedIn?: boolean;
+}) {
   const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
@@ -94,10 +106,15 @@ export function FreeOperatorPhone() {
   const [folders, setFolders] = useState<OperatorV2FolderState[]>(emptyFolders);
   const [roleCards, setRoleCards] = useState<LaborRoleCard[]>(emptyRoleCards);
   const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
+  const [lastWeekPrime, setLastWeekPrime] = useState<LastWeekPrimeSnapshot>(emptyLastWeekPrime);
   const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
   const [paperPath, setPaperPath] = useState(false);
-  const [storeName, setStoreName] = useState(() => day1StoreTitle(null));
+  const [storeName, setStoreName] = useState(() => {
+    if (initialRestaurantName?.trim()) return deskSeatLabel(initialRestaurantName);
+    if (signedIn) return '';
+    return day1StoreTitle(null);
+  });
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -122,6 +139,7 @@ export function FreeOperatorPhone() {
     if (next.folders) setFolders(next.folders.map((row) => ({ ...row })));
     if (next.laborCards) setRoleCards(next.laborCards.map((row) => ({ ...row })));
     if (next.dailyCompare) setDailyCompare(next.dailyCompare.map((row) => ({ ...row })));
+    if (next.lastWeekPrime) setLastWeekPrime(next.lastWeekPrime);
   }
 
   useEffect(() => {
@@ -143,9 +161,9 @@ export function FreeOperatorPhone() {
         const body = (await desk.json()) as { success?: boolean; restaurantName?: string | null };
         if (cancelled) return;
         const named = body.restaurantName?.trim();
-        if (desk.ok && body.success) setStoreName(day1StoreTitle(named));
+        if (desk.ok && body.success && named) setStoreName(deskSeatLabel(named));
       } catch {
-        /* public seat keeps Community Tap */
+        /* signed-in NAG never falls back to Community Tap */
       }
     })();
     return () => {
@@ -326,8 +344,8 @@ export function FreeOperatorPhone() {
       <header className="owner-desk-top">
         <div className="owner-desk-hello">
           <div>
-            <p className="owner-desk-store" title={CTAP_SEAT1_PUBLIC_LABEL}>
-              {day1StoreTitle(storeName)}
+            <p className="owner-desk-store" title={deskSeatTitle(storeName || initialRestaurantName)}>
+              {storeName.trim() ? deskSeatLabel(storeName) : signedIn ? 'Owner desk' : deskSeatLabel(null)}
             </p>
             <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>
@@ -360,8 +378,10 @@ export function FreeOperatorPhone() {
         <div className="owner-desk-main">
       {view === 'home' ? (
         <section className="owner-desk-lom">
-          <p className="owner-desk-kicker">{firstScreen ? 'Operator desk' : weekdayLabel()}</p>
-          <h1 className="owner-desk-ask-title">{hookAsk}</h1>
+          <p className="owner-desk-kicker">Action Shift</p>
+          <h1 className="owner-desk-ask-title">
+            {lastWeekPrime.honesty === 'Missing' ? LAST_WEEK_PRIME_LOAD_ASK : lastWeekPrime.headline}
+          </h1>
           {winLine ? (
             <div className="owner-desk-win" role="status">
               <p className="owner-desk-win-mark">Ready</p>
@@ -369,14 +389,51 @@ export function FreeOperatorPhone() {
             </div>
           ) : (
             <p className="owner-desk-poetry">
-              {firstScreen
-                ? frontPath && !needsPhoto
-                  ? DAY1_PREVIEW_CONTRACT
-                  : DAY1_SUBLINE
-                : hook.attachHint}
+              {lastWeekPrime.nextLoad} Invoice ≠ COGS. Band {lastWeekPrime.bandMin}–{lastWeekPrime.bandMax}%. Missing stays Missing.
             </p>
           )}
-          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+          <article className="owner-desk-lastweek" aria-label="Last-week prime">
+            <p className="owner-desk-lastweek-kicker">{lastWeekPrime.honesty} · last-week prime</p>
+            <ul className="owner-desk-lastweek-list">
+              {lastWeekPrime.families.map((row) => (
+                <li
+                  key={row.id}
+                  className={`owner-desk-lastweek-row is-${row.honesty.toLowerCase()}`}
+                >
+                  <span className="owner-desk-lastweek-label">{row.label}</span>
+                  <span className="owner-desk-lastweek-honesty">{row.honesty}</span>
+                  <span className="owner-desk-lastweek-amt">
+                    {row.amount == null ? 'Missing' : usd(row.amount)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <button
+            type="button"
+            className="owner-desk-snap-hero"
+            disabled={busy}
+            onClick={() => void goAsk(LAST_WEEK_PRIME_LOAD_ASK)}
+          >
+            {busy ? 'Loading…' : 'Load last-week COGS'}
+          </button>
+          <button
+            type="button"
+            className="owner-desk-file-quiet"
+            disabled={busy}
+            onClick={() => onMouth('file')}
+          >
+            Add last-week file
+          </button>
+          {firstScreen ? (
+            <p className="owner-desk-identity">
+              {DAY1_IDENTITY_LINE}
+              {' '}
+              {frontPath && !needsPhoto ? DAY1_PREVIEW_CONTRACT : DAY1_SUBLINE}
+            </p>
+          ) : (
+            <p className="owner-desk-poetry">{hookAsk}</p>
+          )}
           {firstScreen && !paperPath ? (
             <div className="owner-desk-chips" aria-label="Floor asks">
               {DAY1_FRONT_PICKS.filter((pick) => pick.action !== 'photo').map((pick) => (

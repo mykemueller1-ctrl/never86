@@ -1,3 +1,4 @@
+import type { LastWeekPrimeSnapshot } from '@/lib/lastWeekPrimeCost';
 import type { TagLevel } from '@/lib/sourceTags';
 import type { OwnerDeskTrayId, PrimeCostEvidence } from '@/lib/freeOperatorDemo';
 import type { DailyCompareChip, LaborRoleCard, OperatorV2FolderState } from '@/lib/operatorV2';
@@ -53,7 +54,7 @@ export type SimpleOwnerAskRecord = {
   needs: string;
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated';
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated' | 'prime-verified' | 'prime-estimated';
   verifiedClose: boolean;
   createdAt: string;
 };
@@ -68,6 +69,7 @@ export type SimpleOwnerReadiness = {
   uploadCount: number;
   askCount: number;
   sourceTags: SourceTag[];
+  lastWeekPrime: LastWeekPrimeSnapshot;
 };
 
 export type SimpleOwnerAskAnswer = {
@@ -79,7 +81,7 @@ export type SimpleOwnerAskAnswer = {
   tags: string[];
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated';
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated' | 'pdq-verified' | 'pdq-estimated' | 'hyvee-verified' | 'hyvee-estimated' | 'prime-verified' | 'prime-estimated';
   verifiedClose: boolean;
 };
 
