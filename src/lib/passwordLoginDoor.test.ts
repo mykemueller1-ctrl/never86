@@ -33,8 +33,10 @@ describe('email+password live door', () => {
   });
 
   it('exposes the probed /api/auth/login and /api/auth/set-password aliases', () => {
-    expect(read('src/app/api/auth/login/route.ts')).toContain('../../operator/login/route');
-    expect(read('src/app/api/auth/set-password/route.ts')).toContain('../../operator/set-password/route');
+    expect(read('src/app/api/auth/login/route.ts')).toContain("export { POST } from '../../operator/login/route'");
+    expect(read('src/app/api/auth/login/route.ts')).toContain("export const dynamic = 'force-dynamic'");
+    expect(read('src/app/api/auth/set-password/route.ts')).toContain("export { POST } from '../../operator/set-password/route'");
+    expect(read('src/app/api/auth/set-password/route.ts')).toContain("export const runtime = 'nodejs'");
   });
 
   it('keeps public second-store claim as 409 and does not invent plus-alias seats', () => {
