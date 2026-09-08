@@ -38,7 +38,8 @@ export function isOwnerPersonEmail(email: string | undefined | null): boolean {
   if (!normalized || normalized.includes('+')) return false;
   if (normalized === OWNER_PERSON_EMAIL) return true;
   const envOwner = process.env.OWNER_EMAIL?.trim().toLowerCase();
-  return Boolean(envOwner) && !envOwner.includes('+') && normalized === envOwner;
+  if (!envOwner || envOwner.includes('+')) return false;
+  return normalized === envOwner;
 }
 
 export async function ownerPersonSessionOk(req: NextRequest): Promise<boolean> {
