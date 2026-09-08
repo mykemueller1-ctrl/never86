@@ -7,6 +7,8 @@ import {
   seatCredentials,
   seatLocations,
   seatOperators,
+  seatPersonAccess,
+  seatPersonPasswords,
 } from '../db/schema';
 import { restaurantNameForSeatClaim } from './ctapSeat1';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
@@ -15,7 +17,8 @@ import { databaseUrlPresent } from './persistHealth';
 
 // Monday gate (#118) — free seat on Neon (DATABASE_URL).
 // Supabase OPS is deferred; Toast/CTAP data comes back later.
-// Email links are the credential. Never log or return a raw link token.
+// Email links set or reset the password once. Daily door is /login.
+// Never log or return a raw link token.
 
 const TOKEN_BYTES = 32;
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24; // 24h
@@ -67,7 +70,7 @@ export function publicActivationAccepted(expiresAt: Date): {
 } {
   return {
     success: true,
-    message: 'Check your email for a secure sign-in link.',
+    message: 'Check your email for a set-password link.',
     expiresAt: expiresAt.toISOString(),
   };
 }
@@ -78,6 +81,47 @@ export function normalizeEmail(email: string): string {
 
 export function normalizeRestaurant(name: string): string {
   return name.trim().replace(/\s+/g, ' ');
+}
+
+export function restaurantsMatch(left: string, right: string): boolean {
+  return (
+    normalizeRestaurant(left).localeCompare(normalizeRestaurant(right), undefined, {
+      sensitivity: 'accent',
+    }) === 0
+  );
+}
+
+export function isResetActivationSource(sourcePage?: string | null): boolean {
+  const source = (sourcePage ?? '').trim().toLowerCase();
+  return source === 'reset' || source === '/login/reset' || source.endsWith('/login/reset');
+}
+
+export type SeatClaimDecision =
+  | { action: 'reuse'; store: string }
+  | { action: 'reopen-first' }
+  | { action: 'create-isolated' }
+  | { action: 'no-seat' };
+
+/**
+ * One email may own many isolated stores. Same store name reopens.
+ * A different store name creates a new operator — never paints CTAP as Max.
+ * Reset links never mint a store.
+ */
+export function decideSeatClaim(input: {
+  claimedStore: string;
+  existingStores: readonly string[];
+  resetOnly: boolean;
+}): SeatClaimDecision {
+  const claimed = normalizeRestaurant(input.claimedStore);
+  const existing = input.existingStores.map((name) => normalizeRestaurant(name)).filter(Boolean);
+  const match = existing.find((name) => restaurantsMatch(name, claimed));
+  if (input.resetOnly) {
+    if (existing.length === 0) return { action: 'no-seat' };
+    if (match) return { action: 'reuse', store: match };
+    return { action: 'reopen-first' };
+  }
+  if (match) return { action: 'reuse', store: match };
+  return { action: 'create-isolated' };
 }
 
 export function hashActivationToken(rawToken: string): string {
@@ -252,6 +296,42 @@ export async function requestOperatorActivation(
   return { ok: true, rawToken, expiresAt, alreadyPending: false };
 }
 
+async function attachPersonAccessTx(
+  tx: typeof db,
+  email: string,
+  operatorId: number,
+  nowMs: number,
+): Promise<void> {
+  const existing = await tx
+    .select({ id: seatPersonAccess.id })
+    .from(seatPersonAccess)
+    .where(and(eq(seatPersonAccess.email, email), eq(seatPersonAccess.operatorId, operatorId)))
+    .limit(1);
+  if (existing[0]) return;
+  await tx.insert(seatPersonAccess).values({
+    email,
+    operatorId,
+    createdAt: new Date(nowMs),
+  });
+}
+
+export async function listNeonOperatorsForEmail(email: string): Promise<
+  { operatorId: number; email: string; restaurantName: string }[]
+> {
+  if (!neonConfigured()) return [];
+  await ensureFreeSeatSchema();
+  const normalized = normalizeEmail(email);
+  const rows = await db
+    .select({
+      operatorId: seatOperators.id,
+      email: seatOperators.email,
+      restaurantName: seatOperators.restaurantName,
+    })
+    .from(seatOperators)
+    .where(eq(seatOperators.email, normalized));
+  return rows;
+}
+
 export type ActivateInput = {
   rawToken: string;
 };
@@ -288,8 +368,8 @@ export async function activateOperatorSeat(
 
   const tokenHash = hashActivationToken(input.rawToken.trim());
   // Keep the legacy credential row structurally valid while making the random
-  // secret impossible to use as a user-facing password. All public entry is by
-  // a fresh, verified email link.
+  // secret impossible to use as a user-facing password. Public daily entry is
+  // email + password after this link is used once to set that password.
   const passwordHash = hashPassword(crypto.randomBytes(32).toString('base64url'));
 
   try {
@@ -345,42 +425,57 @@ export async function activateOperatorSeat(
       const email = normalizeEmail(row.email);
       const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName);
       const operatorName = (row.operatorName?.trim() || restaurantName).slice(0, 200);
+      const resetOnly = isResetActivationSource(row.sourcePage);
 
-      const priorCred = await tx
-        .select({ operatorId: seatCredentials.operatorId })
-        .from(seatCredentials)
-        .where(eq(seatCredentials.email, email))
-        .limit(1);
-      if (priorCred[0]) {
-        const existingOperator = await tx
-          .select({ restaurantName: seatOperators.restaurantName })
-          .from(seatOperators)
-          .where(eq(seatOperators.id, priorCred[0].operatorId))
-          .limit(1);
-        const existingName = existingOperator[0]?.restaurantName;
-        const mismatch = refuseExistingSeatStoreMismatch(restaurantName, existingName);
-        if (!mismatch.ok) {
-          throw new SeatActivationAbort({
-            ok: false,
-            error: mismatch.error,
-            status: mismatch.status,
-          });
-        }
+      const emailOps = await tx
+        .select({
+          id: seatOperators.id,
+          restaurantName: seatOperators.restaurantName,
+        })
+        .from(seatOperators)
+        .where(eq(seatOperators.email, email));
+
+      const claim = decideSeatClaim({
+        claimedStore: restaurantName,
+        existingStores: emailOps.map((op) => op.restaurantName),
+        resetOnly,
+      });
+
+      if (claim.action === 'no-seat') {
+        throw new SeatActivationAbort({
+          ok: false,
+          error: 'No seat on this email yet. Claim one at /onboard.',
+          status: 404,
+        });
+      }
+
+      const reuseStore =
+        claim.action === 'reuse'
+          ? claim.store
+          : claim.action === 'reopen-first'
+            ? emailOps[0]?.restaurantName
+            : null;
+      const reuseOp = reuseStore
+        ? emailOps.find((op) => restaurantsMatch(op.restaurantName, reuseStore))
+        : undefined;
+
+      if (reuseOp) {
         const existingLocation = await tx
           .select({ id: seatLocations.id })
           .from(seatLocations)
-          .where(eq(seatLocations.operatorId, priorCred[0].operatorId))
+          .where(eq(seatLocations.operatorId, reuseOp.id))
           .limit(1);
+        await attachPersonAccessTx(tx, email, reuseOp.id, nowMs);
         await tx
           .update(seatActivationTokens)
-          .set({ consumedOperatorId: priorCred[0].operatorId })
+          .set({ consumedOperatorId: reuseOp.id })
           .where(eq(seatActivationTokens.id, row.id));
         return {
           ok: true,
-          operatorId: priorCred[0].operatorId,
+          operatorId: reuseOp.id,
           locationId: existingLocation[0]?.id ?? 0,
           email,
-          restaurantName: existingName || restaurantName,
+          restaurantName: reuseOp.restaurantName,
         } as const;
       }
 
@@ -394,38 +489,19 @@ export async function activateOperatorSeat(
         )
       `);
 
-      let operatorId: number;
-      const existingOp = await tx
-        .select({ id: seatOperators.id })
-        .from(seatOperators)
-        .where(eq(seatOperators.email, email))
-        .limit(1);
-
-      if (existingOp[0]) {
-        operatorId = existingOp[0].id;
-        await tx
-          .update(seatOperators)
-          .set({
-            name: operatorName,
-            restaurantName,
-            activatedAt: new Date(nowMs),
-          })
-          .where(eq(seatOperators.id, operatorId));
-      } else {
-        const inserted = await tx
-          .insert(seatOperators)
-          .values({
-            email,
-            name: operatorName,
-            restaurantName,
-            sourcePage: row.sourcePage,
-            consentAt: row.consentAt,
-            activatedAt: new Date(nowMs),
-            createdAt: new Date(nowMs),
-          })
-          .returning({ id: seatOperators.id });
-        operatorId = inserted[0].id;
-      }
+      const inserted = await tx
+        .insert(seatOperators)
+        .values({
+          email,
+          name: operatorName,
+          restaurantName,
+          sourcePage: row.sourcePage,
+          consentAt: row.consentAt,
+          activatedAt: new Date(nowMs),
+          createdAt: new Date(nowMs),
+        })
+        .returning({ id: seatOperators.id });
+      const operatorId = inserted[0].id;
 
       if (operatorId < FREE_SEAT_ID_FLOOR) {
         throw new SeatActivationAbort({
@@ -435,36 +511,27 @@ export async function activateOperatorSeat(
         });
       }
 
-      const existingLoc = await tx
-        .select({ id: seatLocations.id, name: seatLocations.name })
-        .from(seatLocations)
-        .where(eq(seatLocations.operatorId, operatorId))
+      const loc = await tx
+        .insert(seatLocations)
+        .values({ operatorId, name: restaurantName, createdAt: new Date(nowMs) })
+        .returning({ id: seatLocations.id });
+      const locationId = loc[0].id;
+
+      const person = await tx
+        .select({ passwordHash: seatPersonPasswords.passwordHash })
+        .from(seatPersonPasswords)
+        .where(eq(seatPersonPasswords.email, email))
         .limit(1);
+      const nextHash = person[0]?.passwordHash ?? passwordHash;
 
-      let locationId: number;
-      if (existingLoc[0]) {
-        if (existingLoc[0].name && existingLoc[0].name !== restaurantName) {
-          const second = refuseSecondFreeStore(1);
-          if (!second.ok) {
-            throw new SeatActivationAbort({ ok: false, error: second.error, status: 409 });
-          }
-        }
-        locationId = existingLoc[0].id;
-      } else {
-        const loc = await tx
-          .insert(seatLocations)
-          .values({ operatorId, name: restaurantName, createdAt: new Date(nowMs) })
-          .returning({ id: seatLocations.id });
-        locationId = loc[0].id;
-      }
-
-      await tx.delete(seatCredentials).where(eq(seatCredentials.email, email));
+      await tx.delete(seatCredentials).where(eq(seatCredentials.operatorId, operatorId));
       await tx.insert(seatCredentials).values({
         operatorId,
         email,
-        passwordHash,
+        passwordHash: nextHash,
         createdAt: new Date(nowMs),
       });
+      await attachPersonAccessTx(tx, email, operatorId, nowMs);
 
       await tx
         .update(seatActivationTokens)
@@ -545,8 +612,9 @@ export function refuseSecondFreeStore(existingLocationCount: number): {
 }
 
 /**
- * Same email, different store name after restaurantNameForSeatClaim: do not
- * reuse the existing seat and paint the old shop as the new claim.
+ * @deprecated The 1-store-per-email 409 is the product gap that was closed.
+ * Same email + a new store name now create-isolated (decideSeatClaim).
+ * Kept so old call sites compile; it no longer blocks a second store.
  */
 export function refuseExistingSeatStoreMismatch(
   tokenRestaurantName: string,
@@ -554,15 +622,8 @@ export function refuseExistingSeatStoreMismatch(
 ): { ok: true } | { ok: false; error: string; status: 409 } {
   const claimed = normalizeRestaurant(tokenRestaurantName);
   const existing = normalizeRestaurant(existingRestaurantName ?? '');
-  if (!existing) return { ok: true };
-  if (claimed.localeCompare(existing, undefined, { sensitivity: 'accent' }) === 0) {
-    return { ok: true };
-  }
-  return {
-    ok: false,
-    status: 409,
-    error: `This email already has a free seat at ${existing}. Extra stores are paid expansion.`,
-  };
+  if (!existing || restaurantsMatch(claimed, existing)) return { ok: true };
+  return { ok: true };
 }
 
 export function refuseSecondFreeSeat(existingCredentialCount: number): {

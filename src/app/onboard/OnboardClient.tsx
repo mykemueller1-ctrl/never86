@@ -44,7 +44,7 @@ export default function OnboardPage() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
       setStatus('sent');
-      setMessage(data.message || 'Check your email for a secure sign-in link.');
+      setMessage(data.message || 'Check your email for a set-password link.');
       trackEvent('onboard_submit_success', { meta: { path: 'email_store' } });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Could not send the link.';
@@ -80,7 +80,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Work email + store name. We email a secure link. Click it — you&apos;re in Seat 1. No password. No paperwork. First-class folders: schedule, labor cards, menu, invoice / truck.
+                Work email + store name. We email a set-password link once. After that, /login is email + password for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -96,7 +96,7 @@ export default function OnboardPage() {
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
               <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Store. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. No password. Same magic link for return visits. Extra seats stay locked.</p>
+              <p className="compass-body mt-3 text-sm">No card. Set a password once from the email link. Extra stores stay on this same email — no plus-alias.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <input
                   type="email"

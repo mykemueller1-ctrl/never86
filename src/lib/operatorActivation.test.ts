@@ -16,6 +16,8 @@ import {
   normalizeEmail,
   normalizeRestaurant,
   publicActivationAccepted,
+  decideSeatClaim,
+  isResetActivationSource,
   refuseExistingSeatStoreMismatch,
   refuseSecondFreeSeat,
   refuseSecondFreeStore,
@@ -66,36 +68,55 @@ describe('operatorActivation pure helpers', () => {
     expect(refuseSecondFreeStore(0).ok).toBe(true);
   });
 
-  it('returns 409 when a new store claim would silently reuse an existing seat', () => {
-    const mismatch = refuseExistingSeatStoreMismatch('New American Grill', 'Community Tap');
-    expect(mismatch.ok).toBe(false);
-    if (!mismatch.ok) {
-      expect(mismatch.status).toBe(409);
-      expect(mismatch.error).toContain('Community Tap');
-      expect(mismatch.error).not.toMatch(/New American Grill/);
-      expect(mismatch.error).toMatch(/already has a free seat/);
-    }
-    expect(refuseExistingSeatStoreMismatch('Community Tap', 'Community Tap').ok).toBe(true);
-    expect(refuseExistingSeatStoreMismatch('community tap', 'Community  Tap').ok).toBe(true);
-    expect(refuseExistingSeatStoreMismatch('New American Grill', '').ok).toBe(true);
+  it('creates an isolated second store under the same email instead of 409', () => {
+    expect(
+      decideSeatClaim({
+        claimedStore: 'New American Grill',
+        existingStores: ['Community Tap'],
+        resetOnly: false,
+      }),
+    ).toEqual({ action: 'create-isolated' });
+    expect(
+      decideSeatClaim({
+        claimedStore: 'Community Tap',
+        existingStores: ['Community Tap'],
+        resetOnly: false,
+      }),
+    ).toEqual({ action: 'reuse', store: 'Community Tap' });
+    expect(
+      decideSeatClaim({
+        claimedStore: 'New American Grill',
+        existingStores: ['Community Tap'],
+        resetOnly: true,
+      }),
+    ).toEqual({ action: 'reopen-first' });
+    expect(
+      decideSeatClaim({
+        claimedStore: 'Community Tap',
+        existingStores: [],
+        resetOnly: true,
+      }),
+    ).toEqual({ action: 'no-seat' });
+    expect(isResetActivationSource('/login/reset')).toBe(true);
+    expect(isResetActivationSource('/onboard')).toBe(false);
+    expect(isResetActivationSource('preset')).toBe(false);
+    expect(refuseExistingSeatStoreMismatch('New American Grill', 'Community Tap').ok).toBe(true);
   });
 
-  it('keeps first-create restaurantName on the token store, and mismatch abort rolls back', () => {
+  it('keeps first-create restaurantName on the token store and never paints the old shop', () => {
     const source = readFileSync(resolve('src/lib/operatorActivation.ts'), 'utf8');
     expect(source).toContain('const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName)');
-    expect(source).toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
+    expect(source).toContain('decideSeatClaim');
+    expect(source).toContain("action === 'create-isolated'");
     expect(source).toMatch(/insert\(seatOperators\)[\s\S]*restaurantName,/);
     expect(source).toMatch(/insert\(seatLocations\)[\s\S]*name: restaurantName/);
-    const mismatch = refuseExistingSeatStoreMismatch('New American Grill', 'Community Tap');
-    if (!mismatch.ok) {
-      const abort = new SeatActivationAbort({
-        ok: false,
-        error: mismatch.error,
-        status: mismatch.status,
-      });
-      expect(abort.result.status).toBe(409);
-      expect(abort.result.error).toContain('Community Tap');
-    }
+    expect(source).not.toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
+    const abort = new SeatActivationAbort({
+      ok: false,
+      error: 'No seat on this email yet. Claim one at /onboard.',
+      status: 404,
+    });
+    expect(abort.result.status).toBe(404);
   });
 
   it('narrows refuseSecondFreeStore.error for production TypeScript', () => {

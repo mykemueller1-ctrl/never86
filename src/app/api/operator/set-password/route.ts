@@ -6,8 +6,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // POST /api/operator/set-password  { password }
-// Requires n86_operator. Writes ONE person hash for that email so every
-// attached store uses the same password. Magic-link remains as backup.
+// Requires n86_operator from the activation / reset link.
+// Writes ONE person hash for that email so every attached store uses the same password.
 export async function POST(req: NextRequest) {
   const token = req.cookies.get(OPERATOR_COOKIE)?.value;
   const session = await verifyOperatorSession(token, Date.now());

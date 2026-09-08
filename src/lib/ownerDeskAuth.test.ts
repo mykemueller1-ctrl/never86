@@ -110,11 +110,11 @@ describe('magic-link owner-desk email', () => {
 
   it('names Open your owner desk and points the CTA at the activate door', () => {
     expect(payload.subject).toBe(OWNER_DESK_EMAIL_SUBJECT);
-    expect(payload.subject).toBe('Open your owner desk.');
+    expect(payload.subject).toBe('Set your password once.');
     expect(html).toContain(OWNER_DESK_EMAIL_HEADLINE);
     expect(html).toContain(OWNER_DESK_EMAIL_CTA);
     expect(html).toContain(OWNER_DESK_EMAIL_BODY);
-    expect(html).toContain('Open owner desk');
+    expect(html).toContain('Set your password');
     expect(html).toContain('href="https://www.never86.ai/activate?token=token%2Bvalue"');
     expect(html).toContain(expiresAt.toUTCString());
     expect(link).toContain('/activate?token=');

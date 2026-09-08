@@ -10,13 +10,13 @@ const inputClass =
 type SeatChoice = { restaurantName: string };
 
 export default function OperatorLoginPage() {
-  const [mode, setMode] = useState<'password' | 'link'>('password');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
   const [seats, setSeats] = useState<SeatChoice[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [resetOpen, setResetOpen] = useState(false);
 
   async function onPasswordSubmit(restaurantName: string) {
     setStatus('loading');
@@ -46,41 +46,40 @@ export default function OperatorLoginPage() {
         return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
-      window.location.href = data.redirect || OWNER_DESK_POST_AUTH_REDIRECT;
+      window.location.assign(data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
     } catch (err: unknown) {
       setStatus('error');
       setMessage(err instanceof Error ? err.message : 'Wrong email or password.');
     }
   }
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onReset(e: React.FormEvent) {
     e.preventDefault();
-    if (mode === 'password') {
-      await onPasswordSubmit(storeName.trim().replace(/\s+/g, ' '));
-      return;
-    }
-    const restaurantName = storeName.trim().replace(/\s+/g, ' ');
-    if (!restaurantName) {
-      setStatus('error');
-      setMessage('Enter your store name.');
-      return;
-    }
     setStatus('loading');
     setMessage('');
     try {
       const res = await fetch('/api/onboard/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, restaurantName, storeName: restaurantName, sourcePage: '/login' }),
+        body: JSON.stringify({ email, purpose: 'reset', sourcePage: '/login/reset' }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
+      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the reset link.');
       setStatus('sent');
-      setMessage(data.message || 'Check your email for a secure sign-in link.');
+      setMessage(data.message || 'Check your email for a set-password link.');
     } catch (err: unknown) {
       setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Could not send the link.');
+      setMessage(err instanceof Error ? err.message : 'Could not send the reset link.');
     }
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (resetOpen) {
+      await onReset(e);
+      return;
+    }
+    await onPasswordSubmit(storeName.trim().replace(/\s+/g, ' '));
   }
 
   return (
@@ -92,7 +91,7 @@ export default function OperatorLoginPage() {
             <p className="font-serif text-[24px] leading-none text-ink-800">
               Never 86&apos;d <span className="italic text-ink-600">· operator login</span>
             </p>
-            <p className="compass-eyebrow-dim mt-2">One email + one password · magic link backup</p>
+            <p className="compass-eyebrow-dim mt-2">One email + one password · every store</p>
           </span>
         </Link>
       </div>
@@ -101,29 +100,10 @@ export default function OperatorLoginPage() {
         <p className="compass-eyebrow mb-4">— Same login for every store on this email.</p>
         <h1 className="compass-display text-4xl md:text-5xl mb-3">Open your operator.</h1>
         <p className="compass-body text-[15px] mb-8" style={{ color: '#86868b' }}>
-          {mode === 'password'
-            ? 'Email + password. If this email has more than one store, add the store name. No plus-alias seats.'
-            : 'Backup door: work email + store name. We send a secure link. Click it — you\'re in. No sales call.'}
+          {resetOpen
+            ? 'We email a set-password link. After you set it, come back here with email + password.'
+            : 'Email + password. One account opens every store on this email. Switch stores on the desk — no second login email.'}
         </p>
-
-        <div className="flex gap-2 mb-3 text-[13px]">
-          <button
-            type="button"
-            onClick={() => { setMode('password'); setStatus('idle'); setMessage(''); }}
-            className={`flex-1 rounded-full px-3 py-2 font-medium ${mode === 'password' ? 'text-white' : 'text-ink-600 bg-[#f2f2f4]'}`}
-            style={mode === 'password' ? { background: '#0066ff' } : undefined}
-          >
-            Email + password
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMode('link'); setStatus('idle'); setMessage(''); }}
-            className={`flex-1 rounded-full px-3 py-2 font-medium ${mode === 'link' ? 'text-white' : 'text-ink-600 bg-[#f2f2f4]'}`}
-            style={mode === 'link' ? { background: '#0066ff' } : undefined}
-          >
-            Email link
-          </button>
-        </div>
 
         <form onSubmit={onSubmit} className="compass-card space-y-3">
           <input
@@ -135,7 +115,7 @@ export default function OperatorLoginPage() {
             required
             className={inputClass}
           />
-          {mode === 'password' ? (
+          {resetOpen ? null : (
             <input
               type="password"
               autoComplete="current-password"
@@ -147,22 +127,11 @@ export default function OperatorLoginPage() {
               maxLength={MAX_FREE_SEAT_PASSWORD_LEN}
               className={inputClass}
             />
-          ) : null}
-          <input
-            type="text"
-            autoComplete="organization"
-            placeholder={mode === 'password' ? 'Store name (if you have more than one)' : 'Store name'}
-            value={storeName}
-            onChange={(e) => setStoreName(e.target.value)}
-            required={mode === 'link'}
-            minLength={mode === 'link' ? 1 : undefined}
-            maxLength={120}
-            className={inputClass}
-          />
+          )}
           <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
-            {mode === 'password'
-              ? (status === 'loading' ? 'Signing in…' : 'Sign in →')
-              : (status === 'loading' ? 'Sending…' : status === 'sent' ? 'Link sent ✓' : 'Email me the secure link →')}
+            {resetOpen
+              ? (status === 'loading' ? 'Sending…' : status === 'sent' ? 'Link sent ✓' : 'Email me a set-password link →')
+              : (status === 'loading' ? 'Signing in…' : 'Sign in →')}
           </button>
           {message ? <p className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
           {seats.length > 1 ? (
@@ -183,13 +152,24 @@ export default function OperatorLoginPage() {
               ))}
             </div>
           ) : null}
+          <button
+            type="button"
+            onClick={() => {
+              setResetOpen((open) => !open);
+              setStatus('idle');
+              setMessage('');
+            }}
+            className="w-full text-center text-[13px] text-[#6e6e73] underline underline-offset-2"
+          >
+            {resetOpen ? 'Back to email + password' : 'Forgot password? Email a set-password link'}
+          </button>
           <p className="text-center text-[11px] leading-relaxed text-[#86868b]">
             Account email only — access plus essential product help. No marketing list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
           </p>
         </form>
 
         <p className="compass-body text-[13px] mt-6" style={{ color: '#6e6e73' }}>
-          New or returning operator—set a password once after the email link, then skip the inbox next time.
+          Magic link is set-password / reset only. Daily door is email + password.
         </p>
         <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
           New here?{' '}

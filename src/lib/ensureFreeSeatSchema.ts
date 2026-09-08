@@ -48,7 +48,7 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
   await sql`
     create table if not exists seat_operators (
       id serial primary key,
-      email text not null unique,
+      email text not null,
       name text,
       restaurant_name text not null,
       source_page text,
@@ -57,6 +57,11 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
       created_at timestamptz not null default now()
     )
   `;
+
+  await sql`alter table seat_operators drop constraint if exists seat_operators_email_key`;
+  await sql`alter table seat_operators drop constraint if exists seat_operators_email_unique`;
+  await sql`drop index if exists seat_operators_email_idx`;
+  await sql`create index if not exists seat_operators_email_idx on seat_operators (email)`;
 
   await sql`
     create table if not exists seat_locations (
@@ -76,13 +81,22 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
     create table if not exists seat_credentials (
       id serial primary key,
       operator_id integer not null references seat_operators(id) on delete cascade,
-      email text not null unique,
+      email text not null,
       password_hash text not null,
       created_at timestamptz not null default now(),
       last_login_at timestamptz,
       password_set_at timestamptz
     )
   `;
+
+  await sql`alter table seat_credentials drop constraint if exists seat_credentials_email_key`;
+  await sql`alter table seat_credentials drop constraint if exists seat_credentials_email_unique`;
+  await sql`drop index if exists seat_credentials_email_idx`;
+  await sql`
+    create unique index if not exists seat_credentials_one_per_operator_idx
+      on seat_credentials (operator_id)
+  `;
+  await sql`create index if not exists seat_credentials_email_idx on seat_credentials (email)`;
 
   await sql`
     alter table seat_credentials add column if not exists password_set_at timestamptz

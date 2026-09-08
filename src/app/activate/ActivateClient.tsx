@@ -148,18 +148,11 @@ export default function ActivateClient() {
             {passwordStatus === 'error' ? (
               <p className="text-sm text-[#ff453a]" role="alert">{passwordError}</p>
             ) : null}
-            <button
-              type="button"
-              onClick={goToDesk}
-              className="w-full text-center text-[13px] text-[#8fa898] underline underline-offset-2"
-            >
-              Skip for now — keep using email links
-            </button>
           </form>
         ) : null}
         {status === 'error' ? (
           <Link href="/login" className="mt-8 inline-flex rounded-full bg-[#e8ebe6] px-5 py-3 text-sm font-semibold text-[#0c1210]">
-            Send me a new link →
+            Sign in or request a set-password link →
           </Link>
         ) : null}
       </div>

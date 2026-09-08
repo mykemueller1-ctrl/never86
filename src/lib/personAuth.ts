@@ -5,9 +5,11 @@ import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import {
   findFreeSeatCredential,
   findFreeSeatOperator,
+  listNeonOperatorsForEmail,
   neonConfigured,
   normalizeEmail,
   normalizeRestaurant,
+  restaurantsMatch,
 } from './operatorActivation';
 import {
   findOpsOperatorName,
@@ -79,13 +81,7 @@ export function choosePersonLoginPlane(input: {
   return 'ops';
 }
 
-export function restaurantsMatch(left: string, right: string): boolean {
-  return (
-    normalizeRestaurant(left).localeCompare(normalizeRestaurant(right), undefined, {
-      sensitivity: 'accent',
-    }) === 0
-  );
-}
+export { restaurantsMatch };
 
 export function pickAccessibleSeat(seats: AccessibleSeat[], storeName?: string): PickSeatResult {
   if (seats.length === 0) return { ok: false, code: 'none', seats };
@@ -161,12 +157,12 @@ export async function listAccessibleSeats(email: string): Promise<AccessibleSeat
   const seats: AccessibleSeat[] = [];
   const seen = new Set<number>();
 
-  const neon = await findFreeSeatCredential(normalized).catch(() => null);
-  if (neon) {
+  const neonOps = await listNeonOperatorsForEmail(normalized).catch(() => []);
+  for (const neon of neonOps) {
     await addSeat(seats, seen, {
       operatorId: neon.operatorId,
       email: neon.email,
-      restaurantName: neon.name || 'My restaurant',
+      restaurantName: neon.restaurantName || 'My restaurant',
       plane: 'neon',
     });
   }

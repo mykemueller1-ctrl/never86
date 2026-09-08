@@ -52,10 +52,10 @@ export default function Home() {
               </Link>
             </div>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#514b43]">
-              Watch the recorded demo, then give your email. Seat 1 is Community Tap — free for one store. No card. No password.
+              Watch the recorded demo, then give your email. Seat 1 is Community Tap — free for one store. No card. Set a password once.
             </p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Email capture · magic link · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
+              Email capture · set-password once · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
             </p>
           </div>
 
@@ -107,7 +107,7 @@ export default function Home() {
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
               ['1', 'Watch the recorded demo', 'See the loop: find the leak, assign the fix, keep the receipt. No sandbox required to start.'],
-              ['2', 'Give your email', 'Claim the free owner seat. We send a magic link. No password, card, or onboarding interview.'],
+              ['2', 'Give your email', 'Claim the free owner seat. We email a set-password link once. Then /login is email + password. No card or onboarding interview.'],
               ['3', 'Get a receipt-backed move', 'Bring one real thing. See what changed, why it matters, what to do next, and what proves the fix.'],
             ].map(([number, title, copy]) => (
               <article key={number} className="rounded-2xl border border-[#33455c] bg-[#111b27] p-6">
@@ -133,7 +133,7 @@ export default function Home() {
               <span className="block italic text-[#005de8]">Then give your email.</span>
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#514b43]">
-              Strangers do not need a sandbox. Watch the recorded demo, then claim the free owner seat with your email. The magic link is the door.
+              Strangers do not need a sandbox. Watch the recorded demo, then claim the free owner seat with your email. Set a password once. Then /login is the daily door.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SimpleOwnerDemo } from '@/components/FreeOperatorPhone';
+import OperatorStoreSwitcher from '@/components/OperatorStoreSwitcher';
 
 export const metadata: Metadata = {
   title: "Owner desk — Community Tap seat 1 | Never 86'd",
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 export default function OperatorPhonePage() {
   return (
     <main className="owner-desk-page min-h-screen">
+      <OperatorStoreSwitcher />
       <SimpleOwnerDemo />
     </main>
   );

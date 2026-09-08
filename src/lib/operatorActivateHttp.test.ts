@@ -73,12 +73,12 @@ describe('activate HTTP cookie plane', () => {
     const poisonedRedirect = decideActivateClientOutcome({
       httpOk: false,
       success: false,
-      error: 'This email already has a free seat at Community Tap. Extra stores are paid expansion.',
+      error: 'This activation link is invalid.',
       redirect: '/operator',
     });
     expect(poisonedRedirect).toEqual({
       kind: 'error',
-      message: 'This email already has a free seat at Community Tap. Extra stores are paid expansion.',
+      message: 'This activation link is invalid.',
     });
 
     const alreadyUsed = decideActivateClientOutcome({

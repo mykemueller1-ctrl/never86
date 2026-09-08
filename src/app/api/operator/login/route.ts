@@ -32,9 +32,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // POST /api/operator/login  { email, password, storeName? } -> n86_operator cookie.
-// One person password opens each isolated seat attached to that email.
-// Magic-link /api/onboard/* stays as backup. A person/Neon hit with a bad
-// password never falls through to a different OPS password.
+// Daily door. One person password opens each isolated seat on that email.
+// /api/onboard/* is set-password / reset only — not a daily magic-link tab.
+// A person/Neon hit with a bad password never falls through to a different OPS password.
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
