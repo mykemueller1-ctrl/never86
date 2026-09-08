@@ -17,11 +17,13 @@ describe('CTAP Seat 1 POS lock', () => {
     expect(CTAP_SEAT1_POS).toBe('pdq');
     expect(isCtapSeat1Id('demo:ctap-seat1')).toBe(true);
     expect(isCtapSeat1Id('demo:ctap-void-only')).toBe(true);
-    expect(isCtapSeat1Id(`seat:${CTAP_SEAT1_OPERATOR_ID}`)).toBe(true);
+    expect(isCtapSeat1Id(`seat:${CTAP_SEAT1_OPERATOR_ID}`, 'Community Tap')).toBe(true);
+    expect(isCtapSeat1Id(`seat:${CTAP_SEAT1_OPERATOR_ID}`, 'New American Grill')).toBe(false);
     expect(isCtapSeat1Id('community-tap-seat-1')).toBe(true);
     expect(toastMayAnswerSeat('demo:ctap-seat1')).toBe(false);
     expect(toastMayAnswerSeat('demo:nag-toast')).toBe(true);
     expect(toastMayAnswerSeat('demo:alpha')).toBe(true);
+    expect(toastMayAnswerSeat(`seat:${CTAP_SEAT1_OPERATOR_ID}`, 'New American Grill')).toBe(true);
   });
 
   it('Fails if a Toast pack is treated as CTAP sales', () => {

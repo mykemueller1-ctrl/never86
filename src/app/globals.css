@@ -920,6 +920,64 @@ a.btn-secondary:hover, button.btn-secondary:hover {
 .owner-desk-lom {
   margin-top: 0.2rem;
 }
+.owner-desk-lastweek {
+  margin-top: 1.15rem;
+  padding: 0.9rem 0.95rem 0.95rem;
+  border: 1px solid #2A313A;
+  border-radius: 1rem;
+  background: #1A1F26;
+}
+.owner-desk-lastweek-kicker {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #C9A46B;
+}
+.owner-desk-lastweek-list {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
+}
+.owner-desk-lastweek-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.45rem 0.75rem;
+  align-items: baseline;
+  padding: 0.42rem 0;
+  border-top: 1px solid #2A313A;
+}
+.owner-desk-lastweek-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.owner-desk-lastweek-label {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #f4f1ea;
+}
+.owner-desk-lastweek-honesty {
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: #8B949E;
+}
+.owner-desk-lastweek-amt {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: #f4f1ea;
+  text-align: right;
+}
+.owner-desk-lastweek-row.is-missing .owner-desk-lastweek-honesty,
+.owner-desk-lastweek-row.is-missing .owner-desk-lastweek-amt {
+  color: var(--owner-amber);
+}
+.owner-desk-lastweek-row.is-verified .owner-desk-lastweek-honesty {
+  color: #C9A46B;
+}
+.owner-desk-lastweek-row.is-estimated .owner-desk-lastweek-honesty {
+  color: #8B949E;
+}
 .owner-desk-kicker {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.68rem;

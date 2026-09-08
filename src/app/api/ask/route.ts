@@ -11,7 +11,7 @@ const TRAYS = new Set(OWNER_DESK_TRAY.map((row) => row.id));
 const MOUTHS = new Set<AskMouth>(['talk', 'type', 'photo', 'file']);
 
 export async function POST(req: NextRequest) {
-  return withSimpleOwnerTenant(req, async (operatorId) => {
+  return withSimpleOwnerTenant(req, async (operatorId, restaurantName) => {
     const service = getSimpleOwnerDemoService();
     if (isServiceError(service)) {
       return jsonError(service.status, service.error, service.code);
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const tray = TRAYS.has(body?.tray as OwnerDeskTrayId) ? (body?.tray as OwnerDeskTrayId) : 'action';
     const mouth = MOUTHS.has(body?.mouth as AskMouth) ? (body?.mouth as AskMouth) : 'type';
 
-    const result = await service.ask({ operatorId, question, tray, mouth });
+    const result = await service.ask({ operatorId, question, tray, mouth, restaurantName });
     if (!result.ok) {
       return jsonError(result.status, result.error, result.code);
     }

@@ -10,11 +10,13 @@ import {
 } from '@/lib/invoiceIdentity';
 import { decodeInvoiceSource, looksLikeVendorInvoice, parseVendorInvoice } from '@/lib/vendorInvoiceParse';
 import {
+  CTAP_TOAST_CONTAMINANT_SOURCE,
   detectReport,
   hasCtapToastContaminantTag,
-  hasParsedReportPack,
+  hasHydratedToastPack,
   reportSourceTagsForSeat,
 } from '@/lib/reportAdapters';
+import { isCtapSeat, restaurantNameHintFromOperatorId } from '@/lib/seatIsolation';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -32,17 +34,24 @@ import { SIMPLE_OWNER_MAX_BYTES } from './types';
 async function hydrateToastUploads(
   uploads: SimpleOwnerUploadRecord[],
   objects: SimpleOwnerObjectStore,
+  restaurantName?: string | null,
 ): Promise<SimpleOwnerUploadRecord[]> {
   if (!objects.get) return uploads;
   return Promise.all(
     uploads.map(async (upload) => {
       if (!detectReport(upload.filename)) return upload;
-      if (hasParsedReportPack(upload.sourceTags) || hasCtapToastContaminantTag(upload.sourceTags)) return upload;
+      const name = restaurantName ?? restaurantNameHintFromOperatorId(upload.operatorId);
+      const ctap = isCtapSeat(upload.operatorId, name);
+      if (ctap && hasCtapToastContaminantTag(upload.sourceTags)) return upload;
+      if (hasHydratedToastPack(upload.sourceTags)) return upload;
       const blob = await objects.get?.({ operatorId: upload.operatorId, objectKey: upload.objectKey });
       if (!blob) return upload;
       return {
         ...upload,
-        sourceTags: [...upload.sourceTags, ...reportSourceTagsForSeat(upload.operatorId, upload.filename, blob.bytes)],
+        sourceTags: [
+          ...upload.sourceTags.filter((tag) => tag.source !== CTAP_TOAST_CONTAMINANT_SOURCE),
+          ...reportSourceTagsForSeat(upload.operatorId, upload.filename, blob.bytes, name),
+        ],
       };
     }),
   );
@@ -100,6 +109,7 @@ export type SimpleOwnerDemoService = {
     contentType: string;
     bytes: Uint8Array;
     folder?: string;
+    restaurantName?: string | null;
   }): Promise<
     | { ok: true; upload: SimpleOwnerUploadRecord; readiness: SimpleOwnerReadiness }
     | { ok: false; status: number; error: string; code: string }
@@ -109,6 +119,7 @@ export type SimpleOwnerDemoService = {
     question: string;
     tray?: OwnerDeskTrayId;
     mouth?: AskMouth;
+    restaurantName?: string | null;
   }): Promise<
     | {
         ok: true;
@@ -118,7 +129,7 @@ export type SimpleOwnerDemoService = {
       }
     | { ok: false; status: number; error: string; code: string }
   >;
-  readiness(operatorId: string): Promise<SimpleOwnerReadiness>;
+  readiness(operatorId: string, restaurantName?: string | null): Promise<SimpleOwnerReadiness>;
 };
 
 export function createSimpleOwnerDemoService(deps: {
@@ -128,16 +139,17 @@ export function createSimpleOwnerDemoService(deps: {
 }): SimpleOwnerDemoService {
   const now = deps.now ?? (() => new Date());
 
-  async function snapshot(operatorId: string): Promise<SimpleOwnerReadiness> {
+  async function snapshot(operatorId: string, restaurantName?: string | null): Promise<SimpleOwnerReadiness> {
     const [uploads, askCount] = await Promise.all([
       deps.repo.listUploads(operatorId),
       deps.repo.countAsks(operatorId),
     ]);
-    return readinessFromUploads(operatorId, uploads, askCount);
+    const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
+    return readinessFromUploads(operatorId, uploads, askCount, seatName);
   }
 
   return {
-    async upload({ operatorId, filename, contentType, bytes, folder }) {
+    async upload({ operatorId, filename, contentType, bytes, folder, restaurantName }) {
       if (!filename.trim()) {
         return { ok: false, status: 400, error: 'Name the file.', code: 'filename_required' };
       }
@@ -160,7 +172,8 @@ export function createSimpleOwnerDemoService(deps: {
       const classified = classifyUpload(filename, contentType, folder);
       const existing = await deps.repo.listUploads(operatorId);
       const identityTags = invoiceIdentityTags(filename, contentType, bytes, existing);
-      const toastTags = reportSourceTagsForSeat(operatorId, filename, bytes);
+      const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
+      const toastTags = reportSourceTagsForSeat(operatorId, filename, bytes, seatName);
       const objectKey = buildObjectKey(operatorId, filename, createdAt);
       const stored = await deps.objects.put({
         operatorId,
@@ -182,10 +195,10 @@ export function createSimpleOwnerDemoService(deps: {
         createdAt: createdAt.toISOString(),
       };
       await deps.repo.insertUpload(upload);
-      return { ok: true, upload, readiness: await snapshot(operatorId) };
+      return { ok: true, upload, readiness: await snapshot(operatorId, seatName) };
     },
 
-    async ask({ operatorId, question, tray = 'action', mouth = 'type' }) {
+    async ask({ operatorId, question, tray = 'action', mouth = 'type', restaurantName }) {
       const trimmed = question.trim();
       if (!trimmed) {
         return {
@@ -204,12 +217,21 @@ export function createSimpleOwnerDemoService(deps: {
         };
       }
 
+      const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
       const uploads = await hydrateToastUploads(
         await deps.repo.listUploads(operatorId),
         deps.objects,
+        seatName,
       );
-      const readiness = readinessFromUploads(operatorId, uploads);
-      const answer = composeAskAnswer({ question: trimmed, tray, readiness, uploads, now: now() });
+      const readiness = readinessFromUploads(operatorId, uploads, 0, seatName);
+      const answer = composeAskAnswer({
+        question: trimmed,
+        tray,
+        readiness,
+        uploads,
+        now: now(),
+        restaurantName: seatName,
+      });
       const record: SimpleOwnerAskRecord = {
         id: crypto.randomUUID(),
         operatorId,
@@ -232,12 +254,12 @@ export function createSimpleOwnerDemoService(deps: {
         ok: true,
         answer,
         record,
-        readiness: await snapshot(operatorId),
+        readiness: await snapshot(operatorId, seatName),
       };
     },
 
-    async readiness(operatorId) {
-      return snapshot(operatorId);
+    async readiness(operatorId, restaurantName) {
+      return snapshot(operatorId, restaurantName);
     },
   };
 }
