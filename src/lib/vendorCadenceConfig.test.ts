@@ -25,6 +25,7 @@ describe('CTAP vendor cadence config', () => {
     expect(cadenceJson.vendors).toHaveLength(8);
     expect(CTAP_VENDOR_CADENCE.boundary.notPaymentWorkflow).toBe(true);
     expect(CTAP_VENDOR_CADENCE.boundary.noCo2Lecture).toBe(true);
+    expect(CTAP_VENDOR_CADENCE.boundary.posPayoutsUntrustedUntilReceipt).toBe(true);
   });
 
   it('nudges a missing ticket as forget-to-snap, never you-did-not-order', () => {
@@ -36,12 +37,23 @@ describe('CTAP vendor cadence config', () => {
     expect(missingInvoiceNudge('Humes')).toMatch(/later wave/);
     expect(matchVendorCadence('Humes')?.days).toEqual(['Tue', 'Fri']);
     expect(matchVendorCadence('Humes')?.notes.join(' ')).toMatch(/photo OCR backup/);
+    expect(matchVendorCadence('NL')?.days).toEqual(['Tue', 'Fri']);
+    expect(matchVendorCadence('Hy-Vee')?.days).toEqual(['Mon', 'Wed', 'Fri']);
+    expect(matchVendorCadence('PFG')?.days).toEqual(['Tue', 'Fri']);
+    expect(vendorsExpectedOn('Tue').map((row) => row.id)).toEqual(expect.arrayContaining([
+      'fort-dodge-distributing',
+      'humes',
+      'northern-lights',
+      'performance-foodservice',
+    ]));
     expect(vendorsExpectedOn('Tue').map((row) => row.id)).toContain('sysco');
     expect(vendorBabysitLine({ question: 'Where is the Sysco invoice?' })).toMatch(/forget to snap/i);
     expect(missingInvoiceNudge('Pepsi')).toMatch(/papers-in/);
     expect(missingInvoiceNudge('Fort Dodge')).toMatch(/never email/);
     expect(missingInvoiceNudge('Confluence')).toMatch(/empties photo/);
     expect(missingInvoiceNudge('NL')).toMatch(/inv#/);
+    expect(missingInvoiceNudge('Hy-Vee')).toMatch(/owner-email order/);
+    expect(missingInvoiceNudge('Hy-Vee')).toMatch(/M\/W\/F is photo/);
     expect(JSON.stringify(CTAP_VENDOR_CADENCE.vendors)).not.toMatch(/you didn’t order|you did not order|theft/i);
     expect(CTAP_VENDOR_CADENCE.vendors.map((row) => row.missingNudge).join(' ')).not.toMatch(/carbon|CO2 savings/i);
   });

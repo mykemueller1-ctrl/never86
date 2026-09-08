@@ -74,7 +74,7 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     const body = asked.answer.facts.join(' ');
     expect(body).toMatch(/Verified · Menu Category · Food \$400\.00/);
     expect(body).toMatch(/Verified · Menu Category · Large Pizzas \$250\.00/);
-    expect(body).toMatch(/Large Pizzas ≠ Food/);
+    expect(body).toMatch(/Large Pizzas ≠ Food even if Action Shift rolls them together/);
     expect(body).not.toMatch(/\$650\.00/);
   });
 
@@ -177,6 +177,7 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     expect(asked.answer.verifiedClose).toBe(true);
     expect(asked.answer.sampleDollars).toBe('pdq-verified');
     expect(asked.answer.facts.join(' ')).toMatch(/Verified · Void_Promo # Voids \$12\.00/);
+    expect(asked.answer.facts.join(' ')).toMatch(/POS payouts stay untrusted until a receipt match/);
     assertNoToastLeak(`${asked.answer.headline} ${asked.answer.facts.join(' ')}`, asked.answer.sampleDollars);
   });
 
@@ -468,6 +469,8 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     expect(asked.answer.inventedClose).toBe(false);
     expect(asked.answer.sampleDollars).toBe('hyvee-verified');
     expect(body).toContain(HYVEE_MONDAY_PAY_LOCK);
+    expect(body).toMatch(/Monday is the owner-email order\. M\/W\/F is photo/);
+    expect(body).not.toMatch(/\bSawyer\b|myke@n86\.app/);
     expect(body).toMatch(/Verified · Monday one check \$120\.00 \(labeled check total\)/);
     expect(body).not.toMatch(/check total is not on this seat|30\/60|\bTom\b|Humes is on this path/i);
   });

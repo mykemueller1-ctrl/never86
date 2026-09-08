@@ -33,6 +33,7 @@ export type VendorCadenceConfig = {
     noInventedDollars: true;
     noCo2Lecture: true;
     missingIsForgetToSnap: true;
+    posPayoutsUntrustedUntilReceipt: true;
   };
   vendors: readonly VendorCadenceVendor[];
 };
@@ -63,6 +64,7 @@ export const CTAP_VENDOR_CADENCE: VendorCadenceConfig = {
     noInventedDollars: true,
     noCo2Lecture: true,
     missingIsForgetToSnap: true,
+    posPayoutsUntrustedUntilReceipt: true,
   },
   vendors: cadenceJson.vendors.map(asVendor),
 };
