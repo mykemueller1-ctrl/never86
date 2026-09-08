@@ -79,7 +79,7 @@ describe('CTAP vendor spine — coach / Missing, not AP', () => {
 
   it('keeps public nudges free of staff names, private mail, CO2, and AP aging', () => {
     const blob = CTAP_VENDOR_CADENCE.vendors.map((row) => `${row.notes.join(' ')} ${row.missingNudge}`).join('\n');
-    expect(blob).not.toMatch(/\bTom\b|communitypizza2026|karlee|CO2 savings|pay now|ACH remit/i);
+    expect(blob).not.toMatch(/\bTom\b|\bSawyer\b|communitypizza2026|myke@n86\.app|karlee|CO2 savings|pay now|ACH remit/i);
     expect(missingInvoiceNudge('Fort Dodge')).toMatch(/photo-only/);
     expect(missingInvoiceNudge('Confluence')).toMatch(/not cash dollars/);
     expect(missingInvoiceNudge('NL')).toMatch(/dedup on inv#/);

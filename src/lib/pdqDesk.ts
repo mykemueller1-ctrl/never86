@@ -2,8 +2,10 @@
  * CTAP PDQ morning-pack desk answers.
  *
  * Honesty: Verified | Estimated | Missing only. Never invent $.
- * Large Pizzas ≠ Food. Combined food bucket is Estimated and shows both
- * Verified inputs. Void_Promo negatives are line amounts — not theft.
+ * Large Pizzas ≠ Food even if Pulse rolls them together. Combined food
+ * bucket is Estimated and shows both Verified inputs. POS payouts stay
+ * untrusted until a receipt match. Void_Promo negatives are line amounts
+ * — not theft.
  * HARD LOCK: CTAP Seat 1 = PDQ POS only. Toast / NAG / Taco Bamba
  * on this seat is contaminant = Fail. Those dollars never answer CTAP.
  */
@@ -287,7 +289,7 @@ export function answerPdqDeskQuestion(
           pizzas != null
             ? `Verified · Menu Category · Large Pizzas ${usd(pizzas)}`
             : 'Missing · Menu Category · Large Pizzas is not on this Z.',
-          'Large Pizzas ≠ Food. No silent merge. No invented combined total.',
+          'Large Pizzas ≠ Food even if Pulse rolls them together. No silent merge. No invented combined total.',
           ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
         ],
         coachTomorrow: 'Need both Food and Large Pizzas Menu Category lines on the Z before an Estimated bucket.',
@@ -304,7 +306,7 @@ export function answerPdqDeskQuestion(
       headline: `Estimated combined food bucket ${usd(combined)}`,
       facts: [
         `Estimated · combined food bucket ${usd(combined)} = Verified Food ${usd(food)} + Verified Large Pizzas ${usd(pizzas)}.`,
-        `Math: ${food} + ${pizzas} = ${combined}. Large Pizzas ≠ Food. Never silently merged.`,
+        `Math: ${food} + ${pizzas} = ${combined}. Large Pizzas ≠ Food even if Pulse rolls them together. Never silently merged.`,
         `Verified · ${z.filename} · ${formatDay(z.businessDate)}`,
         ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
       ],
@@ -334,7 +336,7 @@ export function answerPdqDeskQuestion(
       z.mix.largePizzas != null
         ? `Verified · Menu Category · Large Pizzas ${usd(z.mix.largePizzas)} — separate line, not Food.`
         : 'Missing · Menu Category · Large Pizzas is not on this Z. Not $0.',
-      'Default food today is the Food line alone. Large Pizzas ≠ Food. Combined Food+Large is Estimated only when you ask.',
+      'Default food today is the Food line alone. Large Pizzas ≠ Food even if Pulse rolls them together. Combined Food+Large is Estimated only when you ask.',
       lane,
       ...(secondaryFallback ? [secondaryFallback] : []),
       ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
@@ -377,6 +379,7 @@ export function answerPdqDeskQuestion(
     ...verifiedMixLines(z),
     ...channelLines,
     'Wave 0: net sales yesterday quotes Grand Total from the Z for that business date. Voids come from Void_Promo. Hard Missing if no same-date Z.',
+    'POS payouts stay untrusted until a receipt match. A Z Pay Outs line is not verified cash-out.',
     lane,
     ...(secondaryFallback ? [secondaryFallback] : []),
     ...(contaminateLine(scoped) ? [contaminateLine(scoped)!] : []),
