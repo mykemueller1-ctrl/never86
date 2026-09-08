@@ -8,13 +8,16 @@ import {
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PATH_ASK,
   DAY1_INVOICE_PLATE_ID,
+  DAY1_NO_RIP_LINE,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
   DAY1_PROMISE_LINE,
+  DAY1_SEAT_LINE,
   DAY1_WEIRD_ASK,
   day1CoachById,
   day1FrontCopyBlob,
+  day1FrontLeadBlob,
   day1FrontNeedsPhoto,
   day1FrontVoiceIsClean,
   day1HookCoach,
@@ -36,6 +39,8 @@ describe('day-1 conversation-first coach', () => {
     expect(DAY1_IDENTITY_LINE).toMatch(/operator first/);
     expect(DAY1_IDENTITY_LINE).toMatch(/was you/);
     expect(DAY1_PROMISE_LINE).toMatch(/Find the leak/);
+    expect(DAY1_SEAT_LINE).toMatch(/one store, one login/);
+    expect(DAY1_NO_RIP_LINE).toMatch(/don't rip-and-replace/);
     expect(DAY1_PREVIEW_CONTRACT).toMatch(/Nothing sends without you/);
     expect(DAY1_OPEN_ASK).not.toMatch(/got a truck ticket or invoice/i);
     expect(DAY1_OPEN_ENERGY).not.toMatch(/got a truck ticket or invoice/i);
@@ -46,6 +51,8 @@ describe('day-1 conversation-first coach', () => {
     expect(day1HookCoach(new Set()).chip).toMatch(/invoice|truck/i);
     expect(day1HookCoach(new Set()).chip).not.toMatch(/order guide/i);
     expect(day1LeadIsConversationFirst()).toBe(true);
+    expect(day1FrontLeadBlob()).not.toMatch(/got a truck ticket or invoice\?\s*snap it/i);
+    expect(day1FrontLeadBlob()).not.toMatch(/order guide/i);
     expect(DAY1_FOLDER_COACH.map((row) => row.id)).toEqual([
       'schedule',
       'labor-cards',
@@ -83,6 +90,9 @@ describe('day-1 conversation-first coach', () => {
     expect(text).toMatch(/what's going on/i);
     expect(text).toMatch(/what got weird at the shop/i);
     expect(text).toMatch(/how can we help you/i);
+    expect(text).toMatch(/find the leak/i);
+    expect(text).toMatch(/one store, one login/i);
+    expect(text).toMatch(/don't rip-and-replace/i);
     expect(text).toMatch(/bartender/i);
     expect(text).toMatch(/drawer/i);
     expect(text).toMatch(/30-60-90|P&L/);

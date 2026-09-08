@@ -20,9 +20,12 @@ import {
   DAY1_HOOK_PLATE_ID,
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PLATE_ID,
+  DAY1_NO_RIP_LINE,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
+  DAY1_PROMISE_LINE,
+  DAY1_SEAT_LINE,
   day1CoachById,
   day1FrontNeedsPhoto,
   day1HookCoach,
@@ -353,7 +356,16 @@ export function FreeOperatorPhone() {
                 : hook.attachHint}
             </p>
           )}
-          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+          {firstScreen && frontPath && !needsPhoto ? (
+            <p className="owner-desk-norip">{DAY1_NO_RIP_LINE}</p>
+          ) : null}
+          {firstScreen ? (
+            <div className="owner-desk-who">
+              <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p>
+              <p className="owner-desk-promise">{DAY1_PROMISE_LINE}</p>
+              <p className="owner-desk-seat">{DAY1_SEAT_LINE}</p>
+            </div>
+          ) : null}
           {needsPhoto ? (
             <>
               <button

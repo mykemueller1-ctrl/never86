@@ -27,9 +27,13 @@ Do **not** default to “snap this week’s order guide.” Internal plate id is
 
 Quiet identity, not a SaaS tour: **built by Myke Mueller · Never86'd · operator first · was you**
 
+Promise (not a tour): **Find the leak. Assign the fix. Keep the receipt.**
+
+Seat grain: **one store, one login, yesterday's numbers, one move, one receipt**
+
 After first choice, preview contract: **Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.**
 
-Promise (not a tour): **Find the leak. Assign the fix. Keep the receipt.**
+No rip: **We don't rip-and-replace — next action already in the data.** (after they pick a conversational path — not a first CTA)
 
 ## LOM
 

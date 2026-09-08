@@ -22,6 +22,8 @@ export const DAY1_WEIRD_ASK = 'What got weird at the shop?';
 export const DAY1_HELP_ENERGY = 'How can we help you?';
 export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first · was you";
 export const DAY1_PROMISE_LINE = 'Find the leak. Assign the fix. Keep the receipt.';
+export const DAY1_SEAT_LINE = "one store, one login, yesterday's numbers, one move, one receipt";
+export const DAY1_NO_RIP_LINE = "We don't rip-and-replace — next action already in the data.";
 export const DAY1_PREVIEW_CONTRACT =
   'Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.';
 export const DAY1_INVOICE_PATH_ASK =
@@ -184,6 +186,8 @@ export function day1FrontLeadBlob(): string {
     DAY1_HELP_ENERGY,
     DAY1_IDENTITY_LINE,
     DAY1_PROMISE_LINE,
+    DAY1_SEAT_LINE,
+    DAY1_NO_RIP_LINE,
     DAY1_PREVIEW_CONTRACT,
   ].join(' ');
 }
@@ -204,6 +208,9 @@ export function day1LeadIsConversationFirst(text = day1FrontLeadBlob()): boolean
   return (
     /what's the problem today/i.test(text) &&
     /what's going on|what got weird/i.test(text) &&
+    /find the leak/i.test(text) &&
+    /one store, one login/i.test(text) &&
+    /don't rip-and-replace/i.test(text) &&
     !STIFF_TRUCK_LEAD.test(text) &&
     !/order guide/i.test(text) &&
     !/all-in-one dashboard/i.test(text)

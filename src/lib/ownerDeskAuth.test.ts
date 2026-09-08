@@ -69,6 +69,9 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('DAY1_OPEN_ENERGY');
     expect(phone).toContain('DAY1_HELP_ENERGY');
     expect(phone).toContain('DAY1_IDENTITY_LINE');
+    expect(phone).toContain('DAY1_PROMISE_LINE');
+    expect(phone).toContain('DAY1_SEAT_LINE');
+    expect(phone).toContain('DAY1_NO_RIP_LINE');
     expect(phone).toContain('DAY1_PREVIEW_CONTRACT');
     expect(phone).toContain('firstPhotoWinLine');
     expect(phone).not.toContain('DAY1_SOFT_DEFAULT');

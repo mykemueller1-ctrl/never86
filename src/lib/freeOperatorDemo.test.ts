@@ -228,6 +228,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('DAY1_OPEN_ENERGY');
     expect(ui).toContain('DAY1_HELP_ENERGY');
     expect(ui).toContain('DAY1_IDENTITY_LINE');
+    expect(ui).toContain('DAY1_PROMISE_LINE');
+    expect(ui).toContain('DAY1_SEAT_LINE');
+    expect(ui).toContain('DAY1_NO_RIP_LINE');
     expect(ui).toContain('DAY1_PREVIEW_CONTRACT');
     expect(ui).toContain('DAY1_FRONT_PICKS');
     expect(ui).not.toContain('DAY1_SOFT_DEFAULT');
