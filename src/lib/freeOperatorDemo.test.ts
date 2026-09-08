@@ -222,9 +222,11 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
     expect(ui).toContain('DAY1_OPEN_ASK');
+    expect(ui).toMatch(/view === 'home' \? DAY1_OPEN_ASK/);
     expect(ui).toContain('DAY1_SOFT_DEFAULT');
     expect(ui).toContain('DAY1_FRONT_PICKS');
     expect(ui).toContain('owner-desk-tray-label');
+    expect(ui).toMatch(/if \(!firstScreen\)/);
     expect(ui).not.toContain('Prime Cost Coach');
     expect(ui).not.toMatch(/Snap this week’s order guide/);
     expect(ui).not.toMatch(/Snap the order guide/);

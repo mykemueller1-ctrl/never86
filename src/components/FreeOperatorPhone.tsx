@@ -97,9 +97,7 @@ export function FreeOperatorPhone() {
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
   const firstScreen = filled.size === 0 && view === 'home' && !winLine;
-  const hookAsk = firstScreen
-    ? DAY1_OPEN_ASK
-    : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
+  const hookAsk = view === 'home' ? DAY1_OPEN_ASK : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
 
   function applyReadiness(next: SimpleOwnerReadiness | undefined) {
     if (!next?.evidence) return;
@@ -165,8 +163,10 @@ export function FreeOperatorPhone() {
   function openPlate(plate: OperatorV2Plate, attach: 'photo' | 'file' | 'ask' = 'photo') {
     const coach = day1CoachById(plate.id);
     setActiveFolder(plate.id);
-    setAsk(coach?.ask ?? plate.ask);
-    onTray(plate.tray);
+    if (!firstScreen) {
+      setAsk(coach?.ask ?? plate.ask);
+      onTray(plate.tray);
+    }
     const folder = folders.find((row) => row.id === plate.id);
     const needPhoto = !folder || folder.state === 'NEED';
     trackEvent('operator_v2_plate', { pagePath: '/operator', meta: { plate: plate.id, ocr: needPhoto, attach } });
@@ -268,9 +268,11 @@ export function FreeOperatorPhone() {
       setWinLine(win);
       setFlash(win ?? `${body.upload?.filename ?? file.name} is on this seat.`);
       if (body.readiness?.folders) {
-        const nextHook = day1HookCoach(filledPlateIds(body.readiness.folders));
-        setActiveFolder(nextHook.id);
-        setAsk(nextHook.ask);
+        const ready = filledPlateIds(body.readiness.folders);
+        if (ready.size > 1) {
+          const nextHook = day1HookCoach(ready);
+          setActiveFolder(nextHook.id);
+        }
       }
       trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true, win: Boolean(win) } });
     } catch {
@@ -319,7 +321,7 @@ export function FreeOperatorPhone() {
                       if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
                     }}
                   >
-                    {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
+                    {folder.state === 'READY' ? `${coach?.label ?? folder.label} ✓` : coach?.chip ?? folder.label}
                   </button>
                 );
               })}
