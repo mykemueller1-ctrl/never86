@@ -2,12 +2,10 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { activateOperatorSeat } from '@/lib/operatorActivation';
 import {
-  signOperatorSession,
-  operatorSessionSecret,
-  OPERATOR_COOKIE,
-  OPERATOR_COOKIE_OPTS,
-} from '@/lib/operatorSession';
-import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+  attachActivateCookie,
+  planActivateHttpResponse,
+} from '@/lib/operatorActivateHttp';
+import { operatorSessionSecret, signOperatorSession } from '@/lib/operatorSession';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +13,12 @@ export const dynamic = 'force-dynamic';
 const bodySchema = z.object({
   token: z.string().min(10),
 });
+
+function jsonWithActivateCookie(plan: ReturnType<typeof planActivateHttpResponse>) {
+  const res = NextResponse.json(plan.body, { status: plan.status });
+  attachActivateCookie(res, plan.cookie);
+  return res;
+}
 
 // POST /api/onboard/activate — consume one email link, create or open the operator seat.
 export async function POST(req: Request) {
@@ -32,28 +36,19 @@ export async function POST(req: Request) {
     const result = await activateOperatorSeat({
       rawToken: data.token,
     });
+    const session = result.ok
+      ? await signOperatorSession(result.operatorId, result.email, Date.now())
+      : null;
 
-    if (!result.ok) {
-      return NextResponse.json({ success: false, error: result.error }, { status: result.status });
-    }
-
-    const session = await signOperatorSession(result.operatorId, result.email, Date.now());
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Activated, but session signing failed. Sign in at /login." },
-        { status: 503 },
-      );
-    }
-
-    const res = NextResponse.json({
-      success: true,
-      redirect: OWNER_DESK_POST_AUTH_REDIRECT,
-      restaurantName: result.restaurantName,
-    });
-    res.cookies.set(OPERATOR_COOKIE, session, OPERATOR_COOKIE_OPTS);
-    return res;
+    return jsonWithActivateCookie(planActivateHttpResponse(result, session));
   } catch (err: unknown) {
-    if (err instanceof z.ZodError) return NextResponse.json({ success: false, error: 'Invalid sign-in link.' }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      return jsonWithActivateCookie({
+        status: 400,
+        body: { success: false, error: 'Invalid sign-in link.' },
+        cookie: { kind: 'clear' },
+      });
+    }
     return NextResponse.json({ success: false, error: 'Activation failed.' }, { status: 500 });
   }
 }

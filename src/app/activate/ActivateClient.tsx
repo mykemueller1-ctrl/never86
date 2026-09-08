@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import {
+  ACTIVATE_FAILURE_LOGOUT_PATH,
+  decideActivateClientOutcome,
+} from '@/lib/operatorActivateHttp';
 
 type Status = 'loading' | 'error' | 'done';
 
@@ -21,6 +24,7 @@ export default function ActivateClient() {
     if (!token) {
       setStatus('error');
       setMessage('This page needs the secure link from your email.');
+      void fetch(ACTIVATE_FAILURE_LOGOUT_PATH, { method: 'POST' });
       return;
     }
 
@@ -31,14 +35,30 @@ export default function ActivateClient() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
         });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || 'Sign-in failed');
+        const data = (await res.json()) as {
+          success?: boolean;
+          error?: string;
+          redirect?: string;
+        };
+        const outcome = decideActivateClientOutcome({
+          httpOk: res.ok,
+          success: data.success,
+          error: data.error,
+          redirect: data.redirect,
+        });
+        if (outcome.kind === 'error') {
+          setStatus('error');
+          setMessage(outcome.message);
+          void fetch(ACTIVATE_FAILURE_LOGOUT_PATH, { method: 'POST' });
+          return;
+        }
         setStatus('done');
         setMessage('Email verified. Opening your operator…');
-        window.location.replace(data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
+        window.location.replace(outcome.href);
       } catch (err: unknown) {
         setStatus('error');
         setMessage(err instanceof Error ? err.message : 'Sign-in failed');
+        void fetch(ACTIVATE_FAILURE_LOGOUT_PATH, { method: 'POST' });
       }
     }
 

@@ -28,6 +28,20 @@ describe('CTAP seat 1 canary', () => {
       'Community Tap',
     );
     expect(restaurantNameForSeatClaim('owner@other.example', 'Ada’s Pizza')).toBe('Ada’s Pizza');
+    expect(restaurantNameForSeatClaim('grill@example.com', 'New American Grill')).toBe(
+      'New American Grill',
+    );
+  });
+
+  it('applies the CTAP restaurant override on exact-match email only', () => {
+    expect(isCtapSeat1Email('communitypizza2026@gmail.com')).toBe(true);
+    expect(isCtapSeat1Email('communitypizza2026+test@gmail.com')).toBe(false);
+    expect(isCtapSeat1Email('not-communitypizza2026@gmail.com')).toBe(false);
+    expect(isCtapSeat1Email('communitypizza2026@gmail.com.evil.com')).toBe(false);
+    expect(restaurantNameForSeatClaim('communitypizza2026+test@gmail.com', 'New American Grill')).toBe(
+      'New American Grill',
+    );
+    expect(restaurantNameForSeatClaim('owner@other.example', 'Community Tap')).toBe('Community Tap');
   });
 
   it('does not put private dollars, PINs, or staff names in the lock', () => {
