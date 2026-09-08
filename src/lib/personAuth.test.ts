@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   choosePersonLoginPlane,
+  copyPersonPasswordHash,
   isPlusAliasEmail,
   pickAccessibleSeat,
   publicSeatsForPicker,
   restaurantsMatch,
+  revokePersonAccess,
   validatePersonPassword,
   type AccessibleSeat,
 } from './personAuth';
@@ -67,6 +69,20 @@ describe('person password lock', () => {
     if (!picked.ok) expect(picked.code).toBe('unknown_store');
     expect(restaurantsMatch('Community Tap', 'community  tap')).toBe(true);
     expect(restaurantsMatch('Community Tap', 'New American Grill')).toBe(false);
+  });
+
+  it('refuses plus-alias detach and same-email hash copy before touching Neon', async () => {
+    await expect(revokePersonAccess('ktmaduna+fun@gmail.com', 1_000_000)).resolves.toMatchObject({
+      ok: false,
+      status: 400,
+    });
+    await expect(
+      copyPersonPasswordHash('mykemueller1@gmail.com', 'mykemueller1@gmail.com'),
+    ).resolves.toMatchObject({ ok: false, status: 400 });
+    await expect(copyPersonPasswordHash('owner+max@gmail.com', 'ktmaduna@gmail.com')).resolves.toMatchObject({
+      ok: false,
+      status: 400,
+    });
   });
 
   it('validates password length before hashing', () => {
