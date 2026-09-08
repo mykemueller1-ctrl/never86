@@ -10,6 +10,7 @@ import {
   DAY1_SUBLINE,
   day1HookCoach,
   firstPhotoWinLine,
+  looksLikeDay1BartenderAsk,
   looksLikeDay1VendorAsk,
 } from '@/lib/day1Coach';
 import {
@@ -45,9 +46,12 @@ import { CTAP_TOAST_CONTAMINANT_SOURCE } from '@/lib/reportAdapters/sourceTags';
 import { restaurantNameHintFromOperatorId } from '@/lib/seatIsolation';
 import {
   answerLastWeekPrime,
+  answerWeekSalesLoop,
   collectLastWeekPrime,
   routeLastWeekPrimeQuestion,
+  routeWeekSalesQuestion,
 } from '@/lib/lastWeekPrimeCost';
+import { OPERATOR_PERSIST_FACT } from '@/lib/ownerDeskPapers';
 import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
@@ -104,8 +108,8 @@ export function readinessFromUploads(
   };
 }
 
-function persistFactFor(operatorId: string): string {
-  return `Question and answer are stored for operator_id ${operatorId}. Files go to object storage with the same seat key.`;
+function persistFactFor(_operatorId?: string): string {
+  return OPERATOR_PERSIST_FACT;
 }
 
 function isHiddenParseTag(tag: SourceTag, hideToastCopy = false): boolean {
@@ -143,6 +147,34 @@ export function composeAskAnswer(input: {
   const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown|food today|net sales yesterday|yesterday(?:'s)? (?:net )?sales/.test(
     qLower,
   );
+
+  if (routeWeekSalesQuestion(input.question)) {
+    const snapshot = collectLastWeekPrime(
+      input.readiness.operatorId,
+      input.uploads,
+      restaurantName,
+    );
+    const sales = answerWeekSalesLoop(snapshot);
+    const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
+    const sourceTags: SourceTag[] = [
+      ...sales.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      ...(lock ? [lock] : []),
+      { tag: sales.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${sales.slug}` },
+    ];
+    return {
+      slug: sales.slug,
+      headline: sales.headline,
+      facts: [...sales.facts, persistFactFor()],
+      coachTomorrow: sales.coachTomorrow,
+      needs: sales.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: sales.sampleDollars,
+      verifiedClose: sales.verifiedClose,
+    };
+  }
 
   if (routeLastWeekPrimeQuestion(input.question)) {
     const snapshot = collectLastWeekPrime(
@@ -315,9 +347,65 @@ export function composeAskAnswer(input: {
 
   const laborFact = laborAsk
     ? 'Labor cards name roles (FOH, Line, Dish, Run). Daily compare to the clock flags early leave, late leave, and labor drift. Punch ≠ schedule. No invented overtime.'
-    : 'This desk answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.';
+    : 'This seat answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.';
 
-  const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
+  if (looksLikeDay1BartenderAsk(input.question) && /bartender|drawer/.test(qLower)) {
+    return {
+      slug: 'unrouted',
+      headline: 'Missing — drawer / Z for that bartender seat.',
+      facts: [
+        'I will not name a thief. Missing paper stays Missing.',
+        'Action Shift: snap the Z and the drawer tape for that night.',
+        persistFactFor(),
+      ],
+      coachTomorrow: 'Add the Z and drawer tape. Then we rank one move.',
+      needs: 'One night Z + drawer tape. No names as thieves.',
+      tags: sourceTags.map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: 'none-verified',
+      verifiedClose: false,
+    };
+  }
+
+  if (/30\s*-?\s*60\s*-?\s*90|behind on the books|p&l surprise|p&l/.test(qLower)) {
+    return {
+      slug: routed.ok ? routed.slug : 'unrouted',
+      headline: 'Missing — 30/60/90 or P&L paper.',
+      facts: [
+        'No AP aging or P&L is on this seat. I will not invent a balance.',
+        'Action Shift: connect Gmail or add the aging / P&L file.',
+        persistFactFor(),
+      ],
+      coachTomorrow: 'Add the aging or P&L. I will rank one move after that paper lands.',
+      needs: 'One 30/60/90 aging or last P&L. Not a typed guess.',
+      tags: sourceTags.map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: 'none-verified',
+      verifiedClose: false,
+    };
+  }
+
+  if (/too many hats|off your plate tonight/.test(qLower)) {
+    return {
+      slug: 'unrouted',
+      headline: 'One thing off the plate tonight.',
+      facts: [
+        'Action Shift: last-week sales file or one invoice photo. Never86 can go get papers if Gmail is connected.',
+        persistFactFor(),
+      ],
+      coachTomorrow: 'Pick one paper — week sales or a truck ticket. I will confirm it landed.',
+      needs: 'One last-week sales file or one invoice photo.',
+      tags: sourceTags.map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: 'none-verified',
+      verifiedClose: false,
+    };
+  }
+
+  const persistFact = persistFactFor();
   const vendorFact = looksLikeDay1VendorAsk(input.question) ? vendorBabysitLine({ question: input.question }) : null;
 
   const facts = [

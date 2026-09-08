@@ -16,9 +16,16 @@ import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwn
 import {
   LAST_WEEK_PRIME_LOAD_ASK,
   emptyLastWeekPrime,
+  type LastWeekPrimeFamilyId,
   type LastWeekPrimeSnapshot,
 } from '@/lib/lastWeekPrimeCost';
 import { deskSeatLabel, deskSeatTitle } from '@/lib/seatIsolation';
+import { PapersInboxConnect } from '@/components/PapersInboxConnect';
+import {
+  folderForLastWeekFamily,
+  receivedPapersLine,
+  receivingPapersLine,
+} from '@/lib/ownerDeskPapers';
 import { usd } from '@/lib/toastParse';
 import {
   DAY1_FRONT_PICKS,
@@ -118,9 +125,11 @@ export function FreeOperatorPhone({
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<string | null>(null);
   const [winLine, setWinLine] = useState<string | null>(null);
   const [answer, setAnswer] = useState<SimpleOwnerAskAnswer | null>(null);
   const [localName, setLocalName] = useState<string | null>(null);
+  const [askFocused, setAskFocused] = useState(false);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
@@ -236,9 +245,21 @@ export function FreeOperatorPhone({
   function onMissingSpine(row: Day1MissingSpine) {
     setPaperPath(true);
     setActiveFolder(row.plateId);
-    setAsk(`Bring the paper for ${row.label}.`);
-    if (!firstScreen) onTray(row.tray);
+    setAsk(`Bring the paper for ${row.label}. One tap. Many photos.`);
+    onTray(row.tray);
     trackEvent('operator_day1_missing_spine', { pagePath: '/operator', meta: { spine: row.id, tray: row.tray } });
+    photoRef.current?.click();
+  }
+
+  function onLastWeekFamily(id: LastWeekPrimeFamilyId) {
+    const folder = folderForLastWeekFamily(id);
+    if (folder) setActiveFolder(folder);
+    setAsk(id === 'week-sales' ? 'What were my sales last week?' : `Bring last-week ${id} paper.`);
+    if (id === 'week-sales') {
+      fileRef.current?.click();
+      return;
+    }
+    photoRef.current?.click();
   }
 
   function onTray(next: OwnerDeskTrayId) {
@@ -294,39 +315,54 @@ export function FreeOperatorPhone({
     recognition.start();
   }
 
-  async function onRemoteFile(kind: 'photo' | 'file', file: File | undefined) {
-    if (!file) return;
+  async function onRemoteFiles(kind: 'photo' | 'file', list: FileList | null | undefined) {
+    const files = Array.from(list ?? []).filter((file) => file && file.size > 0);
+    if (files.length === 0) return;
     setBusy(true);
     setFlash(null);
+    setReceipt(receivingPapersLine(files.length));
     try {
       const form = new FormData();
-      form.set('file', file);
+      for (const file of files) form.append('file', file);
       if (activeFolder) form.set('folder', activeFolder);
       const res = await fetch('/api/upload', { method: 'POST', body: form });
       const body = (await res.json()) as {
         success?: boolean;
         error?: string;
+        receivedCount?: number;
         upload?: { filename: string; evidenceKind: string };
+        uploads?: Array<{ filename: string; evidenceKind: string }>;
         readiness?: SimpleOwnerReadiness;
       };
       if (!res.ok || !body.success) {
-        setFlash(body.error ?? 'Upload did not persist.');
+        const miss = body.error ?? 'Upload did not persist.';
+        setFlash(miss);
+        setReceipt(miss);
         return;
       }
-      setLocalName(body.upload?.filename ?? file.name);
+      const uploads = body.uploads?.length ? body.uploads : body.upload ? [body.upload] : [];
+      const names = uploads.map((row) => row.filename).filter(Boolean);
+      const landed = receivedPapersLine(names.length ? names : files.map((file) => file.name));
+      setLocalName(names[names.length - 1] ?? files[files.length - 1]?.name ?? null);
       applyReadiness(body.readiness);
-      const readyFolder = body.upload?.evidenceKind;
+      const readyFolder = uploads[uploads.length - 1]?.evidenceKind ?? body.upload?.evidenceKind;
       const win = readyFolder ? firstPhotoWinLine(readyFolder) : null;
       setWinLine(win);
-      setFlash(win ?? `${body.upload?.filename ?? file.name} is on this seat.`);
+      setReceipt(landed);
+      setFlash(landed);
       if (body.readiness?.folders) {
         const nextHook = day1HookCoach(filledPlateIds(body.readiness.folders));
         setActiveFolder(nextHook.id);
         setAsk(nextHook.ask);
       }
-      trackEvent('operator_demo_local_file', { pagePath: '/operator', meta: { kind, named: true, win: Boolean(win) } });
+      trackEvent('operator_demo_local_file', {
+        pagePath: '/operator',
+        meta: { kind, named: true, win: Boolean(win), count: names.length || files.length },
+      });
     } catch {
-      setFlash('Upload did not reach the seat. Try again.');
+      const miss = 'Upload did not reach the seat. Try again.';
+      setFlash(miss);
+      setReceipt(miss);
     } finally {
       setBusy(false);
       if (photoRef.current) photoRef.current.value = '';
@@ -345,13 +381,24 @@ export function FreeOperatorPhone({
         <div className="owner-desk-hello">
           <div>
             <p className="owner-desk-store" title={deskSeatTitle(storeName || initialRestaurantName)}>
-              {storeName.trim() ? deskSeatLabel(storeName) : signedIn ? 'Owner desk' : deskSeatLabel(null)}
+              {storeName.trim() ? deskSeatLabel(storeName) : signedIn ? 'Owner seat' : deskSeatLabel(null)}
             </p>
             <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>
-          <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
-            1
-          </Link>
+          {signedIn ? (
+            <button
+              type="button"
+              className="owner-desk-avatar"
+              aria-label="Jump to ask"
+              onClick={() => document.getElementById('owner-desk-ask')?.focus()}
+            >
+              1
+            </button>
+          ) : (
+            <Link href="/login" className="owner-desk-avatar" aria-label="Open owner seat">
+              1
+            </Link>
+          )}
         </div>
       </header>
 
@@ -396,15 +443,18 @@ export function FreeOperatorPhone({
             <p className="owner-desk-lastweek-kicker">{lastWeekPrime.honesty} · last-week prime</p>
             <ul className="owner-desk-lastweek-list">
               {lastWeekPrime.families.map((row) => (
-                <li
-                  key={row.id}
-                  className={`owner-desk-lastweek-row is-${row.honesty.toLowerCase()}`}
-                >
-                  <span className="owner-desk-lastweek-label">{row.label}</span>
-                  <span className="owner-desk-lastweek-honesty">{row.honesty}</span>
-                  <span className="owner-desk-lastweek-amt">
-                    {row.amount == null ? 'Missing' : usd(row.amount)}
-                  </span>
+                <li key={row.id}>
+                  <button
+                    type="button"
+                    className={`owner-desk-lastweek-row is-${row.honesty.toLowerCase()}`}
+                    onClick={() => onLastWeekFamily(row.id)}
+                  >
+                    <span className="owner-desk-lastweek-label">{row.label}</span>
+                    <span className="owner-desk-lastweek-honesty">{row.honesty}</span>
+                    <span className="owner-desk-lastweek-amt">
+                      {row.amount == null ? 'Missing' : usd(row.amount)}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -423,8 +473,14 @@ export function FreeOperatorPhone({
             disabled={busy}
             onClick={() => onMouth('file')}
           >
-            Add last-week file
+            Add last-week files
           </button>
+          <PapersInboxConnect
+            onPulled={(next) => {
+              setReceipt(next);
+              setFlash(next);
+            }}
+          />
           {firstScreen ? (
             <p className="owner-desk-identity">
               {DAY1_IDENTITY_LINE}
@@ -436,7 +492,7 @@ export function FreeOperatorPhone({
           )}
           {firstScreen && !paperPath ? (
             <div className="owner-desk-chips" aria-label="Floor asks">
-              {DAY1_FRONT_PICKS.filter((pick) => pick.action !== 'photo').map((pick) => (
+              {DAY1_FRONT_PICKS.map((pick) => (
                 <button
                   key={pick.id}
                   type="button"
@@ -483,7 +539,7 @@ export function FreeOperatorPhone({
                 <span className="owner-desk-snap-hero-mark" aria-hidden>
                   ⌖
                 </span>
-                {busy ? 'Snapping…' : 'Snap photo'}
+                {busy ? 'Receiving…' : 'Snap photos'}
               </button>
               <button
                 type="button"
@@ -496,7 +552,7 @@ export function FreeOperatorPhone({
                   openPlate(plate, 'file');
                 }}
               >
-                Add file
+                Add files
               </button>
             </>
           ) : null}
@@ -651,13 +707,37 @@ export function FreeOperatorPhone({
                   <span className="owner-desk-chip is-ready">OCR folder</span>
                   <span className="owner-desk-chip is-need">No private dollars yet</span>
                 </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="owner-desk-primary"
+                    disabled={busy}
+                    onClick={() => {
+                      setActiveFolder(view === 'food' ? 'menu' : 'invoice-truck');
+                      onMouth('photo');
+                    }}
+                  >
+                    Snap photos
+                  </button>
+                  <button
+                    type="button"
+                    className="owner-desk-secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      setActiveFolder(view === 'food' ? 'invoice-truck' : 'invoice-truck');
+                      onMouth('file');
+                    }}
+                  >
+                    Add files
+                  </button>
+                </div>
               </div>
             </div>
           </article>
         </section>
       ) : null}
 
-      <div ref={answerRef} className={answer ? 'mt-5 scroll-mt-24' : undefined} aria-live="polite">
+      <div ref={answerRef} className={answer ? 'owner-seat-answer mt-5' : undefined} aria-live="polite">
         {answer ? <FreeOperatorAnswerCard answer={answer} compact live /> : null}
       </div>
 
@@ -669,6 +749,14 @@ export function FreeOperatorPhone({
         </div>
       </div>
 
+      <div
+        className={`owner-seat-dock ${askFocused ? 'is-ask-focus' : ''} ${firstScreen ? 'is-first-win' : ''}`}
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          void onRemoteFiles('file', event.dataTransfer.files);
+        }}
+      >
       <div className="owner-desk-mouth">
         <form
           onSubmit={(event) => {
@@ -679,11 +767,18 @@ export function FreeOperatorPhone({
           <label htmlFor="owner-desk-ask" className="sr-only">
             Ask what&apos;s happening
           </label>
+          {receipt ? (
+            <p className="owner-seat-receipt" role="status" aria-live="polite">
+              {receipt}
+            </p>
+          ) : null}
           <div className="owner-desk-ask-shell">
             <textarea
               id="owner-desk-ask"
               value={ask}
               onChange={(event) => setAsk(event.target.value)}
+              onFocus={() => setAskFocused(true)}
+              onBlur={() => setAskFocused(false)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
@@ -691,16 +786,15 @@ export function FreeOperatorPhone({
                 }
               }}
               rows={2}
-              disabled={busy}
               placeholder={listening ? 'Listening…' : DAY1_HELP_ENERGY}
               className="owner-desk-ask"
             />
             <div className="mt-2 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <button type="button" className="owner-desk-round" aria-label="Add file" onClick={() => onMouth('file')}>
+                <button type="button" className="owner-desk-round" aria-label="Add files" onClick={() => onMouth('file')}>
                   +
                 </button>
-                <button type="button" className="owner-desk-round" aria-label="Take photo" onClick={() => onMouth('photo')}>
+                <button type="button" className="owner-desk-round" aria-label="Add photos" onClick={() => onMouth('photo')}>
                   ▣
                 </button>
                 <button type="button" className="owner-desk-round" aria-label="Talk" onClick={() => onMouth('talk')}>
@@ -714,12 +808,12 @@ export function FreeOperatorPhone({
           </div>
         </form>
         <p className="owner-desk-legal">{PUBLIC_PREVIEW_COPY}</p>
-        {flash ? <p className="owner-desk-flash">{flash}</p> : null}
+        {flash && flash !== receipt ? <p className="owner-desk-flash">{flash}</p> : null}
       </div>
 
       <nav
         className={`owner-desk-tray ${firstScreen ? 'is-quiet' : ''}`}
-        aria-label="Owner desk sections"
+        aria-label="Seat sections"
         hidden={firstScreen}
       >
         {OWNER_DESK_TRAY.map((item) => (
@@ -735,19 +829,22 @@ export function FreeOperatorPhone({
         ))}
       </nav>
 
+      </div>
       <input
         ref={photoRef}
         type="file"
         accept="image/*"
-        capture="environment"
+        multiple
         className="sr-only"
-        onChange={(event) => void onRemoteFile('photo', event.target.files?.[0])}
+        onChange={(event) => void onRemoteFiles('photo', event.target.files)}
       />
       <input
         ref={fileRef}
         type="file"
+        accept="image/*,.pdf,.csv,.txt,.xlsx,.xls"
+        multiple
         className="sr-only"
-        onChange={(event) => void onRemoteFile('file', event.target.files?.[0])}
+        onChange={(event) => void onRemoteFiles('file', event.target.files)}
       />
     </div>
   );

@@ -6,9 +6,11 @@ import {
   LAST_WEEK_PRIME_BAND_MIN,
   LAST_WEEK_PRIME_LOAD_ASK,
   answerLastWeekPrime,
+  answerWeekSalesLoop,
   collectLastWeekPrime,
   emptyLastWeekPrime,
   routeLastWeekPrimeQuestion,
+  routeWeekSalesQuestion,
 } from '@/lib/lastWeekPrimeCost';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
 
@@ -76,6 +78,22 @@ describe('last-week prime — Action Shift path', () => {
     expect(routeLastWeekPrimeQuestion('Are we making money under 60-65?')).toBe(true);
     expect(routeLastWeekPrimeQuestion('What were net sales Aug 31 and the week Aug 24-30? Strongest day?')).toBe(false);
     expect(routeLastWeekPrimeQuestion('What was labor cost and labor percent on Aug 31?')).toBe(false);
+  });
+
+  it('routes “sales last week” as a closed loop and leaves dated Toast Q8 alone', () => {
+    expect(routeWeekSalesQuestion('What were my sales last week?')).toBe(true);
+    expect(routeWeekSalesQuestion('sales last week')).toBe(true);
+    expect(routeWeekSalesQuestion('What were net sales Aug 31 and the week Aug 24-30? Strongest day?')).toBe(false);
+    const missing = answerWeekSalesLoop(emptyLastWeekPrime());
+    expect(missing.headline).toMatch(/Missing — last-week sales/);
+    expect(missing.facts.join(' ')).toMatch(/I will not invent a dollar/);
+    expect(missing.facts.join(' ')).toMatch(/Action Shift/);
+    expect(missing.facts.join(' ')).not.toMatch(/\bdesk\b|operator_id|seat:\d/i);
+    expect(missing.verifiedClose).toBe(false);
+    const ready = answerWeekSalesLoop(collectLastWeekPrime('demo:nag-prime', nagToastUploads(), 'New American Grill'));
+    expect(ready.headline).toMatch(/Verified · last-week sales/);
+    expect(ready.verifiedClose).toBe(true);
+    expect(ready.facts.join(' ')).not.toMatch(/\bdesk\b/i);
   });
 
   it('NAG Toast week + labor stay Verified; food / pop / liquor / beer stay Missing — no invented %', () => {

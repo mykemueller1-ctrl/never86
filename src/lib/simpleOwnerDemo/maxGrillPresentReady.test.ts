@@ -200,6 +200,7 @@ describe('Max Grill present-ready — isolation + honesty + Action Shift', () =>
     expect(asked.answer.sampleDollars).toBe('none-verified');
     expect(asked.answer.headline).toMatch(/Missing — last-week prime/);
     expect(asked.answer.facts.join(' ')).toMatch(/Action Shift/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/\bdesk\b|operator_id seat:/i);
     expect(asked.answer.facts.join(' ')).toMatch(/Missing · Food/);
     expect(asked.answer.facts.join(' ')).toMatch(/Missing · Pop/);
     expect(asked.answer.facts.join(' ')).toMatch(/Missing · Liquor/);

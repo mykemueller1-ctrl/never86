@@ -187,7 +187,8 @@ describe('simple owner demo service persist', () => {
     if (!asked.ok) return;
     expect(asked.answer.inventedClose).toBe(false);
     expect(asked.answer.verifiedClose).toBe(false);
-    expect(asked.answer.facts.some((fact) => fact.includes('demo:alpha'))).toBe(true);
+    expect(asked.answer.facts.join(' ')).toMatch(/stored on this seat/);
+    expect(asked.answer.facts.join(' ')).not.toMatch(/operator_id|demo:alpha/);
     expect(asked.answer.facts.join(' ')).toMatch(/Ready: Schedule/);
     expect(asked.answer.headline).toMatch(/Schedule is on this seat/i);
     expect(asked.record.question).toBe('Why did labor feel wrong last night?');
@@ -348,6 +349,23 @@ describe('compose never invents a close', () => {
     expect(facts).not.toMatch(/Snap this week/i);
     expect(answer.inventedClose).toBe(false);
     expect(answer.verifiedClose).toBe(false);
+  });
+
+  it('answers sales last week as Missing + one Action Shift — not wallpaper', () => {
+    const readiness = readinessFromUploads('seat:7', []);
+    const answer = composeAskAnswer({
+      question: 'What were my sales last week?',
+      tray: 'action',
+      readiness,
+      uploads: [],
+    });
+    expect(answer.headline).toMatch(/Missing — last-week sales/);
+    expect(answer.facts.join(' ')).toMatch(/Action Shift/);
+    expect(answer.facts.join(' ')).not.toMatch(/you're not crazy/i);
+    expect(answer.facts.join(' ')).not.toMatch(/operator_id|seat:7|\bdesk\b/i);
+    expect(answer.needs).toMatch(/SalesSummary|Z/);
+    expect(answer.verifiedClose).toBe(false);
+    expect(answer.inventedClose).toBe(false);
   });
 
   it('keeps sample dollars unverified even when all three reports are named', () => {

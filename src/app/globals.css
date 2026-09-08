@@ -783,12 +783,12 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   width: min(68rem, 100%);
   margin: 0 auto;
   min-height: 100dvh;
-  padding: 1.4rem 1.2rem 11rem;
+  padding: 1.4rem 1.2rem 16rem;
   background: transparent;
   color: #e8eaed;
 }
 .owner-desk.is-first-win {
-  padding-bottom: 8.5rem;
+  padding-bottom: 13rem;
 }
 @media (min-width: 880px) {
   .owner-desk {
@@ -945,8 +945,14 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.45rem 0.75rem;
   align-items: baseline;
+  width: 100%;
   padding: 0.42rem 0;
+  border: 0;
   border-top: 1px solid #2A313A;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .owner-desk-lastweek-row:first-child {
   border-top: 0;
@@ -1064,12 +1070,14 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   width: 100%;
   max-width: 22rem;
   margin-top: 0.75rem;
-  border: 0;
+  min-height: 2.4rem;
+  border: 1px solid #8B949E;
+  border-radius: 0.55rem;
   background: transparent;
-  color: #8B949E;
-  font-size: 0.88rem;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  color: #C9A46B;
+  font-size: 0.95rem;
+  font-weight: 650;
+  text-decoration: none;
 }
 .owner-desk-legal {
   margin-top: 0.7rem;
@@ -1324,15 +1332,67 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   color: #e8eaed;
   border: 1px solid #8B949E;
 }
+.owner-seat-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 40;
+  transform: translateX(-50%);
+  width: min(68rem, 100%);
+  padding: 0.45rem 1.2rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+  background: #0B0D10;
+  border-top: 1px solid #2A313A;
+}
+.owner-seat-dock.is-ask-focus .owner-desk-tray {
+  display: none !important;
+}
+.owner-seat-receipt {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.65rem;
+  background: #1A1F26;
+  border: 1px solid #C9A46B;
+  color: #f4f1ea;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.owner-seat-answer {
+  scroll-margin-bottom: 16rem;
+}
+.owner-seat-papers {
+  margin-top: 1.2rem;
+  padding: 0.95rem 0.95rem 1rem;
+  border: 1px solid #2A313A;
+  border-radius: 1rem;
+  background: #1A1F26;
+}
+.owner-seat-papers-title {
+  margin-top: 0.45rem;
+  font-family: var(--font-serif), Newsreader, Georgia, serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  color: #f4f1ea;
+}
+.owner-seat-papers-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.owner-seat-papers-outlook {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  color: #8B949E;
+}
 .owner-desk-mouth {
-  position: sticky;
-  bottom: 4.4rem;
-  z-index: 25;
-  margin-top: 1.5rem;
-  padding-top: 0.35rem;
+  position: relative;
+  bottom: auto;
+  z-index: 1;
+  margin-top: 0;
+  padding-top: 0;
 }
 .owner-desk.is-first-win .owner-desk-mouth {
-  bottom: 1.1rem;
+  bottom: auto;
 }
 .owner-desk-ask-shell {
   border: 1px solid #2A313A;
@@ -1382,12 +1442,13 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   transform: translateY(1px) scale(0.98);
 }
 .owner-desk-tray {
-  position: fixed;
-  left: 50%;
-  bottom: 0.65rem;
-  z-index: 30;
-  transform: translateX(-50%);
-  width: min(28rem, calc(100% - 1.2rem));
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: 1;
+  transform: none;
+  width: 100%;
+  margin-top: 0.4rem;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 0.2rem;

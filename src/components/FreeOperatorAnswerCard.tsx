@@ -87,7 +87,7 @@ export function FreeOperatorAnswerCard({
           <p className="mt-6 text-sm leading-relaxed text-[#3d4d73]">{OWNER_SEAT_EOD.copy}</p>
           <p className="mt-8">
             <Link href="/operator" className="human-button human-button-primary text-sm">
-              ← Back to Owner desk
+              ← Back to your seat
             </Link>
           </p>
         </>
