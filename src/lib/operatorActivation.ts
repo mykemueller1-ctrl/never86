@@ -357,6 +357,15 @@ export async function activateOperatorSeat(
           .from(seatOperators)
           .where(eq(seatOperators.id, priorCred[0].operatorId))
           .limit(1);
+        const existingName = existingOperator[0]?.restaurantName;
+        const mismatch = refuseExistingSeatStoreMismatch(restaurantName, existingName);
+        if (!mismatch.ok) {
+          throw new SeatActivationAbort({
+            ok: false,
+            error: mismatch.error,
+            status: mismatch.status,
+          });
+        }
         const existingLocation = await tx
           .select({ id: seatLocations.id })
           .from(seatLocations)
@@ -371,7 +380,7 @@ export async function activateOperatorSeat(
           operatorId: priorCred[0].operatorId,
           locationId: existingLocation[0]?.id ?? 0,
           email,
-          restaurantName: existingOperator[0]?.restaurantName || restaurantName,
+          restaurantName: existingName || restaurantName,
         } as const;
       }
 
@@ -529,6 +538,27 @@ export function refuseSecondFreeStore(existingLocationCount: number): {
     return { ok: false, error: 'The free plan is one store. Extra locations are paid expansion.' };
   }
   return { ok: true };
+}
+
+/**
+ * Same email, different store name after restaurantNameForSeatClaim: do not
+ * reuse the existing seat and paint the old shop as the new claim.
+ */
+export function refuseExistingSeatStoreMismatch(
+  tokenRestaurantName: string,
+  existingRestaurantName: string | null | undefined,
+): { ok: true } | { ok: false; error: string; status: 409 } {
+  const claimed = normalizeRestaurant(tokenRestaurantName);
+  const existing = normalizeRestaurant(existingRestaurantName ?? '');
+  if (!existing) return { ok: true };
+  if (claimed.localeCompare(existing, undefined, { sensitivity: 'accent' }) === 0) {
+    return { ok: true };
+  }
+  return {
+    ok: false,
+    status: 409,
+    error: `This email already has a free seat at ${existing}. Extra stores are paid expansion.`,
+  };
 }
 
 export function refuseSecondFreeSeat(existingCredentialCount: number): {

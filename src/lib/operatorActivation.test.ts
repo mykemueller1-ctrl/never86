@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   FREE_SEAT_ID_FLOOR,
@@ -14,6 +16,7 @@ import {
   normalizeEmail,
   normalizeRestaurant,
   publicActivationAccepted,
+  refuseExistingSeatStoreMismatch,
   refuseSecondFreeSeat,
   refuseSecondFreeStore,
 } from './operatorActivation';
@@ -59,6 +62,38 @@ describe('operatorActivation pure helpers', () => {
       error: 'The free plan is one login. Extra seats are paid expansion.',
     });
     expect(refuseSecondFreeStore(0).ok).toBe(true);
+  });
+
+  it('returns 409 when a new store claim would silently reuse an existing seat', () => {
+    const mismatch = refuseExistingSeatStoreMismatch('New American Grill', 'Community Tap');
+    expect(mismatch.ok).toBe(false);
+    if (!mismatch.ok) {
+      expect(mismatch.status).toBe(409);
+      expect(mismatch.error).toContain('Community Tap');
+      expect(mismatch.error).not.toMatch(/New American Grill/);
+      expect(mismatch.error).toMatch(/already has a free seat/);
+    }
+    expect(refuseExistingSeatStoreMismatch('Community Tap', 'Community Tap').ok).toBe(true);
+    expect(refuseExistingSeatStoreMismatch('community tap', 'Community  Tap').ok).toBe(true);
+    expect(refuseExistingSeatStoreMismatch('New American Grill', '').ok).toBe(true);
+  });
+
+  it('keeps first-create restaurantName on the token store, and mismatch abort rolls back', () => {
+    const source = readFileSync(resolve('src/lib/operatorActivation.ts'), 'utf8');
+    expect(source).toContain('const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName)');
+    expect(source).toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
+    expect(source).toMatch(/insert\(seatOperators\)[\s\S]*restaurantName,/);
+    expect(source).toMatch(/insert\(seatLocations\)[\s\S]*name: restaurantName/);
+    const mismatch = refuseExistingSeatStoreMismatch('New American Grill', 'Community Tap');
+    if (!mismatch.ok) {
+      const abort = new SeatActivationAbort({
+        ok: false,
+        error: mismatch.error,
+        status: mismatch.status,
+      });
+      expect(abort.result.status).toBe(409);
+      expect(abort.result.error).toContain('Community Tap');
+    }
   });
 
   it('narrows refuseSecondFreeStore.error for production TypeScript', () => {

@@ -30,20 +30,24 @@ describe('owner desk post-auth redirect', () => {
 
   it('locks magic-link activate, password login, and /dashboard first paint to /operator', () => {
     const activate = read('src/app/api/onboard/activate/route.ts');
+    const activateHttp = read('src/lib/operatorActivateHttp.ts');
     const login = read('src/app/api/operator/login/route.ts');
     const client = read('src/app/activate/ActivateClient.tsx');
     const dashboard = read('src/app/dashboard/page.tsx');
     const desk = read('src/components/OperatorDashboard.tsx');
     const proxy = read('src/proxy.ts');
 
-    expect(activate).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
+    expect(activate).toContain('planActivateHttpResponse');
+    expect(activateHttp).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
     expect(activate).not.toMatch(/redirect:\s*'\/dashboard'/);
     expect(activate).not.toMatch(/redirect:\s*'\/play'/);
+    expect(activateHttp).not.toMatch(/redirect:\s*'\/dashboard'/);
+    expect(activateHttp).not.toMatch(/redirect:\s*'\/play'/);
 
     expect(login).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
     expect(login).not.toMatch(/redirect:\s*'\/dashboard'/);
 
-    expect(client).toContain('OWNER_DESK_POST_AUTH_REDIRECT');
+    expect(client).toContain('decideActivateClientOutcome');
     expect(client).not.toMatch(/\/dashboard/);
     expect(client).not.toMatch(/\/play/);
 

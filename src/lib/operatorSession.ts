@@ -20,6 +20,15 @@ export const OPERATOR_COOKIE_OPTS = {
   maxAge: MAX_AGE,
 };
 
+/** Overwrite a leftover n86_operator so a failed activate cannot walk into the old seat. */
+export const OPERATOR_COOKIE_CLEAR_OPTS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: 0,
+};
+
 export type OperatorSession = { operatorId: number; email: string; exp: number };
 
 export function operatorSessionSecret(): string | null {
