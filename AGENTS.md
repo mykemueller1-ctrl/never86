@@ -6,11 +6,17 @@ MCP: `https://www.never86.ai/api/mcp`
 
 Keys / xAI / Grok factory env: `docs/company/KEYS_ACCESS.md`. Placeholders in `.env.example`. Never commit live secrets. Probe: `npm run keys:probe`.
 
+## WEEK LOCK (2026-09-07) — BINDING
+Read `docs/HARD-TRUTH-PACKET-2026-09-07.md` before any other job.
+Issue: #235.
+One Cursor job: **C1 week-lock-returning-owner**.
+Do not restyle the WOW desk. Do not merge CTap #67/#78 from this repo. Do not open a GPT-6 rewrite. Frozen: peptides, Mad Rat, scout features, Dip Day, fourth repo.
+
 ## How we work (locked)
 - **Grok** is the founder front door. Myke talks to Grok on the phone. Grok dispatches Cursor.
 - **Cursor** runs agents, bots, code, tests, and PRs. Cursor does not wait for Myke to merge from a laptop.
 - **Codex** sits outside the factory: reviews Cursor work, keeps logical rails, ships safe branches Cursor may branch from (e.g. `codex/action-shift-122-safe`).
-- One active Cursor factory job at a time. Stop/Archive stuck chats (including Grok sales organization) before starting the next.
+- One active Cursor factory job at a time. Stop/Archive stuck chats before starting the next.
 - Do **not** merge `cursor/grok-sales-org` dumps or +40k-line reviews into product work.
 
 ## Product
@@ -34,10 +40,7 @@ capture → parse → truth-gate → normalize → decide (formulas first) → a
 - Bundle hunter / sales-org MCP into the operator path
 
 ## Active job
-**#118 Monday gate** — stranger can join → verify email → activate one store → submit yesterday's close → ≤3 source-labeled actions → night proof. Without Myke touching the database.
+**#235 / C1** — returning owner lands on `/operator`, not Claim Seat.
+Monday gate #118 still stands underneath that: stranger can join → verify email → activate one store → submit yesterday's close → ≤3 source-labeled actions → night proof.
 
-**Supabase deferred** (Myke: morning). Free seat runs on **Neon** tonight (`drizzle/0002_free_seat_neon.sql`).
-
-Branch from `codex/action-shift-122-safe` → `cursor/monday-gate-onboard-*`. See #121. SEO/GTM (#122) waits until the stranger door ships.
-
-Grok keep-building brief: `docs/GROK-KEEP-BUILDING.md`. Status: `docs/MONDAY-GATE-STATUS.md`.
+Free seat runs on **Neon**. Do not paste `DATABASE_URL`.
