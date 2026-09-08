@@ -340,9 +340,24 @@ export function shouldRetireNativeOperatorEmail(input: {
   return input.restaurantName.toLowerCase().includes('fun');
 }
 
+export type RetireNativeOperatorSuccess = {
+  ok: true;
+  retiredEmail: string;
+  nativeRetired: boolean;
+};
+
 export type RetireNativeOperatorResult =
-  | { ok: true; retiredEmail: string; nativeRetired: boolean }
+  | RetireNativeOperatorSuccess
   | { ok: false; error: string; status: number };
+
+/** Narrow grant/detach `{ ok: true }` away from the retire success object. */
+export function isRetireNativeSuccess(
+  result: SetSharedPasswordResult | RetireNativeOperatorResult,
+): result is RetireNativeOperatorSuccess {
+  if (!result.ok) return false;
+  const candidate = result as Partial<RetireNativeOperatorSuccess>;
+  return typeof candidate.retiredEmail === 'string' && typeof candidate.nativeRetired === 'boolean';
+}
 
 /**
  * Kill native ownership + person_access + credentials email for one operator.
