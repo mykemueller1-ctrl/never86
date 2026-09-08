@@ -36,6 +36,11 @@ export function createMemoryObjectStore(): SimpleOwnerObjectStore & {
       objects.set(objectKey, { bytes, contentType, operatorId });
       return { objectKey, storageBackend: 'memory' };
     },
+    async get({ operatorId, objectKey }) {
+      const hit = objects.get(objectKey);
+      if (!hit || hit.operatorId !== operatorId) return null;
+      return { bytes: hit.bytes, contentType: hit.contentType };
+    },
   };
 }
 
@@ -132,12 +137,18 @@ function getSignatureKey(secret: string, dateStamp: string, region: string, serv
   return hmac(kService, 'aws4_request');
 }
 
-export function createNeonFallbackObjectStore(putBlob: (input: {
-  operatorId: string;
-  objectKey: string;
-  contentType: string;
-  payloadB64: string;
-}) => Promise<void>): SimpleOwnerObjectStore {
+export function createNeonFallbackObjectStore(
+  putBlob: (input: {
+    operatorId: string;
+    objectKey: string;
+    contentType: string;
+    payloadB64: string;
+  }) => Promise<void>,
+  getBlob?: (input: {
+    operatorId: string;
+    objectKey: string;
+  }) => Promise<{ bytes: Uint8Array; contentType: string } | null>,
+): SimpleOwnerObjectStore {
   return {
     async put({ operatorId, objectKey, bytes, contentType }) {
       await putBlob({
@@ -147,6 +158,10 @@ export function createNeonFallbackObjectStore(putBlob: (input: {
         payloadB64: Buffer.from(bytes).toString('base64'),
       });
       return { objectKey, storageBackend: 'neon-object-fallback' };
+    },
+    async get({ operatorId, objectKey }) {
+      if (!getBlob) return null;
+      return getBlob({ operatorId, objectKey });
     },
   };
 }

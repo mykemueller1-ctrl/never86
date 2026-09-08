@@ -28,7 +28,15 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('truck-ticket.jpg').kind).toBe('invoice-truck');
     expect(classifyUpload('liquor-ticket.jpg').kind).toBe('invoice-truck');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
+    expect(classifyUpload('SalesSummary_2026-08-31.csv').kind).toBe('z');
+    expect(classifyUpload('LaborBreakDown_2026-08-31.csv').kind).toBe('timeclock');
+    expect(classifyUpload('TimeEntries.csv').kind).toBe('timeclock');
+    expect(classifyUpload('ItemSelectionDetails.csv').kind).toBe('void');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
+    expect(classifyUpload('SalesSummary_2026-08-31.csv').sourceTags[0]).toEqual({
+      tag: 'unverified',
+      source: 'operator-upload:toast:sales-summary',
+    });
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
       tag: 'unverified',
       source: 'operator-upload:hourly',

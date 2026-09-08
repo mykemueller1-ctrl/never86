@@ -2,6 +2,10 @@ import { plateById, resolveOperatorV2PlateId } from '@/lib/operatorV2';
 import type { EvidenceKind, SourceTag } from './types';
 
 const KIND_PATTERNS: readonly { kind: EvidenceKind; pattern: RegExp; source: string }[] = [
+  { kind: 'z', pattern: /sales[\s_-]*summary/, source: 'operator-upload:toast:sales-summary' },
+  { kind: 'timeclock', pattern: /labor[\s_-]*break[\s_-]*down/, source: 'operator-upload:toast:labor-breakdown' },
+  { kind: 'timeclock', pattern: /time[\s_-]*entries/, source: 'operator-upload:toast:time-entries' },
+  { kind: 'void', pattern: /item[\s_-]*selection[\s_-]*details/, source: 'operator-upload:toast:item-selection' },
   { kind: 'hourly', pattern: /hourly|hour[_-\s]?sales/, source: 'operator-upload:hourly' },
   { kind: 'timeclock', pattern: /time[_-\s]?clock|timesheet|punch|clock[_-\s]?in|clock[_-\s]?out/, source: 'operator-upload:timeclock' },
   { kind: 'labor-cards', pattern: /labor[_-\s]?card|role[_-\s]?card|shift[_-\s]?role/, source: 'operator-upload:labor-cards' },
