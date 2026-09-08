@@ -66,9 +66,14 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('Snap photo');
     expect(phone).toContain('DAY1_HOOK_PLATE_ID');
     expect(phone).toContain('DAY1_OPEN_ASK');
-    expect(phone).toContain('DAY1_SOFT_DEFAULT');
+    expect(phone).toContain('DAY1_OPEN_ENERGY');
+    expect(phone).toContain('DAY1_HELP_ENERGY');
+    expect(phone).toContain('DAY1_IDENTITY_LINE');
+    expect(phone).toContain('DAY1_PREVIEW_CONTRACT');
     expect(phone).toContain('firstPhotoWinLine');
+    expect(phone).not.toContain('DAY1_SOFT_DEFAULT');
     expect(phone).not.toContain('Prime Cost Coach');
+    expect(phone).not.toMatch(/Got a truck ticket or invoice\? Snap it/);
     expect(phone).not.toMatch(/Snap this week’s order guide/);
     expect(phone).toContain('PUBLIC_PREVIEW_COPY');
     expect(phone).not.toMatch(/UPLOAD PAYROLL CSV/);

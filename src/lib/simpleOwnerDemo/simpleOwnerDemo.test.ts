@@ -280,7 +280,7 @@ describe('day-1 photo win + invoice identity', () => {
 });
 
 describe('compose never invents a close', () => {
-  it('opens an empty seat on invoice / truck — not order-guide ownership', () => {
+  it('opens an empty seat on the problem — not a stiff truck CTA', () => {
     const readiness = readinessFromUploads('seat:7', []);
     const answer = composeAskAnswer({
       question: 'How can we help you?',
@@ -289,7 +289,9 @@ describe('compose never invents a close', () => {
       uploads: [],
     });
     const facts = answer.facts.join(' ');
-    expect(facts).toMatch(/truck ticket or invoice/i);
+    expect(facts).toMatch(/what's the problem today/i);
+    expect(facts).toMatch(/what's going on/i);
+    expect(facts).not.toMatch(/got a truck ticket or invoice\?\s*snap it/i);
     expect(facts).not.toMatch(/order guide first/i);
     expect(facts).not.toMatch(/Snap this week/i);
     expect(answer.inventedClose).toBe(false);

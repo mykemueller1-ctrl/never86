@@ -4,7 +4,7 @@ import { SimpleOwnerDemo } from '@/components/FreeOperatorPhone';
 export const metadata: Metadata = {
   title: "Owner desk — Community Tap seat 1 | Never 86'd",
   description:
-    'Owner desk for Community Tap seat 1: how can we help you? Snap a truck ticket or invoice. Not a dashboard. Not a tour.',
+    'Owner desk for Community Tap seat 1: what’s the problem today? Conversation first. Not a dashboard. Not a tour.',
   alternates: { canonical: 'https://www.never86.ai/operator' },
   openGraph: {
     title: "Owner desk — 1–3 unit Action Shift | Never 86'd",

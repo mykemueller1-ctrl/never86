@@ -5,7 +5,13 @@ import {
   type OwnerDeskTrayId,
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
-import { day1HookCoach, firstPhotoWinLine, looksLikeDay1VendorAsk } from '@/lib/day1Coach';
+import {
+  DAY1_OPEN_ASK,
+  DAY1_OPEN_ENERGY,
+  day1HookCoach,
+  firstPhotoWinLine,
+  looksLikeDay1VendorAsk,
+} from '@/lib/day1Coach';
 import {
   dailyCompareFromEvidence,
   filledPlateIds,
@@ -88,7 +94,7 @@ export function composeAskAnswer(input: {
 
   const evidenceFact =
     input.uploads.length === 0
-      ? 'No files are on this seat yet. Snap a truck ticket or invoice — a handwritten short counts. Then the task is off the plate.'
+      ? `${DAY1_OPEN_ASK} ${DAY1_OPEN_ENERGY} Conversation first. Invoice paper when they choose it.`
       : `This seat has ${input.uploads.length} source-tagged upload(s). Ready: ${ready.join(', ') || 'none'}. Still NEED: ${missing.join(', ') || 'none'}.`;
 
   const filled = filledPlateIds(input.readiness.folders ?? []);
@@ -96,7 +102,7 @@ export function composeAskAnswer(input: {
   const lastReady = (input.readiness.folders ?? []).filter((row) => row.state === 'READY').at(-1);
   const folderFact =
     filled.size === 0
-      ? `Day-1 hook: ${hook.ask} ${hook.attachHint}`
+      ? `Day-1 open: ${DAY1_OPEN_ASK} ${DAY1_OPEN_ENERGY}`
       : `Ready: ${folderReady.join(', ')}. Still Missing: ${folderNeed.join(', ') || 'none'}. Next snap: ${hook.ask}`;
 
   const laborFact = laborAsk
