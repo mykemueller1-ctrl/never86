@@ -13,7 +13,7 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
-import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
+import { CTAP_SEAT1_RESTAURANT_DEFAULT } from '@/lib/ctapSeat1';
 import {
   DAY1_FRONT_PICKS,
   DAY1_HELP_ENERGY,
@@ -31,6 +31,14 @@ import {
   type Day1FrontPickId,
 } from '@/lib/day1Coach';
 import {
+  WOW_HERO,
+  WOW_MISSING_LINE,
+  WOW_RAIL_TITLE,
+  WOW_SUBLINE,
+  WOW_WATERMARK,
+  wowRailFromFolders,
+} from '@/lib/wowDesk';
+import {
   OPERATOR_V2_PLATES,
   dailyCompareFromEvidence,
   filledPlateIds,
@@ -44,13 +52,6 @@ import {
 } from '@/lib/operatorV2';
 
 type DeskView = 'home' | 'labor' | 'food' | 'bev';
-
-function greeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
 
 function weekdayLabel() {
   return new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
@@ -81,7 +82,11 @@ function emptyDailyCompare(): DailyCompareChip[] {
   return dailyCompareFromEvidence({ scheduleReady: false, clockReady: false });
 }
 
-export function FreeOperatorPhone() {
+export function FreeOperatorPhone({
+  storeName = CTAP_SEAT1_RESTAURANT_DEFAULT,
+}: {
+  storeName?: string;
+} = {}) {
   const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
   const [tray, setTray] = useState<OwnerDeskTrayId>('action');
@@ -103,6 +108,7 @@ export function FreeOperatorPhone() {
 
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
+  const wowRail = useMemo(() => wowRailFromFolders(folders), [folders]);
   const firstScreen = filled.size === 0 && view === 'home' && !winLine;
   const needsPhoto = !firstScreen || day1FrontNeedsPhoto(frontPath);
   const hookAsk = firstScreen
@@ -293,67 +299,92 @@ export function FreeOperatorPhone() {
 
   return (
     <div className={`owner-desk ${filled.size === 0 ? 'is-first-win' : 'is-winning'}`}>
+      <p className="owner-desk-watermark" aria-hidden>
+        {WOW_WATERMARK}
+      </p>
+      <aside className="owner-desk-rail" aria-label="Honesty missing panel">
+        <p className="owner-desk-rail-kicker">{WOW_RAIL_TITLE}</p>
+        <ul className="owner-desk-rail-list">
+          {wowRail.map((row) => (
+            <li key={row.id} className={`owner-desk-rail-row ${row.state === 'READY' ? 'is-ready' : 'is-need'}`}>
+              <span className="owner-desk-rail-label">{row.label}</span>
+              <span className="owner-desk-rail-line">{row.line}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="owner-desk-rail-note">{WOW_MISSING_LINE} — never invented dollars.</p>
+      </aside>
+
+      <div className="owner-desk-stage">
       <header className="owner-desk-top">
         <div className="owner-desk-hello">
           <div>
-            <p className="owner-desk-hello-line">{greeting()}.</p>
-            <p className="owner-desk-hello-store">{CTAP_SEAT1_PUBLIC_LABEL}</p>
+            <p className="owner-desk-store-kicker">Active store</p>
+            <p className="owner-desk-hello-store">{storeName}</p>
           </div>
           <Link href="/onboard" className="owner-desk-avatar" aria-label="Claim owner seat">
             1
           </Link>
         </div>
-
-        <div className="owner-desk-chips" aria-label={firstScreen ? 'Floor asks' : 'Day-1 coach chips'}>
-          {firstScreen
-            ? DAY1_FRONT_PICKS.map((pick) => (
-                <button
-                  key={pick.id}
-                  type="button"
-                  className="owner-desk-pill is-need"
-                  onClick={() => onFrontPick(pick)}
-                >
-                  {pick.chip}
-                </button>
-              ))
-            : folders.map((folder) => {
-                const coach = day1CoachById(folder.id);
-                return (
-                  <button
-                    key={folder.id}
-                    type="button"
-                    className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'} ${activeFolder === folder.id ? 'is-hook' : ''}`}
-                    onClick={() => {
-                      const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
-                      if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
-                    }}
-                  >
-                    {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
-                  </button>
-                );
-              })}
-        </div>
       </header>
 
       {view === 'home' ? (
         <section className="owner-desk-lom">
-          <p className="owner-desk-kicker">{weekdayLabel()}</p>
-          <h1 className="owner-desk-ask-title">{hookAsk}</h1>
-          {winLine ? (
-            <div className="owner-desk-win" role="status">
-              <p className="owner-desk-win-mark">Ready</p>
-              <p className="owner-desk-win-line">{winLine}</p>
-            </div>
+          {firstScreen ? (
+            <>
+              <p className="owner-desk-kicker">{weekdayLabel()}</p>
+              <h1 className="owner-desk-ask-title">{WOW_HERO}</h1>
+              <p className="owner-desk-subline">{WOW_SUBLINE}</p>
+              <p className="owner-desk-poetry">
+                {frontPath && !needsPhoto ? DAY1_PREVIEW_CONTRACT : `${DAY1_OPEN_ASK} ${DAY1_OPEN_ENERGY}`}
+              </p>
+              <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p>
+            </>
           ) : (
-            <p className="owner-desk-poetry">
-              {firstScreen
-                ? frontPath && !needsPhoto
-                  ? DAY1_PREVIEW_CONTRACT
-                  : DAY1_OPEN_ENERGY
-                : hook.attachHint}
-            </p>
+            <>
+              <p className="owner-desk-kicker">{weekdayLabel()}</p>
+              <h1 className="owner-desk-ask-title">{hookAsk}</h1>
+              {winLine ? (
+                <div className="owner-desk-win" role="status">
+                  <p className="owner-desk-win-mark">Ready</p>
+                  <p className="owner-desk-win-line">{winLine}</p>
+                </div>
+              ) : (
+                <p className="owner-desk-poetry">{hook.attachHint}</p>
+              )}
+            </>
           )}
-          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+
+          <div className="owner-desk-chips" aria-label={firstScreen ? 'Floor asks' : 'Day-1 coach chips'}>
+            {firstScreen
+              ? DAY1_FRONT_PICKS.map((pick) => (
+                  <button
+                    key={pick.id}
+                    type="button"
+                    className="owner-desk-pill is-need"
+                    onClick={() => onFrontPick(pick)}
+                  >
+                    {pick.chip}
+                  </button>
+                ))
+              : folders.map((folder) => {
+                  const coach = day1CoachById(folder.id);
+                  return (
+                    <button
+                      key={folder.id}
+                      type="button"
+                      className={`owner-desk-pill ${folder.state === 'READY' ? 'is-ready' : 'is-need'} ${activeFolder === folder.id ? 'is-hook' : ''}`}
+                      onClick={() => {
+                        const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
+                        if (plate) openPlate(plate, folder.state === 'NEED' ? 'photo' : 'ask');
+                      }}
+                    >
+                      {folder.state === 'READY' ? `${folder.label} ✓` : coach?.chip ?? folder.label}
+                    </button>
+                  );
+                })}
+          </div>
+
           {needsPhoto ? (
             <>
               <button
@@ -420,8 +451,8 @@ export function FreeOperatorPhone() {
           </div>
 
           <article className="owner-desk-card mt-5">
-            <h2 className="text-lg font-semibold text-[#06122b]">Roles on the card</h2>
-            <p className="mt-1 text-sm text-[#3d4d73]">
+            <h2 className="text-lg font-semibold text-[#e6e1d6]">Roles on the card</h2>
+            <p className="mt-1 text-sm text-[#8b95a3]">
               Labor cards name seats, not people. FOH, Line, Dish, Run spawn from the week schedule.
             </p>
             <div className="owner-v2-roles mt-4">
@@ -448,8 +479,8 @@ export function FreeOperatorPhone() {
           </article>
 
           <article className="owner-desk-card owner-desk-card-peach mt-4">
-            <h2 className="text-lg font-semibold text-[#06122b]">Daily compare</h2>
-            <p className="mt-1 text-sm text-[#3d4d73]">
+            <h2 className="text-lg font-semibold text-[#e6e1d6]">Daily compare</h2>
+            <p className="mt-1 text-sm text-[#8b95a3]">
               Early leave, late leave, and labor drift vs the posted card. No invented overtime.
             </p>
             <ul className="mt-4 space-y-2">
@@ -460,9 +491,9 @@ export function FreeOperatorPhone() {
                       {chip.state === 'READY' ? '✓' : '◷'}
                     </span>
                     <span className="text-left">
-                      <span className="block font-semibold text-[#06122b]">{chip.label}</span>
-                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.rule}</span>
-                      <span className="mt-1 block text-sm text-[#3d4d73]">{chip.reason}</span>
+                      <span className="block font-semibold text-[#e6e1d6]">{chip.label}</span>
+                      <span className="mt-1 block text-sm text-[#8b95a3]">{chip.rule}</span>
+                      <span className="mt-1 block text-sm text-[#8b95a3]">{chip.reason}</span>
                     </span>
                   </div>
                 </li>
@@ -529,7 +560,7 @@ export function FreeOperatorPhone() {
                 N86
               </span>
               <div>
-                <p className="text-sm leading-relaxed text-[#06122b]">
+                <p className="text-sm leading-relaxed text-[#e6e1d6]">
                   {view === 'food'
                     ? 'Picture the menu and a truck ticket or invoice. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
@@ -582,12 +613,16 @@ export function FreeOperatorPhone() {
             />
             <div className="mt-2 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <button type="button" className="owner-desk-round" aria-label="Add file" onClick={() => onMouth('file')}>
-                  +
-                </button>
-                <button type="button" className="owner-desk-round" aria-label="Take photo" onClick={() => onMouth('photo')}>
-                  ▣
-                </button>
+                {needsPhoto ? (
+                  <>
+                    <button type="button" className="owner-desk-round" aria-label="Add file" onClick={() => onMouth('file')}>
+                      +
+                    </button>
+                    <button type="button" className="owner-desk-round" aria-label="Take photo" onClick={() => onMouth('photo')}>
+                      ▣
+                    </button>
+                  </>
+                ) : null}
                 <button type="button" className="owner-desk-round" aria-label="Talk" onClick={() => onMouth('talk')}>
                   ●
                 </button>
@@ -600,6 +635,7 @@ export function FreeOperatorPhone() {
         </form>
         <p className="owner-desk-legal">{PUBLIC_PREVIEW_COPY}</p>
         {flash ? <p className="owner-desk-flash">{flash}</p> : null}
+      </div>
       </div>
 
       <nav

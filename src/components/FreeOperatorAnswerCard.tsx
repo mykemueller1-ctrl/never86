@@ -31,12 +31,10 @@ export function FreeOperatorAnswerCard({
 
   return (
     <article aria-label={live ? 'Operator answer' : 'Sample operator answer'} className="owner-desk-card">
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#003bb5]">
+      <p className="owner-desk-card-kicker">
         {live ? 'Stored on this seat · source-tagged' : SAMPLE_LABEL}
       </p>
-      {chip ? (
-        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#0066ff]">{chip.label}</p>
-      ) : null}
+      {chip ? <p className="owner-desk-card-kicker mt-2">{chip.label}</p> : null}
       {tags?.length && !compact ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {tags.map((tag) => (
@@ -46,47 +44,47 @@ export function FreeOperatorAnswerCard({
           ))}
         </div>
       ) : null}
-      <h2 className={`mt-3 font-serif leading-[0.95] tracking-[-0.04em] text-[#06122b] ${compact ? 'text-[1.55rem]' : 'text-[2rem]'}`}>
+      <h2 className={`mt-3 font-serif leading-[0.95] tracking-[-0.04em] text-[#e6e1d6] ${compact ? 'text-[1.55rem]' : 'text-[2rem]'}`}>
         {answer.headline}
       </h2>
       {compact ? null : (
-        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#3d4d73]">{PUBLIC_PREVIEW_COPY}</p>
+        <p className="owner-desk-card-copy mt-3">{PUBLIC_PREVIEW_COPY}</p>
       )}
 
       <section className="mt-6">
-        <h3 className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#0066ff]">Facts</h3>
+        <h3 className="owner-desk-card-kicker">Facts</h3>
         <ul className="mt-3 space-y-2">
           {answer.facts.map((fact) => (
-            <li key={fact} className="rounded-2xl border border-[#c5d4f5] bg-[#eef3ff] px-4 py-3 text-[15px] leading-relaxed text-[#06122b]">
+            <li key={fact} className="owner-desk-fact">
               {fact}
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="mt-5 rounded-2xl border border-[#0066ff] bg-[#eef3ff] px-4 py-4">
-        <h3 className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#0066ff]">
+      <section className="owner-desk-coach-block mt-5">
+        <h3 className="owner-desk-card-kicker">
           Coach this tomorrow
         </h3>
-        <p className="mt-2 text-[16px] leading-relaxed text-[#06122b]">{answer.coachTomorrow}</p>
+        <p className="mt-2 text-[16px] leading-relaxed text-[#e6e1d6]">{answer.coachTomorrow}</p>
       </section>
 
-      <section className="mt-4 rounded-2xl border border-[#c5d4f5] bg-white px-4 py-4">
-        <h3 className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#003bb5]">Needs</h3>
-        <p className="mt-2 text-[15px] leading-relaxed text-[#3d4d73]">{answer.needs}</p>
+      <section className="owner-desk-need-block mt-4">
+        <h3 className="owner-desk-card-kicker">Needs</h3>
+        <p className="mt-2 text-[15px] leading-relaxed text-[#8b95a3]">{answer.needs}</p>
       </section>
 
       {compact && chip ? (
         <p className="mt-4">
-          <Link href={`/operator/answers/${answer.slug}`} className="text-sm font-semibold text-[#0066ff]">
+          <Link href={`/operator/answers/${answer.slug}`} className="owner-desk-card-link">
             Open this card →
           </Link>
         </p>
       ) : compact ? null : (
         <>
-          <p className="mt-6 text-sm leading-relaxed text-[#3d4d73]">{OWNER_SEAT_EOD.copy}</p>
+          <p className="mt-6 text-sm leading-relaxed text-[#8b95a3]">{OWNER_SEAT_EOD.copy}</p>
           <p className="mt-8">
-            <Link href="/operator" className="human-button human-button-primary text-sm">
+            <Link href="/operator" className="owner-desk-card-link">
               ← Back to Owner desk
             </Link>
           </p>

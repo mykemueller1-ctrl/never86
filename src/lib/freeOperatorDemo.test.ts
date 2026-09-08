@@ -230,6 +230,9 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('DAY1_IDENTITY_LINE');
     expect(ui).toContain('DAY1_PREVIEW_CONTRACT');
     expect(ui).toContain('DAY1_FRONT_PICKS');
+    expect(ui).toContain('WOW_HERO');
+    expect(ui).toContain('WOW_SUBLINE');
+    expect(ui).toContain('owner-desk-rail');
     expect(ui).not.toContain('DAY1_SOFT_DEFAULT');
     expect(ui).toContain('owner-desk-tray-label');
     expect(ui).not.toContain('Prime Cost Coach');
@@ -239,7 +242,7 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('/api/upload');
     expect(ui).not.toMatch(/router\.push/);
     expect(ui).toMatch(/goAsk\(ask/);
-    expect(ui).toMatch(/CTAP_SEAT1_PUBLIC_LABEL/);
+    expect(ui).toMatch(/CTAP_SEAT1_RESTAURANT_DEFAULT/);
     expect(ui).toMatch(/OPERATOR_V2_PLATES/);
     expect(ui).toMatch(/Roles on the card/);
     expect(ui).toMatch(/Daily compare/);
@@ -249,8 +252,11 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).not.toMatch(/\$[\d,]+/);
     expect(ui).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
-    expect(deskCss).toMatch(/#0066ff/);
-    expect(deskCss).toMatch(/#003bb5/);
+    expect(deskCss).toMatch(/#0B0D10/);
+    expect(deskCss).toMatch(/#1A1F26/);
+    expect(deskCss).toMatch(/#C9A36A/);
+    expect(deskCss).toMatch(/Never86/);
+    expect(deskCss).not.toMatch(/#0066ff|#003bb5/);
     expect(deskCss).toMatch(/\.owner-desk-tray\[hidden\]/);
     expect(deskCss).toMatch(/display:\s*none\s*!important/);
     expect(deskCss).toMatch(/\.owner-desk-tray-label/);

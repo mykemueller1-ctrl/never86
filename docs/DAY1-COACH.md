@@ -2,14 +2,26 @@
 
 **Surface:** `/operator` · Seat 1 · Community Tap  
 **Auth:** existing email + store magic link (PR 222). Do not rebuild login.  
-**Front screen:** Conversation-first coach. Human open ask + floor-noun branches.
+**Front screen:** WOW desk + conversation-first coach. Human open, then floor-noun branches. Not Option C truck-first.
+
+## WOW desk (first paint)
+
+1. Hero: **You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.**
+2. Subline: **Your prime coach is finally here. No back-office homework.**
+3. Visual: ink / charcoal `#0B0D10` / `#1A1F26`, quiet Never86 watermark, one amber accent. No toy big-blue CTA.
+4. Header: active restaurant / store name up top.
+5. Left rail honesty Missing panel: Schedules · Food · Drinks/Pop · Beer · Liquor. Empty = **Missing / bring a paper**. Never invent dollars.
+6. Conversation branches after the open. Snap / upload only after the invoice / truck path.
+7. Do not reintroduce Option C truck-first home.
+
+Code: `src/lib/wowDesk.ts` · LOM UI: `src/components/FreeOperatorPhone.tsx`
 
 ## Conversation first (do not miss)
 
 First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the plate. Not a tour.
 
 1. Operator lands on `/operator`.
-2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** (also OK: **What got weird at the shop?**) Chat mouth keeps **How can we help you?**
+2. WOW hero + subline first. Then floor voice: **What's the problem today?** Energy under it: **What's going on?** (also OK: **What got weird at the shop?**) Chat mouth keeps **How can we help you?**
 3. Branch by what they say. Floor nouns, not a sitemap.
 4. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
 5. Snap photo exists when a path needs a photo. It is not the robotic soft default.
@@ -85,6 +97,7 @@ No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 | Lock | File |
 |---|---|
+| WOW hero + Missing rail | `src/lib/wowDesk.ts` |
 | Open ask + branches + identity | `src/lib/day1Coach.ts` |
 | Invoice / truck plate (legacy `order-guide`) | `src/lib/operatorV2.ts` |
 | LOM UI | `src/components/FreeOperatorPhone.tsx` |

@@ -70,6 +70,9 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('DAY1_HELP_ENERGY');
     expect(phone).toContain('DAY1_IDENTITY_LINE');
     expect(phone).toContain('DAY1_PREVIEW_CONTRACT');
+    expect(phone).toContain('WOW_HERO');
+    expect(phone).toContain('WOW_SUBLINE');
+    expect(phone).toContain('wowRailFromFolders');
     expect(phone).toContain('firstPhotoWinLine');
     expect(phone).not.toContain('DAY1_SOFT_DEFAULT');
     expect(phone).not.toContain('Prime Cost Coach');

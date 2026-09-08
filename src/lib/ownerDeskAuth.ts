@@ -1,6 +1,6 @@
 import { escapeHtml } from './escapeHtml';
 
-/** Void Hunter blue. Magic-link mail and owner-desk first paint use this only. */
+/** Void Hunter blue. Magic-link mail only. /operator first paint is WOW ink, not this. */
 export const VOID_HUNTER_BLUE = '#0066ff';
 
 /** Signed-in owner first paint — SimpleOwnerDemo chat, not the card picker. */
