@@ -479,6 +479,14 @@ export async function activateOperatorSeat(
         } as const;
       }
 
+      if (claim.action !== 'create-isolated') {
+        throw new SeatActivationAbort({
+          ok: false,
+          error: 'No seat on this email yet. Claim one at /onboard.',
+          status: 404,
+        });
+      }
+
       await tx.execute(dsql`
         SELECT setval(
           pg_get_serial_sequence('seat_operators', 'id'),

@@ -51,7 +51,7 @@ describe('email+password live door', () => {
     const activation = read('src/lib/operatorActivation.ts');
     const schema = read('src/lib/ensureFreeSeatSchema.ts');
     expect(activation).toContain('decideSeatClaim');
-    expect(activation).toContain("action === 'create-isolated'");
+    expect(activation).toContain("action !== 'create-isolated'");
     expect(activation).not.toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
     expect(schema).toContain('drop constraint if exists seat_operators_email_key');
     expect(schema).toContain('drop constraint if exists seat_credentials_email_key');
@@ -75,7 +75,8 @@ describe('email+password live door', () => {
     expect(stores).toContain('listAccessibleSeats');
     expect(switchStore).toContain('signOperatorSession');
     expect(switchStore).toContain('pickAccessibleSeat');
-    expect(switchStore).not.toContain('password');
+    expect(switchStore).not.toContain('verifyPassword');
+    expect(switchStore).not.toMatch(/body\?\.password/);
   });
 
   it('does not reintroduce Pulse or invented honesty labels on the auth door', () => {

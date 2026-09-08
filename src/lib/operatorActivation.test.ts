@@ -107,7 +107,7 @@ describe('operatorActivation pure helpers', () => {
     const source = readFileSync(resolve('src/lib/operatorActivation.ts'), 'utf8');
     expect(source).toContain('const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName)');
     expect(source).toContain('decideSeatClaim');
-    expect(source).toContain("action === 'create-isolated'");
+    expect(source).toContain("action !== 'create-isolated'");
     expect(source).toMatch(/insert\(seatOperators\)[\s\S]*restaurantName,/);
     expect(source).toMatch(/insert\(seatLocations\)[\s\S]*name: restaurantName/);
     expect(source).not.toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
