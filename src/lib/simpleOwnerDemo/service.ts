@@ -129,7 +129,7 @@ export type SimpleOwnerDemoService = {
       }
     | { ok: false; status: number; error: string; code: string }
   >;
-  readiness(operatorId: string): Promise<SimpleOwnerReadiness>;
+  readiness(operatorId: string, restaurantName?: string | null): Promise<SimpleOwnerReadiness>;
 };
 
 export function createSimpleOwnerDemoService(deps: {
@@ -139,12 +139,13 @@ export function createSimpleOwnerDemoService(deps: {
 }): SimpleOwnerDemoService {
   const now = deps.now ?? (() => new Date());
 
-  async function snapshot(operatorId: string): Promise<SimpleOwnerReadiness> {
+  async function snapshot(operatorId: string, restaurantName?: string | null): Promise<SimpleOwnerReadiness> {
     const [uploads, askCount] = await Promise.all([
       deps.repo.listUploads(operatorId),
       deps.repo.countAsks(operatorId),
     ]);
-    return readinessFromUploads(operatorId, uploads, askCount);
+    const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
+    return readinessFromUploads(operatorId, uploads, askCount, seatName);
   }
 
   return {
@@ -194,7 +195,7 @@ export function createSimpleOwnerDemoService(deps: {
         createdAt: createdAt.toISOString(),
       };
       await deps.repo.insertUpload(upload);
-      return { ok: true, upload, readiness: await snapshot(operatorId) };
+      return { ok: true, upload, readiness: await snapshot(operatorId, seatName) };
     },
 
     async ask({ operatorId, question, tray = 'action', mouth = 'type', restaurantName }) {
@@ -222,7 +223,7 @@ export function createSimpleOwnerDemoService(deps: {
         deps.objects,
         seatName,
       );
-      const readiness = readinessFromUploads(operatorId, uploads);
+      const readiness = readinessFromUploads(operatorId, uploads, 0, seatName);
       const answer = composeAskAnswer({
         question: trimmed,
         tray,
@@ -253,12 +254,12 @@ export function createSimpleOwnerDemoService(deps: {
         ok: true,
         answer,
         record,
-        readiness: await snapshot(operatorId),
+        readiness: await snapshot(operatorId, seatName),
       };
     },
 
-    async readiness(operatorId) {
-      return snapshot(operatorId);
+    async readiness(operatorId, restaurantName) {
+      return snapshot(operatorId, restaurantName);
     },
   };
 }

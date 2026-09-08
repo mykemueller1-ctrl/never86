@@ -43,6 +43,11 @@ import {
 } from '@/lib/ctapPosLock';
 import { CTAP_TOAST_CONTAMINANT_SOURCE } from '@/lib/reportAdapters/sourceTags';
 import { restaurantNameHintFromOperatorId } from '@/lib/seatIsolation';
+import {
+  answerLastWeekPrime,
+  collectLastWeekPrime,
+  routeLastWeekPrimeQuestion,
+} from '@/lib/lastWeekPrimeCost';
 import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
@@ -61,6 +66,7 @@ export function readinessFromUploads(
   operatorId: string,
   uploads: readonly SimpleOwnerUploadRecord[],
   askCount = 0,
+  restaurantName?: string | null,
 ): SimpleOwnerReadiness {
   const kinds = new Set(uploads.map((row) => row.evidenceKind));
   const evidence = EMPTY_EVIDENCE.map((row) => {
@@ -90,6 +96,11 @@ export function readinessFromUploads(
     uploadCount: uploads.length,
     askCount,
     sourceTags,
+    lastWeekPrime: collectLastWeekPrime(
+      operatorId,
+      uploads,
+      restaurantName ?? restaurantNameHintFromOperatorId(operatorId),
+    ),
   };
 }
 
@@ -132,6 +143,34 @@ export function composeAskAnswer(input: {
   const clearlyPdq = /pdq|z ?report|large pizza|void_promo|void promo|hourly_sales|spec instruction|neg menu|menu category|uknown|food today|net sales yesterday|yesterday(?:'s)? (?:net )?sales/.test(
     qLower,
   );
+
+  if (routeLastWeekPrimeQuestion(input.question)) {
+    const snapshot = collectLastWeekPrime(
+      input.readiness.operatorId,
+      input.uploads,
+      restaurantName,
+    );
+    const prime = answerLastWeekPrime(snapshot);
+    const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
+    const sourceTags: SourceTag[] = [
+      ...prime.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      ...(lock ? [lock] : []),
+      { tag: prime.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${prime.slug}` },
+    ];
+    return {
+      slug: prime.slug,
+      headline: prime.headline,
+      facts: [...prime.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: prime.coachTomorrow,
+      needs: prime.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: prime.sampleDollars,
+      verifiedClose: prime.verifiedClose,
+    };
+  }
 
   const toastFacts = nagToastOk ? collectToastFacts(input.uploads) : null;
   const toastKind = toastFacts ? routeToastDeskQuestion(input.question) : null;

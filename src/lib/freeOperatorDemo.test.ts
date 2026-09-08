@@ -235,6 +235,8 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).not.toMatch(/useState\(\s*['"]Fun['"]/);
     expect(ui).not.toMatch(/Missing \/ bring a paper/);
     expect(ui).toContain('DAY1_FRONT_PICKS');
+    expect(ui).toContain('LAST_WEEK_PRIME_LOAD_ASK');
+    expect(ui).toContain('owner-desk-lastweek');
     expect(ui).not.toContain('DAY1_SOFT_DEFAULT');
     expect(ui).toContain('owner-desk-tray-label');
     expect(ui).not.toContain('Prime Cost Coach');
@@ -261,6 +263,7 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(deskCss).not.toMatch(/#0066ff|#003bb5/);
     expect(deskCss).toMatch(/owner-desk-watermark/);
     expect(deskCss).toMatch(/owner-desk-missing-rail/);
+    expect(deskCss).toMatch(/owner-desk-lastweek/);
     expect(deskCss).toMatch(/owner-desk-store/);
     expect(deskCss).toMatch(/\.owner-desk-tray\[hidden\]/);
     expect(deskCss).toMatch(/display:\s*none\s*!important/);
