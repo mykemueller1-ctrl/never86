@@ -20,8 +20,8 @@ describe('day-1 Option C hybrid', () => {
     expect(DAY1_COACH_ID).toBe('day1-coach-option-c');
     expect(DAY1_OPEN_ASK).toBe('How can we help you?');
     expect(DAY1_SOFT_DEFAULT).toBe('Got a truck ticket or invoice? Snap it.');
-    expect(DAY1_HOOK_PLATE_ID).toBe('order-guide');
-    expect(day1HookPlate(new Set()).id).toBe('order-guide');
+    expect(DAY1_HOOK_PLATE_ID).toBe('invoice-truck');
+    expect(day1HookPlate(new Set()).id).toBe('invoice-truck');
     expect(day1HookCoach(new Set()).ask).toBe(DAY1_SOFT_DEFAULT);
     expect(day1HookCoach(new Set()).chip).toMatch(/invoice|truck/i);
     expect(day1HookCoach(new Set()).chip).not.toMatch(/order guide/i);
@@ -31,7 +31,7 @@ describe('day-1 Option C hybrid', () => {
       'schedule',
       'labor-cards',
       'menu',
-      'order-guide',
+      'invoice-truck',
     ]);
   });
 
@@ -49,8 +49,9 @@ describe('day-1 Option C hybrid', () => {
   });
 
   it('after the ticket lands, next ask is schedule — not a module tour', () => {
+    expect(day1HookPlate(new Set(['invoice-truck'])).id).toBe('schedule');
     expect(day1HookPlate(new Set(['order-guide'])).id).toBe('schedule');
-    expect(day1HookPlate(new Set(['order-guide', 'schedule'])).id).toBe('labor-cards');
+    expect(day1HookPlate(new Set(['invoice-truck', 'schedule'])).id).toBe('labor-cards');
   });
 
   it('speaks invoice, truck, short, 86 — not suite voice or invented dollars', () => {
@@ -66,6 +67,7 @@ describe('day-1 Option C hybrid', () => {
       /\b(layer|spine|unlock|insight|orchestration|empower|leverage|holistic|flywheel|north star|ecosystem)\b/,
     );
     expect(JSON.stringify(DAY1_FOLDER_COACH)).not.toMatch(/\$\d/);
+    expect(firstPhotoWinLine('invoice-truck')).toMatch(/ticket is on this seat/i);
     expect(firstPhotoWinLine('order-guide')).toMatch(/ticket is on this seat/i);
     expect(day1CoachById('menu')?.ask).toMatch(/picture of the menu/i);
   });

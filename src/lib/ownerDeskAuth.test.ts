@@ -118,6 +118,11 @@ describe('magic-link owner-desk email', () => {
     const request = read('src/app/api/onboard/request/route.ts');
     expect(request).toContain('activationEmailPayload');
     expect(request).toContain('buildOwnerDeskActivationLink');
+    expect(request).toContain('classifyActivationEmailFailure');
+    expect(request).toContain('activationEmailUnavailable');
+    const activation = read('src/lib/operatorActivation.ts');
+    expect(activation).toContain('Use a real work email');
+    expect(activation).toContain('invalid_recipient');
     expect(request).not.toMatch(/#d4a017/);
     expect(request).not.toMatch(/Payroll\. Prices\. Process/);
     expect(request).not.toMatch(/Your secure Never 86'd sign-in link/);

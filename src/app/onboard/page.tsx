@@ -10,7 +10,7 @@ const PLATES = [
   { title: 'Schedules', line: 'Photo the week. Labor lives here.' },
   { title: 'Labor cards', line: 'Roles on the card. Daily compare to the clock.' },
   { title: 'Menu', line: 'Picture the plates. Cost the movers first.' },
-  { title: 'Order guides', line: 'What is Missing before the next truck.' },
+  { title: 'Invoice / truck', line: 'What is Missing before the next truck.' },
 ] as const;
 
 const inputClass =
@@ -80,7 +80,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Work email + store name. We email a secure link. Click it — you&apos;re in Seat 1. No password. No paperwork. First-class folders: schedule, labor cards, menu, order guide.
+                Work email + store name. We email a secure link. Click it — you&apos;re in Seat 1. No password. No paperwork. First-class folders: schedule, labor cards, menu, invoice / truck.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">

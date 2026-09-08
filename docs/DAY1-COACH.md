@@ -44,7 +44,7 @@ Shown after the first snap — not as the first-screen sitemap.
 | Labor cards | Labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats. |
 | Menu | Menu | Picture of the menu — top money plates first. Recipes suck; we figure the chaos. |
 
-Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads. Soft-default snap still files to the invoice / truck folder (`order-guide` id). Copy says invoice / truck / short — not order-guide ownership.
+Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads. Soft-default snap files to the invoice / truck folder (`invoice-truck` id). Legacy `order-guide` folder hints still land there. Copy says invoice / truck / short — not order-guide ownership.
 
 ## Vendor babysit (not on the first screen)
 
