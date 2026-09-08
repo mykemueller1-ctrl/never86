@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { NAG_TOAST_GT } from '@/lib/reportAdapters/nagToastGt';
 import { createMemoryObjectStore } from './objectStore';
 import { createMemoryRepository } from './repository';
 import { createSimpleOwnerDemoService } from './service';
@@ -51,9 +52,11 @@ describe('Toast seat desk — upload then ask', () => {
     expect(asked.answer.verifiedClose).toBe(true);
     expect(asked.answer.sampleDollars).toBe('toast-verified');
     expect(asked.answer.inventedClose).toBe(false);
-    expect(asked.answer.facts.join(' ')).toMatch(/1,211\.85/);
-    expect(asked.answer.facts.join(' ')).toMatch(/35\.56/);
-    expect(asked.answer.facts.join(' ')).toMatch(/3,408\.15/);
+    expect(asked.answer.facts.join(' ')).toContain(NAG_TOAST_GT.laborCost.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+    expect(asked.answer.facts.join(' ')).toContain(String(NAG_TOAST_GT.laborPctNet));
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.dayNetSales.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
     expect(asked.record.verifiedClose).toBe(true);
   });
 
@@ -67,10 +70,16 @@ describe('Toast seat desk — upload then ask', () => {
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
     expect(asked.answer.verifiedClose).toBe(true);
-    expect(asked.answer.facts.join(' ')).toMatch(/3,408\.15/);
-    expect(asked.answer.facts.join(' ')).toMatch(/36,827\.34/);
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.dayNetSales.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.weekNetSales.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
     expect(asked.answer.facts.join(' ')).toMatch(/Estimated/);
-    expect(asked.answer.facts.join(' ')).toMatch(/6,619\.00/);
+    expect(asked.answer.facts.join(' ')).toContain(
+      NAG_TOAST_GT.strongestItemNet.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
     expect(asked.answer.sourceTags.some((tag) => tag.tag === 'estimated')).toBe(true);
   });
 
@@ -84,7 +93,8 @@ describe('Toast seat desk — upload then ask', () => {
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
     expect(asked.answer.verifiedClose).toBe(true);
-    expect(asked.answer.headline).toMatch(/24/);
+    expect(asked.answer.headline).toContain(String(NAG_TOAST_GT.voidLines));
+    expect(asked.answer.facts.join(' ').toLowerCase()).not.toMatch(/\b(karlee|sturtz|server 1|employee)\b/);
     expect(asked.answer.facts.join(' ')).toMatch(/Burger × 6/);
     expect(asked.answer.needs).not.toMatch(/PDQ Void_Promo/);
     expect(asked.answer.facts.join(' ').toLowerCase()).not.toMatch(/thief|theft/);

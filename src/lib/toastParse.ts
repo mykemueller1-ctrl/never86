@@ -24,6 +24,7 @@ export type ToastVoidItem = {
 };
 
 export type ToastFactPack = {
+  pos?: 'toast';
   family: ToastFamily;
   filename: string;
   businessDate: string | null;
@@ -145,6 +146,7 @@ export function decodeToastText(bytes: Uint8Array): string | null {
 function emptyPack(family: ToastFamily, filename: string): ToastFactPack {
   const dates = datesFromFilename(filename);
   return {
+    pos: 'toast',
     family,
     filename,
     businessDate: dates.start && dates.end && dates.start === dates.end ? dates.start : null,

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { NAG_TOAST_GT } from './reportAdapters/nagToastGt';
 import {
   answerToastDeskQuestion,
   collectToastFacts,
@@ -49,26 +50,26 @@ describe('Toast parsers — NAG ground truth', () => {
     const pack = parseToastReport(load(FILES.labor), FILES.labor);
     expect(pack?.family).toBe('labor-breakdown');
     expect(pack?.businessDate).toBe('2026-08-31');
-    expect(pack?.laborCost).toBe(1211.85);
-    expect(pack?.laborPctNet).toBe(35.56);
-    expect(pack?.netSales).toBe(3408.15);
-    expect(pack?.grossSales).toBe(3570.5);
-    expect(pack?.laborPctGross).toBe(33.94);
+    expect(pack?.laborCost).toBe(NAG_TOAST_GT.laborCost);
+    expect(pack?.laborPctNet).toBe(NAG_TOAST_GT.laborPctNet);
+    expect(pack?.netSales).toBe(NAG_TOAST_GT.dayNetSales);
+    expect(pack?.grossSales).toBe(NAG_TOAST_GT.dayGrossSales);
+    expect(pack?.laborPctGross).toBe(NAG_TOAST_GT.laborPctGross);
   });
 
   it('Q8 SalesSummary day + week', () => {
     const day = parseToastReport(load(FILES.salesDay), FILES.salesDay);
     const week = parseToastReport(load(FILES.salesWeek), FILES.salesWeek);
-    expect(day?.netSales).toBe(3408.15);
-    expect(day?.businessDate).toBe('2026-08-31');
-    expect(week?.netSales).toBe(36827.34);
-    expect(week?.periodStart).toBe('2026-08-24');
-    expect(week?.periodEnd).toBe('2026-08-30');
+    expect(day?.netSales).toBe(NAG_TOAST_GT.dayNetSales);
+    expect(day?.businessDate).toBe(NAG_TOAST_GT.laborDate);
+    expect(week?.netSales).toBe(NAG_TOAST_GT.weekNetSales);
+    expect(week?.periodStart).toBe(NAG_TOAST_GT.weekStart);
+    expect(week?.periodEnd).toBe(NAG_TOAST_GT.weekEnd);
   });
 
   it('Q10 ItemSelectionDetails Void?=true is 24 lines', () => {
     const pack = parseToastReport(load(FILES.items), FILES.items);
-    expect(pack?.voidLineCount).toBe(24);
+    expect(pack?.voidLineCount).toBe(NAG_TOAST_GT.voidLines);
     expect(pack?.voidItems).toEqual([
       { item: 'Burger', count: 6 },
       { item: 'Fries', count: 5 },
@@ -77,7 +78,8 @@ describe('Toast parsers — NAG ground truth', () => {
       { item: 'House Salad', count: 3 },
       { item: 'Wings', count: 3 },
     ]);
-    expect(pack?.itemDayNet['2026-08-25']).toBe(6619);
+    expect(pack?.itemDayNet[NAG_TOAST_GT.strongestItemDay]).toBe(NAG_TOAST_GT.strongestItemNet);
+    expect(pack?.voidItems.every((row) => !/\b(server|employee|id)\b/i.test(row.item))).toBe(true);
   });
 });
 

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { findFreeOperatorPrivacyHits } from '@/lib/freeOperatorDemo';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
-import { createMemoryObjectStore, signR2Put } from './objectStore';
+import { createMemoryObjectStore, signR2Get, signR2Put } from './objectStore';
 import { createMemoryRepository } from './repository';
 import { createSimpleOwnerDemoService } from './service';
 import { signDemoTenant, verifyDemoTenant } from './tenant';
@@ -222,6 +222,23 @@ describe('R2 put signer', () => {
     expect(headers.Authorization).toMatch(/^AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE\//);
     expect(headers.Authorization).not.toContain('super-secret-do-not-leak');
     expect(headers['x-amz-content-sha256']).toHaveLength(64);
+    expect(JSON.stringify(headers)).not.toMatch(/super-secret/);
+  });
+
+  it('signs GET without embedding the secret', () => {
+    const headers = signR2Get({
+      config: {
+        accountId: 'acct',
+        accessKeyId: 'AKIAEXAMPLE',
+        secretAccessKey: 'super-secret-do-not-leak',
+        bucket: 'never86-demo',
+      },
+      host: 'acct.r2.cloudflarestorage.com',
+      objectKey: 'simple-owner/demo:a/file.pdf',
+      now: new Date('2026-09-04T12:00:00.000Z'),
+    });
+    expect(headers.Authorization).toMatch(/^AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE\//);
+    expect(headers.Authorization).not.toContain('super-secret-do-not-leak');
     expect(JSON.stringify(headers)).not.toMatch(/super-secret/);
   });
 });

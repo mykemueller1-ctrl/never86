@@ -9,7 +9,8 @@ import {
   vendorTotalKey,
 } from '@/lib/invoiceIdentity';
 import { decodeInvoiceSource, looksLikeVendorInvoice, parseVendorInvoice } from '@/lib/vendorInvoiceParse';
-import { detectToastFamily, packFromSourceTag, toastSourceTags } from '@/lib/toastParse';
+import { detectReport } from '@/lib/reportAdapters';
+import { packFromSourceTag, toastSourceTags } from '@/lib/toastParse';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -31,7 +32,7 @@ async function hydrateToastUploads(
   if (!objects.get) return uploads;
   return Promise.all(
     uploads.map(async (upload) => {
-      if (!detectToastFamily(upload.filename)) return upload;
+      if (!detectReport(upload.filename)) return upload;
       if (upload.sourceTags.some((tag) => packFromSourceTag(tag))) return upload;
       const blob = await objects.get?.({ operatorId: upload.operatorId, objectKey: upload.objectKey });
       if (!blob) return upload;
