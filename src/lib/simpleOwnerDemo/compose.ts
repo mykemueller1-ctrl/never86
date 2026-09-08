@@ -7,7 +7,7 @@ import {
 } from '@/lib/freeOperatorDemo';
 import {
   DAY1_OPEN_ASK,
-  DAY1_OPEN_ENERGY,
+  DAY1_SUBLINE,
   day1HookCoach,
   firstPhotoWinLine,
   looksLikeDay1VendorAsk,
@@ -94,7 +94,7 @@ export function composeAskAnswer(input: {
 
   const evidenceFact =
     input.uploads.length === 0
-      ? `${DAY1_OPEN_ASK} ${DAY1_OPEN_ENERGY} Conversation first. Invoice paper when they choose it.`
+      ? `${DAY1_OPEN_ASK} ${DAY1_SUBLINE} Missing stays Missing. Invoice paper when they choose it.`
       : `This seat has ${input.uploads.length} source-tagged upload(s). Ready: ${ready.join(', ') || 'none'}. Still NEED: ${missing.join(', ') || 'none'}.`;
 
   const filled = filledPlateIds(input.readiness.folders ?? []);
@@ -102,7 +102,7 @@ export function composeAskAnswer(input: {
   const lastReady = (input.readiness.folders ?? []).filter((row) => row.state === 'READY').at(-1);
   const folderFact =
     filled.size === 0
-      ? `Day-1 open: ${DAY1_OPEN_ASK} ${DAY1_OPEN_ENERGY}`
+      ? `Day-1 open: ${DAY1_OPEN_ASK} ${DAY1_SUBLINE}`
       : `Ready: ${folderReady.join(', ')}. Still Missing: ${folderNeed.join(', ') || 'none'}. Next snap: ${hook.ask}`;
 
   const laborFact = laborAsk

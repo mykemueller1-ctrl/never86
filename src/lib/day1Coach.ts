@@ -8,20 +8,28 @@ import {
 } from './operatorV2';
 
 /**
- * Day-1 conversation-first coach. Open human ask + floor-noun branches.
+ * Day-1 operator-first WOW desk. Adult ink desk + Missing honesty spine.
  * Invoice / truck is one path after they choose it — not the stiff first CTA.
- * Not order-guide ownership. Not a SaaS tour. Not a module sitemap.
+ * Not order-guide ownership. Not a SaaS tour. Not a Prime Cost Coach tile.
  */
 export const DAY1_INVOICE_PLATE_ID: OperatorV2PlateId = 'invoice-truck';
 /** Photo folder after they choose invoice / truck. Not the empty-desk hero. */
 export const DAY1_HOOK_PLATE_ID: OperatorV2PlateId = DAY1_INVOICE_PLATE_ID;
-export const DAY1_COACH_ID = 'day1-coach-conversation';
-export const DAY1_OPEN_ASK = "What's the problem today?";
-export const DAY1_OPEN_ENERGY = "What's going on?";
+export const DAY1_COACH_ID = 'day1-coach-operator-wow';
+/** Default A open — do not soften to “what’s your problem.” */
+export const DAY1_OPEN_ASK =
+  "You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.";
+/** Positioning only. Not a Prime Cost Coach KPI tile. */
+export const DAY1_SUBLINE = 'Your prime coach is finally here. No back-office homework.';
+/** Kept for compose / chat energy. Not the first-paint hero. */
+export const DAY1_OPEN_ENERGY = DAY1_SUBLINE;
 export const DAY1_WEIRD_ASK = 'What got weird at the shop?';
 export const DAY1_HELP_ENERGY = 'How can we help you?';
 export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first · was you";
 export const DAY1_PROMISE_LINE = 'Find the leak. Assign the fix. Keep the receipt.';
+export const DAY1_STORE_NAME_FALLBACK = 'Community Tap';
+export const DAY1_MISSING_EMPTY = 'Missing / bring a paper';
+export const DAY1_MISSING_PAPER = 'Paper in';
 export const DAY1_PREVIEW_CONTRACT =
   'Check the evidence. Name the owner. Draft the fix. Proof step. Nothing sends without you.';
 export const DAY1_INVOICE_PATH_ASK =
@@ -44,6 +52,24 @@ export type Day1FolderCoach = {
 
 export type Day1FrontPickId = 'bartender-leak' | 'behind-on-books' | 'too-many-hats' | 'invoice-truck';
 export type Day1FrontAction = 'photo' | 'ask';
+export type Day1MissingSpineId = 'schedules' | 'food' | 'pop' | 'beer' | 'liquor';
+export type Day1MissingTray = 'labor' | 'food' | 'pop' | 'beer' | 'liquor';
+
+export type Day1MissingSpine = {
+  id: Day1MissingSpineId;
+  label: string;
+  tray: Day1MissingTray;
+  plateId: OperatorV2PlateId;
+};
+
+/** Honesty spine. Empty categories stay Missing — never a fake dollar. */
+export const DAY1_MISSING_SPINE: readonly Day1MissingSpine[] = [
+  { id: 'schedules', label: 'Schedules', tray: 'labor', plateId: 'schedule' },
+  { id: 'food', label: 'Food', tray: 'food', plateId: 'menu' },
+  { id: 'pop', label: 'Drinks/Pop', tray: 'pop', plateId: 'invoice-truck' },
+  { id: 'beer', label: 'Beer', tray: 'beer', plateId: 'invoice-truck' },
+  { id: 'liquor', label: 'Liquor', tray: 'liquor', plateId: 'invoice-truck' },
+];
 
 export type Day1FrontPick = {
   id: Day1FrontPickId;
@@ -176,15 +202,38 @@ export function looksLikeDay1BartenderAsk(question: string): boolean {
   return /\b(bartender|drawer|leak|theft|till)\b/i.test(question);
 }
 
+export function day1MissingSpineState(
+  id: Day1MissingSpineId,
+  filled: ReadonlySet<string>,
+): 'missing' | 'paper' {
+  if (id === 'schedules' && (filledHasPlate(filled, 'schedule') || filledHasPlate(filled, 'labor-cards'))) {
+    return 'paper';
+  }
+  if (id === 'food' && (filledHasPlate(filled, 'menu') || filledHasPlate(filled, 'invoice-truck'))) {
+    return 'paper';
+  }
+  return 'missing';
+}
+
+export function day1MissingSpineCopy(
+  id: Day1MissingSpineId,
+  filled: ReadonlySet<string>,
+): string {
+  return day1MissingSpineState(id, filled) === 'paper' ? DAY1_MISSING_PAPER : DAY1_MISSING_EMPTY;
+}
+
 export function day1FrontLeadBlob(): string {
   return [
     DAY1_OPEN_ASK,
+    DAY1_SUBLINE,
     DAY1_OPEN_ENERGY,
     DAY1_WEIRD_ASK,
     DAY1_HELP_ENERGY,
     DAY1_IDENTITY_LINE,
     DAY1_PROMISE_LINE,
     DAY1_PREVIEW_CONTRACT,
+    DAY1_STORE_NAME_FALLBACK,
+    ...DAY1_MISSING_SPINE.map((row) => `${row.label} ${DAY1_MISSING_EMPTY}`),
   ].join(' ');
 }
 
@@ -202,10 +251,15 @@ export function day1FrontVoiceIsClean(text = day1FrontCopyBlob()): boolean {
 
 export function day1LeadIsConversationFirst(text = day1FrontLeadBlob()): boolean {
   return (
-    /what's the problem today/i.test(text) &&
-    /what's going on|what got weird/i.test(text) &&
+    /you're not crazy\. the stack is/i.test(text) &&
+    /prime coach is finally here/i.test(text) &&
+    /no back-office homework/i.test(text) &&
+    /schedules/i.test(text) &&
+    /drinks\/pop/i.test(text) &&
+    /missing \/ bring a paper/i.test(text) &&
     !STIFF_TRUCK_LEAD.test(text) &&
     !/order guide/i.test(text) &&
-    !/all-in-one dashboard/i.test(text)
+    !/all-in-one dashboard/i.test(text) &&
+    !/prime cost coach/i.test(text)
   );
 }

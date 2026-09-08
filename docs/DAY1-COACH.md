@@ -2,19 +2,22 @@
 
 **Surface:** `/operator` · Seat 1 · Community Tap  
 **Auth:** existing email + store magic link (PR 222). Do not rebuild login.  
-**Front screen:** Conversation-first coach. Human open ask + floor-noun branches.
+**Front screen:** Adult operator-first WOW. Ink desk + Missing honesty spine. Not soft “what’s your problem.”
 
-## Conversation first (do not miss)
+## Operator-first WOW (do not miss)
 
 First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the plate. Not a tour.
 
 1. Operator lands on `/operator`.
-2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** (also OK: **What got weird at the shop?**) Chat mouth keeps **How can we help you?**
-3. Branch by what they say. Floor nouns, not a sitemap.
-4. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
-5. Snap photo exists when a path needs a photo. It is not the robotic soft default.
+2. Open (default A): **You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.**
+3. Subline: **Your prime coach is finally here. No back-office homework.** (“prime coach” is positioning, not a KPI tile.)
+4. Header: restaurant / store name up top (active seat name, e.g. Community Tap).
+5. Left rail — Missing honesty spine: **Schedules · Food · Drinks/Pop · Beer · Liquor**. Empty ones say **Missing / bring a paper**. Never fake $.
+6. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
+7. Snap photo exists when they choose a paper path. It is not the first CTA.
 
 Fail this line as the hero subhead: **Got a truck ticket or invoice? Snap it.**
+Fail this visual: toy Void Hunter blue CTAs, emoji cheer, Prime Cost Coach tile.
 
 | Pick | Action |
 |---|---|
@@ -35,8 +38,8 @@ Promise (not a tour): **Find the leak. Assign the fix. Keep the receipt.**
 
 One screen. Ask → one action before dinner.
 
-- Home is the open ask + branches + chat mouth.
-- Snap photo / Add file appear when they pick invoice / truck or after the first paper lands.
+- Home is the open + Missing rail + quiet floor nouns + chat mouth.
+- Snap photo / Add file appear when they pick a paper path (Missing rail or invoice / truck) or after the first paper lands.
 - Prime Cost Coach / “3 of 3 ready” stays off this screen (dashboard creep).
 - Labor / food trays are progressive disclosure after the first snap.
 - Bottom chrome is quiet adult ops (Desk / Food / Labor / Pop / Beer / Liquor). Hidden on the empty first screen. Never a consumer emoji bar.
@@ -96,9 +99,9 @@ No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 ## Voice
 
-Prefer: problem, going on, bartender, drawer, Z, books, 30-60-90, P&L, hats, invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
+Prefer: not crazy, the stack, weight, run your shop, win, prime coach, missing, bring a paper, bartender, drawer, Z, books, 30-60-90, P&L, hats, invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
 
-Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem, Prime Cost Coach, order-guide lead, SaaS tour.
+Ban: layer, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem, Prime Cost Coach tile, order-guide lead, SaaS tour, toy blue CTAs.
 
 Patterns live in `docs/company/OPERATOR_VOICE.md`. Day-1 open is Wave 0 from the suck-in bank: pain first, not welcome-to-onboarding.
 
@@ -108,4 +111,6 @@ Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. 
 
 ## Hold
 
-PR #224 Stream A locks stay on hold. Do not merge that draft into this conversation-first screen.
+PR #224 Stream A locks stay on hold. Do not merge that draft into this screen.
+PR #78 stays untouched.
+Open draft PR #230 (soft promise / seat-grain polish) is superseded by this operator-first WOW packet and should close.

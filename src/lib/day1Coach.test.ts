@@ -8,10 +8,14 @@ import {
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PATH_ASK,
   DAY1_INVOICE_PLATE_ID,
+  DAY1_MISSING_EMPTY,
+  DAY1_MISSING_SPINE,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
   DAY1_PROMISE_LINE,
+  DAY1_STORE_NAME_FALLBACK,
+  DAY1_SUBLINE,
   DAY1_WEIRD_ASK,
   day1CoachById,
   day1FrontCopyBlob,
@@ -20,25 +24,31 @@ import {
   day1HookCoach,
   day1HookPlate,
   day1LeadIsConversationFirst,
+  day1MissingSpineCopy,
   firstPhotoWinLine,
   looksLikeDay1BartenderAsk,
   looksLikeDay1VendorAsk,
 } from './day1Coach';
 
-describe('day-1 conversation-first coach', () => {
-  it('opens human — not the stiff truck / invoice CTA', () => {
-    expect(DAY1_COACH_ID).toBe('day1-coach-conversation');
-    expect(DAY1_OPEN_ASK).toBe("What's the problem today?");
-    expect(DAY1_OPEN_ENERGY).toBe("What's going on?");
+describe('day-1 operator-first WOW coach', () => {
+  it('opens adult — not soft problem, not the stiff truck / invoice CTA', () => {
+    expect(DAY1_COACH_ID).toBe('day1-coach-operator-wow');
+    expect(DAY1_OPEN_ASK).toBe(
+      "You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.",
+    );
+    expect(DAY1_SUBLINE).toBe('Your prime coach is finally here. No back-office homework.');
+    expect(DAY1_OPEN_ENERGY).toBe(DAY1_SUBLINE);
     expect(DAY1_WEIRD_ASK).toBe('What got weird at the shop?');
     expect(DAY1_HELP_ENERGY).toBe('How can we help you?');
+    expect(DAY1_STORE_NAME_FALLBACK).toBe('Community Tap');
     expect(DAY1_IDENTITY_LINE).toMatch(/built by Myke Mueller/);
     expect(DAY1_IDENTITY_LINE).toMatch(/operator first/);
     expect(DAY1_IDENTITY_LINE).toMatch(/was you/);
     expect(DAY1_PROMISE_LINE).toMatch(/Find the leak/);
     expect(DAY1_PREVIEW_CONTRACT).toMatch(/Nothing sends without you/);
+    expect(DAY1_OPEN_ASK).not.toMatch(/what's your problem/i);
     expect(DAY1_OPEN_ASK).not.toMatch(/got a truck ticket or invoice/i);
-    expect(DAY1_OPEN_ENERGY).not.toMatch(/got a truck ticket or invoice/i);
+    expect(DAY1_SUBLINE).not.toMatch(/got a truck ticket or invoice/i);
     expect(DAY1_INVOICE_PATH_ASK.toLowerCase()).not.toMatch(/order guide/);
     expect(DAY1_HOOK_PLATE_ID).toBe('invoice-truck');
     expect(DAY1_INVOICE_PLATE_ID).toBe('invoice-truck');
@@ -52,6 +62,24 @@ describe('day-1 conversation-first coach', () => {
       'menu',
       'invoice-truck',
     ]);
+  });
+
+  it('keeps the Missing honesty spine — no fake dollars', () => {
+    expect(DAY1_MISSING_SPINE.map((row) => row.label)).toEqual([
+      'Schedules',
+      'Food',
+      'Drinks/Pop',
+      'Beer',
+      'Liquor',
+    ]);
+    expect(DAY1_MISSING_EMPTY).toBe('Missing / bring a paper');
+    for (const row of DAY1_MISSING_SPINE) {
+      expect(day1MissingSpineCopy(row.id, new Set())).toBe('Missing / bring a paper');
+    }
+    expect(day1MissingSpineCopy('schedules', new Set(['schedule']))).toBe('Paper in');
+    expect(day1MissingSpineCopy('food', new Set(['invoice-truck']))).toBe('Paper in');
+    expect(day1MissingSpineCopy('beer', new Set(['invoice-truck']))).toBe('Missing / bring a paper');
+    expect(JSON.stringify(DAY1_MISSING_SPINE)).not.toMatch(/\$\d/);
   });
 
   it('keeps branches as floor nouns — conversation first, invoice when they choose it', () => {
@@ -77,11 +105,13 @@ describe('day-1 conversation-first coach', () => {
     expect(day1HookPlate(new Set(['invoice-truck', 'schedule'])).id).toBe('labor-cards');
   });
 
-  it('speaks problem, drawer, Z — not suite voice or invented dollars', () => {
+  it('speaks weight, hats, missing — not suite voice or invented dollars', () => {
     const text = day1FrontCopyBlob();
-    expect(text).toMatch(/what's the problem today/i);
-    expect(text).toMatch(/what's going on/i);
-    expect(text).toMatch(/what got weird at the shop/i);
+    expect(text).toMatch(/you're not crazy\. the stack is/i);
+    expect(text).toMatch(/prime coach is finally here/i);
+    expect(text).toMatch(/no back-office homework/i);
+    expect(text).toMatch(/community tap/i);
+    expect(text).toMatch(/missing \/ bring a paper/i);
     expect(text).toMatch(/how can we help you/i);
     expect(text).toMatch(/bartender/i);
     expect(text).toMatch(/drawer/i);
