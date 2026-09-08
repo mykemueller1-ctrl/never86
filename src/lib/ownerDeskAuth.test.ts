@@ -62,6 +62,8 @@ describe('owner desk post-auth redirect', () => {
   it('keeps the authenticated first screen as the SimpleOwnerDemo composer', () => {
     const operator = read('src/app/operator/page.tsx');
     const phone = read('src/components/FreeOperatorPhone.tsx');
+    expect(operator).toContain('readOperatorSession');
+    expect(operator).toContain('OperatorSignIn');
     expect(operator).toContain('SimpleOwnerDemo');
     expect(phone).toContain('Snap photo');
     expect(phone).toContain('DAY1_HOOK_PLATE_ID');

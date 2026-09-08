@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 import { SimpleOwnerDemo } from '@/components/FreeOperatorPhone';
+import { readOperatorSession } from '@/lib/readOperatorSession';
+import { OperatorSignIn } from './OperatorSignIn';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
   title: "Owner desk — Community Tap seat 1 | Never 86'd",
@@ -13,7 +18,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function OperatorPhonePage() {
+export default async function OperatorPhonePage() {
+  const session = await readOperatorSession();
+  if (!session) {
+    return <OperatorSignIn />;
+  }
   return (
     <main className="owner-desk-page min-h-screen">
       <SimpleOwnerDemo />
