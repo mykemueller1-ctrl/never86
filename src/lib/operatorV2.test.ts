@@ -9,19 +9,23 @@ import {
   filledPlateIds,
   isOperatorV2PlateId,
   nextMissingPlate,
+  normalizePlateId,
+  plateById,
   projectFoldersFromKinds,
   spawnLaborRoleCards,
 } from './operatorV2';
 
 describe('Operator V2 first-class paper-shop folders', () => {
-  it('locks schedule and labor cards as first-class OCR folders beside menu and order guide', () => {
+  it('locks schedule and labor cards as first-class OCR folders beside menu and invoice / truck', () => {
     expect(OPERATOR_V2_BLUE).toBe('#0066ff');
     expect(OPERATOR_V2_PLATES.map((plate) => plate.id)).toEqual([
       'schedule',
       'labor-cards',
       'menu',
-      'order-guide',
+      'invoice-truck',
     ]);
+    expect(OPERATOR_V2_PLATES.find((plate) => plate.id === 'invoice-truck')?.label).toBe('Invoice / truck');
+    expect(JSON.stringify(OPERATOR_V2_PLATES)).not.toMatch(/Order guide/);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.ocrInput === true)).toBe(true);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.firstClass === true)).toBe(true);
     expect(OPERATOR_V2_PLATES.every((plate) => plate.deferred === false)).toBe(true);
@@ -29,6 +33,9 @@ describe('Operator V2 first-class paper-shop folders', () => {
     expect(nextMissingPlate(new Set(['schedule'])).id).toBe('labor-cards');
     expect(isOperatorV2PlateId('labor-cards')).toBe(true);
     expect(isOperatorV2PlateId('timeclock')).toBe(false);
+    expect(isOperatorV2PlateId('invoice-truck')).toBe(true);
+    expect(normalizePlateId('order-guide')).toBe('invoice-truck');
+    expect(plateById('order-guide')?.id).toBe('invoice-truck');
   });
 
   it('flips folder chips only when that OCR file lands', () => {
@@ -41,6 +48,9 @@ describe('Operator V2 first-class paper-shop folders', () => {
     expect(afterSchedule.find((folder) => folder.id === 'labor-cards')?.state).toBe('NEED');
     expect(afterSchedule.find((folder) => folder.id === 'menu')?.state).toBe('NEED');
     expect(filledPlateIds(afterSchedule).has('schedule')).toBe(true);
+
+    const legacyTicket = projectFoldersFromKinds(new Set(['order-guide']));
+    expect(legacyTicket.find((folder) => folder.id === 'invoice-truck')?.state).toBe('READY');
   });
 
   it('spawns role-named labor cards from the schedule and keeps punch Missing until the clock', () => {

@@ -44,6 +44,47 @@ export function emailSendSucceeded(
   return Boolean(result && !result.error);
 }
 
+/** Resend invalid-recipient / invalid `to` is a caller mistake — HTTP 400, not 503. */
+export function isResendInvalidRecipient(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const rec = error as { name?: unknown; message?: unknown; statusCode?: unknown };
+  const name = String(rec.name ?? '').toLowerCase();
+  const message = String(rec.message ?? '').toLowerCase();
+  if (name === 'invalid_recipient' || name.includes('invalid_recipient')) return true;
+  if (/invalid[_\s-]?recipient/.test(message)) return true;
+  const looksInvalid =
+    name === 'validation_error' || rec.statusCode === 400 || rec.statusCode === 422;
+  return looksInvalid && /invalid/.test(message) && /\b(to|recipient|email|address)\b/.test(message);
+}
+
+export type ActivationEmailFailure = {
+  status: 400 | 503;
+  code: 'invalid_recipient' | 'activation_email_unavailable';
+  error: string;
+};
+
+export function activationEmailFailure(error: unknown): ActivationEmailFailure {
+  if (error && typeof error === 'object' && 'code' in error && error.code === 'invalid_recipient') {
+    return {
+      status: 400,
+      code: 'invalid_recipient',
+      error: 'That email cannot receive mail. Check the address.',
+    };
+  }
+  if (isResendInvalidRecipient(error)) {
+    return {
+      status: 400,
+      code: 'invalid_recipient',
+      error: 'That email cannot receive mail. Check the address.',
+    };
+  }
+  return {
+    status: 503,
+    code: 'activation_email_unavailable',
+    error: 'Activation email is unavailable. Try again later.',
+  };
+}
+
 export async function sendWelcomeEmail(email: string, name?: string) {
   const firstName = name?.split(' ')[0] || 'there';
 

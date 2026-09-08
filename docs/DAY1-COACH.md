@@ -2,33 +2,37 @@
 
 **Surface:** `/operator` · Seat 1 · Community Tap  
 **Auth:** existing email + store magic link (PR 222). Do not rebuild login.  
-**Front screen:** Option C hybrid. Open ask + soft default physical artifact.
+**Front screen:** Conversation-first coach. Human open ask + floor-noun branches.
 
-## Option C hybrid (do not miss)
+## Conversation first (do not miss)
 
 First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the plate. Not a tour.
 
 1. Operator lands on `/operator`.
-2. Open ask, floor voice: **How can we help you?**
-3. Soft default under it: **Got a truck ticket or invoice? Snap it.** Liquor / distributor invoice, truck ticket, or a handwritten short.
-4. They tap **Snap photo**. Camera opens. One paper lands.
-5. That is the win. Stop. No module map. No KPI tiles. No order-guide ownership as the first aha.
+2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** Chat mouth keeps **How can we help you?**
+3. Branch by what they say. Floor nouns, not a sitemap.
+4. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
+5. Snap photo exists when a path needs a photo. It is not the robotic soft default.
 
-Secondary choices stay floor nouns only. One pick → one action.
+Fail this line as the hero subhead: **Got a truck ticket or invoice? Snap it.**
 
 | Pick | Action |
 |---|---|
-| DoorDash statement | Snap the statement |
-| Fee line | Ask the DoorDash take on the fee line |
-| What's 86'd | Ask what's 86'd |
+| Bartender leak | Ask for the name. Drawer and Z stay on that seat. Do not name a thief from a guess. |
+| Behind on books | 30-60-90 or a P&L surprise. Conversation. |
+| Too many hats | What's the one thing off the plate tonight. |
+| Invoice / truck | Snap when they choose this path. |
 
-Do **not** default to “snap this week’s order guide.” Order guide is a later folder, not day-1 ownership.
+Do **not** default to “snap this week’s order guide.” Internal plate id is `invoice-truck`. Leftover `order-guide` normalizes to it.
+
+Quiet identity, not a SaaS tour: **built by Myke Mueller · Never86'd · operator first · was you**
 
 ## LOM
 
 One screen. Ask → one action before dinner.
 
-- Home is the open ask + soft default + Snap photo / Add file.
+- Home is the open ask + branches + chat mouth.
+- Snap photo / Add file appear when they pick invoice / truck or after the first paper lands.
 - Prime Cost Coach / “3 of 3 ready” stays off this screen (dashboard creep).
 - Labor / food trays are progressive disclosure after the first snap.
 - Bottom chrome is quiet adult ops (Desk / Food / Labor / Pop / Beer / Liquor). Hidden on the empty first screen. Never a consumer emoji bar.
@@ -39,12 +43,12 @@ Shown after the first snap — not as the first-screen sitemap.
 
 | Folder | Chip | Ask |
 |---|---|---|
-| Invoice / truck | Invoice / truck | Got a truck ticket or invoice? Snap it. |
+| Invoice / truck | Invoice / truck | Truck ticket or invoice — snap it when you want that paper off the plate. |
 | Schedule | Week schedule | Can you snap this week’s schedule? We’ll see who’s posted in and out. Labor lives on that grid. |
 | Labor cards | Labor cards | Got labor cards, or is it shift / role specific? Snap how this shop runs the seats. |
 | Menu | Menu | Picture of the menu — top money plates first. Recipes suck; we figure the chaos. |
 
-Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads. Soft-default snap still files to the invoice / truck folder (`order-guide` id). Copy says invoice / truck / short — not order-guide ownership.
+Attach path: existing `/api/upload` + folder hint. Photo uses `capture="environment"`. File picker is the stub that matches current seat uploads. Invoice / truck snap files to `invoice-truck` (legacy `order-guide` still maps). Copy says invoice / truck / short — not order-guide ownership.
 
 ## Vendor babysit (not on the first screen)
 
@@ -77,19 +81,27 @@ No CO2 lecture. No invented dollar savings. No extra magic-link sends.
 
 | Lock | File |
 |---|---|
-| Open ask + soft default + floor picks | `src/lib/day1Coach.ts` |
+| Open ask + branches + identity | `src/lib/day1Coach.ts` |
+| Invoice / truck plate (legacy `order-guide`) | `src/lib/operatorV2.ts` |
 | LOM UI | `src/components/FreeOperatorPhone.tsx` |
 | Adult tray chrome | `src/lib/freeOperatorDemo.ts` · `src/app/globals.css` |
 | Vendor cadence | `config/ctap-vendor-cadence.json` · `src/lib/vendorCadenceConfig.ts` |
 | Dedup | `src/lib/invoiceIdentity.ts` |
 | Ask copy | `src/lib/simpleOwnerDemo/compose.ts` |
+| Resend invalid-recipient → HTTP 400 | `src/lib/email.ts` · `src/app/api/onboard/request/route.ts` |
 
 ## Voice
 
-Prefer: invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
+Prefer: problem, going on, bartender, drawer, Z, books, 30-60-90, P&L, hats, invoice, truck, short, credit, DoorDash take, checkout, 86, food cost.
 
-Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem.
+Ban: layer, spine, unlock, insight, orchestration, empower, leverage, holistic, flywheel, north star, ecosystem, Prime Cost Coach, order-guide lead, SaaS tour.
+
+Patterns live in `docs/company/OPERATOR_VOICE.md`. Day-1 open is Wave 0 from the suck-in bank: pain first, not welcome-to-onboarding.
 
 ## Anti-patterns (cut)
 
-Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Order-guide-as-first-aha. Toy emoji bottom nav.
+Fee portals. Apps that own you. Multi-dashboard. Modules tour before papers-in. KPI tiles on day 1. Order-guide-as-first-aha. Stiff truck/invoice hero. Toy emoji bottom nav.
+
+## Hold
+
+PR #224 Stream A locks stay on hold. Do not merge that draft into this conversation-first screen.

@@ -69,6 +69,9 @@ describe('free operator demo pack', () => {
 
   it('routes typed asks and refuses an invented close', () => {
     expect(resolveFreeOperatorAsk('voids on the floor').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('bartender leak').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('behind on the books').ok).toBe(true);
+    expect(resolveFreeOperatorAsk('wearing too many hats').ok).toBe(true);
     expect(resolveFreeOperatorAsk('invoice and food cost').ok).toBe(true);
     expect(resolveFreeOperatorAsk('schedule hours').ok).toBe(true);
     expect(resolveFreeOperatorAsk('vendor cadence').ok).toBe(true);
@@ -222,8 +225,11 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
     expect(ui).toContain('DAY1_OPEN_ASK');
-    expect(ui).toContain('DAY1_SOFT_DEFAULT');
+    expect(ui).toContain('DAY1_OPEN_ENERGY');
+    expect(ui).toContain('DAY1_HELP_ENERGY');
+    expect(ui).toContain('DAY1_IDENTITY_LINE');
     expect(ui).toContain('DAY1_FRONT_PICKS');
+    expect(ui).not.toContain('DAY1_SOFT_DEFAULT');
     expect(ui).toContain('owner-desk-tray-label');
     expect(ui).not.toContain('Prime Cost Coach');
     expect(ui).not.toMatch(/Snap this week’s order guide/);

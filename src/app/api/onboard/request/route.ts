@@ -9,6 +9,7 @@ import {
 import { Resend } from 'resend';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowAuthAttempt } from '@/lib/authThrottle';
+import { activationEmailFailure } from '@/lib/email';
 import { activationEmailPayload, buildOwnerDeskActivationLink } from '@/lib/ownerDeskAuth';
 
 export const runtime = 'nodejs';
@@ -35,7 +36,8 @@ async function sendActivationEmail(email: string, link: string, expiresAt: Date)
       name: sent.error.name,
       message: sent.error.message,
     });
-    throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
+    const failure = activationEmailFailure(sent.error);
+    throw Object.assign(new Error(failure.code), failure);
   }
   if (!sent.data?.id) {
     console.error('[onboard/request] Resend returned no message id', { to: email });
@@ -91,14 +93,15 @@ export async function POST(req: NextRequest) {
         throw new Error('ACTIVATION_EMAIL_UNAVAILABLE');
       }
       await sendActivationEmail(data.email, link, result.expiresAt);
-    } catch {
+    } catch (err) {
+      const failure = activationEmailFailure(err);
       return NextResponse.json(
         {
           success: false,
-          error: 'Activation email is unavailable. Try again later.',
-          code: 'activation_email_unavailable',
+          error: failure.error,
+          code: failure.code,
         },
-        { status: 503 },
+        { status: failure.status },
       );
     }
 

@@ -24,9 +24,11 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('weekly-schedule.xlsx').kind).toBe('schedule');
     expect(classifyUpload('labor-cards.jpg').kind).toBe('labor-cards');
     expect(classifyUpload('menu-photo.png').kind).toBe('menu');
-    expect(classifyUpload('order-guide.pdf').kind).toBe('order-guide');
-    expect(classifyUpload('truck-ticket.jpg').kind).toBe('order-guide');
-    expect(classifyUpload('liquor-ticket.jpg').kind).toBe('order-guide');
+    expect(classifyUpload('order-guide.pdf').kind).toBe('invoice-truck');
+    expect(classifyUpload('truck-ticket.jpg').kind).toBe('invoice-truck');
+    expect(classifyUpload('liquor-ticket.jpg').kind).toBe('invoice-truck');
+    expect(classifyUpload('IMG_9001.jpg', 'image/jpeg', 'order-guide').kind).toBe('invoice-truck');
+    expect(classifyUpload('IMG_9001.jpg', 'image/jpeg', 'invoice-truck').kind).toBe('invoice-truck');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
@@ -210,19 +212,19 @@ describe('R2 put signer', () => {
 });
 
 describe('day-1 photo win + invoice identity', () => {
-  it('flips the order-guide folder Ready from a camera photo', async () => {
+  it('flips the invoice / truck folder Ready from a camera photo', async () => {
     const { svc } = service();
     const result = await svc.upload({
       operatorId: 'demo:hook',
       filename: 'IMG_9001.jpg',
       contentType: 'image/jpeg',
       bytes: new TextEncoder().encode('jpeg-bytes'),
-      folder: 'order-guide',
+      folder: 'invoice-truck',
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.upload.evidenceKind).toBe('order-guide');
-    expect(result.readiness.folders.find((row) => row.id === 'order-guide')?.state).toBe('READY');
+    expect(result.upload.evidenceKind).toBe('invoice-truck');
+    expect(result.readiness.folders.find((row) => row.id === 'invoice-truck')?.state).toBe('READY');
     expect(result.upload.sourceTags.join(' ')).not.toMatch(/invoice-dup-flag/);
   });
 
@@ -257,7 +259,7 @@ describe('day-1 photo win + invoice identity', () => {
 });
 
 describe('compose never invents a close', () => {
-  it('opens an empty seat on invoice / truck — not order-guide ownership', () => {
+  it('opens an empty seat on the problem — not a stiff truck CTA', () => {
     const readiness = readinessFromUploads('seat:7', []);
     const answer = composeAskAnswer({
       question: 'How can we help you?',
@@ -266,7 +268,9 @@ describe('compose never invents a close', () => {
       uploads: [],
     });
     const facts = answer.facts.join(' ');
-    expect(facts).toMatch(/truck ticket or invoice/i);
+    expect(facts).toMatch(/what's the problem today/i);
+    expect(facts).toMatch(/what's going on/i);
+    expect(facts).not.toMatch(/got a truck ticket or invoice\?\s*snap it/i);
     expect(facts).not.toMatch(/order guide first/i);
     expect(facts).not.toMatch(/Snap this week/i);
     expect(answer.inventedClose).toBe(false);
@@ -296,7 +300,7 @@ describe('compose never invents a close', () => {
 
 function fakeUpload(
   operatorId: string,
-  evidenceKind: 'schedule' | 'hourly' | 'timeclock' | 'labor-cards' | 'menu' | 'order-guide',
+  evidenceKind: 'schedule' | 'hourly' | 'timeclock' | 'labor-cards' | 'menu' | 'invoice-truck',
   filename: string,
 ) {
   return {

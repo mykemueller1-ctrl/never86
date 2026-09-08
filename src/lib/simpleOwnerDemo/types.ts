@@ -12,6 +12,7 @@ export type EvidenceKind =
   | 'timeclock'
   | 'labor-cards'
   | 'menu'
+  | 'invoice-truck'
   | 'order-guide'
   | 'z'
   | 'void'

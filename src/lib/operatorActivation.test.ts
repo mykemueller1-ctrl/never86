@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { activationEmailFailure, isResendInvalidRecipient } from './email';
 import {
   FREE_SEAT_ID_FLOOR,
   SeatActivationAbort,
@@ -70,6 +71,30 @@ describe('operatorActivation pure helpers', () => {
     } else {
       throw new Error('expected refusal');
     }
+  });
+
+  it('maps Resend invalid-recipient to HTTP 400, not 503', () => {
+    expect(
+      isResendInvalidRecipient({
+        name: 'validation_error',
+        message: "Invalid `to` field. The email address isn't valid.",
+        statusCode: 403,
+      }),
+    ).toBe(true);
+    expect(isResendInvalidRecipient({ name: 'invalid_recipient', message: 'suppressed' })).toBe(true);
+    expect(isResendInvalidRecipient({ name: 'application_error', message: 'timeout' })).toBe(false);
+    const invalid = activationEmailFailure({
+      name: 'validation_error',
+      message: 'Invalid recipient',
+    });
+    expect(invalid).toEqual({
+      status: 400,
+      code: 'invalid_recipient',
+      error: 'That email cannot receive mail. Check the address.',
+    });
+    const down = activationEmailFailure(new Error('ACTIVATION_EMAIL_UNAVAILABLE'));
+    expect(down.status).toBe(503);
+    expect(down.code).toBe('activation_email_unavailable');
   });
 
   it('fails closed when activation email is not configured', () => {

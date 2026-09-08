@@ -5,7 +5,9 @@ import { ORCHESTRATION_BRAND_BLUE } from './orchestration/types';
 export const OPERATOR_V2_BLUE = ORCHESTRATION_BRAND_BLUE;
 export const OPERATOR_V2_SURFACE = 'plates-chat' as const;
 
-export type OperatorV2PlateId = 'schedule' | 'labor-cards' | 'menu' | 'order-guide';
+export type OperatorV2PlateId = 'schedule' | 'labor-cards' | 'menu' | 'invoice-truck';
+/** Leftover plate id from the order-guide era. Normalize to invoice-truck. */
+export const LEGACY_ORDER_GUIDE_PLATE_ID = 'order-guide';
 export type OperatorV2FolderStateId = 'NEED' | 'READY';
 
 export type OperatorV2Plate = {
@@ -59,16 +61,16 @@ export const OPERATOR_V2_PLATES: readonly OperatorV2Plate[] = [
     evidenceKind: 'menu',
   },
   {
-    id: 'order-guide',
-    label: 'Order guide',
-    folder: 'Order guides',
-    ask: 'Got a truck ticket or invoice? Snap it.',
+    id: 'invoice-truck',
+    label: 'Invoice / truck',
+    folder: 'Invoice / truck',
+    ask: 'Truck ticket or invoice — snap it when you want that paper off the plate.',
     tray: 'food',
     missingUntil: 'A truck ticket, liquor invoice, or handwritten short lands. Invoice ≠ COGS.',
     ocrInput: true,
     firstClass: true,
     deferred: false,
-    evidenceKind: 'order-guide',
+    evidenceKind: 'invoice-truck',
   },
 ] as const;
 
@@ -125,8 +127,14 @@ export type DailyCompareChip = {
   reason: string;
 };
 
+export function normalizePlateId(id: string): OperatorV2PlateId | undefined {
+  if (id === LEGACY_ORDER_GUIDE_PLATE_ID) return 'invoice-truck';
+  return OPERATOR_V2_PLATES.some((plate) => plate.id === id) ? (id as OperatorV2PlateId) : undefined;
+}
+
 export function plateById(id: string): OperatorV2Plate | undefined {
-  return OPERATOR_V2_PLATES.find((plate) => plate.id === id);
+  const normalized = normalizePlateId(id);
+  return normalized ? OPERATOR_V2_PLATES.find((plate) => plate.id === normalized) : undefined;
 }
 
 export function isOperatorV2PlateId(id: string): id is OperatorV2PlateId {
@@ -137,9 +145,17 @@ export function nextMissingPlate(filled: ReadonlySet<OperatorV2PlateId>): Operat
   return OPERATOR_V2_PLATES.find((plate) => !filled.has(plate.id)) ?? OPERATOR_V2_PLATES[0];
 }
 
+function folderKindIsReady(plate: OperatorV2Plate, kinds: ReadonlySet<string>): boolean {
+  if (kinds.has(plate.evidenceKind)) return true;
+  if (plate.id === 'invoice-truck') {
+    return kinds.has('order-guide') || kinds.has('invoice');
+  }
+  return false;
+}
+
 export function projectFoldersFromKinds(kinds: ReadonlySet<string>): OperatorV2FolderState[] {
   return OPERATOR_V2_PLATES.map((plate) => {
-    const ready = kinds.has(plate.evidenceKind);
+    const ready = folderKindIsReady(plate, kinds);
     return {
       id: plate.id,
       label: plate.label,

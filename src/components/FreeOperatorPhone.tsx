@@ -16,13 +16,18 @@ import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwn
 import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
 import {
   DAY1_FRONT_PICKS,
+  DAY1_HELP_ENERGY,
   DAY1_HOOK_PLATE_ID,
+  DAY1_IDENTITY_LINE,
+  DAY1_INVOICE_PLATE_ID,
   DAY1_OPEN_ASK,
-  DAY1_SOFT_DEFAULT,
+  DAY1_OPEN_ENERGY,
   day1CoachById,
+  day1FrontNeedsPhoto,
   day1HookCoach,
   firstPhotoWinLine,
   type Day1FrontPick,
+  type Day1FrontPickId,
 } from '@/lib/day1Coach';
 import {
   OPERATOR_V2_PLATES,
@@ -83,7 +88,8 @@ export function FreeOperatorPhone() {
   const [folders, setFolders] = useState<OperatorV2FolderState[]>(emptyFolders);
   const [roleCards, setRoleCards] = useState<LaborRoleCard[]>(emptyRoleCards);
   const [dailyCompare, setDailyCompare] = useState<DailyCompareChip[]>(emptyDailyCompare);
-  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(DAY1_HOOK_PLATE_ID);
+  const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
+  const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -97,6 +103,7 @@ export function FreeOperatorPhone() {
   const filled = useMemo(() => filledPlateIds(folders), [folders]);
   const hook = useMemo(() => day1HookCoach(filled), [filled]);
   const firstScreen = filled.size === 0 && view === 'home' && !winLine;
+  const needsPhoto = !firstScreen || day1FrontNeedsPhoto(frontPath);
   const hookAsk = firstScreen
     ? DAY1_OPEN_ASK
     : (day1CoachById(activeFolder ?? hook.id)?.ask ?? hook.ask);
@@ -179,10 +186,11 @@ export function FreeOperatorPhone() {
   }
 
   function onFrontPick(pick: Day1FrontPick) {
-    setAsk(pick.ask);
+    setFrontPath(pick.id);
+    setAsk(pick.followUp ?? pick.ask);
     trackEvent('operator_day1_front_pick', { pagePath: '/operator', meta: { pick: pick.id, action: pick.action } });
     if (pick.action === 'photo') {
-      setActiveFolder(null);
+      setActiveFolder(DAY1_INVOICE_PLATE_ID);
       photoRef.current?.click();
       return;
     }
@@ -337,38 +345,43 @@ export function FreeOperatorPhone() {
             </div>
           ) : (
             <p className="owner-desk-poetry">
-              {firstScreen ? DAY1_SOFT_DEFAULT : hook.attachHint}
+              {firstScreen ? DAY1_OPEN_ENERGY : hook.attachHint}
             </p>
           )}
-          <button
-            type="button"
-            className="owner-desk-snap-hero"
-            disabled={busy}
-            onClick={() => {
-              const plate =
-                OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
-                OPERATOR_V2_PLATES[3];
-              openPlate(plate, 'photo');
-            }}
-          >
-            <span className="owner-desk-snap-hero-mark" aria-hidden>
-              ⌖
-            </span>
-            {busy ? 'Snapping…' : 'Snap photo'}
-          </button>
-          <button
-            type="button"
-            className="owner-desk-file-quiet"
-            disabled={busy}
-            onClick={() => {
-              const plate =
-                OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
-                OPERATOR_V2_PLATES[3];
-              openPlate(plate, 'file');
-            }}
-          >
-            Add file
-          </button>
+          {firstScreen ? <p className="owner-desk-identity">{DAY1_IDENTITY_LINE}</p> : null}
+          {needsPhoto ? (
+            <>
+              <button
+                type="button"
+                className="owner-desk-snap-hero"
+                disabled={busy}
+                onClick={() => {
+                  const plate =
+                    OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
+                    OPERATOR_V2_PLATES[3];
+                  openPlate(plate, 'photo');
+                }}
+              >
+                <span className="owner-desk-snap-hero-mark" aria-hidden>
+                  ⌖
+                </span>
+                {busy ? 'Snapping…' : 'Snap photo'}
+              </button>
+              <button
+                type="button"
+                className="owner-desk-file-quiet"
+                disabled={busy}
+                onClick={() => {
+                  const plate =
+                    OPERATOR_V2_PLATES.find((row) => row.id === (activeFolder ?? DAY1_HOOK_PLATE_ID)) ??
+                    OPERATOR_V2_PLATES[3];
+                  openPlate(plate, 'file');
+                }}
+              >
+                Add file
+              </button>
+            </>
+          ) : null}
         </section>
       ) : null}
 
@@ -479,7 +492,7 @@ export function FreeOperatorPhone() {
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
           <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Menu & order guides' : 'Beverage margin'}
+            {view === 'food' ? 'Menu & invoices' : 'Beverage margin'}
           </h1>
           <p className="mt-2 text-sm text-white/80">
             Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
@@ -487,7 +500,7 @@ export function FreeOperatorPhone() {
           {view === 'food' ? (
             <div className="owner-v2-plates mt-5" aria-label="Food folders">
               {folders
-                .filter((folder) => folder.id === 'menu' || folder.id === 'order-guide')
+                .filter((folder) => folder.id === 'menu' || folder.id === 'invoice-truck')
                 .map((folder) => {
                   const plate = OPERATOR_V2_PLATES.find((row) => row.id === folder.id);
                   return (
@@ -513,7 +526,7 @@ export function FreeOperatorPhone() {
               <div>
                 <p className="text-sm leading-relaxed text-[#06122b]">
                   {view === 'food'
-                    ? 'Picture the menu and the order guide. Top plates first. Missing count stays Missing Evidence.'
+                    ? 'Picture the menu and the truck ticket. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -559,7 +572,7 @@ export function FreeOperatorPhone() {
               }}
               rows={2}
               disabled={busy}
-              placeholder={listening ? 'Listening…' : DAY1_OPEN_ASK}
+              placeholder={listening ? 'Listening…' : DAY1_HELP_ENERGY}
               className="owner-desk-ask"
             />
             <div className="mt-2 flex items-center justify-between gap-2">
