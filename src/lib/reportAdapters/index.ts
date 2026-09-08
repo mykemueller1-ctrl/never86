@@ -1,3 +1,4 @@
+export { evidenceKindForReport } from './evidenceKind';
 export { NAG_TOAST_GT } from './nagToastGt';
 export {
   detectReport,
@@ -8,6 +9,7 @@ export {
   registerReportAdapter,
   unregisterReportAdapter,
 } from './registry';
+export { hasParsedReportPack, reportSourceTags } from './sourceTags';
 export {
   PLANNED_REPORT_ADAPTERS,
   REPORT_POS,

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { findFreeOperatorPrivacyHits } from '@/lib/freeOperatorDemo';
+import { registerReportAdapter, unregisterReportAdapter } from '@/lib/reportAdapters';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import { createMemoryObjectStore, signR2Get, signR2Put } from './objectStore';
@@ -41,6 +42,25 @@ describe('simple owner demo classify + object keys', () => {
       tag: 'unverified',
       source: 'operator-upload:hourly',
     });
+  });
+
+  it('classifies a newly registered POS from the adapter registry — no classify fork', () => {
+    registerReportAdapter({
+      pos: 'square',
+      family: 'sales-summary',
+      detect: (filename) => /square[_-]?sales/i.test(filename),
+      parse: () => null,
+    });
+    try {
+      const hit = classifyUpload('square-sales.csv');
+      expect(hit.kind).toBe('z');
+      expect(hit.sourceTags[0]).toEqual({
+        tag: 'unverified',
+        source: 'operator-upload:square:sales-summary',
+      });
+    } finally {
+      unregisterReportAdapter('square', 'sales-summary');
+    }
   });
 
   it('uses the open folder to classify a paper-shop camera photo', () => {

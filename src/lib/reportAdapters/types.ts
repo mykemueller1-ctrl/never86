@@ -4,6 +4,12 @@
  * Toast ships first (NAG ground truth). Next POS is a new adapter in this
  * registry — not a fork of the desk. Honesty spine is enforced by the desk:
  * Verified | Estimated (show math) | Missing. Never invent $.
+ *
+ * Add a POS:
+ * 1. registerReportAdapter({ pos, family, detect, parse })
+ * 2. parse returns a fact pack or null — null invents no dollars
+ * 3. classifyUpload / reportSourceTags pick it up automatically
+ * Do not edit compose chrome or onboard to add Square/Clover/Sysco.
  */
 
 export const REPORT_POS = [

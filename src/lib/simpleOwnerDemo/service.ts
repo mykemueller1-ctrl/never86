@@ -9,8 +9,7 @@ import {
   vendorTotalKey,
 } from '@/lib/invoiceIdentity';
 import { decodeInvoiceSource, looksLikeVendorInvoice, parseVendorInvoice } from '@/lib/vendorInvoiceParse';
-import { detectReport } from '@/lib/reportAdapters';
-import { packFromSourceTag, toastSourceTags } from '@/lib/toastParse';
+import { detectReport, hasParsedReportPack, reportSourceTags } from '@/lib/reportAdapters';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -33,12 +32,12 @@ async function hydrateToastUploads(
   return Promise.all(
     uploads.map(async (upload) => {
       if (!detectReport(upload.filename)) return upload;
-      if (upload.sourceTags.some((tag) => packFromSourceTag(tag))) return upload;
+      if (hasParsedReportPack(upload.sourceTags)) return upload;
       const blob = await objects.get?.({ operatorId: upload.operatorId, objectKey: upload.objectKey });
       if (!blob) return upload;
       return {
         ...upload,
-        sourceTags: [...upload.sourceTags, ...toastSourceTags(upload.filename, blob.bytes)],
+        sourceTags: [...upload.sourceTags, ...reportSourceTags(upload.filename, blob.bytes)],
       };
     }),
   );
@@ -156,7 +155,7 @@ export function createSimpleOwnerDemoService(deps: {
       const classified = classifyUpload(filename, contentType, folder);
       const existing = await deps.repo.listUploads(operatorId);
       const identityTags = invoiceIdentityTags(filename, contentType, bytes, existing);
-      const toastTags = toastSourceTags(filename, bytes);
+      const toastTags = reportSourceTags(filename, bytes);
       const objectKey = buildObjectKey(operatorId, filename, createdAt);
       const stored = await deps.objects.put({
         operatorId,
