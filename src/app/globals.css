@@ -865,6 +865,13 @@ a.btn-secondary:hover, button.btn-secondary:hover {
 .owner-desk-who .owner-desk-identity {
   margin-top: 0;
 }
+.owner-desk-onboard {
+  margin-top: 0.65rem;
+  max-width: 28rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
 .owner-desk-promise,
 .owner-desk-seat,
 .owner-desk-norip {

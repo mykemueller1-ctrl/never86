@@ -67,6 +67,7 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('DAY1_HOOK_PLATE_ID');
     expect(phone).toContain('DAY1_OPEN_ASK');
     expect(phone).toContain('DAY1_OPEN_ENERGY');
+    expect(phone).toContain('DAY1_ONBOARD_AFTER');
     expect(phone).toContain('DAY1_HELP_ENERGY');
     expect(phone).toContain('DAY1_IDENTITY_LINE');
     expect(phone).toContain('DAY1_PROMISE_LINE');

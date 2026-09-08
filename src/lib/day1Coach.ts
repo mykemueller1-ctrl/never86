@@ -20,6 +20,8 @@ export const DAY1_OPEN_ASK = "What's the problem today?";
 export const DAY1_OPEN_ENERGY = "What's going on?";
 export const DAY1_WEIRD_ASK = 'What got weird at the shop?';
 export const DAY1_HELP_ENERGY = 'How can we help you?';
+/** Floor nouns after the open ask — not a first CTA, not a tour. */
+export const DAY1_ONBOARD_AFTER = 'Trucks, order day, who yells, what sucks.';
 export const DAY1_IDENTITY_LINE = "built by Myke Mueller · Never86'd · operator first · was you";
 export const DAY1_PROMISE_LINE = 'Find the leak. Assign the fix. Keep the receipt.';
 export const DAY1_SEAT_LINE = "one store, one login, yesterday's numbers, one move, one receipt";
@@ -184,6 +186,7 @@ export function day1FrontLeadBlob(): string {
     DAY1_OPEN_ENERGY,
     DAY1_WEIRD_ASK,
     DAY1_HELP_ENERGY,
+    DAY1_ONBOARD_AFTER,
     DAY1_IDENTITY_LINE,
     DAY1_PROMISE_LINE,
     DAY1_SEAT_LINE,
@@ -208,6 +211,7 @@ export function day1LeadIsConversationFirst(text = day1FrontLeadBlob()): boolean
   return (
     /what's the problem today/i.test(text) &&
     /what's going on|what got weird/i.test(text) &&
+    /trucks, order day, who yells, what sucks/i.test(text) &&
     /find the leak/i.test(text) &&
     /one store, one login/i.test(text) &&
     /don't rip-and-replace/i.test(text) &&

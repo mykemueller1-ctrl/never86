@@ -9,6 +9,7 @@ import {
   DAY1_INVOICE_PATH_ASK,
   DAY1_INVOICE_PLATE_ID,
   DAY1_NO_RIP_LINE,
+  DAY1_ONBOARD_AFTER,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
@@ -35,6 +36,7 @@ describe('day-1 conversation-first coach', () => {
     expect(DAY1_OPEN_ENERGY).toBe("What's going on?");
     expect(DAY1_WEIRD_ASK).toBe('What got weird at the shop?');
     expect(DAY1_HELP_ENERGY).toBe('How can we help you?');
+    expect(DAY1_ONBOARD_AFTER).toBe('Trucks, order day, who yells, what sucks.');
     expect(DAY1_IDENTITY_LINE).toMatch(/built by Myke Mueller/);
     expect(DAY1_IDENTITY_LINE).toMatch(/operator first/);
     expect(DAY1_IDENTITY_LINE).toMatch(/was you/);
@@ -90,6 +92,7 @@ describe('day-1 conversation-first coach', () => {
     expect(text).toMatch(/what's going on/i);
     expect(text).toMatch(/what got weird at the shop/i);
     expect(text).toMatch(/how can we help you/i);
+    expect(text).toMatch(/trucks, order day, who yells, what sucks/i);
     expect(text).toMatch(/find the leak/i);
     expect(text).toMatch(/one store, one login/i);
     expect(text).toMatch(/don't rip-and-replace/i);

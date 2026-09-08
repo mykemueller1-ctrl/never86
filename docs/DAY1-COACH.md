@@ -10,7 +10,7 @@ First session is a stool, not a stack. Decade of POS / SaaS burn. Tasks off the 
 
 1. Operator lands on `/operator`.
 2. Open ask, floor voice: **What's the problem today?** Energy under it: **What's going on?** (also OK: **What got weird at the shop?**) Chat mouth keeps **How can we help you?**
-3. Branch by what they say. Floor nouns, not a sitemap.
+3. After the open ask, voice onboard: **Trucks, order day, who yells, what sucks.** Then branch by what they say. Floor nouns, not a sitemap.
 4. Invoice / truck is **one path after they choose it**. Never the stiff first CTA.
 5. Snap photo exists when a path needs a photo. It is not the robotic soft default.
 

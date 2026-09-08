@@ -21,6 +21,7 @@ import {
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PLATE_ID,
   DAY1_NO_RIP_LINE,
+  DAY1_ONBOARD_AFTER,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
@@ -356,6 +357,7 @@ export function FreeOperatorPhone() {
                 : hook.attachHint}
             </p>
           )}
+          {firstScreen && !frontPath ? <p className="owner-desk-onboard">{DAY1_ONBOARD_AFTER}</p> : null}
           {firstScreen && frontPath && !needsPhoto ? (
             <p className="owner-desk-norip">{DAY1_NO_RIP_LINE}</p>
           ) : null}
