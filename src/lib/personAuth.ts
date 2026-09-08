@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { seatCredentials, seatPersonAccess, seatPersonPasswords } from '../db/schema';
+import { seatCredentials, seatOperators, seatPersonAccess, seatPersonPasswords } from '../db/schema';
 import { ensureFreeSeatSchema } from './ensureFreeSeatSchema';
 import {
   findFreeSeatCredential,
@@ -317,6 +317,89 @@ export async function revokePersonAccess(
     .delete(seatPersonAccess)
     .where(and(eq(seatPersonAccess.email, normalized), eq(seatPersonAccess.operatorId, operatorId)));
   return { ok: true };
+}
+
+/** Hyphen, not plus — plus-alias emails are refused by the person plane. */
+export function retiredNativeSeatEmail(operatorId: number): string {
+  return `fun-retired-${operatorId}@invalid.never86`;
+}
+
+/**
+ * Native seat_operators.email still feeds the picker after person-access detach.
+ * Fun 1000000 is always retired when asked. Other ids only if this person
+ * owns the row or the restaurant name is Fun.
+ */
+export function shouldRetireNativeOperatorEmail(input: {
+  operatorId: number;
+  operatorEmail: string;
+  personEmail: string;
+  restaurantName: string;
+}): boolean {
+  if (input.operatorId === 1_000_000) return true;
+  if (normalizeEmail(input.operatorEmail) === normalizeEmail(input.personEmail)) return true;
+  return input.restaurantName.toLowerCase().includes('fun');
+}
+
+export type RetireNativeOperatorResult =
+  | { ok: true; retiredEmail: string; nativeRetired: boolean }
+  | { ok: false; error: string; status: number };
+
+/**
+ * Kill native ownership + person_access + credentials email for one operator.
+ * Does not delete the store. Re-points seat_operators.email off this person.
+ */
+export async function retireNativeOperator(
+  email: string,
+  operatorId: number,
+): Promise<RetireNativeOperatorResult> {
+  const normalized = normalizeEmail(email);
+  if (!normalized || !normalized.includes('@')) {
+    return { ok: false, error: 'Enter a valid email.', status: 400 };
+  }
+  if (isPlusAliasEmail(normalized)) {
+    return {
+      ok: false,
+      error: 'Do not mint plus-alias seats. Use the real person email.',
+      status: 400,
+    };
+  }
+  if (!Number.isInteger(operatorId) || operatorId <= 0) {
+    return { ok: false, error: 'Pick a valid operator.', status: 400 };
+  }
+  if (!neonConfigured()) {
+    return { ok: false, error: 'Primary database (Neon) is not configured.', status: 503 };
+  }
+  await ensureFreeSeatSchema();
+
+  const neonOp = await findFreeSeatOperator(operatorId).catch(() => null);
+  if (!neonOp) {
+    return { ok: false, error: `No operator with id ${operatorId}.`, status: 400 };
+  }
+
+  const retiredEmail = retiredNativeSeatEmail(operatorId);
+  const nativeRetired = shouldRetireNativeOperatorEmail({
+    operatorId,
+    operatorEmail: neonOp.email,
+    personEmail: normalized,
+    restaurantName: neonOp.restaurantName,
+  });
+
+  if (nativeRetired) {
+    await db
+      .update(seatOperators)
+      .set({ email: retiredEmail })
+      .where(eq(seatOperators.id, operatorId));
+  }
+  await db
+    .update(seatCredentials)
+    .set({ email: retiredEmail })
+    .where(and(eq(seatCredentials.operatorId, operatorId), eq(seatCredentials.email, normalized)));
+
+  await db
+    .delete(seatPersonAccess)
+    .where(and(eq(seatPersonAccess.email, normalized), eq(seatPersonAccess.operatorId, operatorId)));
+
+  return { ok: true, retiredEmail, nativeRetired };
 }
 
 /**

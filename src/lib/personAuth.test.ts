@@ -6,7 +6,10 @@ import {
   pickAccessibleSeat,
   publicSeatsForPicker,
   restaurantsMatch,
+  retiredNativeSeatEmail,
+  retireNativeOperator,
   revokePersonAccess,
+  shouldRetireNativeOperatorEmail,
   validatePersonPassword,
   type AccessibleSeat,
 } from './personAuth';
@@ -76,6 +79,10 @@ describe('person password lock', () => {
       ok: false,
       status: 400,
     });
+    await expect(retireNativeOperator('ktmaduna+fun@gmail.com', 1_000_000)).resolves.toMatchObject({
+      ok: false,
+      status: 400,
+    });
     await expect(
       copyPersonPasswordHash('mykemueller1@gmail.com', 'mykemueller1@gmail.com'),
     ).resolves.toMatchObject({ ok: false, status: 400 });
@@ -83,6 +90,35 @@ describe('person password lock', () => {
       ok: false,
       status: 400,
     });
+  });
+
+  it('retires Fun native email with a hyphen, never a plus-alias', () => {
+    expect(retiredNativeSeatEmail(1_000_000)).toBe('fun-retired-1000000@invalid.never86');
+    expect(isPlusAliasEmail(retiredNativeSeatEmail(1_000_000))).toBe(false);
+    expect(
+      shouldRetireNativeOperatorEmail({
+        operatorId: 1_000_000,
+        operatorEmail: 'mykemueller1@gmail.com',
+        personEmail: 'mykemueller1@gmail.com',
+        restaurantName: 'Fun',
+      }),
+    ).toBe(true);
+    expect(
+      shouldRetireNativeOperatorEmail({
+        operatorId: 1_000_007,
+        operatorEmail: 'ktmaduna@gmail.com',
+        personEmail: 'mykemueller1@gmail.com',
+        restaurantName: 'New American Grill',
+      }),
+    ).toBe(false);
+    expect(
+      shouldRetireNativeOperatorEmail({
+        operatorId: 1_000_007,
+        operatorEmail: 'mykemueller1@gmail.com',
+        personEmail: 'mykemueller1@gmail.com',
+        restaurantName: 'New American Grill',
+      }),
+    ).toBe(true);
   });
 
   it('validates password length before hashing', () => {

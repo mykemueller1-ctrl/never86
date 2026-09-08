@@ -206,7 +206,7 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   {
     name: 'ADMIN_API_SECRET',
     purpose:
-      'Same Bearer as CRON_SECRET for /api/admin/person-access and person-password. Owner n86_operator session is an alternate gate when Vercel Reveal is unavailable.',
+      'Same Bearer as CRON_SECRET for /api/admin/person-access, person-password, and retire-operator. Owner n86_operator session is an alternate gate when Vercel Reveal is unavailable.',
     surfaces: ['vercel'],
     kind: 'secret',
     required: false,

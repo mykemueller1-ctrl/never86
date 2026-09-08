@@ -23,6 +23,7 @@ const AUTH_FILES = [
   'src/app/portal/login/page.tsx',
   'src/app/api/admin/person-password/route.ts',
   'src/app/api/admin/person-access/route.ts',
+  'src/app/api/admin/retire-operator/route.ts',
   'src/lib/adminBearerAuth.ts',
   'src/lib/personAuth.ts',
   'src/components/OperatorStoreSwitcher.tsx',
@@ -70,6 +71,10 @@ describe('email+password live door', () => {
     expect(read('src/lib/personAuth.ts')).toContain('Do not mint plus-alias seats');
     expect(read('src/app/api/admin/person-access/route.ts')).toContain('grantPersonAccess');
     expect(read('src/app/api/admin/person-access/route.ts')).toContain('revokePersonAccess');
+    expect(read('src/app/api/admin/person-access/route.ts')).toContain('retireNativeOperator');
+    expect(read('src/app/api/admin/retire-operator/route.ts')).toContain('retireNativeOperator');
+    expect(read('src/app/api/admin/retire-operator/route.ts')).toContain('adminOk');
+    expect(read('src/lib/personAuth.ts')).toContain('retiredNativeSeatEmail');
     expect(read('src/app/api/admin/person-password/route.ts')).toContain('copyPersonPasswordHash');
     expect(read('src/lib/adminBearerAuth.ts')).toContain('ADMIN_API_SECRET');
     expect(read('src/lib/adminBearerAuth.ts')).toContain('verifyOperatorSession');

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as passwordPost } from './route';
 import { POST as accessPost } from '../person-access/route';
+import { POST as retirePost } from '../retire-operator/route';
 import { OPERATOR_COOKIE, signOperatorSession } from '@/lib/operatorSession';
 
 beforeAll(() => {
@@ -30,8 +31,15 @@ describe('admin person password / access', () => {
         operatorId: 1_000_000,
       }),
     );
+    const retire = await retirePost(
+      post('https://www.never86.ai/api/admin/retire-operator', {
+        email: 'mykemueller1@gmail.com',
+        operatorId: 1_000_000,
+      }),
+    );
     expect(pw.status).toBe(401);
     expect(access.status).toBe(401);
+    expect(retire.status).toBe(401);
   });
 
   it('accepts Bearer ADMIN_API_SECRET when CRON_SECRET is unset', async () => {
@@ -87,8 +95,16 @@ describe('admin person password / access', () => {
           { cookie: `${OPERATOR_COOKIE}=${token}` },
         ),
       );
+      const retire = await retirePost(
+        post(
+          'https://www.never86.ai/api/admin/retire-operator',
+          { email: 'mykemueller1@gmail.com', operatorId: 1_000_000 },
+          { cookie: `${OPERATOR_COOKIE}=${token}` },
+        ),
+      );
       expect(pw.status).not.toBe(401);
       expect(access.status).not.toBe(401);
+      expect(retire.status).not.toBe(401);
     } finally {
       if (prevCron === undefined) delete process.env.CRON_SECRET;
       else process.env.CRON_SECRET = prevCron;
