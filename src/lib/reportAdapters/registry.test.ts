@@ -5,9 +5,7 @@ import { assertNoToastPosForCtapSales } from '@/lib/ctapPosLock';
 import { NAG_TOAST_GT } from './nagToastGt';
 import {
   detectReport,
-  isPdqFactPack,
   isRegisteredPosFamily,
-  isToastFactPack,
   listReportAdapters,
   parseRegisteredReport,
   plannedReportAdapterHooks,
@@ -57,27 +55,19 @@ describe('report adapter registry', () => {
       family: 'labor-breakdown',
     });
     const labor = parseRegisteredReport(load('LaborBreakDown_2026-08-31.csv'), 'LaborBreakDown_2026-08-31.csv');
-    expect(labor && isToastFactPack(labor)).toBe(true);
-    if (!labor || !isToastFactPack(labor)) return;
-    expect(labor.laborCost).toBe(NAG_TOAST_GT.laborCost);
-    expect(labor.laborPctNet).toBe(NAG_TOAST_GT.laborPctNet);
-    expect(labor.netSales).toBe(NAG_TOAST_GT.dayNetSales);
+    expect(labor && 'laborCost' in labor ? labor.laborCost : null).toBe(NAG_TOAST_GT.laborCost);
+    expect(labor && 'laborPctNet' in labor ? labor.laborPctNet : null).toBe(NAG_TOAST_GT.laborPctNet);
+    expect(labor && 'netSales' in labor ? labor.netSales : null).toBe(NAG_TOAST_GT.dayNetSales);
 
     const day = parseRegisteredReport(load('SalesSummary_2026-08-31.csv'), 'SalesSummary_2026-08-31.csv');
-    expect(day && isToastFactPack(day)).toBe(true);
-    if (!day || !isToastFactPack(day)) return;
-    expect(day.netSales).toBe(NAG_TOAST_GT.dayNetSales);
+    expect(day && 'netSales' in day ? day.netSales : null).toBe(NAG_TOAST_GT.dayNetSales);
     const week = parseRegisteredReport(
       load('SalesSummary_2026-08-24_2026-08-30.csv'),
       'SalesSummary_2026-08-24_2026-08-30.csv',
     );
-    expect(week && isToastFactPack(week)).toBe(true);
-    if (!week || !isToastFactPack(week)) return;
-    expect(week.netSales).toBe(NAG_TOAST_GT.weekNetSales);
+    expect(week && 'netSales' in week ? week.netSales : null).toBe(NAG_TOAST_GT.weekNetSales);
     const items = parseRegisteredReport(load('ItemSelectionDetails.csv'), 'ItemSelectionDetails.csv');
-    expect(items && isToastFactPack(items)).toBe(true);
-    if (!items || !isToastFactPack(items)) return;
-    expect(items.voidLineCount).toBe(NAG_TOAST_GT.voidLines);
+    expect(items && 'voidLineCount' in items ? items.voidLineCount : null).toBe(NAG_TOAST_GT.voidLines);
   });
 
   it('routes PDQ Z to the PDQ adapter, not Toast', () => {
@@ -89,14 +79,12 @@ describe('report adapter registry', () => {
 
   it('Fails if a Toast pack is used as CTAP sales', () => {
     const toast = parseRegisteredReport(load('SalesSummary_2026-08-31.csv'), 'SalesSummary_2026-08-31.csv');
-    expect(toast && isToastFactPack(toast)).toBe(true);
-    if (!toast || !isToastFactPack(toast)) return;
-    expect(() => assertNoToastPosForCtapSales(toast.pos)).toThrow(/PDQ POS only/);
+    expect(toast && 'pos' in toast ? toast.pos : null).toBe('toast');
+    expect(() => assertNoToastPosForCtapSales(toast && 'pos' in toast && toast.pos ? toast.pos : '')).toThrow(/PDQ POS only/);
     const zText = readFileSync(path.join(process.cwd(), 'tests/fixtures/pdq/sample-z-large-pizzas.txt'), 'utf8');
     const z = parseRegisteredReport(zText, '8-24-2026 ZReport_Summary.pdf');
-    expect(z && isPdqFactPack(z)).toBe(true);
-    if (!z || !isPdqFactPack(z)) return;
-    expect(() => assertNoToastPosForCtapSales(z.pos)).not.toThrow();
+    expect(z && 'pos' in z ? z.pos : null).toBe('pdq');
+    expect(() => assertNoToastPosForCtapSales(z && 'pos' in z && z.pos ? z.pos : '')).not.toThrow();
   });
 
   it('lets the next POS register without rewriting the desk, and parse=null invents no $', () => {

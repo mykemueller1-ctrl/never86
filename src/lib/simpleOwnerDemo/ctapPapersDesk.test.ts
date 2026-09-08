@@ -439,6 +439,29 @@ describe('CTAP papers-in desk — Hy-Vee liquor path', () => {
     expect(asked.answer.facts.join(' ')).not.toMatch(/94016902/);
   });
 
+  it('Monday one-check is Verified when the labeled check paper is on the seat', async () => {
+    const svc = service();
+    const operatorId = 'demo:ctap-hyvee-monday-verified';
+    const uploaded = await svc.upload({
+      operatorId,
+      filename: 'hyvee-monday-batch.txt',
+      contentType: 'text/plain',
+      bytes: loadHyvee('monday-batch.txt'),
+    });
+    expect(uploaded.ok).toBe(true);
+    const asked = await svc.ask({
+      operatorId,
+      question: 'What is the Hy-Vee Monday one check?',
+      tray: 'food',
+    });
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.answer.headline).toMatch(/Verified Monday one check \$120\.00/);
+    expect(asked.answer.verifiedClose).toBe(true);
+    expect(asked.answer.facts.join(' ')).toMatch(/Verified · Monday lock: one check/);
+    expect(asked.answer.facts.join(' ')).toMatch(/labeled check total/);
+  });
+
   it('Monday one-check is Missing when pay pattern is only invoices', async () => {
     const svc = service();
     const operatorId = 'demo:ctap-hyvee-monday-gap';
