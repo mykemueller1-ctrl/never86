@@ -17,6 +17,10 @@ const AUTH_FILES = [
   'src/app/api/operator/switch-store/route.ts',
   'src/app/api/auth/login/route.ts',
   'src/app/api/auth/set-password/route.ts',
+  'src/app/api/login/route.ts',
+  'src/app/api/password/route.ts',
+  'src/app/api/portal/login/route.ts',
+  'src/app/portal/login/page.tsx',
   'src/app/api/admin/person-password/route.ts',
   'src/app/api/admin/person-access/route.ts',
   'src/lib/personAuth.ts',
@@ -40,11 +44,16 @@ describe('email+password live door', () => {
     expect(OWNER_DESK_POST_AUTH_REDIRECT).toBe('/operator');
   });
 
-  it('exposes the probed /api/auth/login and /api/auth/set-password aliases', () => {
+  it('exposes the probed login aliases so CTAP portal login is not a 404', () => {
     expect(read('src/app/api/auth/login/route.ts')).toContain("export { POST } from '../../operator/login/route'");
     expect(read('src/app/api/auth/login/route.ts')).toContain("export const dynamic = 'force-dynamic'");
     expect(read('src/app/api/auth/set-password/route.ts')).toContain("export { POST } from '../../operator/set-password/route'");
     expect(read('src/app/api/auth/set-password/route.ts')).toContain("export const runtime = 'nodejs'");
+    expect(read('src/app/api/login/route.ts')).toContain("export { POST } from '../operator/login/route'");
+    expect(read('src/app/api/password/route.ts')).toContain("export { POST } from '../operator/set-password/route'");
+    expect(read('src/app/api/portal/login/route.ts')).toContain("export { POST } from '../../operator/login/route'");
+    expect(read('src/app/portal/login/page.tsx')).toContain("from '../../login/LoginClient'");
+    expect(read('src/app/portal/login/page.tsx')).toContain('readOperatorSession');
   });
 
   it('kills the 1-store-per-email 409 and refuses plus-alias seats', () => {

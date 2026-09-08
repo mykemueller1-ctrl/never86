@@ -30,9 +30,13 @@ export default function HouseCodePortalPage() {
         </p>
         <h1 className="compass-display text-4xl md:text-5xl mb-3">House code. Then the desk.</h1>
         <p className="compass-body text-[15px] mb-8" style={{ color: '#86868b' }}>
-          This is the community house-code door. Owner email at /login stays owner-only. Staff /login stays
-          fail-closed. A house code maps to one <span className="font-mono">operator_id</span>. No PIN, no staff
-          name, no marketplace password. Live issuance stays blocked until the first code is issued.
+          This is the community house-code door. Owner email + password is at{' '}
+          <Link href="/portal/login" className="underline" style={{ textDecorationColor: HOUSE_CODE_BRAND_BLUE }}>
+            /portal/login
+          </Link>
+          {' '}(same door as /login). Staff /login stays fail-closed. A house code maps to one{' '}
+          <span className="font-mono">operator_id</span>. No PIN, no staff name, no marketplace password.
+          Live issuance stays blocked until the first code is issued.
         </p>
         <PortalHouseForm />
         <p className="compass-body text-[13px] mt-8" style={{ color: '#86868b' }}>
