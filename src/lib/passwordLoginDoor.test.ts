@@ -72,6 +72,10 @@ describe('email+password live door', () => {
     expect(read('src/app/api/admin/person-access/route.ts')).toContain('revokePersonAccess');
     expect(read('src/app/api/admin/person-password/route.ts')).toContain('copyPersonPasswordHash');
     expect(read('src/lib/adminBearerAuth.ts')).toContain('ADMIN_API_SECRET');
+    expect(read('src/lib/adminBearerAuth.ts')).toContain('verifyOperatorSession');
+    expect(read('src/lib/adminBearerAuth.ts')).toContain('OWNER_PERSON_EMAIL');
+    expect(read('src/app/api/admin/person-access/route.ts')).toContain('adminOk');
+    expect(read('src/app/api/admin/person-password/route.ts')).toContain('adminOk');
     expect(read('src/app/api/onboard/request/route.ts')).toContain("purpose: z.enum(['activate', 'reset'])");
     expect(read('sql/0010_person_password.sql')).toContain('drop constraint if exists seat_operators_email_key');
   });

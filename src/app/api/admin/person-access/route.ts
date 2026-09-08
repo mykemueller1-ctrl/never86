@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminBearerOk } from '@/lib/adminBearerAuth';
+import { adminOk } from '@/lib/adminBearerAuth';
 import { grantPersonAccess, revokePersonAccess } from '@/lib/personAuth';
 import { neonConfigured } from '@/lib/operatorActivation';
 
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // Attach or detach an EXISTING isolated operator to this person email.
 // Same password then opens that store. Does not mint +alias emails.
 export async function POST(req: NextRequest) {
-  if (!adminBearerOk(req)) {
+  if (!(await adminOk(req))) {
     return NextResponse.json({ success: false, error: 'Not authorized.' }, { status: 401 });
   }
   if (!neonConfigured()) {
