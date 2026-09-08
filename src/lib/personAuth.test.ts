@@ -3,6 +3,7 @@ import {
   choosePersonLoginPlane,
   copyPersonPasswordHash,
   isPlusAliasEmail,
+  isRetireNativeSuccess,
   pickAccessibleSeat,
   publicSeatsForPicker,
   restaurantsMatch,
@@ -90,6 +91,27 @@ describe('person password lock', () => {
       ok: false,
       status: 400,
     });
+  });
+
+  it('narrows retire success off grant/detach { ok: true }', () => {
+    expect(isRetireNativeSuccess({ ok: true })).toBe(false);
+    expect(
+      isRetireNativeSuccess({
+        ok: true,
+        retiredEmail: 'fun-retired-1000000@invalid.never86',
+        nativeRetired: false,
+      }),
+    ).toBe(true);
+    const retired = {
+      ok: true as const,
+      retiredEmail: 'fun-retired-1000000@invalid.never86',
+      nativeRetired: true,
+    };
+    expect(isRetireNativeSuccess(retired)).toBe(true);
+    if (isRetireNativeSuccess(retired)) {
+      expect(retired.retiredEmail).toBe('fun-retired-1000000@invalid.never86');
+      expect(retired.nativeRetired).toBe(true);
+    }
   });
 
   it('retires Fun native email with a hyphen, never a plus-alias', () => {

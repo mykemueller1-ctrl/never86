@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminOk } from '@/lib/adminBearerAuth';
-import { grantPersonAccess, retireNativeOperator, revokePersonAccess } from '@/lib/personAuth';
+import {
+  grantPersonAccess,
+  isRetireNativeSuccess,
+  retireNativeOperator,
+  revokePersonAccess,
+} from '@/lib/personAuth';
 import { neonConfigured } from '@/lib/operatorActivation';
 
 export const runtime = 'nodejs';
@@ -33,14 +38,17 @@ export async function POST(req: NextRequest) {
   if (!result.ok) {
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });
   }
+
+  const retired = isRetireNativeSuccess(result)
+    ? { nativeRetired: result.nativeRetired, retiredEmail: result.retiredEmail }
+    : {};
+
   return NextResponse.json({
     success: true,
     email: email.trim().toLowerCase(),
     operatorId,
     detached: detach || retire,
     retired: retire,
-    ...('nativeRetired' in result
-      ? { nativeRetired: result.nativeRetired, retiredEmail: result.retiredEmail }
-      : {}),
+    ...retired,
   });
 }
