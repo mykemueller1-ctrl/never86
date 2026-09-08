@@ -20,6 +20,8 @@ import {
   refuseSecondFreeSeat,
   refuseSecondFreeStore,
 } from './operatorActivation';
+import { setFreeSeatPassword } from './personAuth';
+import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN } from './ownerDeskAuth';
 
 describe('operatorActivation pure helpers', () => {
   it('normalizes email case and trim', () => {
@@ -181,6 +183,25 @@ describe('operatorActivation pure helpers', () => {
     expect(chooseLoginPlane({ passwordHash: 'x' }, false)).toBe('deny-neon');
     expect(chooseLoginPlane({ passwordHash: 'x' }, true)).toBe('neon');
     expect(chooseLoginPlane(null, false)).toBe('ops');
+  });
+
+  it('rejects a self-service password shorter than the minimum, before touching Neon', async () => {
+    const result = await setFreeSeatPassword(1_000_001, 'owner@example.test', 'short');
+    expect(result).toEqual({
+      ok: false,
+      error: `Password must be at least ${MIN_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    });
+  });
+
+  it('rejects an oversized self-service password before hashing it (DoS guard)', async () => {
+    const tooLong = 'x'.repeat(MAX_FREE_SEAT_PASSWORD_LEN + 1);
+    const result = await setFreeSeatPassword(1_000_001, 'owner@example.test', tooLong);
+    expect(result).toEqual({
+      ok: false,
+      error: `Password must be at most ${MAX_FREE_SEAT_PASSWORD_LEN} characters.`,
+      status: 400,
+    });
   });
 
   it('aborts activation so second-store and id-namespace failures can roll back', () => {

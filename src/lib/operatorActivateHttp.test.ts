@@ -101,7 +101,8 @@ describe('activate HTTP cookie plane', () => {
     expect(client).toContain('ACTIVATE_FAILURE_LOGOUT_PATH');
     expect(http).toContain(`'${ACTIVATE_FAILURE_LOGOUT_PATH}'`);
     expect(client).toMatch(/if \(outcome\.kind === 'error'\)/);
-    expect(client).toMatch(/window\.location\.replace\(outcome\.href\)/);
+    expect(client).toMatch(/setRedirect\(outcome\.href\)/);
+    expect(client).toMatch(/window\.location\.replace\(redirect\)/);
     expect(client).not.toMatch(/window\.location\.replace\(data\.redirect/);
     expect(client).not.toMatch(/window\.location\.assign/);
     expect(ACTIVATE_FAILURE_LOGOUT_PATH).toBe('/api/operator/logout');

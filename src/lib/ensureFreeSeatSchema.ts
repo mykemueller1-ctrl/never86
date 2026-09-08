@@ -79,8 +79,38 @@ async function applyFreeSeatDdl(databaseUrl: string): Promise<void> {
       email text not null unique,
       password_hash text not null,
       created_at timestamptz not null default now(),
+      last_login_at timestamptz,
+      password_set_at timestamptz
+    )
+  `;
+
+  await sql`
+    alter table seat_credentials add column if not exists password_set_at timestamptz
+  `;
+
+  await sql`
+    create table if not exists seat_person_passwords (
+      id serial primary key,
+      email text not null unique,
+      password_hash text not null,
+      password_set_at timestamptz not null,
+      created_at timestamptz not null default now(),
       last_login_at timestamptz
     )
+  `;
+
+  await sql`
+    create table if not exists seat_person_access (
+      id serial primary key,
+      email text not null,
+      operator_id integer not null,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create unique index if not exists seat_person_access_email_operator_idx
+      on seat_person_access (email, operator_id)
   `;
 
   // Keep free-seat ids out of the OPS operator_users range.

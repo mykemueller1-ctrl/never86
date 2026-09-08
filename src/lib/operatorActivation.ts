@@ -490,10 +490,12 @@ export type FreeSeatCredential = {
   email: string;
   passwordHash: string;
   name: string | null;
+  passwordSetAt: Date | null;
 };
 
 export async function findFreeSeatCredential(email: string): Promise<FreeSeatCredential | null> {
   if (!neonConfigured()) return null;
+  await ensureFreeSeatSchema();
   const normalized = normalizeEmail(email);
   const rows = await db
     .select({
@@ -501,6 +503,7 @@ export async function findFreeSeatCredential(email: string): Promise<FreeSeatCre
       email: seatCredentials.email,
       passwordHash: seatCredentials.passwordHash,
       name: seatOperators.restaurantName,
+      passwordSetAt: seatCredentials.passwordSetAt,
     })
     .from(seatCredentials)
     .leftJoin(seatOperators, eq(seatOperators.id, seatCredentials.operatorId))
@@ -513,6 +516,7 @@ export async function findFreeSeatCredential(email: string): Promise<FreeSeatCre
         email: r.email,
         passwordHash: r.passwordHash,
         name: r.name,
+        passwordSetAt: r.passwordSetAt,
       }
     : null;
 }
