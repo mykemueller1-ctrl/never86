@@ -284,14 +284,16 @@ describe('compose never invents a close', () => {
   it('opens an empty seat on the operator WOW — not a stiff truck CTA', () => {
     const readiness = readinessFromUploads('seat:7', []);
     const answer = composeAskAnswer({
-      question: 'How can we help you?',
+      question: "What's still on the plate?",
       tray: 'action',
       readiness,
       uploads: [],
     });
     const facts = answer.facts.join(' ');
     expect(facts).toMatch(/you're not crazy\. the stack is/i);
-    expect(facts).toMatch(/prime coach is finally here/i);
+    expect(facts).toMatch(/weight off the plate/i);
+    expect(facts).not.toMatch(/prime coach is finally here/i);
+    expect(facts).not.toMatch(/how can we help you/i);
     expect(facts).not.toMatch(/got a truck ticket or invoice\?\s*snap it/i);
     expect(facts).not.toMatch(/order guide first/i);
     expect(facts).not.toMatch(/Snap this week/i);

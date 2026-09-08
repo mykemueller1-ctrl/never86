@@ -13,7 +13,7 @@ import {
   type PrimeCostEvidence,
 } from '@/lib/freeOperatorDemo';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness } from '@/lib/simpleOwnerDemo/types';
-import { CTAP_SEAT1_PUBLIC_LABEL, CTAP_SEAT1_RESTAURANT_DEFAULT } from '@/lib/ctapSeat1';
+import { CTAP_SEAT1_PUBLIC_LABEL } from '@/lib/ctapSeat1';
 import {
   DAY1_FRONT_PICKS,
   DAY1_HELP_ENERGY,
@@ -23,12 +23,13 @@ import {
   DAY1_MISSING_SPINE,
   DAY1_OPEN_ASK,
   DAY1_PREVIEW_CONTRACT,
-  DAY1_STORE_NAME_FALLBACK,
   DAY1_SUBLINE,
   day1CoachById,
   day1FrontNeedsPhoto,
   day1HookCoach,
   day1MissingSpineCopy,
+  day1MissingSpineState,
+  day1StoreTitle,
   firstPhotoWinLine,
   type Day1FrontPick,
   type Day1FrontPickId,
@@ -96,7 +97,7 @@ export function FreeOperatorPhone() {
   const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
   const [paperPath, setPaperPath] = useState(false);
-  const [storeName, setStoreName] = useState(DAY1_STORE_NAME_FALLBACK);
+  const [storeName, setStoreName] = useState(() => day1StoreTitle(null));
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -142,7 +143,7 @@ export function FreeOperatorPhone() {
         const body = (await desk.json()) as { success?: boolean; restaurantName?: string | null };
         if (cancelled) return;
         const named = body.restaurantName?.trim();
-        if (desk.ok && body.success && named) setStoreName(named);
+        if (desk.ok && body.success) setStoreName(day1StoreTitle(named));
       } catch {
         /* public seat keeps Community Tap */
       }
@@ -326,7 +327,7 @@ export function FreeOperatorPhone() {
         <div className="owner-desk-hello">
           <div>
             <p className="owner-desk-store" title={CTAP_SEAT1_PUBLIC_LABEL}>
-              {storeName || CTAP_SEAT1_RESTAURANT_DEFAULT}
+              {day1StoreTitle(storeName)}
             </p>
             <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>
@@ -341,7 +342,7 @@ export function FreeOperatorPhone() {
           <p className="owner-desk-missing-kicker">Missing</p>
           {DAY1_MISSING_SPINE.map((row) => {
             const copy = day1MissingSpineCopy(row.id, filled);
-            const isMissing = copy === 'Missing / bring a paper';
+            const isMissing = day1MissingSpineState(row.id, filled) === 'missing';
             return (
               <button
                 key={row.id}

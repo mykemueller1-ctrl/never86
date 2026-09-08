@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   DAY1_COACH_ID,
@@ -8,7 +10,6 @@ import {
   DAY1_IDENTITY_LINE,
   DAY1_INVOICE_PATH_ASK,
   DAY1_INVOICE_PLATE_ID,
-  DAY1_MISSING_EMPTY,
   DAY1_MISSING_SPINE,
   DAY1_OPEN_ASK,
   DAY1_OPEN_ENERGY,
@@ -16,15 +17,18 @@ import {
   DAY1_PROMISE_LINE,
   DAY1_STORE_NAME_FALLBACK,
   DAY1_SUBLINE,
+  DAY1_TOY_STORE_TITLES,
   DAY1_WEIRD_ASK,
   day1CoachById,
   day1FrontCopyBlob,
+  day1FrontLeadBlob,
   day1FrontNeedsPhoto,
   day1FrontVoiceIsClean,
   day1HookCoach,
   day1HookPlate,
   day1LeadIsConversationFirst,
   day1MissingSpineCopy,
+  day1StoreTitle,
   firstPhotoWinLine,
   looksLikeDay1BartenderAsk,
   looksLikeDay1VendorAsk,
@@ -36,14 +40,18 @@ describe('day-1 operator-first WOW coach', () => {
     expect(DAY1_OPEN_ASK).toBe(
       "You're not crazy. The stack is. I'm here to get that weight off you so you can run your shop again — and win.",
     );
-    expect(DAY1_SUBLINE).toBe('Your prime coach is finally here. No back-office homework.');
+    expect(DAY1_SUBLINE).toBe('Weight off the plate. No back-office homework.');
     expect(DAY1_OPEN_ENERGY).toBe(DAY1_SUBLINE);
     expect(DAY1_WEIRD_ASK).toBe('What got weird at the shop?');
-    expect(DAY1_HELP_ENERGY).toBe('How can we help you?');
+    expect(DAY1_HELP_ENERGY).toBe("What's still on the plate?");
+    expect(DAY1_HELP_ENERGY).not.toMatch(/how can we help/i);
+    expect(DAY1_HELP_ENERGY).not.toMatch(/what's the problem today/i);
+    expect(DAY1_HELP_ENERGY).not.toMatch(/get started|book a demo/i);
     expect(DAY1_STORE_NAME_FALLBACK).toBe('Community Tap');
     expect(DAY1_IDENTITY_LINE).toMatch(/built by Myke Mueller/);
     expect(DAY1_IDENTITY_LINE).toMatch(/operator first/);
-    expect(DAY1_IDENTITY_LINE).toMatch(/was you/);
+    expect(DAY1_IDENTITY_LINE).not.toMatch(/was you/);
+    expect(DAY1_SUBLINE).not.toMatch(/prime coach is finally here/i);
     expect(DAY1_PROMISE_LINE).toMatch(/Find the leak/);
     expect(DAY1_PREVIEW_CONTRACT).toMatch(/Nothing sends without you/);
     expect(DAY1_OPEN_ASK).not.toMatch(/what's your problem/i);
@@ -72,14 +80,44 @@ describe('day-1 operator-first WOW coach', () => {
       'Beer',
       'Liquor',
     ]);
-    expect(DAY1_MISSING_EMPTY).toBe('Missing / bring a paper');
+    const emptyLines = DAY1_MISSING_SPINE.map((row) => row.emptyCopy);
+    expect(emptyLines).toEqual([
+      'Missing — posted week',
+      'Missing — menu paper',
+      'Missing — pop invoice',
+      'Missing — beer ticket',
+      'Missing — liquor ticket',
+    ]);
+    expect(new Set(emptyLines).size).toBe(emptyLines.length);
+    expect(emptyLines.every((line) => /^Missing/.test(line))).toBe(true);
     for (const row of DAY1_MISSING_SPINE) {
-      expect(day1MissingSpineCopy(row.id, new Set())).toBe('Missing / bring a paper');
+      expect(day1MissingSpineCopy(row.id, new Set())).toBe(row.emptyCopy);
+      expect(day1MissingSpineCopy(row.id, new Set())).not.toBe('Missing / bring a paper');
     }
-    expect(day1MissingSpineCopy('schedules', new Set(['schedule']))).toBe('Paper in');
-    expect(day1MissingSpineCopy('food', new Set(['invoice-truck']))).toBe('Paper in');
-    expect(day1MissingSpineCopy('beer', new Set(['invoice-truck']))).toBe('Missing / bring a paper');
+    expect(day1MissingSpineCopy('schedules', new Set(['schedule']))).toBe('Week is on');
+    expect(day1MissingSpineCopy('food', new Set(['invoice-truck']))).toBe('Menu paper in');
+    expect(day1MissingSpineCopy('beer', new Set(['invoice-truck']))).toBe('Missing — beer ticket');
     expect(JSON.stringify(DAY1_MISSING_SPINE)).not.toMatch(/\$\d/);
+  });
+
+  it('never paints Fun as the empty-desk store title', () => {
+    expect(DAY1_TOY_STORE_TITLES).toContain('fun');
+    expect(day1StoreTitle(null)).toBe('Community Tap');
+    expect(day1StoreTitle('')).toBe('Community Tap');
+    expect(day1StoreTitle('   ')).toBe('Community Tap');
+    expect(day1StoreTitle('Fun')).toBe('Community Tap');
+    expect(day1StoreTitle('fun')).toBe('Community Tap');
+    expect(day1StoreTitle('  FUN  ')).toBe('Community Tap');
+    expect(day1StoreTitle('Community Tap')).toBe('Community Tap');
+    expect(day1StoreTitle('Ada’s Pizza')).toBe('Ada’s Pizza');
+    expect(day1FrontLeadBlob()).not.toMatch(/\bFun\b/);
+    expect(DAY1_STORE_NAME_FALLBACK.toLowerCase()).not.toBe('fun');
+    const phone = readFileSync(resolve('src/components/FreeOperatorPhone.tsx'), 'utf8');
+    expect(phone).toContain('day1StoreTitle');
+    expect(phone).toMatch(/useState\(\(\) => day1StoreTitle\(null\)\)/);
+    expect(phone).not.toMatch(/['"]Fun['"]/);
+    const desk = readFileSync(resolve('src/app/api/desk/route.ts'), 'utf8');
+    expect(desk).toContain('day1StoreTitle');
   });
 
   it('keeps branches as floor nouns — conversation first, invoice when they choose it', () => {
@@ -108,11 +146,15 @@ describe('day-1 operator-first WOW coach', () => {
   it('speaks weight, hats, missing — not suite voice or invented dollars', () => {
     const text = day1FrontCopyBlob();
     expect(text).toMatch(/you're not crazy\. the stack is/i);
-    expect(text).toMatch(/prime coach is finally here/i);
+    expect(text).toMatch(/weight off the plate/i);
     expect(text).toMatch(/no back-office homework/i);
     expect(text).toMatch(/community tap/i);
-    expect(text).toMatch(/missing \/ bring a paper/i);
-    expect(text).toMatch(/how can we help you/i);
+    expect(text).toMatch(/missing — posted week/i);
+    expect(text).toMatch(/missing — beer ticket/i);
+    expect(text).toMatch(/what's still on the plate/i);
+    expect(text).not.toMatch(/prime coach is finally here/i);
+    expect(text).not.toMatch(/how can we help you/i);
+    expect(text).not.toMatch(/was you/);
     expect(text).toMatch(/bartender/i);
     expect(text).toMatch(/drawer/i);
     expect(text).toMatch(/30-60-90|P&L/);
