@@ -23,8 +23,8 @@ import {
   DAY1_NO_RIP_LINE,
   DAY1_ONBOARD_AFTER,
   DAY1_OPEN_ASK,
-  DAY1_OPEN_ENERGY,
   DAY1_PREVIEW_CONTRACT,
+  DAY1_WEIRD_ASK,
   DAY1_PROMISE_LINE,
   DAY1_SEAT_LINE,
   day1CoachById,
@@ -353,7 +353,7 @@ export function FreeOperatorPhone() {
               {firstScreen
                 ? frontPath && !needsPhoto
                   ? DAY1_PREVIEW_CONTRACT
-                  : DAY1_OPEN_ENERGY
+                  : DAY1_WEIRD_ASK
                 : hook.attachHint}
             </p>
           )}

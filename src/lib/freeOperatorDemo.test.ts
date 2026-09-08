@@ -225,7 +225,7 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('Snap photo');
     expect(ui).toContain('DAY1_HOOK_PLATE_ID');
     expect(ui).toContain('DAY1_OPEN_ASK');
-    expect(ui).toContain('DAY1_OPEN_ENERGY');
+    expect(ui).toContain('DAY1_WEIRD_ASK');
     expect(ui).toContain('DAY1_ONBOARD_AFTER');
     expect(ui).toContain('DAY1_HELP_ENERGY');
     expect(ui).toContain('DAY1_IDENTITY_LINE');
