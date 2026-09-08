@@ -9,6 +9,7 @@ import {
   vendorTotalKey,
 } from '@/lib/invoiceIdentity';
 import { decodeInvoiceSource, looksLikeVendorInvoice, parseVendorInvoice } from '@/lib/vendorInvoiceParse';
+import { detectReport, hasParsedReportPack, reportSourceTags } from '@/lib/reportAdapters';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -22,6 +23,25 @@ import type {
   SourceTag,
 } from './types';
 import { SIMPLE_OWNER_MAX_BYTES } from './types';
+
+async function hydrateToastUploads(
+  uploads: SimpleOwnerUploadRecord[],
+  objects: SimpleOwnerObjectStore,
+): Promise<SimpleOwnerUploadRecord[]> {
+  if (!objects.get) return uploads;
+  return Promise.all(
+    uploads.map(async (upload) => {
+      if (!detectReport(upload.filename)) return upload;
+      if (hasParsedReportPack(upload.sourceTags)) return upload;
+      const blob = await objects.get?.({ operatorId: upload.operatorId, objectKey: upload.objectKey });
+      if (!blob) return upload;
+      return {
+        ...upload,
+        sourceTags: [...upload.sourceTags, ...reportSourceTags(upload.filename, blob.bytes)],
+      };
+    }),
+  );
+}
 
 function invoiceIdentityTags(
   filename: string,
@@ -135,6 +155,7 @@ export function createSimpleOwnerDemoService(deps: {
       const classified = classifyUpload(filename, contentType, folder);
       const existing = await deps.repo.listUploads(operatorId);
       const identityTags = invoiceIdentityTags(filename, contentType, bytes, existing);
+      const toastTags = reportSourceTags(filename, bytes);
       const objectKey = buildObjectKey(operatorId, filename, createdAt);
       const stored = await deps.objects.put({
         operatorId,
@@ -150,7 +171,7 @@ export function createSimpleOwnerDemoService(deps: {
         contentType: contentType || 'application/octet-stream',
         byteLength: bytes.byteLength,
         evidenceKind: classified.kind,
-        sourceTags: [...classified.sourceTags, ...identityTags],
+        sourceTags: [...classified.sourceTags, ...identityTags, ...toastTags],
         objectKey: stored.objectKey,
         storageBackend: stored.storageBackend,
         createdAt: createdAt.toISOString(),
@@ -178,7 +199,10 @@ export function createSimpleOwnerDemoService(deps: {
         };
       }
 
-      const uploads = await deps.repo.listUploads(operatorId);
+      const uploads = await hydrateToastUploads(
+        await deps.repo.listUploads(operatorId),
+        deps.objects,
+      );
       const readiness = readinessFromUploads(operatorId, uploads);
       const answer = composeAskAnswer({ question: trimmed, tray, readiness, uploads });
       const record: SimpleOwnerAskRecord = {
@@ -194,8 +218,8 @@ export function createSimpleOwnerDemoService(deps: {
         needs: answer.needs,
         sourceTags: answer.sourceTags,
         inventedClose: false,
-        sampleDollars: 'none-verified',
-        verifiedClose: false,
+        sampleDollars: answer.sampleDollars,
+        verifiedClose: answer.verifiedClose,
         createdAt: now().toISOString(),
       };
       await deps.repo.insertAsk(record);

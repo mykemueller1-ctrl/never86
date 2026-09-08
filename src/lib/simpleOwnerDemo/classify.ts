@@ -1,3 +1,4 @@
+import { detectReport, evidenceKindForReport } from '@/lib/reportAdapters';
 import { plateById, resolveOperatorV2PlateId } from '@/lib/operatorV2';
 import type { EvidenceKind, SourceTag } from './types';
 
@@ -21,6 +22,14 @@ export function classifyUpload(
   kind: EvidenceKind;
   sourceTags: SourceTag[];
 } {
+  const registered = detectReport(filename, contentType);
+  if (registered) {
+    return {
+      kind: evidenceKindForReport(registered),
+      sourceTags: [{ tag: 'unverified', source: `operator-upload:${registered.pos}:${registered.family}` }],
+    };
+  }
+
   const haystack = `${filename} ${contentType}`.toLowerCase();
   for (const row of KIND_PATTERNS) {
     if (row.pattern.test(haystack)) {

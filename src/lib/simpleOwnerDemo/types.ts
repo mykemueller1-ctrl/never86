@@ -53,8 +53,8 @@ export type SimpleOwnerAskRecord = {
   needs: string;
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified';
-  verifiedClose: false;
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated';
+  verifiedClose: boolean;
   createdAt: string;
 };
 
@@ -79,8 +79,8 @@ export type SimpleOwnerAskAnswer = {
   tags: string[];
   sourceTags: SourceTag[];
   inventedClose: false;
-  sampleDollars: 'none-verified';
-  verifiedClose: false;
+  sampleDollars: 'none-verified' | 'toast-verified' | 'toast-estimated';
+  verifiedClose: boolean;
 };
 
 export type ObjectPutResult = {
@@ -95,6 +95,10 @@ export type SimpleOwnerObjectStore = {
     bytes: Uint8Array;
     contentType: string;
   }): Promise<ObjectPutResult>;
+  get?(input: {
+    operatorId: string;
+    objectKey: string;
+  }): Promise<{ bytes: Uint8Array; contentType: string } | null>;
 };
 
 export type SimpleOwnerRepository = {

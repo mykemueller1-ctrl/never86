@@ -115,7 +115,7 @@ export function createNeonRepository(databaseUrl: string): SimpleOwnerRepository
         ) values (
           ${row.id}, ${row.operatorId}, ${row.question}, ${row.tray}, ${row.mouth}, ${row.slug},
           ${row.headline}, ${JSON.stringify(row.facts)}::jsonb, ${row.coachTomorrow}, ${row.needs},
-          ${JSON.stringify(row.sourceTags)}::jsonb, false, ${row.sampleDollars}, false, ${row.createdAt}
+          ${JSON.stringify(row.sourceTags)}::jsonb, false, ${row.sampleDollars}, ${row.verifiedClose}, ${row.createdAt}
         )
       `;
       return row;
@@ -124,7 +124,7 @@ export function createNeonRepository(databaseUrl: string): SimpleOwnerRepository
       await ensureSimpleOwnerDemoSchema(databaseUrl);
       const rows = await sql`
         select id, operator_id, question, tray, mouth, slug, headline, facts, coach_tomorrow,
-               needs, source_tags, created_at
+               needs, source_tags, sample_dollars, verified_close, created_at
         from simple_owner_asks
         where operator_id = ${operatorId}
         order by created_at asc
@@ -138,6 +138,28 @@ export function createNeonRepository(databaseUrl: string): SimpleOwnerRepository
       `;
       return Number((rows[0] as { n?: number } | undefined)?.n ?? 0);
     },
+  };
+}
+
+export function createNeonBlobReader(databaseUrl: string) {
+  const sql = neon(databaseUrl);
+  return async function getBlob(input: {
+    operatorId: string;
+    objectKey: string;
+  }): Promise<{ bytes: Uint8Array; contentType: string } | null> {
+    await ensureSimpleOwnerDemoSchema(databaseUrl);
+    const rows = await sql`
+      select payload_b64, content_type
+      from simple_owner_blobs
+      where object_key = ${input.objectKey} and operator_id = ${input.operatorId}
+      limit 1
+    `;
+    const row = rows[0] as { payload_b64?: string; content_type?: string } | undefined;
+    if (!row?.payload_b64) return null;
+    return {
+      bytes: new Uint8Array(Buffer.from(row.payload_b64, 'base64')),
+      contentType: row.content_type || 'application/octet-stream',
+    };
   };
 }
 
@@ -205,8 +227,8 @@ function mapAsk(row: Record<string, unknown>): SimpleOwnerAskRecord {
     needs: asString(row.needs),
     sourceTags: asJson(row.source_tags, []),
     inventedClose: false,
-    sampleDollars: 'none-verified',
-    verifiedClose: false,
+    sampleDollars: asString(row.sample_dollars, 'none-verified') as SimpleOwnerAskRecord['sampleDollars'],
+    verifiedClose: row.verified_close === true,
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : asString(row.created_at),
   };
 }

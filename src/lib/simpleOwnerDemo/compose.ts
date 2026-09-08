@@ -19,6 +19,12 @@ import {
   spawnLaborRoleCards,
 } from '@/lib/operatorV2';
 import { vendorBabysitLine } from '@/lib/vendorCadenceConfig';
+import {
+  answerToastDeskQuestion,
+  collectToastFacts,
+  isToastParseDisplayTag,
+  routeToastDeskQuestion,
+} from '@/lib/toastParse';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -74,13 +80,40 @@ export function composeAskAnswer(input: {
   readiness: SimpleOwnerReadiness;
   uploads: readonly SimpleOwnerUploadRecord[];
 }): SimpleOwnerAskAnswer {
+  const toastFacts = collectToastFacts(input.uploads);
+  const toastKind = routeToastDeskQuestion(input.question);
+  const toastAnswer =
+    toastKind && (toastFacts.hasToast || toastKind === 'payables')
+      ? answerToastDeskQuestion(input.question, toastFacts)
+      : null;
+  if (toastAnswer) {
+    const persistFact = `Question and answer are stored for operator_id ${input.readiness.operatorId}. Files go to object storage with the same seat key.`;
+    const sourceTags: SourceTag[] = [
+      ...toastAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isToastParseDisplayTag(tag)),
+      { tag: toastAnswer.verifiedClose ? 'verified' : 'unverified', source: `simple-owner-ask:${toastAnswer.slug}` },
+    ];
+    return {
+      slug: toastAnswer.slug,
+      headline: toastAnswer.headline,
+      facts: [...toastAnswer.facts, persistFact],
+      coachTomorrow: toastAnswer.coachTomorrow,
+      needs: toastAnswer.needs,
+      tags: sourceTags.filter((tag) => !isToastParseDisplayTag(tag)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: toastAnswer.sampleDollars,
+      verifiedClose: toastAnswer.verifiedClose,
+    };
+  }
+
   const routed = resolveOwnerDeskAsk(input.question, input.tray);
   const slug = routed.ok ? routed.slug : 'unrouted';
   const sample = routed.ok ? getFreeOperatorAnswer(routed.slug) : null;
   const ready = input.readiness.evidence.filter((row) => row.state === 'READY').map((row) => row.short);
   const missing = input.readiness.evidence.filter((row) => row.state === 'NEED').map((row) => row.short);
   const sourceTags: SourceTag[] = [
-    ...input.readiness.sourceTags,
+    ...input.readiness.sourceTags.filter((tag) => !isToastParseDisplayTag(tag)),
     { tag: 'unverified', source: `simple-owner-ask:${slug}` },
   ];
 

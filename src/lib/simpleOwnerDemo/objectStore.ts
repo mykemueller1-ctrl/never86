@@ -36,6 +36,11 @@ export function createMemoryObjectStore(): SimpleOwnerObjectStore & {
       objects.set(objectKey, { bytes, contentType, operatorId });
       return { objectKey, storageBackend: 'memory' };
     },
+    async get({ operatorId, objectKey }) {
+      const hit = objects.get(objectKey);
+      if (!hit || hit.operatorId !== operatorId) return null;
+      return { bytes: hit.bytes, contentType: hit.contentType };
+    },
   };
 }
 
@@ -63,6 +68,24 @@ export function createR2ObjectStore(
         throw new Error(`R2 put failed (${res.status})${detail ? `: ${detail.slice(0, 180)}` : ''}`);
       }
       return { objectKey, storageBackend: 'r2' };
+    },
+    async get({ operatorId, objectKey }) {
+      const seat = operatorId.replace(/[^a-zA-Z0-9._:-]+/g, '-');
+      if (!objectKey.startsWith(`simple-owner/${seat}/`)) return null;
+      const host = config.jurisdiction
+        ? `${config.accountId}.${config.jurisdiction}.r2.cloudflarestorage.com`
+        : `${config.accountId}.r2.cloudflarestorage.com`;
+      const url = `https://${host}/${config.bucket}/${objectKey}`;
+      const headers = signR2Get({
+        config,
+        host,
+        objectKey,
+        now: new Date(),
+      });
+      const res = await fetchImpl(url, { method: 'GET', headers });
+      if (!res.ok) return null;
+      const buf = new Uint8Array(await res.arrayBuffer());
+      return { bytes: buf, contentType: res.headers.get('content-type') || 'application/octet-stream' };
     },
   };
 }
@@ -113,6 +136,33 @@ export function signR2Put(input: {
   };
 }
 
+export function signR2Get(input: {
+  config: R2Config;
+  host: string;
+  objectKey: string;
+  now: Date;
+}): Record<string, string> {
+  const { config, host, objectKey, now } = input;
+  const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+  const dateStamp = amzDate.slice(0, 8);
+  const payloadHash = sha256Hex('');
+  const canonicalUri = `/${config.bucket}/${objectKey.split('/').map(encodeURIComponent).join('/')}`;
+  const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${amzDate}\n`;
+  const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+  const canonicalRequest = ['GET', canonicalUri, '', canonicalHeaders, signedHeaders, payloadHash].join('\n');
+  const region = 'auto';
+  const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
+  const stringToSign = ['AWS4-HMAC-SHA256', amzDate, credentialScope, sha256Hex(canonicalRequest)].join('\n');
+  const signingKey = getSignatureKey(config.secretAccessKey, dateStamp, region, 's3');
+  const signature = hmacHex(signingKey, stringToSign);
+  return {
+    Authorization: `AWS4-HMAC-SHA256 Credential=${config.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
+    'x-amz-content-sha256': payloadHash,
+    'x-amz-date': amzDate,
+    Host: host,
+  };
+}
+
 function sha256Hex(value: string | Uint8Array): string {
   return createHash('sha256').update(value).digest('hex');
 }
@@ -132,12 +182,18 @@ function getSignatureKey(secret: string, dateStamp: string, region: string, serv
   return hmac(kService, 'aws4_request');
 }
 
-export function createNeonFallbackObjectStore(putBlob: (input: {
-  operatorId: string;
-  objectKey: string;
-  contentType: string;
-  payloadB64: string;
-}) => Promise<void>): SimpleOwnerObjectStore {
+export function createNeonFallbackObjectStore(
+  putBlob: (input: {
+    operatorId: string;
+    objectKey: string;
+    contentType: string;
+    payloadB64: string;
+  }) => Promise<void>,
+  getBlob?: (input: {
+    operatorId: string;
+    objectKey: string;
+  }) => Promise<{ bytes: Uint8Array; contentType: string } | null>,
+): SimpleOwnerObjectStore {
   return {
     async put({ operatorId, objectKey, bytes, contentType }) {
       await putBlob({
@@ -147,6 +203,10 @@ export function createNeonFallbackObjectStore(putBlob: (input: {
         payloadB64: Buffer.from(bytes).toString('base64'),
       });
       return { objectKey, storageBackend: 'neon-object-fallback' };
+    },
+    async get({ operatorId, objectKey }) {
+      if (!getBlob) return null;
+      return getBlob({ operatorId, objectKey });
     },
   };
 }

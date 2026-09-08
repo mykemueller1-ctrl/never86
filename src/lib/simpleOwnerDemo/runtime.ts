@@ -5,7 +5,7 @@ import {
   createR2ObjectStore,
   readR2Config,
 } from './objectStore';
-import { createMemoryRepository, createNeonBlobWriter, createNeonRepository } from './repository';
+import { createMemoryRepository, createNeonBlobReader, createNeonBlobWriter, createNeonRepository } from './repository';
 import { createSimpleOwnerDemoService, type SimpleOwnerDemoService } from './service';
 
 let testOverride: SimpleOwnerDemoService | null = null;
@@ -50,7 +50,7 @@ export function createDefaultSimpleOwnerDemoService(
   const repo = createNeonRepository(databaseUrl);
   const objects = r2
     ? createR2ObjectStore(r2)
-    : createNeonFallbackObjectStore(createNeonBlobWriter(databaseUrl));
+    : createNeonFallbackObjectStore(createNeonBlobWriter(databaseUrl), createNeonBlobReader(databaseUrl));
   return createSimpleOwnerDemoService({ repo, objects });
 }
 

@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { findFreeOperatorPrivacyHits } from '@/lib/freeOperatorDemo';
+import { registerReportAdapter, unregisterReportAdapter } from '@/lib/reportAdapters';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
-import { createMemoryObjectStore, signR2Put } from './objectStore';
+import { createMemoryObjectStore, signR2Get, signR2Put } from './objectStore';
 import { createMemoryRepository } from './repository';
 import { createSimpleOwnerDemoService } from './service';
 import { signDemoTenant, verifyDemoTenant } from './tenant';
@@ -28,11 +29,38 @@ describe('simple owner demo classify + object keys', () => {
     expect(classifyUpload('truck-ticket.jpg').kind).toBe('invoice-truck');
     expect(classifyUpload('liquor-ticket.jpg').kind).toBe('invoice-truck');
     expect(classifyUpload('ZReport_Summary.pdf').kind).toBe('z');
+    expect(classifyUpload('SalesSummary_2026-08-31.csv').kind).toBe('z');
+    expect(classifyUpload('LaborBreakDown_2026-08-31.csv').kind).toBe('timeclock');
+    expect(classifyUpload('TimeEntries.csv').kind).toBe('timeclock');
+    expect(classifyUpload('ItemSelectionDetails.csv').kind).toBe('void');
     expect(classifyUpload('mystery.bin').kind).toBe('other');
+    expect(classifyUpload('SalesSummary_2026-08-31.csv').sourceTags[0]).toEqual({
+      tag: 'unverified',
+      source: 'operator-upload:toast:sales-summary',
+    });
     expect(classifyUpload('Hourly_Sales_Report.pdf').sourceTags[0]).toEqual({
       tag: 'unverified',
       source: 'operator-upload:hourly',
     });
+  });
+
+  it('classifies a newly registered POS from the adapter registry — no classify fork', () => {
+    registerReportAdapter({
+      pos: 'square',
+      family: 'sales-summary',
+      detect: (filename) => /square[_-]?sales/i.test(filename),
+      parse: () => null,
+    });
+    try {
+      const hit = classifyUpload('square-sales.csv');
+      expect(hit.kind).toBe('z');
+      expect(hit.sourceTags[0]).toEqual({
+        tag: 'unverified',
+        source: 'operator-upload:square:sales-summary',
+      });
+    } finally {
+      unregisterReportAdapter('square', 'sales-summary');
+    }
   });
 
   it('uses the open folder to classify a paper-shop camera photo', () => {
@@ -214,6 +242,23 @@ describe('R2 put signer', () => {
     expect(headers.Authorization).toMatch(/^AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE\//);
     expect(headers.Authorization).not.toContain('super-secret-do-not-leak');
     expect(headers['x-amz-content-sha256']).toHaveLength(64);
+    expect(JSON.stringify(headers)).not.toMatch(/super-secret/);
+  });
+
+  it('signs GET without embedding the secret', () => {
+    const headers = signR2Get({
+      config: {
+        accountId: 'acct',
+        accessKeyId: 'AKIAEXAMPLE',
+        secretAccessKey: 'super-secret-do-not-leak',
+        bucket: 'never86-demo',
+      },
+      host: 'acct.r2.cloudflarestorage.com',
+      objectKey: 'simple-owner/demo:a/file.pdf',
+      now: new Date('2026-09-04T12:00:00.000Z'),
+    });
+    expect(headers.Authorization).toMatch(/^AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE\//);
+    expect(headers.Authorization).not.toContain('super-secret-do-not-leak');
     expect(JSON.stringify(headers)).not.toMatch(/super-secret/);
   });
 });
