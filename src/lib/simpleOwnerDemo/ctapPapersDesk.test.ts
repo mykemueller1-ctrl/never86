@@ -74,7 +74,7 @@ describe('CTAP papers-in desk — PDQ morning pack', () => {
     const body = asked.answer.facts.join(' ');
     expect(body).toMatch(/Verified · Menu Category · Food \$400\.00/);
     expect(body).toMatch(/Verified · Menu Category · Large Pizzas \$250\.00/);
-    expect(body).toMatch(/Large Pizzas ≠ Food even if Pulse rolls them together/);
+    expect(body).toMatch(/Large Pizzas ≠ Food even if Action Shift rolls them together/);
     expect(body).not.toMatch(/\$650\.00/);
   });
 

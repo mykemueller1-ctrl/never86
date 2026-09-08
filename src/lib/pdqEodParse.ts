@@ -10,7 +10,7 @@
  * - $0 cash field = unentered POS, not a shortage.
  *
  * Fixtures are synthetic. Do not commit live restaurant totals or staff names.
- * CoS lock: Large Pizzas ≠ Food even if Pulse rolls them together.
+ * CoS lock: Large Pizzas ≠ Food even if Action Shift rolls them together.
  * POS payouts stay untrusted until a receipt match. Primary ingest is
  * the fuller EOD inbox.
  */
