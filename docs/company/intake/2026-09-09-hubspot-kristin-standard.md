@@ -2,7 +2,7 @@
 
 **From:** Cursor cloud agent `bc-71098b0c-c799-4b37-b49c-42f35734030e`  
 **Task:** `hubspot-kristin-standard-spec`  
-**Status:** drafted · docs only · not merged · portal not live-verified  
+**Status:** drafted · docs only · pushed · draft PR `#250` · not merged · portal not live-verified  
 **For HQ:** Grok command hub `Cursor agents: You talk, I run`
 
 ## What I found (5 bullets max)
