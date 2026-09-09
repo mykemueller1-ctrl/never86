@@ -71,7 +71,8 @@ Myke authorized workers to use connected apps, Chrome, and desktop computer cont
 | Cursor cloud agent | Code, git, verified MCPs | Cannot drive local Chrome |
 | Cursor desktop MCP Connect | After Myke clicks Connect | Gmail, Calendar, X OAuth |
 | Grok Bot Agent Computer | Shared Linux Chrome/logins | Password / 2FA / CAPTCHA takeover |
-| Sentia+ | Signed-in browser app | No CRM write without exact approval |
+| HubSpot product CRM | Kristin owns it. Spec: [`HUBSPOT_CRM_SPEC.md`](HUBSPOT_CRM_SPEC.md) | Factory never writes, merges, or deletes. Portal not live-read from cloud. |
+| Sentia+ | Signed-in browser app; older intake still names it | Overlap with HubSpot is a hygiene ticket, not an auto-merge. No CRM write without exact approval. |
 
 **Still forbidden:** agent-typed passwords/2FA/CAPTCHA; auto-send/post/DM; random account creation; Apollo; marketplace portal credentials; Facebook unless Myke asks.
 
