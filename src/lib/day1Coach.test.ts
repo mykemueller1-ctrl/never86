@@ -113,7 +113,7 @@ describe('day-1 operator-first WOW coach', () => {
     expect(day1FrontLeadBlob()).not.toMatch(/\bFun\b/);
     expect(DAY1_STORE_NAME_FALLBACK.toLowerCase()).not.toBe('fun');
     const phone = readFileSync(resolve('src/components/FreeOperatorPhone.tsx'), 'utf8');
-    expect(phone).toContain('day1StoreTitle');
+    expect(phone).toContain("return 'Your restaurant'");
     expect(phone).toContain('deskSeatLabel');
     expect(phone).toContain('deskSeatTitle');
     expect(phone).not.toMatch(/title=\{CTAP_SEAT1_PUBLIC_LABEL\}/);

@@ -37,25 +37,25 @@ export default function Home() {
           <div>
             <p className="human-kicker">Payroll · Prices · Process</p>
             <h1 className="mt-6 max-w-5xl font-serif text-[clamp(3.9rem,8.5vw,7.8rem)] font-medium leading-[0.88] tracking-[-0.055em] text-[#161616]">
-              Find the leak.
-              <span className="block italic text-[#005de8]">Run the fix.</span>
+              Too many hats.
+              <span className="block italic text-[#005de8]">Start with one problem.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#514b43] md:text-xl">
-              Paper-shop folders first: schedule, labor cards, menu, invoice / truck. Photo the week. Labor cards name roles. Daily compare to the clock. Never 86&apos;d reads the evidence and gives you one move with the receipt attached.
+              The invoice you haven’t checked. The shift that ran late. The note nobody followed up on. Bring it to Never 86&apos;d and work through the next move, with the source beside the answer.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>
                 Claim the free owner seat →
               </Link>
-              <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'Watch the recorded demo' } })}>
-                Watch the recorded demo
+              <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'See how it works' } })}>
+                See how it works
               </Link>
             </div>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#514b43]">
-              Watch the recorded demo, then give your email. Seat 1 is Community Tap — free for one store. No card. Set a password once.
+              One owner seat. One restaurant. Free to start. No card. Your restaurant gets its own workspace.
             </p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Email capture · set-password once · already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
+              Already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
             </p>
           </div>
 
@@ -106,8 +106,8 @@ export default function Home() {
           </h2>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
-              ['1', 'Watch the recorded demo', 'See the loop: find the leak, assign the fix, keep the receipt. No sandbox required to start.'],
-              ['2', 'Give your email', 'Claim the free owner seat. We email a set-password link once. Then /login is email + password. No card or onboarding interview.'],
+              ['1', 'Pick one job', 'Check an invoice, compare scheduled hours with the clock, or untangle a shift handoff.'],
+              ['2', 'Bring what you have', 'Create your seat and add a file, photo, or note. You can connect a cloud account later.'],
               ['3', 'Get a receipt-backed move', 'Bring one real thing. See what changed, why it matters, what to do next, and what proves the fix.'],
             ].map(([number, title, copy]) => (
               <article key={number} className="rounded-2xl border border-[#33455c] bg-[#111b27] p-6">
@@ -119,7 +119,7 @@ export default function Home() {
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link href="/onboard" className="human-button human-button-light">Claim the free owner seat →</Link>
-            <Link href="/#demo" className="human-button border border-[#5f7591] text-white hover:border-white">Watch the recorded demo</Link>
+            <Link href="/#demo" className="human-button border border-[#5f7591] text-white hover:border-white">See how it works</Link>
           </div>
         </div>
       </section>
@@ -127,13 +127,13 @@ export default function Home() {
       <section id="demo" className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
           <div>
-            <p className="human-kicker">Recorded demo</p>
+            <p className="human-kicker">One job at a time</p>
             <h2 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
-              Watch the recorded demo.
-              <span className="block italic text-[#005de8]">Then give your email.</span>
+              Bring the paper.
+              <span className="block italic text-[#005de8]">See the next move.</span>
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#514b43]">
-              Strangers do not need a sandbox. Watch the recorded demo, then claim the free owner seat with your email. Set a password once. Then /login is the daily door.
+              Start with one question. Never 86&apos;d checks the records you provide, shows what is missing, and helps you decide what to do next.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
@@ -155,14 +155,14 @@ export default function Home() {
             </div>
           ) : (
             <div className="human-receipt-card border-[#005de8] bg-[#fffdf8] p-7 md:p-9">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-[#005de8]">Demo placeholder</p>
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-[#005de8]">Example workflow · invoice check</p>
               <div className="mt-6 flex aspect-video items-center justify-center rounded-xl border border-dashed border-[#005de8] bg-[#f1f6ff] px-6 text-center">
                 <p className="max-w-sm text-sm leading-relaxed text-[#514b43]">
-                  The hosted recorded demo is not on this page yet. No fake player. Watch it here when the URL is set — until then, give your email and claim the free owner seat.
+                  Add two invoices from the same vendor. Check the SKU and pack size. Review a price change beside the original lines. Decide what to ask before your next order.
                 </p>
               </div>
               <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#766f65]">
-                Watch the recorded demo, then give your email
+                Your records · your decision · a clear next step
               </p>
             </div>
           )}
@@ -171,7 +171,7 @@ export default function Home() {
 
       <section id="one-to-three" className="border-t border-[#d8cec0] px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-7xl">
-          <p className="human-kicker">1–3 unit ICP · not Command Center</p>
+          <p className="human-kicker">For independent restaurants</p>
           <h2 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
             Owner seat first.
             <span className="block italic text-[#005de8]">Pay when you add seats.</span>
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
-            <Link href="/#demo" className="human-button human-button-secondary">Watch the recorded demo</Link>
+            <Link href="/#demo" className="human-button human-button-secondary">See how it works</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
           </div>
         </div>

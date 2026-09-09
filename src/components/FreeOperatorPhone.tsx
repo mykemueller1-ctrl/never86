@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { OperatorQuickStart } from './OperatorQuickStart';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { trackEvent } from '@/lib/track';
 import { FreeOperatorAnswerCard } from '@/components/FreeOperatorAnswerCard';
@@ -42,7 +43,6 @@ import {
   day1HookCoach,
   day1MissingSpineCopy,
   day1MissingSpineState,
-  day1StoreTitle,
   firstPhotoWinLine,
   type Day1FrontPick,
   type Day1FrontPickId,
@@ -120,7 +120,7 @@ export function FreeOperatorPhone({
   const [storeName, setStoreName] = useState(() => {
     if (initialRestaurantName?.trim()) return deskSeatLabel(initialRestaurantName);
     if (signedIn) return '';
-    return day1StoreTitle(null);
+    return 'Your restaurant';
   });
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -130,6 +130,7 @@ export function FreeOperatorPhone({
   const [answer, setAnswer] = useState<SimpleOwnerAskAnswer | null>(null);
   const [localName, setLocalName] = useState<string | null>(null);
   const [askFocused, setAskFocused] = useState(false);
+  const [startJob, setStartJob] = useState<string | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
@@ -403,8 +404,12 @@ export function FreeOperatorPhone({
       </header>
 
       <div className="owner-desk-stage">
-        <aside className="owner-desk-missing-rail" aria-label="Missing honesty spine">
-          <p className="owner-desk-missing-kicker">Missing</p>
+        <aside className="owner-desk-missing-rail" aria-label="Restaurant workspace">
+          <p className="owner-desk-missing-kicker">Your workspace</p>
+          <button type="button" className="owner-desk-missing-row" onClick={() => onTray('action')}>
+            <span className="owner-desk-missing-label">Today</span>
+            <span className="owner-desk-missing-state">One thing off your plate</span>
+          </button>
           {DAY1_MISSING_SPINE.map((row) => {
             const copy = day1MissingSpineCopy(row.id, filled);
             const isMissing = day1MissingSpineState(row.id, filled) === 'missing';
@@ -425,20 +430,30 @@ export function FreeOperatorPhone({
         <div className="owner-desk-main">
       {view === 'home' ? (
         <section className="owner-desk-lom">
-          <p className="owner-desk-kicker">Action Shift</p>
+          <p className="owner-desk-kicker">Your operator desk</p>
           <h1 className="owner-desk-ask-title">
-            {lastWeekPrime.honesty === 'Missing' ? LAST_WEEK_PRIME_LOAD_ASK : lastWeekPrime.headline}
+            {firstScreen ? 'What’s eating your time today?' : lastWeekPrime.honesty === 'Missing' ? 'Let’s take one thing off your plate.' : lastWeekPrime.headline}
           </h1>
+          {firstScreen ? <OperatorQuickStart selected={startJob} busy={busy} onFile={() => onMouth('file')} onPhoto={() => onMouth('photo')} onSelect={(id, question) => {
+            setStartJob(id);
+            setActiveFolder(id === 'invoice' ? 'invoice-truck' : id === 'labor' ? 'schedule' : null);
+            setAsk(question);
+            setTray('action');
+            document.getElementById('owner-desk-ask')?.focus();
+            trackEvent('operator_first_job_selected', { pagePath: '/operator', meta: { job: id } });
+          }} /> : null}
           {winLine ? (
             <div className="owner-desk-win" role="status">
               <p className="owner-desk-win-mark">Ready</p>
               <p className="owner-desk-win-line">{winLine}</p>
             </div>
-          ) : (
+          ) : !firstScreen ? (
             <p className="owner-desk-poetry">
               {lastWeekPrime.nextLoad} Invoice ≠ COGS. Band {lastWeekPrime.bandMin}–{lastWeekPrime.bandMax}%. Missing stays Missing.
             </p>
-          )}
+          ) : null}
+          <details className="operator-evidence-details">
+          <summary>Review last week’s sales and costs</summary>
           <article className="owner-desk-lastweek" aria-label="Last-week prime">
             <p className="owner-desk-lastweek-kicker">{lastWeekPrime.honesty} · last-week prime</p>
             <ul className="owner-desk-lastweek-list">
@@ -475,12 +490,16 @@ export function FreeOperatorPhone({
           >
             Add last-week files
           </button>
+          </details>
+          <details className="operator-evidence-details">
+          <summary>Bring files from Gmail or Drive</summary>
           <PapersInboxConnect
             onPulled={(next) => {
               setReceipt(next);
               setFlash(next);
             }}
           />
+          </details>
           {firstScreen ? (
             <p className="owner-desk-identity">
               {DAY1_IDENTITY_LINE}
