@@ -19,7 +19,7 @@ This is a demo with made up restaurant records. Live AI, photo reading, account 
 
 The offer I’m building toward: one location and one seat free. Extra manager seats will be paid.
 
-Try the sample: DEMO_URL
+Try the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
 
 Then tell me where it loses you. Invoice prices, extra hours, drink costs, or getting the next shift ready?
 

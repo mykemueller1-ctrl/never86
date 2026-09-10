@@ -12,7 +12,7 @@ The first promise is small: understand one cost question and the next action. Th
 
 | Day | Concrete asset and action | Owner | Measure |
 | --- | --- | --- | --- |
-| 1 | Publish the founder LinkedIn post and the X thread after the sample URL and recording are verified. Use one clear demo link. | Myke publishes. Content agent prepares the exact files. | Source visits, demo starts, finished checks, time to finish. Record unknown metrics as unknown. |
+| 1 | Publish the founder LinkedIn post and the X thread with the verified sample URL and completed captioned walkthrough. Use one clear demo link. | Myke publishes. Content agent prepares the exact files. | Source visits, demo starts, finished checks, time to finish. Record unknown metrics as unknown. |
 | 2 | Review the first sessions. Answer actual public questions in Myke’s voice. Log the step where people paused. Fix the most common failure before making more assets. | Myke and product reviewer. | Count failures by step and the user’s own words. |
 | 3 | Publish the invoice still and the short copy below. Show the same product and pack alongside the change. | Myke publishes. Design agent prepares the crop. | Does this draw operators with a real invoice problem? Does the invoice path finish? |
 | 4 | Publish the labor still on X. Run more observed sessions with a manager role. | Myke and product reviewer. | Can the person explain hours versus cost and what to ask next? |
@@ -34,7 +34,7 @@ That’s $2.40 to $2.60 per pound. Twenty cents more per pound. Six dollars more
 
 The product and pack have to match before the comparison means anything.
 
-Made up records. You can check the math in the sample: DEMO_URL
+Made up records. You can check the math in the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
 
 I’m Myke, founder of Never86’d. What invoice item do you check first?
 
@@ -44,7 +44,7 @@ Scheduled until 10. Clocked out at midnight.
 
 That’s two extra hours in this sample. The next question is what happened on the shift.
 
-Try the Never86’d sample: DEMO_URL
+Try the Never86’d sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. I’m Myke, the founder.
 
@@ -56,7 +56,7 @@ That’s $1.48 of spirit per pour in this sample. Mixers, garnish and waste come
 
 What’s your standard pour?
 
-Try the Never86’d sample: DEMO_URL
+Try the Never86’d sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. I’m Myke, the founder.
 
@@ -68,7 +68,7 @@ Who? By when? What do they need to bring back?
 
 That’s the handoff I’m building into Never86’d. One next action with a clear owner and due time.
 
-Try the sample draft: DEMO_URL
+Try the sample draft: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. The demo does not send anyone a message.
 

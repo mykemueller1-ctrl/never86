@@ -35,27 +35,27 @@ class Scene:
 
 
 SCENES = (
-    Scene("01-invoice-result.png", 7, (
+    Scene("01-invoice-result.jpg", 7, (
         "Same cheese. Same case.",
         "$12 more on this sample order.",
     )),
-    Scene("02-invoice-evidence.png", 11, (
+    Scene("02-invoice-evidence.jpg", 11, (
         "$2.40 → $2.60 per lb.",
         "Check the math.",
     )),
-    Scene("03-handoff.png", 13, (
+    Scene("03-handoff.jpg", 13, (
         "Ask the vendor. Name an owner.",
         "Keep the reply.",
     )),
-    Scene("04-labor.png", 11, (
+    Scene("04-labor.jpg", 11, (
         "Two extra hours.",
         "Find out why.",
     )),
-    Scene("05-pour.png", 9, (
+    Scene("05-pour.jpg", 9, (
         "Know what your",
         "standard pour costs.",
     )),
-    Scene("06-demo-link.png", 9, (
+    Scene("06-demo-link.jpg", 9, (
         "Try the Never86’d",
         "sample demo.",
     )),
@@ -87,7 +87,7 @@ def arguments(argv: list[str] | None = None) -> argparse.Namespace:
             "Do not substitute customer screenshots or different figures."
         ),
     )
-    parser.add_argument("capture_dir", type=Path, help="Directory containing the six named PNG captures")
+    parser.add_argument("capture_dir", type=Path, help="Directory containing the six named JPEG captures")
     parser.add_argument("output", type=Path, help="Output MP4 path")
     parser.add_argument("--ffmpeg", type=Path, required=True, help="Explicit path to the FFmpeg executable")
     parser.add_argument("--font", type=Path, help="Optional TrueType/OpenType font file; an installed system font is used otherwise")

@@ -1,6 +1,6 @@
 {
-  "status": "Draft only. Replace DEMO_URL and verify every shown feature before posting.",
-  "media": "Attach the finished 60 second sample demo video to post 1.",
+  "status": "Reviewable copy. Public demo and canonical calculations verified by the release owner around 2026-09-10 03:23 UTC. Not published or scheduled.",
+  "media": "Attach deliverables/never86-sample-demo-60s.mp4 to post 1. This completed silent captioned walkthrough uses six still screenshots of the deployed demo. It is not a live interaction recording or a voiceover.",
   "posts": [
     {
       "number": 1,
@@ -20,7 +20,7 @@
     },
     {
       "number": 5,
-      "text": "Try the sample: DEMO_URL\n\nWhich job should we make easiest first: invoice prices, extra hours, drink costs, or the next shift?\n\nI’m Myke, founder of Never86’d. I want the answer from people doing the work."
+      "text": "Try the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator\n\nWhich job should we make easiest first: invoice prices, extra hours, drink costs, or the next shift?\n\nI’m Myke, founder of Never86’d. I want the answer from people doing the work."
     }
   ]
 }

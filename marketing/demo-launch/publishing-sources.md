@@ -4,7 +4,7 @@ Official sources checked September 9, 2026. This is a publishing guide, not a re
 
 ## LinkedIn
 
-Use Myke’s founder profile for the main post. Keep the first person wording and founder identification together. In the native composer, add the final video, paste the text from `linkedin-founder-post.txt`, replace `DEMO_URL`, and inspect the visibility and comment settings. Preview the captions and ensure the sample label remains readable. LinkedIn supports uploading a video through its sharing interface. It does not let a creator directly place a video in the immersive feed. [Share videos](https://www.linkedin.com/help/linkedin/answer/a7174587), [Video FAQ](https://www.linkedin.com/help/linkedin/answer/a554002)
+Use Myke’s founder profile for the main post. Keep the first person wording and founder identification together. In the native composer, attach `deliverables/never86-sample-demo-60s.mp4`, paste the text from `linkedin-founder-post.txt` with its verified public URL, and inspect the visibility and comment settings. Preview the captions and ensure the sample label remains readable. LinkedIn supports uploading a video through its sharing interface. It does not let a creator directly place a video in the immersive feed. [Share videos](https://www.linkedin.com/help/linkedin/answer/a7174587), [Video FAQ](https://www.linkedin.com/help/linkedin/answer/a554002)
 
 LinkedIn offers a native scheduling control. Check the date and local time before scheduling. For the first launch, publish at a time when Myke can respond to genuine questions. Scheduled video captions may only be ready to review after the post is live, so review them promptly or use a carefully captioned export. [Schedule posts](https://www.linkedin.com/help/linkedin/answer/a1347212), [Caption review](https://www.linkedin.com/help/linkedin/answer/a1360638)
 
@@ -12,7 +12,7 @@ After publication, record the actual post URL and read its analytics. LinkedIn d
 
 ## X
 
-Open the native composer and paste post 1 from `x-thread.json`. Attach the verified video. Use the plus control to add the other four posts. Replace the link placeholder and inspect the complete thread before using “Post all.” The standard composer supports 280 character posts; the prepared thread keeps each post below that limit before final URL replacement. The composer remains the final length check. [Create a thread](https://help.x.com/en/using-x/create-a-thread), [Post instructions](https://help.x.com/en/using-x/how-to-post)
+Open the native composer and paste post 1 from `x-thread.json`. Attach the verified video. Use the plus control to add the other four posts. Keep the verified public link and inspect the complete thread before using “Post all.” The standard composer supports 280 character posts; the prepared thread keeps each post below that limit with the verified public URL included. The composer remains the final length check. [Create a thread](https://help.x.com/en/using-x/create-a-thread), [Post instructions](https://help.x.com/en/using-x/how-to-post)
 
 The 60 second video fits the documented 140 second limit for an account without Premium. Keep the actual export under the documented 512 MB limit. [X video upload guidance](https://help.x.com/en/using-x/x-videos)
 
@@ -32,6 +32,6 @@ Keep “sample demo” and “made up records” near the results and in the lau
 
 If an outside creator is compensated or given a benefit to promote Never86’d, disclose the relationship. LinkedIn requires clear notice of endorsement benefits. X’s paid partnership policy requires the disclosure toggle for applicable organic paid partnerships and includes regional differences. Check the exact arrangement before a partner publishes. [LinkedIn professional rules](https://www.linkedin.com/legal/professional-community-policies), [X paid partnership policy](https://help.x.com/en/rules-and-policies/paid-partnerships-policy)
 
-Use real screen recordings and Myke’s own narration or plain captions. If synthetic media depicts someone saying or doing something they did not, disclose it clearly and follow the service’s rules. This kit does not need synthetic people. [LinkedIn authenticity rules](https://www.linkedin.com/legal/professional-community-policies), [X authenticity policy](https://help.x.com/en/rules-and-policies/authenticity)
+The supplied video is a silent captioned walkthrough assembled from six real screenshots of the deployed sample. No live interaction recording or narration was made. For a future narrated version, use Myke’s own narration. If synthetic media depicts someone saying or doing something they did not, disclose it clearly and follow the service’s rules. This kit does not need synthetic people. [LinkedIn authenticity rules](https://www.linkedin.com/legal/professional-community-policies), [X authenticity policy](https://help.x.com/en/rules-and-policies/authenticity)
 
 No official source here establishes an ideal posting hour, a magic hashtag count, a guaranteed reach outcome or an algorithm advantage from hiding a link. The rollout is a test of a clear problem and a usable demo.

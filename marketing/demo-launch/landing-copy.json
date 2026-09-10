@@ -1,10 +1,10 @@
 {
-  "status": "Copy for the public sample demo. Verify controls and feature names against the deployed build.",
+  "status": "Reviewable copy for the public sample demo. Canonical inputs and controls verified by the release owner around 2026-09-10 03:23 UTC. Live restaurant accounts and integrations remain separate work.",
   "badge": "SAMPLE DEMO · MADE UP RECORDS",
   "headline": "Where did the extra cost come from?",
   "subhead": "Check an invoice price, an extra shift hour, or the cost of a pour. See the source. Leave with one clear next step.",
   "primaryCta": "Try the sample demo",
-  "primaryHref": "DEMO_URL",
+  "primaryHref": "https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator",
   "secondaryCta": "Watch the 60 second walkthrough",
   "firstStep": "Pick the job that’s on your mind.",
   "cards": [

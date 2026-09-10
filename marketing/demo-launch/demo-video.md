@@ -1,10 +1,27 @@
-# Record the sample demo
+# Captioned walkthrough and optional recording script
 
-Status: script and recording directions are ready. This file is not a finished video. Capture the verified public sample build, then replace `DEMO_URL`.
+## Completed media
+
+`deliverables/never86-sample-demo-60s.mp4` has been rendered as a 60 second silent captioned walkthrough. It uses still screenshots captured from the verified [public sample demo](https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator). Output: 1920 × 1080, H.264, 30 fps. There is no voiceover or live interaction recording. The following timeline describes the completed assembly, not measured task completion time.
+
+| Time | Screenshot |
+| --- | --- |
+| 00:00–00:07 | `01-invoice-result.jpg` |
+| 00:07–00:18 | `02-invoice-evidence.jpg` |
+| 00:18–00:31 | `03-handoff.jpg` |
+| 00:31–00:42 | `04-labor.jpg` |
+| 00:42–00:51 | `05-pour.jpg` |
+| 00:51–01:00 | `06-demo-link.jpg` |
+
+`07-phone-start.jpg` is an additional phone screenshot supplied separately. No square social crops have been produced. Final playback review is handled by the release owner before packaging.
+
+## Optional future recording
+
+The script below is available for a future recording with real clicks and narration. It was not used as a voiceover in the completed walkthrough.
 
 Use Myke’s real voice if available. An editor can use this script as captions over a silent screen recording. Do not generate a fake founder performance or an invented customer endorsement.
 
-## 60 second walkthrough
+### Optional 60 second narration script
 
 | Time | Screen action | Spoken words and captions |
 | --- | --- | --- |
@@ -28,7 +45,7 @@ The timing is an editing target. Record naturally, then shorten pauses or copy i
 | Pour | Bottle $25. Bottle 750 ml. Pour 1.5 US fl oz. Conversion 29.5735295625 ml per US fl oz. | $1.48 spirit cost per pour, rounded for display. Mixers, garnish and waste are additional. |
 | Handoff | Fictional role or person, clear due date and time, check required. | A local draft only. No message sent and no live assignment created. |
 
-## Production directions
+## Optional recording directions
 
 Record a clean browser window with personal bookmarks, email, extensions and private tabs hidden. Use the public sample route only. Frame one record and one result at a time. Show the mouse movement and a real click before each result.
 
@@ -38,16 +55,15 @@ Use the actual forest green and cream demo styling. Keep “SAMPLE DEMO” visib
 
 One 60 second file fits within the current documented LinkedIn duration limit and X’s 140 second limit for accounts without Premium. Verify the final export in the composer before publishing. [LinkedIn video specifications](https://www.linkedin.com/help/linkedin/answer/a7174587), [X video specifications](https://help.x.com/en/using-x/x-videos)
 
-## Still images to export
+## Supplied still images
 
-1. The invoice comparison with both sample source rows and the $0.20 per lb change. Caption: “Same product. Same pack. What changed?”
-2. The schedule comparison showing 22:00 scheduled and 00:00 next day actual. Caption: “Two extra hours. Start with the question.”
-3. The pour calculator showing all three inputs and $1.48. Caption: “Know the cost of your standard pour.”
+1. `01-invoice-result.jpg` and `02-invoice-evidence.jpg`: sample invoice result and source records. Suggested post caption: “Same product. Same pack. What changed?”
+2. `03-handoff.jpg`: sample action draft.
+3. `04-labor.jpg`: sample schedule comparison. Suggested post caption: “Two extra hours. Start with the question.”
+4. `05-pour.jpg`: sample pour calculation. Suggested post caption: “Know the cost of your standard pour.”
+5. `06-demo-link.jpg`: demo entry and link scene.
+6. `07-phone-start.jpg`: phone layout with the first action visible.
 
 Every image needs a visible sample label. Use the source values on screen as written. No recovered dollars, customer logos, private restaurant details, stock testimonials, or fake chat responses.
 
-## Export names
-
-`never86-sample-demo-60s.mp4`, `never86-sample-invoice.png`, `never86-sample-labor.png`, `never86-sample-pour.png`.
-
-These names describe assets to produce. Their existence and final output quality must be checked before the post is marked ready.
+Use the supplied filenames above when packaging. The optional narration and square crop directions describe future assets, not additional completed exports.
