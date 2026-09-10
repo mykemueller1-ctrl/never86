@@ -92,4 +92,5 @@ export type DemoDraft = {
   dueDay: string;
   dueTime: string;
   proof: string;
+  question?: string;
 };

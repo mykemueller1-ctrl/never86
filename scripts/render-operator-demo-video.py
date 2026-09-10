@@ -35,29 +35,29 @@ class Scene:
 
 
 SCENES = (
-    Scene("01-invoice-result.jpg", 7, (
-        "Same cheese. Same case.",
-        "$12 more on this sample order.",
+    Scene("01-vendor-prices.jpg", 8, (
+        "Same cheese. Two vendors.",
+        "Watch both prices move.",
     )),
-    Scene("02-invoice-evidence.jpg", 11, (
-        "$2.40 → $2.60 per lb.",
-        "Check the math.",
+    Scene("02-order-result.jpg", 12, (
+        "$6 less on cheese.",
+        "$6 more with delivery.",
     )),
-    Scene("03-handoff.jpg", 13, (
-        "Ask the vendor. Name an owner.",
+    Scene("03-smaller-case.jpg", 10, (
+        "A smaller case changes the order.",
+        "Check the weight and the extra food.",
+    )),
+    Scene("04-handoff.jpg", 12, (
+        "Ask what changed. Name an owner.",
         "Keep the reply.",
     )),
-    Scene("04-labor.jpg", 11, (
-        "Two extra hours.",
-        "Find out why.",
-    )),
-    Scene("05-pour.jpg", 9, (
-        "Know what your",
-        "standard pour costs.",
+    Scene("05-labor-pour.jpg", 9, (
+        "The shift ran two hours late.",
+        "Find the reason before the next shift.",
     )),
     Scene("06-demo-link.jpg", 9, (
         "Try the Never86’d",
-        "sample demo.",
+        "sample operator desk.",
     )),
 )
 
@@ -67,9 +67,9 @@ CANVAS_HEIGHT = 1080
 SCREEN_WIDTH = 1780
 SCREEN_HEIGHT = 790
 SCREEN_TOP = 76
-BACKGROUND = "0x17372F"
-CREAM = "0xF8F7F0"
-MUTED = "0xDDE7DC"
+BACKGROUND = "0x25262A"
+CREAM = "0xF8F6F2"
+MUTED = "0xDFBBA2"
 
 
 class RenderError(Exception):
