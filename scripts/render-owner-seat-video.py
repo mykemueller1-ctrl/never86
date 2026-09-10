@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render caption-matched closeups from inspected owner seat UI captures.
+"""Render caption-matched scenes from inspected owner seat UI captures.
 Produces 1080p H.264, CRF 14, 30fps, no audio, plus exact caption SRT.
 The source screenshots and crop rectangles are captured through browser tools.
 """
@@ -15,7 +15,7 @@ args=parser.parse_args()
 scenes=json.loads((Path(__file__).resolve().parents[1]/'marketing/demo-launch/owner-seat-story.json').read_text(encoding='utf-8'))
 frames={f['id']:f for f in json.loads((args.captures/'frames.json').read_text(encoding='utf-8'))}
 if args.short:
-    scenes=[{**scenes[0],'seconds':7},{**scenes[2],'seconds':8},{**scenes[5],'seconds':5}]
+    scenes=[{**scenes[0],'seconds':7},{**scenes[1],'seconds':8},{**scenes[-1],'seconds':5}]
 assert sum(s['seconds'] for s in scenes)==(20 if args.short else 60)
 args.output.parent.mkdir(parents=True,exist_ok=True)
 def run(params,work):

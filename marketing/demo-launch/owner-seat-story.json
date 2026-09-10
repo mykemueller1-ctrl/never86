@@ -1,62 +1,62 @@
 [
   {
-    "id": "01-prices",
-    "seconds": 8,
+    "id": "01-vendors",
+    "seconds": 10,
     "caption": [
-      "Your cheese was $72 a case.",
-      "Now it’s $78. We flag the increase."
+      "Two invoices. What went up this week?",
+      "Catch the price change before the next order."
     ],
-    "screen": "Hilltop invoice history: $72 to $78 for a 30 lb case.",
-    "voice": "Your cheese was seventy two dollars a case. Now it’s seventy eight. We flag the increase."
+    "screen": "Full app with the sidebar visible. Hilltop and Lakefront price histories sit side by side.",
+    "voice": "Start with this week’s invoice and last week’s. See which items went up. Then check what your other vendor charges for the same cheese. You don’t have to sort through the item numbers."
   },
   {
-    "id": "02-vendors",
-    "seconds": 9,
+    "id": "02-menu",
+    "seconds": 10,
     "caption": [
-      "Hilltop: $78. Lakefront: $75.",
-      "We line up the same cheese for you."
-    ],
-    "screen": "Both vendor histories, case prices, case weights and product identity.",
-    "voice": "One vendor charges seventy eight. The other charges seventy five. We line up the same cheese, even when the item numbers are different."
-  },
-  {
-    "id": "03-menu",
-    "seconds": 12,
-    "caption": [
-      "That’s 10¢ more on your cheese pizza.",
+      "That increase adds 10¢ to this cheese pizza.",
       "Food cost: 30.6%. Your target: 30%."
     ],
-    "screen": "Recipe target card: cheese pizza, 30.6% food cost, 30% target, $0.10 more per pizza.",
-    "voice": "That increase adds ten cents to your cheese pizza. Your food cost is now thirty point six percent. Your target is thirty. That’s the item to check."
+    "screen": "The menu cost card inside the full app. Cheese pizza ingredient cost is $4.90 on a $16 menu price, with an editable 30% target.",
+    "voice": "The cheese went up. That adds ten cents to this pizza. Food cost is thirty point six percent against your thirty percent target. Now you know which item needs a look."
   },
   {
-    "id": "04-prepared",
+    "id": "03-labor",
     "seconds": 11,
     "caption": [
-      "The vendor question is already written.",
-      "Alex and the due time are filled in."
+      "Scheduled until 10. Clocked out at midnight.",
+      "Check what kept the shift running."
     ],
-    "screen": "Prepared vendor question with Alex and Before Friday prep at 10:00.",
-    "voice": "The vendor question is already written. Alex and the due time are filled in. Review it. Change something only if you need to."
+    "screen": "Hours on the clock is selected in the sidebar. Sam’s planned and actual shift appear with the two hour difference.",
+    "voice": "Over in labor, the schedule ended at ten. The clock says midnight. Was it a late close, extra prep or a missed punch? Get the reason before the next shift."
   },
   {
-    "id": "05-approval",
+    "id": "04-pours",
     "seconds": 10,
     "caption": [
-      "Review once. Approve the follow up.",
-      "No starting from a blank form."
+      "A $25 bottle. Your 1.5 ounce pour.",
+      "$1.48 of spirit in each drink."
     ],
-    "screen": "Approval confirmation retained in the preview tab. Nothing is sent.",
-    "voice": "Approve the follow up. You don’t have to start from a blank form. In this preview, nothing is sent."
+    "screen": "Cost of a pour is selected. A $25, 750 ml bottle and 1.5 US fl oz pour produce $1.48 of spirit cost. Mixers, garnish and waste are excluded.",
+    "voice": "Then check the bar. A twenty five dollar bottle and your ounce and a half pour. That’s a dollar forty eight of spirit in each drink, before mixers, garnish and waste."
   },
   {
-    "id": "06-seat",
+    "id": "05-follow-up",
     "seconds": 10,
     "caption": [
-      "Keep your food costs in sight.",
-      "Try your Never86 owner seat."
+      "The question, person and due time are ready.",
+      "Review it. Approve the follow up."
     ],
-    "screen": "Owner seat heading and price watch.",
-    "voice": "Keep your food costs in sight. Know what changed, see the menu impact, and review the next step. Try your Never86 owner seat."
+    "screen": "The prepared vendor question opens over the app. Alex and the due time are filled in. Approval is local to the preview and sends nothing.",
+    "voice": "The vendor question is already written. The person and due time are filled in. Review it, then approve the follow up. In this preview, nothing is sent."
+  },
+  {
+    "id": "06-owner-seat",
+    "seconds": 9,
+    "caption": [
+      "Your first location and owner seat are free.",
+      "Vendors. Labor. Pours. Try Never86."
+    ],
+    "screen": "The complete owner seat with all three workflow tabs visible, plus the guidance panel on the right.",
+    "voice": "Your first location and owner seat are free. Start with two invoices. Keep vendors, labor and pours together. You’ve got a restaurant to run."
   }
 ]

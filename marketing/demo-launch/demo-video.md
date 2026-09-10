@@ -1,10 +1,12 @@
-# Owner seat video revision
+# Owner seat video: full app revision
 
-The current story is price watch, menu food cost and a prepared follow up. See `owner-seat-transcript.md` and `owner-seat-story.json` for the exact captions, the optional spoken script and screen mapping.
+The current 60 second walkthrough restores the earlier framing with the sidebar and guidance panel visible. It leads with two invoices and what went up week over week. It moves through menu cost, labor and pours, then a prepared follow up. The offer is one free location and owner seat. See owner-seat-transcript.md and owner-seat-story.json for the exact captions and optional spoken script.
 
-The 60 second and 20 second cuts are captioned, silent 1920 × 1080 H.264 at 30 fps and CRF 14. Closeups show the relevant UI instead of shrinking a whole dashboard. Each scene uses an actual screenshot of fictional records. The current video replaces the bytes at the existing Drive link after render and playback checks.
+[Watch the full app video](https://drive.google.com/file/d/1CeoCCSufKfA63uKxhxl-jB8CINJb77GJ/view). [Earlier layout reference](https://drive.google.com/file/d/1ba5xXn2EcHNoh8aR_QRk_zNXyyNEofLQ/view).
 
-[Watch the revised video](https://drive.google.com/file/d/1ba5xXn2EcHNoh8aR_QRk_zNXyyNEofLQ/view). The earlier green and vendor order cuts remain local historical artifacts. This video does not demonstrate live matching, account connections, a sent vendor request, measured savings or activation time.
+Both the 60 second and 20 second cuts are silent H.264 at 1920 × 1080, 30 fps and CRF 14. Screens are fitted proportionately, without cropping away the navigation. The source is the locally built public demo with fictional records. Full decode checks passed. These are UI still walkthroughs, not live interaction recordings.
 
-Voice review: the script talks about cheese, invoices, menu cost and the next step.
-Voice review: the operator reviews a prepared follow up instead of being asked to create a task.
+The earlier video is restored at its original Drive link. The full app revision has its own file ID so the comparison remains stable.
+
+Voice review: prices, menu cost, hours and pours lead the story.
+Voice review: retained owner seat, real person labels and prepared follow up wording.
