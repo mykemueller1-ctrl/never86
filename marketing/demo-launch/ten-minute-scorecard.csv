@@ -1,0 +1,11 @@
+session_id,role,restaurant_size_band,source_channel,build_version,job_selected,started_at,ended_at,elapsed_seconds,completed_without_coaching,understood_inputs,explained_result,selected_next_action,recognized_sample_data,recognized_missing_live_features,wrong_calculation_seen,first_confusing_step,participant_feedback,followup_permission,observer_notes
+01,,,,,,,,,,,,,,,,,,,
+02,,,,,,,,,,,,,,,,,,,
+03,,,,,,,,,,,,,,,,,,,
+04,,,,,,,,,,,,,,,,,,,
+05,,,,,,,,,,,,,,,,,,,
+06,,,,,,,,,,,,,,,,,,,
+07,,,,,,,,,,,,,,,,,,,
+08,,,,,,,,,,,,,,,,,,,
+09,,,,,,,,,,,,,,,,,,,
+10,,,,,,,,,,,,,,,,,,,

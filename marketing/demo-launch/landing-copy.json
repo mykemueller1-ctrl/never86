@@ -1,0 +1,31 @@
+{
+  "status": "Copy for the public sample demo. Verify controls and feature names against the deployed build.",
+  "badge": "SAMPLE DEMO · MADE UP RECORDS",
+  "headline": "Where did the extra cost come from?",
+  "subhead": "Check an invoice price, an extra shift hour, or the cost of a pour. See the source. Leave with one clear next step.",
+  "primaryCta": "Try the sample demo",
+  "primaryHref": "DEMO_URL",
+  "secondaryCta": "Watch the 60 second walkthrough",
+  "firstStep": "Pick the job that’s on your mind.",
+  "cards": [
+    { "title": "Did that price go up?", "body": "Compare the same product and pack. See the change per usable unit.", "cta": "Check sample invoices" },
+    { "title": "Where did the extra hours go?", "body": "Put the posted schedule beside the actual punches. Start with the time difference.", "cta": "Check a sample shift" },
+    { "title": "What does that pour cost?", "body": "Use the bottle cost, bottle size and your standard pour.", "cta": "Check a sample pour" },
+    { "title": "Who’s taking care of it?", "body": "Keep one next action, an owner and a due time together.", "cta": "Draft a handoff" }
+  ],
+  "tenMinuteGoal": "Our goal: one useful answer and a clear next step in your first ten minutes.",
+  "receiptHeading": "The paper behind the answer.",
+  "receiptBody": "Open the sample record and check the math. A missing number is a reason to ask, not a reason to guess.",
+  "disclosureHeading": "What you’re trying today",
+  "disclosureBody": "This demo uses made up records and fixed calculation rules. Live AI, photo reading, account connections and the ChatGPT store release are still being built. A handoff here is a draft. It does not send anyone a message.",
+  "offerHeading": "One location. One free seat.",
+  "offerBody": "That’s the live product offer we’re building toward. Extra seats for your managers will be paid. This sample demo does not create a restaurant account.",
+  "feedbackPrompt": "What would make this useful before your next shift?",
+  "socialImage": {
+    "eyebrow": "NEVER86’D · SAMPLE DEMO",
+    "headline": "Food bill up? Shift ran long?",
+    "subhead": "See the numbers. Pick the next step.",
+    "footer": "Try the sample. Made up records.",
+    "altText": "Never86’d sample demo showing a food cost check and a next action draft. All visible restaurant records are made up."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "status": "Draft only. Replace DEMO_URL and verify every shown feature before posting.",
+  "media": "Attach the finished 60 second sample demo video to post 1.",
+  "posts": [
+    {
+      "number": 1,
+      "text": "Your food bill went up. The shift ran long. Now you get to figure out why.\n\nI’m building Never86’d for the operator wearing too many hats.\n\nHere’s a sample demo. Made up records. Real calculations."
+    },
+    {
+      "number": 2,
+      "text": "Start with one job.\n\nCompare two sample invoices per pound.\nCheck a schedule against actual punches.\nCalculate one pour.\n\nThe numbers stay next to the answer. Missing information stays missing."
+    },
+    {
+      "number": 3,
+      "text": "An extra two hours needs an explanation. It does not tell you someone stole from you.\n\nReview the source. Pick one next action. Draft the handoff.\n\nThat’s the loop I want an operator to understand in ten minutes."
+    },
+    {
+      "number": 4,
+      "text": "This is the sample demo, not a live restaurant account.\n\nLive AI, photo reading, account connections and the ChatGPT store release are still being built.\n\nThe planned offer: one location and one seat free. Extra manager seats paid."
+    },
+    {
+      "number": 5,
+      "text": "Try the sample: DEMO_URL\n\nWhich job should we make easiest first: invoice prices, extra hours, drink costs, or the next shift?\n\nI’m Myke, founder of Never86’d. I want the answer from people doing the work."
+    }
+  ]
+}

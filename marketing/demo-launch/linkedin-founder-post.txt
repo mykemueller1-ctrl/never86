@@ -1,0 +1,27 @@
+Your food bill went up. The shift ran long. Now you get to figure out why.
+
+Usually after everyone else has gone home.
+
+I’m building Never86’d for the operator wearing too many hats.
+
+Here’s the sample demo.
+
+Open two sample invoices. Check what changed per pound.
+Compare a sample schedule with the actual punches.
+Check the cost of one pour.
+Turn a finding into a clear handoff draft.
+
+You can see the numbers behind the answer. You can also see when something is missing.
+
+The goal is simple: help you understand one useful thing and know what to do next in your first ten minutes.
+
+This is a demo with made up restaurant records. Live AI, photo reading, account connections and the ChatGPT store release are still being built.
+
+The offer I’m building toward: one location and one seat free. Extra manager seats will be paid.
+
+Try the sample: DEMO_URL
+
+Then tell me where it loses you. Invoice prices, extra hours, drink costs, or getting the next shift ready?
+
+Myke
+Founder, Never86’d
