@@ -16,8 +16,8 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
   const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
   const config = readFileSync(resolve('next.config.js'), 'utf8');
 
-  it('names schedule, labor cards, menu, and invoice / truck as the operator OS', () => {
-    expect(home).toMatch(/Paper-shop folders first: schedule, labor cards, menu, invoice \/ truck/);
+  it('leads with a concrete operator problem and retains labor evidence requirements', () => {
+    expect(home).toContain('Start with one problem.');
     expect(home).toMatch(/Labor cards name roles/);
     expect(home).toMatch(/Daily compare to the clock/);
     expect(home).toMatch(/punch ≠ schedule/);
@@ -32,10 +32,11 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
     expect(home).not.toMatch(/href="\/play"[^>]*human-button-primary/);
   });
 
-  it('tells strangers to watch the recorded demo, then give their email', () => {
-    expect(home).toMatch(/Watch the recorded demo, then give your email/);
-    expect(home).toMatch(/Set a password once/);
-    expect(home).toMatch(/\/login is the daily door/);
+  it('lets operators start without a video and without assigning them to Community', () => {
+    expect(home).toContain('Pick one job');
+    expect(home).not.toContain('Seat 1 is Community Tap');
+    expect(home).toContain('Your restaurant gets its own workspace.');
+    expect(home).toContain('href="/login"');
     expect(home).not.toMatch(/The magic link is the door/);
     expect(home).toMatch(/id="demo"/);
     expect(home).toMatch(/homeDemoVideoReady/);

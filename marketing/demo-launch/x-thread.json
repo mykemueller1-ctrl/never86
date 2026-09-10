@@ -1,0 +1,26 @@
+{
+  "status": "Draft only. Updated vendor demo verified in the public preview. Nothing published or scheduled.",
+  "media": "Attach never86-vendor-demo-v2-60s.mp4 to post 1. Sixty second silent captioned walkthrough of six actual public demo screenshots.",
+  "posts": [
+    {
+      "number": 1,
+      "text": "One vendor is cheaper on the cheese. Then delivery flips the bill.\n\nThe other vendor raised the price last week.\n\nI’m building Never86’d for the operator who has to chase both answers. Here’s the updated sample."
+    },
+    {
+      "number": 2,
+      "text": "Watch each vendor against last week. Compare the product, case weight and amount you need.\n\nThen check delivery, stock and the order minimum.\n\nA lower case price can still mean a bigger order."
+    },
+    {
+      "number": 3,
+      "text": "In our fictional example: $6 less on cheese becomes $6 more with delivery.\n\nChange one detail. The explanation changes.\n\nDraft the vendor question, name an owner and ask for the reply. No message is sent in this sample."
+    },
+    {
+      "number": 4,
+      "text": "The goal: one useful answer and a clear next move in ten minutes. Real operator sessions still need to prove it.\n\nLive AI, photo reading and accounts are still being built. Planned offer: one location, one free seat. Extra manager seats paid."
+    },
+    {
+      "number": 5,
+      "text": "Try the updated sample: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator\n\nMade up records. Working calculations.\n\nWhat would change your next order?\n\nMyke, founder of Never86’d."
+    }
+  ]
+}

@@ -200,6 +200,9 @@ export function createSimpleOwnerDemoService(deps: {
 
     async ask({ operatorId, question, tray = 'action', mouth = 'type', restaurantName }) {
       const trimmed = question.trim();
+      if (trimmed.length > 8000) {
+        return { ok: false, status: 413, error: 'Keep the question under 8,000 characters. Attach longer notes as a file.', code: 'question_too_long' };
+      }
       if (!trimmed) {
         return {
           ok: false,

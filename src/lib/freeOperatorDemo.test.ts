@@ -230,7 +230,7 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).toContain('DAY1_HELP_ENERGY');
     expect(ui).toContain('DAY1_IDENTITY_LINE');
     expect(ui).toContain('DAY1_PREVIEW_CONTRACT');
-    expect(ui).toContain('day1StoreTitle');
+    expect(ui).toContain("return 'Your restaurant'");
     expect(ui).toContain('day1MissingSpineState');
     expect(ui).not.toMatch(/useState\(\s*['"]Fun['"]/);
     expect(ui).not.toMatch(/Missing \/ bring a paper/);

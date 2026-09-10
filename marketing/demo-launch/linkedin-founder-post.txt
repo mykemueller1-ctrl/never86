@@ -1,0 +1,28 @@
+One vendor is cheaper on the cheese.
+Then the delivery charge shows up.
+
+The other vendor raised the price again last week.
+You have a kitchen to run. Now you get to chase both answers.
+
+I’m building Never86’d for that operator.
+
+In the updated sample, you can compare both vendors’ price history, case weights, whole case orders and delivery. Change the pack, minimum or arrival time. The explanation changes with it.
+
+Our made up example: $6 less on cheese becomes $6 more with delivery. That is a reason to ask a better question.
+
+Draft the question. Give it one owner and a due time. Keep the reply with the record.
+
+Labor hours and pour costs are on the desk too.
+
+My goal is one useful answer and one clear next move in your first ten minutes. We still need to prove that with real operators.
+
+This is a working sample with fictional records. Live AI, photo reading, account connections and restaurant seats are still being built.
+
+The offer I’m building toward: one location and one seat free. Extra manager seats will be paid.
+
+Try it: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
+
+Tell me what would change your next order.
+
+Myke
+Founder, Never86’d

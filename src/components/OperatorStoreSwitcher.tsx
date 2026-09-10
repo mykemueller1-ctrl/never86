@@ -12,6 +12,7 @@ export default function OperatorStoreSwitcher() {
   const [seats, setSeats] = useState<SeatChoice[]>([]);
   const [current, setCurrent] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,6 +43,7 @@ export default function OperatorStoreSwitcher() {
   async function onChange(restaurantName: string) {
     if (!restaurantName || restaurantName === current) return;
     setBusy(true);
+    setError(null);
     try {
       const res = await fetch('/api/operator/switch-store', {
         method: 'POST',
@@ -49,8 +51,10 @@ export default function OperatorStoreSwitcher() {
         body: JSON.stringify({ storeName: restaurantName, restaurantName }),
       });
       const data = (await res.json()) as { success?: boolean };
-      if (!res.ok || !data.success) return;
+      if (!res.ok || !data.success) throw new Error('Store switch failed. Your current store is still open.');
       window.location.reload();
+    } catch {
+      setError('Could not switch stores. Your current store is still open. Try again.');
     } finally {
       setBusy(false);
     }
@@ -66,7 +70,6 @@ export default function OperatorStoreSwitcher() {
         value={current}
         disabled={busy}
         onChange={(event) => {
-          setCurrent(event.target.value);
           void onChange(event.target.value);
         }}
         className="rounded-full border border-[#2A313A] bg-[#1A1F26] px-3 py-1.5 text-sm text-[#f4f1ea]"
@@ -77,6 +80,7 @@ export default function OperatorStoreSwitcher() {
           </option>
         ))}
       </select>
+      {error ? <p role="alert" className="text-sm text-amber-200">{error}</p> : null}
     </div>
   );
 }

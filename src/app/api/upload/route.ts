@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collectUploadFiles } from '@/lib/ownerDeskPapers';
+import { readBoundedBody, RequestTooLarge } from '@/lib/boundedRequest';
+import { SIMPLE_OWNER_MAX_BYTES } from '@/lib/simpleOwnerDemo/types';
+import { collectUploadFiles, MAX_PAPERS_PER_DROP } from '@/lib/ownerDeskPapers';
 import { getSimpleOwnerDemoService, isServiceError } from '@/lib/simpleOwnerDemo/runtime';
 import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
@@ -13,10 +15,20 @@ export async function POST(req: NextRequest) {
       return jsonError(service.status, service.error, service.code);
     }
 
-    const form = await req.formData().catch(() => null);
+    let form: FormData | null = null;
+    try {
+      const bytes = await readBoundedBody(req, 24 * 1024 * 1024);
+      form = await new Response(bytes as BodyInit, { headers: { 'content-type': req.headers.get('content-type') ?? '' } }).formData();
+    } catch (error) {
+      if (error instanceof RequestTooLarge) return jsonError(413, 'Send a smaller batch: up to 12 files and 24 MB total.', 'batch_too_large');
+    }
     const files = form ? collectUploadFiles(form) : [];
     if (files.length === 0) {
       return jsonError(400, 'Attach a file as form field `file`.', 'file_required');
+    }
+    if (files.length > MAX_PAPERS_PER_DROP) return jsonError(413, 'Send up to 12 files at a time.', 'too_many_files');
+    if (files.some(file => file.size > SIMPLE_OWNER_MAX_BYTES)) {
+      return jsonError(413, 'Each file must be 8 MB or smaller. Split the larger file and try again.', 'too_large');
     }
 
     const folderRaw = form?.get('folder');

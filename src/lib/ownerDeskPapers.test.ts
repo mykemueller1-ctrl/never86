@@ -11,7 +11,7 @@ import {
 } from './ownerDeskPapers';
 
 describe('owner seat papers helpers', () => {
-  it('collects multiple file fields and caps the drop', () => {
+  it('collects multiple file fields for explicit boundary validation', () => {
     const form = new FormData();
     form.append('file', new File([new Uint8Array([1])], 'a.jpg', { type: 'image/jpeg' }));
     form.append('file', new File([new Uint8Array([2])], 'b.jpg', { type: 'image/jpeg' }));
@@ -20,6 +20,12 @@ describe('owner seat papers helpers', () => {
     const files = collectUploadFiles(form);
     expect(files.map((row) => row.name)).toEqual(['a.jpg', 'b.jpg', 'c.pdf']);
     expect(MAX_PAPERS_PER_DROP).toBe(12);
+  });
+
+  it('does not silently throw away files beyond the batch limit', () => {
+    const form = new FormData();
+    for (let i = 0; i < MAX_PAPERS_PER_DROP + 1; i++) form.append('file', new File(['paper'], `${i}.txt`));
+    expect(collectUploadFiles(form)).toHaveLength(MAX_PAPERS_PER_DROP + 1);
   });
 
   it('names the receipt so the operator sees the paper landed', () => {

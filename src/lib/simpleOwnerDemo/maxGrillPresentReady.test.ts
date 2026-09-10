@@ -212,7 +212,7 @@ describe('Max Grill present-ready — isolation + honesty + Action Shift', () =>
     const phone = readFileSync(path.join(process.cwd(), 'src/components/FreeOperatorPhone.tsx'), 'utf8');
     expect(phone).toContain('LAST_WEEK_PRIME_LOAD_ASK');
     expect(phone).toContain('owner-desk-lastweek');
-    expect(phone).toContain('Action Shift');
+    expect(phone).toContain('Review last week’s sales and costs');
     expect(phone).not.toContain('Prime Cost Coach');
     expect(phone).not.toMatch(/\bPulse\b/);
   });
