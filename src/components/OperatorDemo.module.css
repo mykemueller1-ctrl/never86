@@ -281,3 +281,20 @@
 }
 @media (max-width: 360px) { .layout { padding-inline: 16px; } .intro h1 { font-size: 33px; } .vendorCard { padding: 18px; } .vendorHeadline { font-size: 25px; } .needRow h2 { font-size: 16px; } .sampleBar { gap: 6px; padding-inline: 12px; font-size: 9px; } .vendorFields { gap: 10px; } .vendorResult, .result { padding: 20px 16px; } }
 @media (prefers-reduced-motion: reduce) { .app *, .app *::before, .app *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+.foodGuard { margin: 26px 0; border: 1px solid #d7c0a4; border-radius: 15px; background: #fffdf8; padding: 27px; }
+.foodGuard h2 { font-size: 25px; letter-spacing: -.7px; font-weight: 600; margin-top: 18px; }
+.foodNumbers { display: flex; gap: 42px; margin: 20px 0; }
+.foodNumbers strong { display: block; font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; }
+.foodNumbers div:first-child strong { color: #805400; }
+.foodNumbers span { display: block; color: #6b6660; font-size: 13px; margin-top: 7px; }
+.foodImpact { font-size: 15px; line-height: 1.65; }
+.foodBasis { font-size: 12px; color: #6b6660; margin-top: 12px !important; }
+.recipeDetails { margin: 18px 0; font-size: 12px; }
+.recipeDetails summary, .editFollowUp summary, .invoiceDetails summary { cursor: pointer; min-height: 44px; padding-block: 12px; }
+.recipeDetails p { margin-top: 14px; color: #6b6660; }
+.invoiceDetails { font-size: 11px; color: #6b6660; margin-top: 8px; }
+.preparedMeta { display: flex; align-items: center; gap: 15px; padding: 16px; border-radius: 9px; background: #edf2f7; color: #395674; font-size: 14px; }
+.preparedMeta span { margin-left: auto; font-size: 12px; }
+.editFollowUp { margin-top: 5px; font-size: 12px; }
+@media (max-width: 720px) { .foodGuard { padding: 21px; } .foodNumbers { gap: 25px; } .foodNumbers strong { font-size: 38px; } .preparedMeta { flex-wrap: wrap; } .preparedMeta span { margin-left: 0; } }

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "01-prices",
+    "seconds": 8,
+    "caption": [
+      "Your cheese was $72 a case.",
+      "Now it’s $78. We flag the increase."
+    ],
+    "screen": "Hilltop invoice history: $72 to $78 for a 30 lb case.",
+    "voice": "Your cheese was seventy two dollars a case. Now it’s seventy eight. We flag the increase."
+  },
+  {
+    "id": "02-vendors",
+    "seconds": 9,
+    "caption": [
+      "Hilltop: $78. Lakefront: $75.",
+      "We line up the same cheese for you."
+    ],
+    "screen": "Both vendor histories, case prices, case weights and product identity.",
+    "voice": "One vendor charges seventy eight. The other charges seventy five. We line up the same cheese, even when the item numbers are different."
+  },
+  {
+    "id": "03-menu",
+    "seconds": 12,
+    "caption": [
+      "That’s 10¢ more on your cheese pizza.",
+      "Food cost: 30.6%. Your target: 30%."
+    ],
+    "screen": "Recipe target card: cheese pizza, 30.6% food cost, 30% target, $0.10 more per pizza.",
+    "voice": "That increase adds ten cents to your cheese pizza. Your food cost is now thirty point six percent. Your target is thirty. That’s the item to check."
+  },
+  {
+    "id": "04-prepared",
+    "seconds": 11,
+    "caption": [
+      "The vendor question is already written.",
+      "Alex and the due time are filled in."
+    ],
+    "screen": "Prepared vendor question with Alex and Before Friday prep at 10:00.",
+    "voice": "The vendor question is already written. Alex and the due time are filled in. Review it. Change something only if you need to."
+  },
+  {
+    "id": "05-approval",
+    "seconds": 10,
+    "caption": [
+      "Review once. Approve the follow up.",
+      "No starting from a blank form."
+    ],
+    "screen": "Approval confirmation retained in the preview tab. Nothing is sent.",
+    "voice": "Approve the follow up. You don’t have to start from a blank form. In this preview, nothing is sent."
+  },
+  {
+    "id": "06-seat",
+    "seconds": 10,
+    "caption": [
+      "Keep your food costs in sight.",
+      "Try your Never86 owner seat."
+    ],
+    "screen": "Owner seat heading and price watch.",
+    "voice": "Keep your food costs in sight. Know what changed, see the menu impact, and review the next step. Try your Never86 owner seat."
+  }
+]

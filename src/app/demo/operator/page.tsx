@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { OperatorDemo } from '@/components/OperatorDemo';
 
 export const metadata: Metadata = {
-  title: "Try the operator desk | Never86’d",
+  title: "Try the owner seat | Never86’d",
   description: 'Try three restaurant checks with fictional sample records. Compare vendor price drift, whole case orders and delivery, scheduled hours and the cost of a pour. No account required.',
   robots: { index: false, follow: true },
   openGraph: {

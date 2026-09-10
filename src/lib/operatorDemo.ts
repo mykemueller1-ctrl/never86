@@ -88,7 +88,7 @@ export type DemoDraft = {
   topic: DemoTopic;
   title: string;
   evidence: string;
-  owner: 'Alex · sample manager' | 'Riley · sample owner';
+  owner: 'Alex' | 'Riley';
   dueDay: string;
   dueTime: string;
   proof: string;
