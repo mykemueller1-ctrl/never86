@@ -34,7 +34,7 @@ That’s $2.40 to $2.60 per pound. Twenty cents more per pound. Six dollars more
 
 The product and pack have to match before the comparison means anything.
 
-Made up records. You can check the math in the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
+Made up records. You can check the math in the sample: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
 
 I’m Myke, founder of Never86’d. What invoice item do you check first?
 
@@ -44,7 +44,7 @@ Scheduled until 10. Clocked out at midnight.
 
 That’s two extra hours in this sample. The next question is what happened on the shift.
 
-Try the Never86’d sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
+Try the Never86’d sample: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. I’m Myke, the founder.
 
@@ -56,7 +56,7 @@ That’s $1.48 of spirit per pour in this sample. Mixers, garnish and waste come
 
 What’s your standard pour?
 
-Try the Never86’d sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
+Try the Never86’d sample: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. I’m Myke, the founder.
 
@@ -68,7 +68,7 @@ Who? By when? What do they need to bring back?
 
 That’s the handoff I’m building into Never86’d. One next action with a clear owner and due time.
 
-Try the sample draft: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
+Try the sample draft: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
 
 Made up records. The demo does not send anyone a message.
 

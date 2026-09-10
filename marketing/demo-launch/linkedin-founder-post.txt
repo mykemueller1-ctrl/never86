@@ -1,27 +1,28 @@
-Your food bill went up. The shift ran long. Now you get to figure out why.
+One vendor is cheaper on the cheese.
+Then the delivery charge shows up.
 
-Usually after everyone else has gone home.
+The other vendor raised the price again last week.
+You have a kitchen to run. Now you get to chase both answers.
 
-I’m building Never86’d for the operator wearing too many hats.
+I’m building Never86’d for that operator.
 
-Here’s the sample demo.
+In the updated sample, you can compare both vendors’ price history, case weights, whole case orders and delivery. Change the pack, minimum or arrival time. The explanation changes with it.
 
-Open two sample invoices. Check what changed per pound.
-Compare a sample schedule with the actual punches.
-Check the cost of one pour.
-Turn a finding into a clear handoff draft.
+Our made up example: $6 less on cheese becomes $6 more with delivery. That is a reason to ask a better question.
 
-You can see the numbers behind the answer. You can also see when something is missing.
+Draft the question. Give it one owner and a due time. Keep the reply with the record.
 
-The goal is simple: help you understand one useful thing and know what to do next in your first ten minutes.
+Labor hours and pour costs are on the desk too.
 
-This is a demo with made up restaurant records. Live AI, photo reading, account connections and the ChatGPT store release are still being built.
+My goal is one useful answer and one clear next move in your first ten minutes. We still need to prove that with real operators.
+
+This is a working sample with fictional records. Live AI, photo reading, account connections and restaurant seats are still being built.
 
 The offer I’m building toward: one location and one seat free. Extra manager seats will be paid.
 
-Try the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator
+Try it: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator
 
-Then tell me where it loses you. Invoice prices, extra hours, drink costs, or getting the next shift ready?
+Tell me what would change your next order.
 
 Myke
 Founder, Never86’d

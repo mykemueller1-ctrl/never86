@@ -1,17 +1,33 @@
 {
-  "status": "Reviewable copy for the public sample demo. Canonical inputs and controls verified by the release owner around 2026-09-10 03:23 UTC. Live restaurant accounts and integrations remain separate work.",
+  "status": "Reviewable copy for the verified fictional vendor demo. Live restaurant seats remain separate work.",
   "badge": "SAMPLE DEMO · MADE UP RECORDS",
-  "headline": "Where did the extra cost come from?",
-  "subhead": "Check an invoice price, an extra shift hour, or the cost of a pour. See the source. Leave with one clear next step.",
+  "headline": "The price moved. Let’s find out why.",
+  "subhead": "Check both vendors against last week. Compare what the order needs. Ask one useful question before the next delivery.",
   "primaryCta": "Try the sample demo",
-  "primaryHref": "https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator",
+  "primaryHref": "https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator",
   "secondaryCta": "Watch the 60 second walkthrough",
   "firstStep": "Pick the job that’s on your mind.",
   "cards": [
-    { "title": "Did that price go up?", "body": "Compare the same product and pack. See the change per usable unit.", "cta": "Check sample invoices" },
-    { "title": "Where did the extra hours go?", "body": "Put the posted schedule beside the actual punches. Start with the time difference.", "cta": "Check a sample shift" },
-    { "title": "What does that pour cost?", "body": "Use the bottle cost, bottle size and your standard pour.", "cta": "Check a sample pour" },
-    { "title": "Who’s taking care of it?", "body": "Keep one next action, an owner and a due time together.", "cta": "Draft a handoff" }
+    {
+      "title": "What changed on this order?",
+      "body": "Compare both vendors’ product, pack, price history and delivery. Missing facts stay missing.",
+      "cta": "Check sample vendors"
+    },
+    {
+      "title": "Where did the extra hours go?",
+      "body": "Put the posted schedule beside the actual punches. Start with the time difference.",
+      "cta": "Check a sample shift"
+    },
+    {
+      "title": "What does that pour cost?",
+      "body": "Use the bottle cost, bottle size and your standard pour.",
+      "cta": "Check a sample pour"
+    },
+    {
+      "title": "Who’s taking care of it?",
+      "body": "Keep one next action, an owner and a due time together.",
+      "cta": "Draft a handoff"
+    }
   ],
   "tenMinuteGoal": "Our goal: one useful answer and a clear next step in your first ten minutes.",
   "receiptHeading": "The paper behind the answer.",
@@ -27,5 +43,6 @@
     "subhead": "See the numbers. Pick the next step.",
     "footer": "Try the sample. Made up records.",
     "altText": "Never86’d sample demo showing a food cost check and a next action draft. All visible restaurant records are made up."
-  }
+  },
+  "secondaryHref": "https://drive.google.com/file/d/1ba5xXn2EcHNoh8aR_QRk_zNXyyNEofLQ/view"
 }

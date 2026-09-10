@@ -1,46 +1,42 @@
 # Never86’d operator sample release
 
-Verified September 9, 2026, Central time. This release is a working public sample demo. It does not provision a live restaurant seat.
+Updated vendor demo, September 9, 2026 Central time. This release is a working public sample; it does not provision live restaurant seats.
 
-[Open the sample](https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator)
+[Try the refreshed demo](https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator) · [Watch the updated video](https://drive.google.com/file/d/1ba5xXn2EcHNoh8aR_QRk_zNXyyNEofLQ/view)
 
-## What works
+## What changed
 
-The fictional Cedar & Salt desk compares two invoices by unit weight, compares a scheduled shift with actual clock times, calculates spirit cost from a bottle and house pour, and keeps one sample handoff draft in the current tab. Inputs change the calculations. Source values, units and limits appear with the results. Reset and reload clear the draft.
+Warm ivory, charcoal and burnt orange replace the green palette. Sans serif headlines, clearer prices and more legible phone controls simplify the desk. The next action follows the order result; detailed reasoning appears below it.
 
-The opening action appears above the sample records. The desktop sidebar becomes three simple workflow buttons on a phone. A sample disclosure stays visible as the page scrolls. Changing workflows returns to the start of the next check.
+The fictional Cedar & Salt desk now compares two vendor histories and explains what changes the actual order. Same product mapping, pack size, usable yield, whole cases, delivery charges, minimum order, stock and arrival before prep matter. Missing information withholds a price choice. Seven editable scenarios demonstrate how one detail changes the answer. A vendor question can be edited, assigned a sample owner and due time, and kept in the tab. Switching workflows preserves vendor inputs. Reload or Reset sample clears them and the draft.
 
-## Release evidence
+Labor and spirit cost calculations remain available. No real restaurant record, message or vendor order is part of the public sample.
+
+## Verified release evidence
 
 | Check | Result |
 | --- | --- |
-| Public access | Anonymous HTTP GET `/demo/operator` returned 200 without authentication or a redirect to login. |
-| Private source boundary | `/operator/review` returned 404 on the same deployment. No private source snapshot was committed or included in the demo. |
-| Invoice | Same SKU and vendor: $72 / 30 lb versus $78 / 30 lb. $2.40 to $2.60 per lb, 8.3% increase, $6 per case and $12 across two current cases. |
-| Pack change | Changing the current case to $36 / 15 lb produced the same $2.40 per lb and zero unit price increase. |
-| Invalid input | Zero case weight withheld the result. |
-| Labor | 16:00–22:00 scheduled versus 16:00–00:00 next day actual produced 2 additional hours. Wage cost remained missing until supplied. |
-| Wage and break | A supplied $18 hourly rate and 30 minute unpaid break produced 90 extra minutes and a $27 straight wage estimate. |
-| Pour | $25 / 750 ml / 1.5 US fl oz produced $1.48. Changing to 2 US fl oz produced $1.97. These are spirit costs only. |
-| Handoff | Owner, due time and requested proof appeared in a sample draft. Nothing was sent. Reload cleared the draft. |
-| Phone | Published 390 px view had no horizontal overflow; the first action ended at 525 px in an 844 px viewport. The first invoice interaction worked. Local 320 px reflow also had no horizontal overflow. |
-| Tests | All 9 new calculator tests passed. Full Linux CI, including dependency audit, lint, tests and production build, succeeded. |
-| Media | Seven JPEG screenshots captured from the published sample. A 60 second, 1920 × 1080, 30 fps H.264 MP4 was rendered and visually checked. It is a captioned sequence of still screenshots without audio, not a recording of live interaction. |
+| Public access | Anonymous GET `/demo/operator`: 200, no login redirect, new vendor content present. |
+| Private boundary | `/operator/review`: 404 on the same deployment. |
+| Both histories | Hilltop $2.40 → $2.60/lb, +8.3%. Lakefront $2.45 → $2.50/lb, +2.0%; latest Lakefront record is a quote. |
+| Actual order | Need 60 usable lb. Hilltop: $156 cheese + $0 delivery. Lakefront: $150 cheese + $12 delivery = $162. Lower item price becomes $6 higher order cost. |
+| Smaller pack | Lakefront $65 / 25 lb: 3 whole cases, $195 cheese + $12 delivery, 15 extra usable lb. |
+| Missing facts | Unknown fees are not zero. Product mismatch, missing yield, minimum uncertainty, unmet minimum, late delivery or unavailable stock withhold a price choice. |
+| Scenario interaction | Seven scenarios exercised in a 390 px browser, with expected headlines and no horizontal overflow. |
+| Workflow continuity | A $65 / 25 lb edit and its result remained after switching to labor and back on the public deployment. |
+| Handoff | Vendor question, owner, due time and evidence saved as a tab draft. Changing the assignment allows saving again. No message sent. |
+| Labor and pours | 2 extra hours with wage missing. Supplied $18/hr plus a 30 minute break: 90 extra minutes, $27 straight wages. $25 / 750 ml / 1.5 US fl oz: $1.48 spirit cost. |
+| Phone | Published 390 px page had no horizontal overflow; first action ended at 678 px in an 844 px viewport. Published 320 px start, result, expanded terms and dialog fit without horizontal overflow. |
+| Local checks | 22 calculator tests pass, including 13 new vendor tests. Production build and TypeScript pass. Lint has zero errors and two pre-existing image warnings. |
+| CI | Full Linux dependency audit, lint, tests and build succeeded in [run 466](https://github.com/mykemueller1-ctrl/never86/actions/runs/34436769601). |
+| Video | 60 sec, 1920 × 1080, H.264, 30 fps, 1,575,183 bytes. Six published screenshots, silent captions. Full decode and visual frame inspection pass. |
 
-Local full testing reported 827 passing tests and one existing Bash dependent test that could not execute on this Windows host. Linux CI succeeded on the same source. Local lint passed with two existing image warnings after excluding the uncommitted local tool runtime. These runtime tools are not part of the repository or release.
+Application source: `6691b471c872267363a785e80faafd663440988d`, tree `d3f7c8a923bf324f0f4c12ac7a033dd1701a3886`. Vercel preview `dpl_HZbh1Yj9DFnFJ7SX8xxNAZqk2Szg`, READY, existing Never86 project. Automatic deployment started successfully for this revision. The production domain was not promoted.
 
-Source: `27bcbf81e1a4b1a56392c907da20d1338a344a63`. Vercel preview: `dpl_3YvRsht3JKWcgVsoFEx1fmc7vcbb`, READY. [CI run](https://github.com/mykemueller1-ctrl/never86/actions/runs/34432608726). The deployment was started through the existing Vercel project's Create Preview Deployment control after automatic deployment did not start. The production domain was not promoted.
+[Design and source rationale](DEMO-VENDOR-REFINEMENT.md) records the business rules and primary references. Delivery is counted once for this order. Tax, rebates, other charges and whole basket optimization remain outside this sample. Calculated differences are not confirmed errors, credits or recovered money.
 
-## Readiness scorecard
+## Readiness
 
-| Area | Assessment |
-| --- | --- |
-| Public product demonstration | Ready to share as a labeled sample. |
-| Math and supporting records | Verified for the three bounded examples and tested edge cases. |
-| Marketing package | Draft assets prepared for human publication. No posts, messages, schedules or ad purchases were made. |
-| Ten minute operator activation | Not measured. The included scorecard is blank; run observed sessions with real operators. |
-| Community and Max live seats | Not completed by this demo release. Private source review is separate. |
-| Live AI, OCR, Drive/POS connections and ongoing learning | Still require implementation, authorized data access, and evaluation on real records. |
-| ChatGPT distribution | No store submission, approval or OpenAI endorsement established. |
+The sample is ready to review and share as a sample. Ten minute activation has not been measured. Community and Max live seats, authenticated workflows, live AI, OCR, authorized Drive/POS connections, ongoing learning and ChatGPT app submission remain incomplete. This release establishes no OpenAI endorsement or measured customer savings.
 
-Next production milestone: one authorized restaurant user signs in, supplies a real source pair, reviews an extracted and reconciled finding, assigns one action, returns proof, and sees that history on the next visit. Measure that full path before claiming ten minute activation or repeatable customer savings.
+The next live milestone is an authorized restaurant user supplying a real source pair, reviewing extracted and reconciled facts, assigning one action, bringing back proof and seeing it on the next visit.

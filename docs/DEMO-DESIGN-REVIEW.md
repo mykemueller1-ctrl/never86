@@ -1,5 +1,6 @@
 # Never86’d public sample demo: design and capture brief
 
+Historical first-pass review. The current palette and vendor interaction are specified in [DEMO-VENDOR-REFINEMENT.md](DEMO-VENDOR-REFINEMENT.md); the green styling below has been replaced.
 Date: 2026-09-09. Target route: `/demo/operator`. This is a design review and production brief, not a record of user testing or a claim that deployment is complete.
 
 The demo should let a busy operator understand one cost change, inspect the records behind it, and draft the next step. Lead with two sample invoices. Give labor and pours their own smaller follow up stories. Ten minutes is the product target; no measured activation or conversion result exists yet.

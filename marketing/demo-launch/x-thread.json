@@ -1,26 +1,26 @@
 {
-  "status": "Reviewable copy. Public demo and canonical calculations verified by the release owner around 2026-09-10 03:23 UTC. Not published or scheduled.",
-  "media": "Attach deliverables/never86-sample-demo-60s.mp4 to post 1. This completed silent captioned walkthrough uses six still screenshots of the deployed demo. It is not a live interaction recording or a voiceover.",
+  "status": "Draft only. Updated vendor demo verified in the public preview. Nothing published or scheduled.",
+  "media": "Attach never86-vendor-demo-v2-60s.mp4 to post 1. Sixty second silent captioned walkthrough of six actual public demo screenshots.",
   "posts": [
     {
       "number": 1,
-      "text": "Your food bill went up. The shift ran long. Now you get to figure out why.\n\nI’m building Never86’d for the operator wearing too many hats.\n\nHere’s a sample demo. Made up records. Real calculations."
+      "text": "One vendor is cheaper on the cheese. Then delivery flips the bill.\n\nThe other vendor raised the price last week.\n\nI’m building Never86’d for the operator who has to chase both answers. Here’s the updated sample."
     },
     {
       "number": 2,
-      "text": "Start with one job.\n\nCompare two sample invoices per pound.\nCheck a schedule against actual punches.\nCalculate one pour.\n\nThe numbers stay next to the answer. Missing information stays missing."
+      "text": "Watch each vendor against last week. Compare the product, case weight and amount you need.\n\nThen check delivery, stock and the order minimum.\n\nA lower case price can still mean a bigger order."
     },
     {
       "number": 3,
-      "text": "An extra two hours needs an explanation. It does not tell you someone stole from you.\n\nReview the source. Pick one next action. Draft the handoff.\n\nThat’s the loop I want an operator to understand in ten minutes."
+      "text": "In our fictional example: $6 less on cheese becomes $6 more with delivery.\n\nChange one detail. The explanation changes.\n\nDraft the vendor question, name an owner and ask for the reply. No message is sent in this sample."
     },
     {
       "number": 4,
-      "text": "This is the sample demo, not a live restaurant account.\n\nLive AI, photo reading, account connections and the ChatGPT store release are still being built.\n\nThe planned offer: one location and one seat free. Extra manager seats paid."
+      "text": "The goal: one useful answer and a clear next move in ten minutes. Real operator sessions still need to prove it.\n\nLive AI, photo reading and accounts are still being built. Planned offer: one location, one free seat. Extra manager seats paid."
     },
     {
       "number": 5,
-      "text": "Try the sample: https://never86-8xi9adiox-myke-muellers-projects.vercel.app/demo/operator\n\nWhich job should we make easiest first: invoice prices, extra hours, drink costs, or the next shift?\n\nI’m Myke, founder of Never86’d. I want the answer from people doing the work."
+      "text": "Try the updated sample: https://never86-bnt24t594-myke-muellers-projects.vercel.app/demo/operator\n\nMade up records. Working calculations.\n\nWhat would change your next order?\n\nMyke, founder of Never86’d."
     }
   ]
 }
