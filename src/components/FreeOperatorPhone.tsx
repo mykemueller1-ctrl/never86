@@ -331,6 +331,7 @@ export function FreeOperatorPhone({
         success?: boolean;
         error?: string;
         receivedCount?: number;
+        errors?: Array<{ filename: string; error: string }>;
         upload?: { filename: string; evidenceKind: string };
         uploads?: Array<{ filename: string; evidenceKind: string }>;
         readiness?: SimpleOwnerReadiness;
@@ -343,18 +344,20 @@ export function FreeOperatorPhone({
       }
       const uploads = body.uploads?.length ? body.uploads : body.upload ? [body.upload] : [];
       const names = uploads.map((row) => row.filename).filter(Boolean);
-      const landed = receivedPapersLine(names.length ? names : files.map((file) => file.name));
+      const landed = receivedPapersLine(names);
+      const failed = body.errors?.map(row => `${row.filename}: ${row.error}`).join(' ');
       setLocalName(names[names.length - 1] ?? files[files.length - 1]?.name ?? null);
       applyReadiness(body.readiness);
       const readyFolder = uploads[uploads.length - 1]?.evidenceKind ?? body.upload?.evidenceKind;
       const win = readyFolder ? firstPhotoWinLine(readyFolder) : null;
       setWinLine(win);
-      setReceipt(landed);
-      setFlash(landed);
+      setReceipt(failed ? `${landed} Not received: ${failed}` : landed);
+      setFlash(failed ? `${landed} Not received: ${failed}` : landed);
       if (body.readiness?.folders) {
         const nextHook = day1HookCoach(filledPlateIds(body.readiness.folders));
         setActiveFolder(nextHook.id);
-        setAsk(nextHook.ask);
+        // Finish the operator's chosen job before asking for another paper.
+        setAsk(current => current.trim() ? current : nextHook.ask);
       }
       trackEvent('operator_demo_local_file', {
         pagePath: '/operator',

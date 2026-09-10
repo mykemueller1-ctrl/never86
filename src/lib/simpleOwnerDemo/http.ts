@@ -22,6 +22,9 @@ export async function withSimpleOwnerTenant(
   handler: (operatorId: string, restaurantName?: string) => Promise<NextResponse>,
 ): Promise<NextResponse> {
   const tenant = await resolveSimpleOwnerTenant(req.cookies);
+  if (tenant.minted && !tenant.cookieValue) {
+    return jsonError(503, 'The workspace is temporarily unavailable. Please try again later.', 'tenant_signing_unavailable');
+  }
   const restaurantName = await restaurantNameForTenant(tenant.operatorId);
   const response = await handler(tenant.operatorId, restaurantName);
   if (tenant.cookieValue) {

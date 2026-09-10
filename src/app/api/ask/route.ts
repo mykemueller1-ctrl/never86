@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readBoundedBody, RequestTooLarge } from '@/lib/boundedRequest';
 import { OWNER_DESK_TRAY, type OwnerDeskTrayId } from '@/lib/freeOperatorDemo';
 import { getSimpleOwnerDemoService, isServiceError } from '@/lib/simpleOwnerDemo/runtime';
 import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
@@ -17,7 +18,13 @@ export async function POST(req: NextRequest) {
       return jsonError(service.status, service.error, service.code);
     }
 
-    const body = (await req.json().catch(() => null)) as {
+    let raw: unknown = null;
+    try {
+      raw = JSON.parse(new TextDecoder().decode(await readBoundedBody(req, 64 * 1024)));
+    } catch (error) {
+      if (error instanceof RequestTooLarge) return jsonError(413, 'The question is too long. Attach longer notes as a file.', 'question_too_long');
+    }
+    const body = raw as {
       question?: unknown;
       tray?: unknown;
       mouth?: unknown;

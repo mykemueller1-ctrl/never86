@@ -43,7 +43,8 @@ function tenantSecret(): string | null {
   const explicit = process.env.SIMPLE_OWNER_DEMO_SECRET || process.env.OPERATOR_SESSION_SECRET;
   if (explicit) return explicit;
   const seed = process.env.REPORTS_PASSWORD || process.env.ADMIN_PASSWORD;
-  return seed ? `n86-simple-owner:${seed}` : 'n86-simple-owner:dev-only-not-for-prod';
+  if (seed) return `n86-simple-owner:${seed}`;
+  return process.env.NODE_ENV === 'production' ? null : 'n86-simple-owner:dev-only-not-for-prod';
 }
 
 function b64urlEncode(bytes: Uint8Array): string {

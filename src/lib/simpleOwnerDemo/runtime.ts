@@ -23,6 +23,9 @@ export function createDefaultSimpleOwnerDemoService(
   const r2 = readR2Config(env);
 
   if (env.SIMPLE_OWNER_DEMO_MEMORY === '1') {
+    if (env.NODE_ENV === 'production') {
+      return { ok: false, status: 503, error: 'Durable storage is required in production.', code: 'persist_unavailable' };
+    }
     return createSimpleOwnerDemoService({
       repo: createMemoryRepository(),
       objects: createMemoryObjectStore(),

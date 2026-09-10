@@ -18,7 +18,8 @@ export function collectUploadFiles(form: FormData): File[] {
       if (value instanceof File && value.size > 0) files.push(value);
     }
   }
-  return files.slice(0, MAX_PAPERS_PER_DROP);
+  // The HTTP boundary rejects oversized batches; never silently discard files.
+  return files;
 }
 
 export function receivedPapersLine(filenames: string[]): string {
