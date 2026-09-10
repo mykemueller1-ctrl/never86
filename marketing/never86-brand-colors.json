@@ -1,0 +1,128 @@
+{
+  "brand": "Never86’d",
+  "status": "Selected visual direction for the operator demo and future marketing assets.",
+  "core": [
+    "charcoal",
+    "ivory",
+    "ember"
+  ],
+  "tokens": {
+    "charcoal": "#25262A",
+    "ivory": "#F8F6F2",
+    "ember": "#B84322",
+    "emberHover": "#98371C",
+    "white": "#FFFFFF",
+    "secondaryText": "#6B6660",
+    "controlOutline": "#8B8177",
+    "slate": "#395674",
+    "slateSoft": "#EDF2F7",
+    "amber": "#805400",
+    "amberSoft": "#FFF1CE",
+    "error": "#A12F33",
+    "errorSoft": "#FCECEE",
+    "darkFocus": "#9DC3E8"
+  },
+  "roles": {
+    "ember": "Primary actions and limited brand emphasis.",
+    "charcoal": "Navigation, main text and financial figures.",
+    "ivory": "Reading surfaces.",
+    "slate": "Information, retained draft status and light-surface keyboard focus.",
+    "amber": "Needs review; paired with explicit words or signed numbers.",
+    "error": "Invalid input; paired with correction text."
+  },
+  "type": {
+    "family": "Inter",
+    "headings": "600 weight; clear sentence case",
+    "prices": "Tabular numerals"
+  },
+  "contrastChecks": [
+    {
+      "use": "body text",
+      "foreground": "#25262A",
+      "background": "#F8F6F2",
+      "contrastRatio": 14.0036,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "secondary text",
+      "foreground": "#6B6660",
+      "background": "#F8F6F2",
+      "contrastRatio": 5.266,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "primary button",
+      "foreground": "#FFFFFF",
+      "background": "#B84322",
+      "contrastRatio": 5.4347,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "primary hover",
+      "foreground": "#FFFFFF",
+      "background": "#98371C",
+      "contrastRatio": 7.2456,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "input outline",
+      "foreground": "#8B8177",
+      "background": "#FFFFFF",
+      "contrastRatio": 3.8152,
+      "minimum": 3,
+      "passes": true
+    },
+    {
+      "use": "light keyboard focus",
+      "foreground": "#395674",
+      "background": "#F8F6F2",
+      "contrastRatio": 7.0561,
+      "minimum": 3,
+      "passes": true
+    },
+    {
+      "use": "dark keyboard focus",
+      "foreground": "#9DC3E8",
+      "background": "#25262A",
+      "contrastRatio": 8.2089,
+      "minimum": 3,
+      "passes": true
+    },
+    {
+      "use": "information",
+      "foreground": "#395674",
+      "background": "#EDF2F7",
+      "contrastRatio": 6.762,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "review",
+      "foreground": "#805400",
+      "background": "#FFF1CE",
+      "contrastRatio": 5.8774,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "use": "input error",
+      "foreground": "#A12F33",
+      "background": "#FCECEE",
+      "contrastRatio": 6.1862,
+      "minimum": 4.5,
+      "passes": true
+    }
+  ],
+  "limits": "Pairwise contrast checks only, not a full WCAG audit. No measured attention, conversion or ten minute activation claim.",
+  "sources": [
+    "https://www.adobe.com/express/learn/blog/design-trends-2026",
+    "https://www.nngroup.com/articles/visual-hierarchy-ux-definition/",
+    "https://carbondesignsystem.com/elements/color/overview/",
+    "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+    "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html"
+  ]
+}
