@@ -48,7 +48,7 @@ describe('llm-shells crawler and LLM discovery gate', () => {
 });
 
 describe('llm-shells durable status claims', () => {
-  it('does not hard-code merge or deploy state that goes stale on a live build', () => {
+  it('keeps provider paths explicit without hard-coding deployment or directory state', () => {
     const matrix = getInstallMatrix();
     const pageSource = readFileSync(join(ROOT, 'src/app/llm-shells/page.tsx'), 'utf8');
     const installDoc = readFileSync(join(ROOT, 'docs/llm-shells/INSTALL.md'), 'utf8');
@@ -67,16 +67,29 @@ describe('llm-shells durable status claims', () => {
     expect(matrix.status.credentials).toBe('none-claimed');
     expect(matrix.status.readOnlyCertified).toBe('certified-in-repo');
     expect(matrix.status.draftOnlyCertified).toBe('certified-in-repo');
+    expect(matrix.shells.map((shell) => shell.provider)).toEqual([
+      'chatgpt',
+      'claude',
+      'perplexity',
+      'grok',
+      'gemini',
+    ]);
     expect(DURABLE_SHELL_CLAIMS).toEqual([
-      'Provider installation: unverified.',
+      'Provider-specific remote MCP paths are documented; each live Never86’d account connection still requires verification.',
       'Marketplace publication: not submitted.',
       'Credentials: none claimed.',
+      'Consumer Gemini custom-MCP install: not claimed.',
       'READ-ONLY and DRAFT-ONLY: certified in repo.',
     ]);
-    expect(pageSource).toContain('Provider installation: unverified');
-    expect(pageSource).toContain('Marketplace publication: not submitted');
-    expect(pageSource).toContain('Credentials: none claimed');
-    expect(pageSource).toContain('READ-ONLY and DRAFT-ONLY: certified in repo');
+
+    expect(pageSource).toContain('Public MCP endpoint · read-only');
+    expect(pageSource).toContain('Remote MCP · developer mode');
+    expect(pageSource).toContain('Remote MCP · custom connector');
+    expect(pageSource).toContain('Remote MCP · developer/API path');
+    expect(pageSource).toContain('ChatGPT directory/plugin publication for the private owner app: not claimed');
     expect(pageSource).toContain('https://chatgpt.com');
+    expect(pageSource).toContain('https://docs.x.ai/grok/connectors');
+    expect(pageSource).toContain('https://ai.google.dev/gemini-api/docs/function-calling');
+    expect(pageSource).not.toMatch(/consumer Gemini app has a generic custom-MCP connector[^.]*available/i);
   });
 });
