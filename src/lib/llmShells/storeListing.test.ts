@@ -17,7 +17,9 @@ describe('store listing packet', () => {
     expect(packet.status.chatgptCustomMcp).toBe('available-in-developer-mode');
     expect(packet.status.claudeRemoteMcp).toBe('available-as-custom-connector');
     expect(packet.status.perplexityRemoteMcp).toBe('available-as-custom-connector');
+    expect(packet.status.grokRemoteMcp).toBe('available-as-custom-connector');
     expect(packet.status.grokFeaturedCatalog).toBe('not-claimed');
+    expect(packet.status.geminiRemoteMcp).toBe('available-via-api-on-compatible-models');
     expect(packet.status.geminiConsumerConnector).toBe('not-claimed');
     expect(packet.listing.mcpUrl).toBe(MCP_PUBLIC_ENDPOINT);
     expect(packet.listing.chatgptPortal).toBe('https://chatgpt.com');
@@ -34,10 +36,12 @@ describe('store listing packet', () => {
     expect(STORE_LISTING.chatgptSubmitType).toMatch(/developer mode/i);
   });
 
-  it('does not claim a live directory listing or unverified provider install path', () => {
+  it('does not claim an unreviewed directory or consumer Gemini connector', () => {
     const blob = JSON.stringify(getStoreListingPacket());
     expect(blob).not.toMatch(/listed in GPT Store|published to Claude directory|featured on Grok/i);
-    expect(blob).not.toMatch(/gemini consumer mcp.*available/i);
+    expect(STORE_DIRECTORY_STATUS.geminiConsumerConnector).toBe('not-claimed');
+    expect(STORE_LISTING.geminiNote).toMatch(/No consumer Gemini MCP-install claim/i);
+    expect(STORE_LISTING.grokNote).toMatch(/No claim is made.*featured.*catalog/i);
   });
 
   it('keeps the ChatGPT submission packet aligned to the public MCP tool set', () => {
