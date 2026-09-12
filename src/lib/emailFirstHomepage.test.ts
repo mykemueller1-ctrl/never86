@@ -10,14 +10,16 @@ function firstHref(source: string, className: string): string | null {
   return flipped ? flipped[1] : null;
 }
 
-describe('email-first homepage (no sandbox as the stranger door)', () => {
+describe('owner-seat homepage (no sandbox as the stranger door)', () => {
   const home = readFileSync(resolve('src/components/HomePage.tsx'), 'utf8');
   const shell = readFileSync(resolve('src/components/HumanSiteShell.tsx'), 'utf8');
   const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
   const config = readFileSync(resolve('next.config.js'), 'utf8');
 
-  it('names schedule, labor cards, menu, and invoice / truck as the operator OS', () => {
-    expect(home).toMatch(/Paper-shop folders first: schedule, labor cards, menu, invoice \/ truck/);
+  it('keeps the evidence-first operator model visible', () => {
+    expect(home).toMatch(/The invoice you haven’t checked/);
+    expect(home).toMatch(/Bring what you have/);
+    expect(home).toMatch(/file, photo, or note/);
     expect(home).toMatch(/Labor cards name roles/);
     expect(home).toMatch(/Daily compare to the clock/);
     expect(home).toMatch(/punch ≠ schedule/);
@@ -32,14 +34,14 @@ describe('email-first homepage (no sandbox as the stranger door)', () => {
     expect(home).not.toMatch(/href="\/play"[^>]*human-button-primary/);
   });
 
-  it('tells strangers to watch the recorded demo, then give their email', () => {
-    expect(home).toMatch(/Watch the recorded demo, then give your email/);
-    expect(home).toMatch(/Set a password once/);
-    expect(home).toMatch(/\/login is the daily door/);
-    expect(home).not.toMatch(/The magic link is the door/);
+  it('keeps the demo useful even before a hosted recording exists', () => {
     expect(home).toMatch(/id="demo"/);
     expect(home).toMatch(/homeDemoVideoReady/);
+    expect(home).toMatch(/Example workflow · invoice check/);
+    expect(home).toMatch(/Your records · your decision · a clear next step/);
     expect(home).toContain('/onboard');
+    expect(home).not.toMatch(/hosted recorded demo.*not/i);
+    expect(home).not.toMatch(/Watch the recorded demo, then give your email/);
   });
 
   it('does not invent a broken video embed while no hosted demo URL exists', () => {
