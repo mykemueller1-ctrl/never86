@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import HomePage from '@/components/HomePage';
 
 export const metadata: Metadata = {
-  title: "Claim the free owner seat | Never 86'd",
+  title: "Restaurant operator intelligence for payroll, prices & process | Never86'd",
   description:
-    "Email-first free owner seat. Watch the recorded demo, then give your email. Payroll. Prices. Process. Not another dashboard.",
+    "Operator-built restaurant intelligence for independent owners. Bring schedules, labor records, invoices, closes, or marketplace statements and get a source-backed next action. One owner seat is free for one store.",
   alternates: { canonical: 'https://www.never86.ai/' },
   openGraph: {
-    title: "Find the leak. Run the fix. | Never 86'd",
+    title: "Too many hats. Start with one problem. | Never86'd",
     description:
-      'Watch the recorded demo, then give your email to claim the free owner seat. Payroll. Prices. Process.',
+      'Bring one real restaurant problem and the evidence you already have. Never86’d helps find the leak, show the source, and work through the next move.',
     url: 'https://www.never86.ai/',
   },
 };

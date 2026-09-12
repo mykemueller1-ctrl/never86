@@ -18,7 +18,7 @@ import {
   evaluateTenantIsolation,
 } from './llmShells/evals';
 
-describe('Never86 four-LLM thin shells', () => {
+describe('Never86 provider-neutral AI shells', () => {
   it('keeps one provider-neutral skill pack pointed at the existing MCP backend', () => {
     const pack = getNever86SkillPack();
     expect(pack.providerNeutral).toBe(true);
@@ -40,9 +40,15 @@ describe('Never86 four-LLM thin shells', () => {
     expect(cert.marketplacePublication).toBe('not-claimed');
   });
 
-  it('exposes four thin shells with an honest install matrix', () => {
+  it('exposes five provider shells with an honest install matrix', () => {
     const shells = listLlmShells();
-    expect(shells.map((shell) => shell.provider)).toEqual(['chatgpt', 'claude', 'gemini', 'grok']);
+    expect(shells.map((shell) => shell.provider)).toEqual([
+      'chatgpt',
+      'claude',
+      'perplexity',
+      'grok',
+      'gemini',
+    ]);
     const matrix = getInstallMatrix();
     expect(matrix.status.marketplacePublication).toBe('not-submitted');
     expect(matrix.status.liveProviderInstall).toBe('unverified');
