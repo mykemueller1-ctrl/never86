@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import { getStoreListingPacket } from '@/lib/llmShells/storeListing';
 
 export const metadata: Metadata = {
-  title: "Store listing packet · Never 86'd",
+  title: "AI connector publisher packet · Never86'd",
   description:
-    'ChatGPT Plugin Directory and Claude Connectors Directory filing for Never 86\'d Inc. Not a restaurant task.',
+    "Internal publisher packet for the public Never86'd MCP and provider-specific connector review. Not a restaurant task.",
   alternates: { canonical: 'https://www.never86.ai/store-listing' },
   robots: { index: false, follow: false },
 };
@@ -22,33 +22,33 @@ export default function StoreListingPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86{"'"}d <span className="italic text-ink-600">· store listing</span>
+                Never 86{"'"}d <span className="italic text-ink-600">· publisher packet</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Never 86{"'"}d Inc. publisher · not CTAP staff</p>
+              <p className="compass-eyebrow-dim mt-2">Never 86{"'"}d Inc. · provider review only</p>
             </span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px]">
             <Link href="/llm-shells" className="compass-pill">
-              <span className="avatar">T</span>
-              <span>Try page</span>
+              <span className="avatar">AI</span>
+              <span>Connector page</span>
             </Link>
           </nav>
         </div>
       </div>
 
       <section className="max-w-3xl mx-auto px-6 pt-16 pb-24">
-        <p className="compass-eyebrow mb-6">— 1-click Install</p>
+        <p className="compass-eyebrow mb-6">— Provider release packet</p>
         <h1 className="compass-display text-5xl md:text-6xl mb-8">
-          Search Never86{"'"}d. <em>Click Install.</em>
+          Verify first. <em>Publish second.</em>
         </h1>
         <p className="compass-body text-lg mb-8">
-          This is a company publisher job. Community Tap managers do not file this.
-          Operators never paste a URL. They search the directory and click Install after OpenAI or Anthropic list us.
+          The public read-only MCP can be added as a custom remote connector on supported providers today.
+          Directory or plugin publication is a separate provider-review step and is never marked complete until the provider approves it.
         </p>
 
         <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 mb-5">
           <p className="compass-card-label" style={{ color: '#0066ff' }}>
-            Status · not submitted
+            Honest launch status
           </p>
           <ul className="compass-body mt-3 space-y-2 text-sm">
             {packet.honesty.map((line) => (
@@ -58,29 +58,31 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">1. ChatGPT · Never 86{"'"}d Inc. org</p>
+          <p className="compass-card-label">1. ChatGPT · custom MCP verification</p>
           <p className="compass-body mt-3 text-sm">
-            Log in as the company. Create plugin → With MCP. Auth: none. URL type: Universal.
+            Use ChatGPT developer mode to create a custom app from the MCP endpoint, scan the tools, and test the reviewer cases. A public Plugins Directory listing is a separate submission/review step.
           </p>
           <a
-            href={L.chatgptPortal}
+            href="https://help.openai.com/en/articles/12584461"
             className="btn-primary mt-5 inline-flex"
             style={{ background: '#0066ff' }}
+            target="_blank"
+            rel="noreferrer"
           >
-            Open ChatGPT plugin portal →
+            Open current ChatGPT MCP guide →
           </a>
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">Publisher form fields</p>
+          <p className="compass-card-label">Publisher / connector fields</p>
           <dl className="mt-4 space-y-3 text-sm">
             {[
               ['Name', L.name],
               ['MCP URL', L.mcpUrl],
               ['Website', L.website],
+              ['Support', L.supportUrl],
               ['Privacy', L.privacyUrl],
               ['Terms', L.termsUrl],
-              ['Support', L.supportUrl],
               ['Short', L.shortDescription],
             ].map(([k, v]) => (
               <div key={k}>
@@ -101,7 +103,7 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">5 positive tests</p>
+          <p className="compass-card-label">Public MCP · 5 positive checks</p>
           <ol className="mt-4 space-y-3 text-sm compass-body">
             {packet.positiveTests.map((row) => (
               <li key={row.id}>
@@ -113,7 +115,7 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">3 negative tests</p>
+          <p className="compass-card-label">Public MCP · 3 negative checks</p>
           <ol className="mt-4 space-y-3 text-sm compass-body">
             {packet.negativeTests.map((row) => (
               <li key={row.id}>
@@ -125,21 +127,41 @@ export default function StoreListingPage() {
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">2. Claude</p>
+          <p className="compass-card-label">2. Claude · custom remote MCP</p>
           <p className="compass-body mt-3 text-sm">{L.claudeRequires}</p>
-          <a href={L.claudePortal} className="btn-primary mt-5 inline-flex" style={{ background: '#0066ff' }}>
-            Open Claude directory form →
+          <a
+            href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp"
+            className="btn-primary mt-5 inline-flex"
+            style={{ background: '#0066ff' }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open current Claude connector guide →
           </a>
         </div>
 
         <div className="compass-card p-6 mb-5">
-          <p className="compass-card-label">3. Grok + Gemini</p>
+          <p className="compass-card-label">3. Perplexity · custom remote MCP</p>
+          <p className="compass-body mt-3 text-sm">{L.perplexityRequires}</p>
+          <a
+            href="https://www.perplexity.ai/help-center/en/articles/13915507-adding-custom-remote-connectors"
+            className="btn-primary mt-5 inline-flex"
+            style={{ background: '#0066ff' }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open current Perplexity connector guide →
+          </a>
+        </div>
+
+        <div className="compass-card p-6 mb-5">
+          <p className="compass-card-label">Other model clients</p>
           <p className="compass-body mt-3 text-sm">{L.grokNote}</p>
           <p className="compass-body mt-2 text-sm">{L.geminiNote}</p>
         </div>
 
         <p className="compass-body text-sm">
-          Domain token from OpenAI goes at <code>{packet.domainChallengePath}</code>. Company publisher sends the token. Do not invent one.
+          Never publish a directory/install claim from this packet until the live provider flow is verified. If OpenAI issues a domain challenge token, place only the issued value at <code>{packet.domainChallengePath}</code>.
         </p>
       </section>
     </main>
