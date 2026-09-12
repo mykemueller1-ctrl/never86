@@ -87,7 +87,7 @@ describe('llm-shells durable status claims', () => {
     expect(pageSource).toContain('Remote MCP · custom connector');
     expect(pageSource).toContain('Remote MCP · developer/API path');
     expect(pageSource).toContain('ChatGPT directory/plugin publication for the private owner app: not claimed');
-    expect(pageSource).toContain('https://chatgpt.com');
+    expect(pageSource).toContain('https://help.openai.com/en/articles/12584461');
     expect(pageSource).toContain('https://docs.x.ai/grok/connectors');
     expect(pageSource).toContain('https://ai.google.dev/gemini-api/docs/function-calling');
     expect(pageSource).not.toMatch(/consumer Gemini app has a generic custom-MCP connector[^.]*available/i);
