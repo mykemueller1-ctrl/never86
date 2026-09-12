@@ -4,7 +4,7 @@ import { MCP_PUBLIC_ENDPOINT } from '@/lib/mcpPublicContract';
 import { CopyMcpUrl } from './CopyMcpUrl';
 
 export const metadata: Metadata = {
-  title: "Use Never86'd in ChatGPT, Claude & Perplexity",
+  title: "Use Never86'd in ChatGPT, Claude, Perplexity, Grok & Gemini",
   description:
     "Connect the public, read-only Never86'd MCP to supported AI clients for payroll, invoice-price, and restaurant-process analysis. Private owner data stays in the authenticated Never86'd Operator app.",
   alternates: { canonical: 'https://www.never86.ai/llm-shells' },
@@ -46,10 +46,32 @@ const PROVIDERS = [
     steps: [
       'Go to Account settings → Connectors.',
       'Choose + Custom connector → Remote and enter the Never86’d MCP endpoint.',
-      'Use HTTPS, select the supported remote transport, and use no app credentials for this public read-only connector.',
+      'Use HTTPS and no application credentials for this public read-only connector.',
     ],
     href: 'https://www.perplexity.ai/help-center/en/articles/13915507-adding-custom-remote-connectors',
     linkLabel: 'Perplexity setup guide',
+  },
+  {
+    name: 'Grok',
+    status: 'Remote MCP · custom connector',
+    steps: [
+      'Go to grok.com/connectors and choose New Connector → Custom.',
+      'Enter the Never86’d public MCP endpoint and save the connector.',
+      'Business / Enterprise workspaces may require an admin to provision the connector first.',
+    ],
+    href: 'https://docs.x.ai/grok/connectors',
+    linkLabel: 'xAI setup guide',
+  },
+  {
+    name: 'Gemini API',
+    status: 'Remote MCP · developer/API path',
+    steps: [
+      'Use a Gemini API flow/model that supports remote MCP over Streamable HTTP.',
+      'Configure an MCP server with the Never86’d public endpoint; use a server name without hyphens.',
+      'This is an API integration path, not a claim that the consumer Gemini app has a generic custom-MCP connector.',
+    ],
+    href: 'https://ai.google.dev/gemini-api/docs/function-calling',
+    linkLabel: 'Gemini API MCP guide',
   },
 ] as const;
 
@@ -88,7 +110,7 @@ export default function LlmShellsPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3 mt-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 mt-5">
           {PROVIDERS.map((provider) => (
             <article key={provider.name} className="compass-card p-6">
               <p className="compass-card-label">{provider.status}</p>
@@ -121,7 +143,7 @@ export default function LlmShellsPage() {
             The private owner app is a different surface: authenticated, tenant-scoped, and designed for a restaurant&apos;s own evidence, owner interview, action queue, and explicit private writes. It is not exposed through the public endpoint above.
           </p>
           <p className="compass-body mt-4 text-sm">
-            Public connector: available as a custom remote MCP where the provider supports it. ChatGPT directory/plugin publication for the private owner app: not claimed until review is completed.
+            Public connector: available through the provider-specific paths above. ChatGPT directory/plugin publication for the private owner app: not claimed until review is completed.
           </p>
           <p className="compass-body mt-4 text-sm">
             <Link href="/store-listing" className="font-semibold text-[#0066ff] hover:underline">Publisher packet →</Link>
