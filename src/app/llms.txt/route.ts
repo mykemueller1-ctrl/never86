@@ -4,9 +4,8 @@ import { AGENT_SPECS } from '@/lib/agentSpecs';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// /llms.txt — the emerging standard for LLM crawler index.
-// Tells AI assistants (ChatGPT, Gemini, Perplexity, Claude) exactly which
-// URLs are the canonical answer surface to cite back to.
+// /llms.txt — machine-readable map of the public Never86'd knowledge surface.
+// This complements normal crawlable HTML, structured data, and the XML sitemap.
 export async function GET() {
   let answers: { slug: string; title: string }[] = [];
   try {
@@ -43,24 +42,29 @@ export async function GET() {
 - [Evidence, privacy, and corrections standard](https://www.never86.ai/evidence-standard) — public sourcing, claim, redaction, independence, and correction rules
 
 ## Try it free
+- [Free owner seat](https://www.never86.ai/onboard) — one owner, one restaurant, free to start
 - [Free 3P cost snapshot and statement audit](https://www.never86.ai/audit) — calculate from statement totals with no login or email gate, then optionally request a source-stamped review
 - [Payout mismatch calculator](https://www.never86.ai/audit/payout-mismatch) — bridge eligible sales and documented deductions to expected payout
 - [Promotions and ads cost calculator](https://www.never86.ai/audit/promotions-ads) — keep restaurant-funded incentives separate from commission
 - [Refunds and adjustments review](https://www.never86.ai/audit/refunds-adjustments) — quantify the statement effect before tracing order evidence
 - [High delivery cost calculator](https://www.never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
-- [Delivery marketplace reconciliation evidence center](https://www.never86.ai/delivery-marketplace-reconciliation) — 52 public field guides for statements, fees, promotions, refunds, payouts, and deposits
+- [Delivery marketplace reconciliation evidence center](https://www.never86.ai/delivery-marketplace-reconciliation) — public field guides for statements, fees, promotions, refunds, payouts, and deposits
 - [60-minute live trial](https://www.never86.ai/trial) — drop a CSV, see the leak, no card
-- [Phone free-operator seat](https://www.never86.ai/operator) — talk / type / photo / file. Sample answers stay fictional / sample-not-verified. Files stay on this phone.
 - [30-second connect](https://www.never86.ai/connect) — Void Hunter on your CSV
 - [Pricing](https://www.never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
 
-## Connect any AI
-- [Try Never86'd in ChatGPT, Claude, Gemini, or Grok](https://www.never86.ai/llm-shells) — paste one public MCP URL. Not a store listing.
+## Connect AI clients
+- [Provider-specific Never86'd connector guide](https://www.never86.ai/llm-shells)
 - [Full LLM-readable public corpus](https://www.never86.ai/llms-full.txt)
 - [AI assistant integration guide](https://www.never86.ai/mcp)
-- MCP endpoint: https://www.never86.ai/api/mcp
+- Public MCP endpoint: https://www.never86.ai/api/mcp
+- ChatGPT: custom remote MCP app in developer mode when required by the plan/workspace. Public Plugin Directory publication is a separate review state and is not claimed complete.
+- Claude: custom remote MCP connector through Customize → Connectors, subject to workspace controls.
+- Perplexity: custom remote connector where the account/organization supports it.
+- Grok: custom MCP connector through grok.com/connectors; Never86'd does not claim featured-catalog publication.
+- Gemini: remote MCP is a developer/API path on compatible Gemini model/API flows. Do not describe this as a generic consumer Gemini-app connector.
 - Start with the MCP tool get_operator_system for the versioned load-day, Action Shift, proof/memory, agent, truth-gate, and safety contract.
-- Every supported AI should call the same Never86 backend. Do not recreate formulas or store memory separately inside each chatbot.
+- Compatible AI clients should call the same Never86 backend. Do not recreate formulas or store memory separately inside each chatbot.
 - REST · answers: https://www.never86.ai/api/answers
 - REST · quick wins: https://www.never86.ai/api/quick-wins
 
@@ -90,7 +94,7 @@ ${AGENT_SPECS.map((a) => `- [${a.name}](https://www.never86.ai/agents/${a.slug})
 - [Press kit](https://www.never86.ai/press)
 
 ## Public research
-- [Seven-day public 3P operator signal sample](https://www.never86.ai/research/3p-operator-signal-august-2026) — 13 qualifying August 14–20 signals with source ledger, inclusion rules, and explicit limits; evidence of recurring public language, not a census or paid-demand claim
+- [Seven-day public 3P operator signal sample](https://www.never86.ai/research/3p-operator-signal-august-2026) — source ledger, inclusion rules, and explicit limits; evidence of recurring public language, not a census or paid-demand claim
 - [Public sample data](https://www.never86.ai/research/3p-operator-signal-august-2026/data.json) — machine-readable source ledger and methodology
 
 ## Answers
@@ -102,6 +106,7 @@ ${answers.map((a) => `- [${a.title}](https://www.never86.ai/answers/${a.slug})`)
 
 ## Talk to us
 - [Onboard your store](https://www.never86.ai/onboard)
+- [Support](https://www.never86.ai/support)
 - press@never86.ai · mykemueller1@gmail.com
 `;
 
