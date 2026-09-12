@@ -1,12 +1,14 @@
 import { MCP_PUBLIC_ENDPOINT, MCP_PUBLIC_TOOLS } from '../mcpPublicContract';
 
-/** Honest provider status. Change only after the corresponding provider flow is verified. */
+/** Honest provider status. Change only after the corresponding provider path is documented and verified. */
 export const STORE_DIRECTORY_STATUS = {
   chatgptPluginDirectory: 'not-submitted',
   chatgptCustomMcp: 'available-in-developer-mode',
   claudeRemoteMcp: 'available-as-custom-connector',
   perplexityRemoteMcp: 'available-as-custom-connector',
+  grokRemoteMcp: 'available-as-custom-connector',
   grokFeaturedCatalog: 'not-claimed',
+  geminiRemoteMcp: 'available-via-api-on-compatible-models',
   geminiConsumerConnector: 'not-claimed',
 } as const;
 
@@ -43,10 +45,16 @@ export const STORE_LISTING = {
   perplexityPortal: 'https://www.perplexity.ai',
   perplexityRequires:
     'Perplexity supports custom remote connectors from Account settings → Connectors when the account or organization has the feature enabled. Use the public endpoint with no application credentials.',
+  grokPortal: 'https://grok.com/connectors',
+  grokRequires:
+    'Grok supports custom MCP connectors. Add a Custom connector at grok.com/connectors and use the public Never86’d MCP URL. Business and Enterprise workspaces may require an admin to provision the connector first.',
   grokNote:
-    'No Never86’d Grok install claim is published until an xAI-supported remote connector path is verified against the live endpoint.',
+    'Custom MCP connection is supported. No claim is made that Never86’d is listed in Grok’s featured or preconfigured connector catalog.',
+  geminiDocs: 'https://ai.google.dev/gemini-api/docs/function-calling',
+  geminiRequires:
+    'The Gemini API supports remote MCP through supported API flows/models using Streamable HTTP. This is a developer/API integration path, not a claim that the consumer Gemini app has a generic custom-MCP connector.',
   geminiNote:
-    'Never86.ai is available to Google Search/Gemini through the public web. No Gemini consumer MCP-install claim is published until Google documents a supported path we can verify.',
+    'Never86.ai is also discoverable through Google Search/Gemini. No consumer Gemini MCP-install claim is published.',
 } as const;
 
 export const STORE_STARTER_PROMPTS = [
@@ -130,8 +138,9 @@ export function getStoreListingPacket() {
     negativeTests: [...STORE_NEGATIVE_TESTS],
     domainChallengePath: '/.well-known/openai-apps-challenge',
     honesty: [
-      'Public Never86’d MCP: available today as a custom remote connector where the provider supports remote MCP.',
+      'Public Never86’d MCP: available today through documented custom remote-MCP paths on supported providers.',
       'ChatGPT public Plugin Directory publication: not claimed and not marked complete until OpenAI review is completed.',
+      'Gemini remote MCP is described only as a developer/API path; no consumer Gemini connector claim is made.',
       'Authenticated Never86’d Operator: separate tenant-private app; never substitute the public MCP for a private owner connection.',
     ],
   };
