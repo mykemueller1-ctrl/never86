@@ -11,29 +11,33 @@ import {
 } from './storeListing';
 
 describe('store listing packet', () => {
-  it('stays unsubmitted and points at the public MCP', () => {
+  it('keeps directory publication unclaimed and points at the public MCP', () => {
     const packet = getStoreListingPacket();
     expect(packet.status.chatgptPluginDirectory).toBe('not-submitted');
-    expect(packet.status.claudeConnectorsDirectory).toBe('not-submitted');
-    expect(packet.status.grokFeaturedCatalog).toBe('no-public-submit-path');
-    expect(packet.status.geminiConsumerConnectors).toBe('partnership-only');
+    expect(packet.status.chatgptCustomMcp).toBe('available-in-developer-mode');
+    expect(packet.status.claudeRemoteMcp).toBe('available-as-custom-connector');
+    expect(packet.status.perplexityRemoteMcp).toBe('available-as-custom-connector');
+    expect(packet.status.grokFeaturedCatalog).toBe('not-claimed');
+    expect(packet.status.geminiConsumerConnector).toBe('not-claimed');
     expect(packet.listing.mcpUrl).toBe(MCP_PUBLIC_ENDPOINT);
-    expect(packet.listing.chatgptPortal).toBe('https://platform.openai.com/plugins');
+    expect(packet.listing.chatgptPortal).toBe('https://chatgpt.com');
+    expect(packet.listing.supportUrl).toBe('https://www.never86.ai/support');
     expect(packet.listing.privacyUrl).toBe('https://www.never86.ai/privacy');
     expect(packet.listing.termsUrl).toBe('https://www.never86.ai/terms');
     expect(packet.listing.authentication).toBe('none-public-read-only');
   });
 
-  it('has the ChatGPT 5-positive / 3-negative test pack', () => {
+  it('has the public connector 5-positive / 3-negative test pack', () => {
     expect(STORE_POSITIVE_TESTS).toHaveLength(5);
     expect(STORE_NEGATIVE_TESTS).toHaveLength(3);
     expect(STORE_DIRECTORY_STATUS.chatgptPluginDirectory).toBe('not-submitted');
-    expect(STORE_LISTING.chatgptSubmitType).toBe('With MCP');
+    expect(STORE_LISTING.chatgptSubmitType).toMatch(/developer mode/i);
   });
 
-  it('does not claim a live store listing', () => {
+  it('does not claim a live directory listing or unverified provider install path', () => {
     const blob = JSON.stringify(getStoreListingPacket());
     expect(blob).not.toMatch(/listed in GPT Store|published to Claude directory|featured on Grok/i);
+    expect(blob).not.toMatch(/gemini consumer mcp.*available/i);
   });
 
   it('keeps the ChatGPT submission packet aligned to the public MCP tool set', () => {
@@ -41,7 +45,7 @@ describe('store listing packet', () => {
       readFileSync(join(process.cwd(), 'chatgpt-app-submission.json'), 'utf8'),
     );
     expect(submission.$schema).toBe(
-      'https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json',
+      'https://developers.openai.com/plugins/schemas/chatgpt-app-submission.v1.json',
     );
     expect(submission.schema_version).toBe(1);
     expect(submission.app_info).toMatchObject({
