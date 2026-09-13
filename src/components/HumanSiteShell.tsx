@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { SELECTED_SITES_BASE_URL } from '@/lib/selectedSites';
 
 const TEAM = [
   { name: 'Myke', src: '/team/mm.jpg' },
@@ -29,12 +30,12 @@ export function HumanSiteHeader() {
           <Link href="/#demo" className="human-nav-link">Demo</Link>
           <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
           <Link href="/pricing" className="human-nav-link">Pricing</Link>
-          <Link href="/login" className="human-nav-link">Sign in</Link>
-          <Link href="/onboard" className="human-button human-button-primary text-sm">Claim the free owner seat →</Link>
+          <Link href={SELECTED_SITES_BASE_URL} className="human-nav-link">Open One Seat V2</Link>
+          <Link href="/contact" className="human-button human-button-primary text-sm">Request the free owner seat →</Link>
         </nav>
 
-        <Link href="/onboard" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          Claim the free owner seat →
+        <Link href="/contact" className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
+          Request the free owner seat →
         </Link>
       </div>
     </header>
@@ -74,9 +75,12 @@ export function HumanSiteFooter() {
           </p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
-          <Link href="/onboard" className="human-nav-link">Claim the free owner seat</Link>
+          <Link href="/contact" className="human-nav-link">Request the free owner seat</Link>
           <Link href="/product" className="human-nav-link">Product story</Link>
-          <Link href="/login" className="human-nav-link">Sign in</Link>
+          <Link href={SELECTED_SITES_BASE_URL} className="human-nav-link">Open One Seat V2</Link>
+          <Link href="/check/invoices" className="human-nav-link">Check invoices</Link>
+          <Link href="/check/labor" className="human-nav-link">Check labor</Link>
+          <Link href="/check/menu" className="human-nav-link">Check menu</Link>
           <Link href="/#demo" className="human-nav-link">Demo</Link>
           <Link href="/portal" className="human-nav-link">House code</Link>
           <Link href="/llm-shells" className="human-nav-link">ChatGPT</Link>
