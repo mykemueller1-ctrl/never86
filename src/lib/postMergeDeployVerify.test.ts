@@ -2,18 +2,25 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { HOUSE_CODE_BRAND_BLUE, HOUSE_CODE_SEAT_DOOR } from './houseCode';
+import { SELECTED_SITES_BASE_URL, SELECTED_SITES_CONTACT_URL } from './selectedSites';
 
 function read(path: string): string {
   return readFileSync(resolve(path), 'utf8');
 }
 
 describe('post-merge deploy-verify locks', () => {
-  it('keeps the stranger funnel email-first to /onboard', () => {
+  it('keeps the stranger funnel email-first through selected Sites V28', () => {
     const home = read('src/components/HomePage.tsx');
-    expect(home).toMatch(/Claim the free owner seat/);
-    expect(home).toContain('href="/onboard"');
+    const shell = read('src/components/HumanSiteShell.tsx');
+    const config = read('next.config.js');
+    expect(home).toMatch(/Request the free owner seat/);
+    expect(home).toContain('href="/contact"');
     expect(home).not.toMatch(/Start playing/);
-    expect(read('src/components/HumanSiteShell.tsx')).toMatch(/href="\/onboard"/);
+    expect(shell).toMatch(/href="\/contact"/);
+    expect(shell).toMatch(/SELECTED_SITES_BASE_URL/);
+    expect(SELECTED_SITES_CONTACT_URL).toBe(`${SELECTED_SITES_BASE_URL}/contact`);
+    expect(config).toContain("source: '/onboard'");
+    expect(config).toContain("destination: `${SELECTED_SITES_BASE_URL}/contact`");
   });
 
   it('redirects /communities to the house-code /portal door', () => {
