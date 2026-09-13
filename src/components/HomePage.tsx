@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { HumanSiteFooter, HumanSiteHeader } from '@/components/HumanSiteShell';
 import { HOME_DEMO_VIDEO_URL, homeDemoVideoReady } from '@/lib/homeDemo';
+import { SELECTED_SITES_BASE_URL } from '@/lib/selectedSites';
 import { trackEvent } from '@/lib/track';
 
 const PILLARS = [
@@ -44,18 +45,23 @@ export default function Home() {
               The invoice you haven’t checked. The shift that ran late. The note nobody followed up on. Bring it to Never 86&apos;d and work through the next move, with the source beside the answer.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/onboard" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/onboard', label: 'Claim the free owner seat' } })}>
-                Claim the free owner seat →
+              <Link href="/contact" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/contact', label: 'Request the free owner seat' } })}>
+                Request the free owner seat →
               </Link>
               <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'See how it works' } })}>
                 See how it works
               </Link>
             </div>
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#514b43]">
+              <Link href="/check/invoices" className="underline-offset-4 hover:underline">Check an invoice</Link>
+              <Link href="/check/labor" className="underline-offset-4 hover:underline">Check labor</Link>
+              <Link href="/check/menu" className="underline-offset-4 hover:underline">Check a menu</Link>
+            </div>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#514b43]">
               One owner seat. One restaurant. Free to start. No card. Your restaurant gets its own workspace.
             </p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Already have a seat? <Link href="/login" className="underline-offset-4 hover:underline">Sign in</Link>
+              Already working in One Seat V2? <Link href={SELECTED_SITES_BASE_URL} className="underline-offset-4 hover:underline">Open it</Link>
             </p>
           </div>
 
@@ -107,7 +113,7 @@ export default function Home() {
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
               ['1', 'Pick one job', 'Check an invoice, compare scheduled hours with the clock, or untangle a shift handoff.'],
-              ['2', 'Bring what you have', 'Create your seat and add a file, photo, or note. You can connect a cloud account later.'],
+              ['2', 'Bring what you have', 'Use a public check now, or send your email for the owner-seat path. No inbox or Drive access is required.'],
               ['3', 'Get a receipt-backed move', 'Bring one real thing. See what changed, why it matters, what to do next, and what proves the fix.'],
             ].map(([number, title, copy]) => (
               <article key={number} className="rounded-2xl border border-[#33455c] bg-[#111b27] p-6">
@@ -118,7 +124,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/onboard" className="human-button human-button-light">Claim the free owner seat →</Link>
+            <Link href="/contact" className="human-button human-button-light">Request the free owner seat →</Link>
             <Link href="/#demo" className="human-button border border-[#5f7591] text-white hover:border-white">See how it works</Link>
           </div>
         </div>
@@ -136,8 +142,8 @@ export default function Home() {
               Start with one question. Never 86&apos;d checks the records you provide, shows what is missing, and helps you decide what to do next.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
-              <Link href="/login" className="human-button human-button-secondary">Already have a seat? Sign in</Link>
+              <Link href="/contact" className="human-button human-button-primary">Request the free owner seat →</Link>
+              <Link href={SELECTED_SITES_BASE_URL} className="human-button human-button-secondary">Open One Seat V2</Link>
             </div>
           </div>
 
@@ -150,7 +156,7 @@ export default function Home() {
                 src={HOME_DEMO_VIDEO_URL}
                 className="aspect-video w-full rounded-xl bg-[#111b27]"
               >
-                Your browser cannot play this recorded demo. Claim the free owner seat with email instead.
+                Your browser cannot play this recorded demo. Use the email-only contact path instead.
               </video>
             </div>
           ) : (
@@ -193,7 +199,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/onboard" className="human-button human-button-primary">Claim the free owner seat →</Link>
+            <Link href="/contact" className="human-button human-button-primary">Request the free owner seat →</Link>
             <Link href="/#demo" className="human-button human-button-secondary">See how it works</Link>
             <Link href="/pricing" className="human-button human-button-secondary">1–3 unit pricing</Link>
           </div>
