@@ -1,109 +1,35 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import { HOME_DEMO_VIDEO_URL, homeDemoVideoReady } from './homeDemo';
-import {
-  SELECTED_SITES_BASE_URL,
-  SELECTED_SITES_CONTACT_URL,
-  SELECTED_SITES_CHECK_URLS,
-} from './selectedSites';
-
-function firstHref(source: string, className: string): string | null {
-  const match = source.match(new RegExp(`href="([^"]+)"[^>]*className="[^"]*${className}`));
-  if (match) return match[1];
-  const flipped = source.match(new RegExp(`className="[^"]*${className}[^"]*"[^>]*href="([^"]+)"`));
-  return flipped ? flipped[1] : null;
-}
-
-describe('owner-seat homepage (selected Sites is the stranger handoff)', () => {
-  const home = readFileSync(resolve('src/components/HomePage.tsx'), 'utf8');
-  const shell = readFileSync(resolve('src/components/HumanSiteShell.tsx'), 'utf8');
-  const demo = readFileSync(resolve('src/lib/homeDemo.ts'), 'utf8');
-  const config = readFileSync(resolve('next.config.js'), 'utf8');
-
-  it('keeps the evidence-first operator model visible', () => {
-    expect(home).toMatch(/The invoice you haven’t checked/);
-    expect(home).toMatch(/Bring what you have/);
-    expect(home).toMatch(/No inbox or Drive access is required/);
-    expect(home).toMatch(/Labor cards name roles/);
-    expect(home).toMatch(/Daily compare to the clock/);
-    expect(home).toMatch(/punch ≠ schedule/);
-  });
-
-  it('makes the homepage primary button use the single selected Sites contact path', () => {
-    expect(home).toMatch(/human-button human-button-primary/);
-    expect(firstHref(home, 'human-button-primary')).toBe('/contact');
-    expect(home).toMatch(/Request the free owner seat/);
-    expect(home).not.toMatch(/Start playing/);
-    expect(home).not.toMatch(/Try Owner desk/);
-    expect(home).not.toMatch(/href="\/play"[^>]*human-button-primary/);
-    expect(SELECTED_SITES_CONTACT_URL).toBe(`${SELECTED_SITES_BASE_URL}/contact`);
-  });
-
-  it('keeps the demo useful even before a hosted recording exists', () => {
-    expect(home).toMatch(/id="demo"/);
-    expect(home).toMatch(/homeDemoVideoReady/);
-    expect(home).toMatch(/Example workflow · invoice check/);
-    expect(home).toMatch(/Your records · your decision · a clear next step/);
-    expect(home).toContain('/contact');
-    expect(home).not.toMatch(/hosted recorded demo.*not/i);
-    expect(home).not.toMatch(/Watch the recorded demo, then give your email/);
-  });
-
-  it('does not invent a broken video embed while no hosted recording exists', () => {
-    expect(HOME_DEMO_VIDEO_URL).toBe('');
-    expect(homeDemoVideoReady()).toBe(false);
-    expect(homeDemoVideoReady('https://cdn.example.test/never86-demo.mp4')).toBe(true);
-    expect(homeDemoVideoReady('not-a-url')).toBe(false);
-    expect(demo).toMatch(/export const HOME_DEMO_VIDEO_URL = ''/);
-    expect(home).not.toMatch(/<iframe/);
-    expect(home).not.toMatch(/youtube\.com\/embed/);
-    expect(home).not.toMatch(/src=""/);
-  });
-
-  it('keeps Void Hunter blue on the public home brand', () => {
-    expect(home).toMatch(/#005de8/);
-    expect(shell).not.toMatch(/Start playing/);
-  });
-
-  it('routes public navigation to selected Sites while preserving the house-code and MCP separation', () => {
-    expect(shell).toMatch(/Request the free owner seat/);
-    expect(firstHref(shell, 'human-button-primary')).toBe('/contact');
-    expect(shell).not.toMatch(/Start playing/);
-    expect(shell).not.toMatch(/href="\/play"[^>]*human-button-primary/);
-    expect(shell).not.toMatch(/href="\/play"[^>]*human-nav-link">Play/);
-    expect(shell).not.toMatch(/human-nav-link">Owner desk/);
-    expect(shell).toMatch(/SELECTED_SITES_BASE_URL/);
-    expect(shell).toMatch(/href="\/check\/invoices"/);
-    expect(shell).toMatch(/href="\/check\/labor"/);
-    expect(shell).toMatch(/href="\/check\/menu"/);
-    expect(shell).toMatch(/href="\/portal"/);
-    expect(shell).toMatch(/href="\/llm-shells"/);
-    expect(shell).not.toMatch(/href="\/communities"/);
-  });
-
-  it('locks the three public check handoffs to selected Sites V28', () => {
-    expect(SELECTED_SITES_CHECK_URLS).toEqual({
-      invoices: `${SELECTED_SITES_BASE_URL}/check/invoices`,
-      labor: `${SELECTED_SITES_BASE_URL}/check/labor`,
-      menu: `${SELECTED_SITES_BASE_URL}/check/menu`,
-    });
-    expect(config).toContain("source: '/check/invoices'");
-    expect(config).toContain("source: '/check/labor'");
-    expect(config).toContain("source: '/check/menu'");
-  });
-
-  it('keeps legacy owner entry as compatibility redirects instead of a second lead store', () => {
-    expect(config).toContain("source: '/contact'");
-    expect(config).toContain("source: '/onboard'");
-    expect(config).toContain("destination: `${SELECTED_SITES_BASE_URL}/contact`");
-    expect(config).toContain("source: '/login'");
-    expect(config).toContain('destination: SELECTED_SITES_BASE_URL');
-  });
-
-  it('does not rewrite the homepage to open play', () => {
-    expect(config).not.toMatch(/source: '\/'/);
-    expect(config).toMatch(/source: '\/play'/);
-    expect(config).toMatch(/destination: '\/demo\/action-shift\.html'/);
-  });
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {describe,it,expect} from 'vitest';
+import Home from '../components/OwnerHome';
+import Pricing from '../app/pricing/page';
+import {SELECTED_SITES_BASE_URL} from './selectedSites';
+describe('public owner experience',()=>{
+ const html=renderToStaticMarkup(createElement(Home));
+ it('offers three direct checks before asking for contact information',()=>{
+  for(const path of ['/check/invoices','/check/labor','/check/menu'])expect(html).toContain(`href="${path}"`);
+  expect(html.indexOf('id="checks"')).toBeLessThan(html.indexOf('href="/contact"'));
+  expect(html).toContain(`${SELECTED_SITES_BASE_URL}/seat`);
+ });
+ it('renders a playable hosted demo with captions and honest disclosure',()=>{
+  expect(html).toContain('/media/never86-landscape-v24.mp4');
+  expect(html).toContain('kind="captions"');expect(html).toContain('Fictional sample documents');
+  expect(html).not.toContain('autoplay');expect(html).not.toContain('src=""');
+ });
+ it('labels the sample and shows price change without promising recovered savings',()=>{
+  expect(html).toContain('FICTIONAL EXAMPLE');expect(html).toContain('not money recovered');
+  expect(html).toContain('15.8%');expect(html).toContain('same product and pack');
+ });
+ it('keeps optional detail accessible and public pricing honest',()=>{
+  expect(html).toContain('<details>');expect(html).toContain('Skip to the checks');
+  const pricing=renderToStaticMarkup(createElement(Pricing));
+  expect(pricing).toContain('not finalized');expect(pricing).not.toMatch(/199|499|fully separate database|545,677/);
+ });
+ it('retains selected Sites handoffs and separate house access',()=>{
+  const config=readFileSync(resolve('next.config.js'),'utf8');
+  for(const p of ['/contact','/check/invoices','/check/labor','/check/menu'])expect(config).toContain(`source: '${p}'`);
+  expect(config).toContain("destination: '/portal'");
+ });
 });
