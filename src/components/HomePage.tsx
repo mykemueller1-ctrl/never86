@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { HumanSiteFooter, HumanSiteHeader } from '@/components/HumanSiteShell';
 import { HOME_DEMO_VIDEO_URL, homeDemoVideoReady } from '@/lib/homeDemo';
-import { SELECTED_SITES_BASE_URL } from '@/lib/selectedSites';
+import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 import { trackEvent } from '@/lib/track';
 
 const PILLARS = [
@@ -61,7 +61,7 @@ export default function Home() {
               One owner seat. One restaurant. Free to start. No card. Your restaurant gets its own workspace.
             </p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f675e]">
-              Already working in One Seat V2? <Link href={SELECTED_SITES_BASE_URL} className="underline-offset-4 hover:underline">Open it</Link>
+              Already have a seat? <Link href={ONE_SEAT_PATHS.login} className="underline-offset-4 hover:underline">Sign in on never86.ai</Link>
             </p>
           </div>
 
@@ -70,13 +70,13 @@ export default function Home() {
               <p className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-[#005de8]">Example operator answer</p>
               <span className="rounded-full bg-[#eaf2ff] px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#005de8]">Prices</span>
             </div>
-            <h2 className="mt-8 font-serif text-4xl leading-tight text-[#1b1b1b]">Olive oil moved 15.8%.</h2>
+            <h2 className="mt-8 font-serif text-4xl leading-tight text-[#1b1b1b]">Same cheese. Higher price.</h2>
             <p className="mt-4 text-base leading-relaxed text-[#514b43]">
-              The current case is $79.20, up from $68.40. That is $10.80 of price drift on the same SKU—not usage, waste, or a guess.
+              The fictional mozzarella case is $56.00, up from $48.00. That is $8.00 of price drift on the same 20 lb SKU—not usage, waste, or a guess.
             </p>
             <div className="mt-7 border-l-4 border-[#005de8] bg-[#f1f6ff] p-4">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-[#005de8]">Next move</p>
-              <p className="mt-2 text-sm font-semibold leading-relaxed text-[#252525]">Verify pack size, then ask the vendor to explain the increase before the next order.</p>
+              <p className="mt-2 text-sm font-semibold leading-relaxed text-[#252525]">Check the new price with your rep. A price increase is not money recovered.</p>
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#766f65]">Receipt · two invoice periods · same vendor · same SKU</p>
           </div>
@@ -143,7 +143,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/contact" className="human-button human-button-primary">Request the free owner seat →</Link>
-              <Link href={SELECTED_SITES_BASE_URL} className="human-button human-button-secondary">Open One Seat V2</Link>
+              <Link href={ONE_SEAT_PATHS.try} className="human-button human-button-secondary">Try the two-invoice win</Link>
             </div>
           </div>
 

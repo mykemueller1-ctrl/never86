@@ -37,7 +37,7 @@ export default function Public3PSignalReport() {
     <main className="compass min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
       <header className="max-w-7xl mx-auto px-6 pt-6 pb-4 flex items-start justify-between gap-6 flex-wrap">
-        <Link href="/" className="flex items-start gap-4"><span className="compass-mark">N</span><span><p className="font-serif text-[24px] leading-none text-ink-800">Never 86&apos;d <span className="italic text-ink-600">· research</span></p><p className="compass-eyebrow-dim mt-2">Public operator evidence desk</p></span></Link>
+        <Link href="/" className="flex items-start gap-4"><span className="compass-mark">N</span><span><p className="font-serif text-[24px] leading-none text-ink-800">Never 86&apos;d <span className="italic text-ink-600">· research</span></p><p className="compass-eyebrow-dim mt-2">Public operator evidence seat</p></span></Link>
         <nav className="flex items-center gap-2 text-[13px]"><Link href="/delivery-marketplace-reconciliation" className="compass-pill">3P evidence center</Link><Link href="/audit" className="btn-primary" style={{ background: '#0066ff' }}>Audit one statement</Link></nav>
       </header>
 
