@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { HonestyLegend } from '@/components/HonestyLegend';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_RECIPE, money, pctLabel } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
@@ -28,6 +29,10 @@ export default function CheckMenuPage() {
           <strong>{pctLabel(GOLD_RECIPE.foodCostPct)}</strong>
           <b>sample food cost</b>
         </div>
+        <HonestyLegend
+          active="Estimated"
+          note="Estimated fictional plate math. No count stays Missing. Invoice ≠ COGS. We do not invent food cost."
+        />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>
           <p>{GOLD_RECIPE.nextMove}</p>

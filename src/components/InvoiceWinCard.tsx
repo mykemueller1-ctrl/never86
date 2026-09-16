@@ -1,4 +1,11 @@
-import { GOLD_MOZZARELLA, money, pctLabel } from '@/lib/oneSeatPublicWin';
+import { HonestyLegend } from '@/components/HonestyLegend';
+import {
+  GOLD_MOZZARELLA,
+  GOLD_SAMPLE_HONESTY,
+  GOLD_SAMPLE_HONESTY_NOTE,
+  money,
+  pctLabel,
+} from '@/lib/oneSeatPublicWin';
 import { oneSeatStyles as styles } from './OneSeatPublicShell';
 
 export function InvoiceWinCard({ heading = 'Same cheese. Higher price.' }: { heading?: string }) {
@@ -24,6 +31,7 @@ export function InvoiceWinCard({ heading = 'Same cheese. Higher price.' }: { hea
         <strong>+{money(GOLD_MOZZARELLA.delta)} <small>per case</small></strong>
         <b>+{pctLabel(GOLD_MOZZARELLA.driftPct)}</b>
       </div>
+      <HonestyLegend active={GOLD_SAMPLE_HONESTY} note={GOLD_SAMPLE_HONESTY_NOTE} />
       <div className={styles.next}>
         <small>YOUR NEXT MOVE</small>
         <p>{GOLD_MOZZARELLA.nextMove}</p>

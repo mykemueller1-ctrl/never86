@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { HonestyLegend } from '@/components/HonestyLegend';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_LABOR } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
@@ -27,6 +28,10 @@ export default function TryLaborPage() {
           <strong>+{GOLD_LABOR.driftHours.toFixed(2)} h</strong>
           <b>sample ${GOLD_LABOR.sampleDollars}</b>
         </div>
+        <HonestyLegend
+          active="Estimated"
+          note="Estimated fictional sample. A missing punch stays Missing. Matching live clock and schedule become Verified."
+        />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>
           <p>{GOLD_LABOR.nextMove}</p>

@@ -4,8 +4,15 @@
  * One Seat = Action Shift = Community logic for 1–5 unit independents.
  */
 
-import { buildVendorDriftActionShift, compareVendorInvoiceDocuments } from './vendorDriftActionShift';
+import {
+  buildVendorDriftActionShift,
+  compareVendorInvoiceDocuments,
+  type VendorDriftSkuRow,
+} from './vendorDriftActionShift';
 import { parseVendorInvoice } from './vendorInvoiceParse';
+
+export const HONESTY_LABELS = ['Verified', 'Estimated', 'Missing'] as const;
+export type HonestyLabel = (typeof HONESTY_LABELS)[number];
 
 export const ONE_SEAT_ICP = '1–5 unit independents';
 export const ONE_SEAT_EQUALS = 'One Seat = Action Shift = Community logic';
@@ -92,3 +99,43 @@ export const PUBLIC_DOOR_VOICE = {
   say: ['One Seat', 'Action Shift', 'seat', 'app'],
   grok: 'Grok can explain the card. Deterministic formulas decide the dollars. This is not a Grok-resale product.',
 } as const;
+
+export const GOLD_SAMPLE_HONESTY: HonestyLabel = 'Estimated';
+export const GOLD_SAMPLE_HONESTY_NOTE =
+  'This mozzarella sample is Estimated. Matching live papers become Verified. One invoice stays Missing — not $0.';
+
+export function honestyFromVendorRow(
+  row: Pick<VendorDriftSkuRow, 'evidenceState' | 'priorPrice' | 'currentPrice'>,
+): HonestyLabel {
+  if (row.evidenceState === 'missing-evidence' || row.priorPrice == null || row.currentPrice == null) {
+    return 'Missing';
+  }
+  if (row.evidenceState === 'partial') return 'Estimated';
+  return 'Verified';
+}
+
+export function publicDoorHonesty(input: {
+  row?: Pick<VendorDriftSkuRow, 'evidenceState' | 'priorPrice' | 'currentPrice'>;
+  disclosedSample?: boolean;
+}): HonestyLabel {
+  if (!input.row) return 'Missing';
+  const fromPaper = honestyFromVendorRow(input.row);
+  if (input.disclosedSample && fromPaper === 'Verified') return 'Estimated';
+  return fromPaper;
+}
+
+export function isGoldSampleInvoices(prior: string, current: string): boolean {
+  const texts = [prior.trim(), current.trim()].sort();
+  const gold = [GOLD_PRIOR_INVOICE_CSV.trim(), GOLD_CURRENT_INVOICE_CSV.trim()].sort();
+  return texts[0] === gold[0] && texts[1] === gold[1];
+}
+
+export function attachPublicHonesty<T extends VendorDriftSkuRow>(
+  rows: T[],
+  disclosedSample = false,
+): Array<T & { honesty: HonestyLabel }> {
+  return rows.map((row) => ({
+    ...row,
+    honesty: publicDoorHonesty({ row, disclosedSample }),
+  }));
+}

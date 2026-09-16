@@ -13,17 +13,29 @@ import {
   SELECTED_SITES_CONTACT_URL,
   isChatgptSitesHost,
 } from './selectedSites';
+import CheckInvoices from '../app/check/invoices/page';
+import { InvoiceWinCard } from '../components/InvoiceWinCard';
 import {
+  GOLD_CURRENT_INVOICE_CSV,
   GOLD_FLOUR,
   GOLD_LABOR,
   GOLD_MOZZARELLA,
+  GOLD_PRIOR_INVOICE_CSV,
   GOLD_RECIPE,
+  GOLD_SAMPLE_HONESTY,
+  GOLD_SAMPLE_HONESTY_NOTE,
+  HONESTY_LABELS,
   ONE_SEAT_EQUALS,
   ONE_SEAT_ICP,
+  attachPublicHonesty,
   goldInvoiceCompare,
+  honestyFromVendorRow,
+  isGoldSampleInvoices,
   money,
   pctLabel,
+  publicDoorHonesty,
 } from './oneSeatPublicWin';
+import { buildVendorDriftActionShift } from './vendorDriftActionShift';
 
 function read(path: string): string {
   return readFileSync(resolve(path), 'utf8');
@@ -78,6 +90,32 @@ describe('Grok-native One Seat public door', () => {
     expect(action.result.morningActions[0].claimBoundary).toMatch(/not.*recoverable cash/i);
   });
 
+  it('labels honesty Verified / Estimated / Missing and never invents a missing dollar', () => {
+    const { compare } = goldInvoiceCompare();
+    const mozzarella = compare.rows.find((row) => row.sku === GOLD_MOZZARELLA.sku);
+    const flour = compare.rows.find((row) => row.sku === GOLD_FLOUR.sku);
+    expect(HONESTY_LABELS).toEqual(['Verified', 'Estimated', 'Missing']);
+    expect(mozzarella && honestyFromVendorRow(mozzarella)).toBe('Verified');
+    expect(flour && honestyFromVendorRow(flour)).toBe('Verified');
+    expect(isGoldSampleInvoices(GOLD_PRIOR_INVOICE_CSV, GOLD_CURRENT_INVOICE_CSV)).toBe(true);
+    expect(isGoldSampleInvoices(GOLD_CURRENT_INVOICE_CSV, GOLD_PRIOR_INVOICE_CSV)).toBe(true);
+    expect(publicDoorHonesty({ row: mozzarella, disclosedSample: true })).toBe('Estimated');
+    const sampleRows = attachPublicHonesty(compare.rows, true);
+    expect(sampleRows).toHaveLength(2);
+    expect(sampleRows.every((row) => row.honesty === 'Estimated')).toBe(true);
+
+    const oneInvoice = buildVendorDriftActionShift({
+      documents: [{ text: GOLD_CURRENT_INVOICE_CSV, filename: 'current-only.csv' }],
+    });
+    expect(oneInvoice.ok).toBe(true);
+    if (!oneInvoice.ok) return;
+    expect(oneInvoice.compare.flagged).toHaveLength(0);
+    expect(oneInvoice.compare.rows.every((row) => row.dollarsObserved == null)).toBe(true);
+    expect(oneInvoice.compare.rows.every((row) => honestyFromVendorRow(row) === 'Missing')).toBe(true);
+    expect(oneInvoice.result.morningActions[0].dollarsObserved).toBeNull();
+    expect(oneInvoice.result.missingEvidence.join(' ')).toMatch(/Missing Evidence, not \$0/);
+  });
+
   it('leads the homepage with the gold mozzarella card, free-seat CTA, and 1–5 One Seat voice', () => {
     expect(home).toContain(money(GOLD_MOZZARELLA.priorPrice));
     expect(home).toContain(money(GOLD_MOZZARELLA.currentPrice));
@@ -92,6 +130,23 @@ describe('Grok-native One Seat public door', () => {
     expect(home).toContain(`href="${ONE_SEAT_PATHS.checkInvoices}"`);
     expect(home).not.toMatch(/\bdesk\b/i);
     expect(home).toMatch(/Grok/i);
+    expect(home).toContain('Verified');
+    expect(home).toContain('Estimated');
+    expect(home).toContain('Missing');
+    expect(home).toContain(GOLD_SAMPLE_HONESTY);
+    expect(home).toContain(GOLD_SAMPLE_HONESTY_NOTE);
+
+    const win = renderToStaticMarkup(createElement(InvoiceWinCard));
+    const invoices = renderToStaticMarkup(createElement(CheckInvoices));
+    for (const html of [win, invoices]) {
+      expect(html).toContain(money(GOLD_MOZZARELLA.priorPrice));
+      expect(html).toContain(money(GOLD_MOZZARELLA.currentPrice));
+      expect(html).toContain('Verified');
+      expect(html).toContain('Estimated');
+      expect(html).toContain('Missing');
+      expect(html).not.toMatch(/\bdesk\b/i);
+      expect(html).not.toMatch(/chatgpt\.site/);
+    }
   });
 
   it('keeps labor and recipe samples disclosed and formula-honest', () => {
@@ -100,5 +155,23 @@ describe('Grok-native One Seat public door', () => {
     expect(GOLD_LABOR.claimBoundary).toMatch(/Fictional/);
     expect(GOLD_RECIPE.foodCostPct).toBe(0.25);
     expect(GOLD_RECIPE.claimBoundary).toMatch(/No count/);
+    for (const path of [
+      'src/app/try/labor/page.tsx',
+      'src/app/try/recipes/page.tsx',
+      'src/app/check/labor/page.tsx',
+      'src/app/check/menu/page.tsx',
+    ]) {
+      const source = read(path);
+      expect(source).toMatch(/HonestyLegend/);
+      expect(source).toMatch(/Estimated/);
+      expect(source).not.toMatch(/\bdesk\b/i);
+      expect(source).not.toMatch(/chatgpt\.site/);
+    }
+    for (const path of ['src/app/try/page.tsx', 'src/app/check/invoices/page.tsx']) {
+      const source = read(path);
+      expect(source).toMatch(/InvoiceWinCard/);
+      expect(source).not.toMatch(/\bdesk\b/i);
+      expect(source).not.toMatch(/chatgpt\.site/);
+    }
   });
 });

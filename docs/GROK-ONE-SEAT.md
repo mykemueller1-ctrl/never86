@@ -18,6 +18,16 @@
 
 ChatGPT Sites V28 (`action-shift-one-seat-v2.never86-d-9722.chatgpt.site`) is archived. Do not send `/check/*`, `/login`, or `/onboard` there.
 
+## Honesty on the cold win
+
+| Label | When |
+|---|---|
+| **Verified** | Two matching live invoices (same vendor + SKU + pack) produced the dollar. |
+| **Estimated** | Disclosed fictional sample, or partial / unreadable lines. |
+| **Missing** | Prior period, pack, or punch is absent. Missing is not $0. |
+
+Public gold mozzarella `$48.00 → $56.00` is **Estimated** (fictional sample). Formulas do not invent a missing dollar. Public copy does not say “desk.”
+
 ## Grok / xAI inside the seat
 
 Grok is the preferred **explain** voice. It does not compute dollars. It is not a resale of Grok.

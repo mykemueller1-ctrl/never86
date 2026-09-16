@@ -22,6 +22,8 @@ describe('public owner experience',()=>{
   expect(html).toContain('FICTIONAL EXAMPLE');expect(html).toContain('not money recovered');
   expect(html).toContain('16.7%');expect(html).toContain('Same product and pack');
   expect(html).toContain('$48.00');expect(html).toContain('$56.00');
+  expect(html).toContain('Verified');expect(html).toContain('Estimated');expect(html).toContain('Missing');
+  expect(html).not.toMatch(/\bdesk\b/i);
  });
  it('keeps optional detail accessible and public pricing honest',()=>{
   expect(html).toContain('<details>');expect(html).toContain('Skip to the checks');

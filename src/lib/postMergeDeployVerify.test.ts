@@ -10,9 +10,16 @@ function read(path: string): string {
 
 describe('post-merge deploy-verify locks', () => {
   it('keeps the stranger funnel email-first on never86.ai One Seat', () => {
+    const liveHome = read('src/app/page.tsx');
+    const ownerHome = read('src/components/OwnerHome.tsx');
     const home = read('src/components/HomePage.tsx');
     const shell = read('src/components/HumanSiteShell.tsx');
     const config = read('next.config.js');
+    expect(liveHome).toContain("from '@/components/OwnerHome'");
+    expect(ownerHome).toContain('Claim free owner seat');
+    expect(ownerHome).toContain('/check/invoices');
+    expect(ownerHome).not.toMatch(/\bdesk\b/i);
+    expect(ownerHome).not.toMatch(/chatgpt\.site/);
     expect(home).toMatch(/Request the free owner seat/);
     expect(home).toContain('href="/contact"');
     expect(home).not.toMatch(/Start playing/);
@@ -23,6 +30,7 @@ describe('post-merge deploy-verify locks', () => {
     expect(SELECTED_SITES_CONTACT_URL).toBe('/contact');
     expect(config).not.toMatch(/chatgpt\.site/);
     expect(config).not.toContain("source: '/onboard'");
+    expect(config).not.toContain("source: '/check/invoices'");
   });
 
   it('redirects /communities to the house-code /portal door', () => {

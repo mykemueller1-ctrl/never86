@@ -312,7 +312,7 @@ export async function probeXaiModels(
   fetchFn: FetchLike = fetch,
 ): Promise<{ status: ProbeStatus; httpStatus?: number; modelCount?: number; detail?: string }> {
   const key = env[XAI_API_KEY_NAME]?.trim();
-  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. Grok Bot and public MCP do not need this key.' };
+  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. One Seat formulas still decide. Grok explain stays off. Public MCP does not need this key.' };
 
   const response = await fetchFn(`${xaiApiBase(env)}/models`, {
     method: 'GET',

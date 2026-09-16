@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { attachPublicHonesty, isGoldSampleInvoices } from '@/lib/oneSeatPublicWin';
 import { buildVendorDriftActionShift } from '@/lib/vendorDriftActionShift';
 
 export const runtime = 'nodejs';
@@ -24,9 +25,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: built.error }, { status: 400 });
   }
 
+  const disclosedSample = isGoldSampleInvoices(documents[0]?.text ?? '', documents[1]?.text ?? '');
   return NextResponse.json({
     success: true,
+    disclosedSample,
     result: built.result,
-    compare: built.compare,
+    compare: {
+      ...built.compare,
+      rows: attachPublicHonesty(built.compare.rows, disclosedSample),
+    },
   });
 }

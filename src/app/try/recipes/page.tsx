@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { HonestyLegend } from '@/components/HonestyLegend';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_MOZZARELLA, GOLD_RECIPE, money, pctLabel } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
@@ -27,6 +28,10 @@ export default function TryRecipesPage() {
           <strong>{pctLabel(GOLD_RECIPE.foodCostPct)} food cost</strong>
           <b>sample only</b>
         </div>
+        <HonestyLegend
+          active="Estimated"
+          note="Estimated fictional plate math. No count stays Missing. Invoice ≠ COGS. We do not invent food cost."
+        />
         <p className={styles.note}>
           Uses the fictional mozzarella case at {money(GOLD_MOZZARELLA.currentPrice)}. {GOLD_RECIPE.nextMove}
         </p>

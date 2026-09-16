@@ -1,17 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { GOLD_CURRENT_INVOICE_CSV, GOLD_PRIOR_INVOICE_CSV } from '@/lib/oneSeatPublicWin';
+import { HonestyLegend } from '@/components/HonestyLegend';
+import {
+  GOLD_CURRENT_INVOICE_CSV,
+  GOLD_PRIOR_INVOICE_CSV,
+  GOLD_SAMPLE_HONESTY_NOTE,
+  money,
+  type HonestyLabel,
+} from '@/lib/oneSeatPublicWin';
 import { oneSeatStyles as styles } from './OneSeatPublicShell';
+
+type CompareRow = {
+  sku: string;
+  vendor: string;
+  description: string;
+  priorPrice: number | null;
+  currentPrice: number | null;
+  dollarsObserved: number | null;
+  flagged: boolean;
+  honesty: HonestyLabel;
+  missingEvidence: string | null;
+};
 
 type CompareResponse = {
   success: boolean;
   error?: string;
+  disclosedSample?: boolean;
   result?: {
     summary: string;
     morningActions: Array<{ title: string; move: string; evidence: string; claimBoundary: string }>;
     missingEvidence: string[];
   };
+  compare?: { rows: CompareRow[] };
 };
 
 export function InvoiceCompareClient() {
@@ -20,12 +41,16 @@ export function InvoiceCompareClient() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [actions, setActions] = useState<CompareResponse['result'] | null>(null);
+  const [rows, setRows] = useState<CompareRow[]>([]);
+  const [disclosedSample, setDisclosedSample] = useState(false);
   const [explain, setExplain] = useState('');
 
   async function runCompare() {
     setStatus('loading');
     setMessage('');
     setExplain('');
+    setRows([]);
+    setDisclosedSample(false);
     try {
       const res = await fetch('/api/one-seat/compare', {
         method: 'POST',
@@ -43,6 +68,8 @@ export function InvoiceCompareClient() {
         throw new Error(data.error || 'Could not compare those invoices.');
       }
       setActions(data.result);
+      setRows(data.compare?.rows ?? []);
+      setDisclosedSample(Boolean(data.disclosedSample));
       setStatus('done');
       const first = data.result.morningActions[0];
       if (first) {
@@ -91,6 +118,28 @@ export function InvoiceCompareClient() {
       {actions ? (
         <div>
           <p>{actions.summary}</p>
+          {disclosedSample ? <HonestyLegend active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} /> : null}
+          {rows.map((row) => (
+            <div className={styles.next} key={`${row.vendor}-${row.sku}`}>
+              <HonestyLegend
+                active={row.honesty}
+                note={
+                  row.honesty === 'Missing'
+                    ? (row.missingEvidence || 'Prior invoice is Missing. That is not $0.')
+                    : row.honesty === 'Estimated'
+                      ? 'Estimated from partial or disclosed sample papers. Not invented dollars.'
+                      : `${row.vendor} ${row.sku} is Verified from the two matching invoices. A price increase is not recovered cash.`
+                }
+              />
+              <p>
+                {row.sku} · {row.description || row.vendor}
+                {row.priorPrice != null && row.currentPrice != null
+                  ? ` · ${money(row.priorPrice)} → ${money(row.currentPrice)}`
+                  : ' · no invented $'}
+                {row.flagged && row.dollarsObserved != null ? ` · +${money(row.dollarsObserved)}` : ''}
+              </p>
+            </div>
+          ))}
           {actions.morningActions.map((action) => (
             <div className={styles.next} key={action.title}>
               <small>ONE NEXT MOVE</small>
