@@ -6,6 +6,8 @@ import sitemap from '../app/sitemap';
 import {
   CAPTURE_LANDING_PATHS,
   CAPTURE_LANDING_SLUGS,
+  CAPTURE_SITEMAP_PRIORITY,
+  CAPTURE_SHIP_ORDER,
   INVOICE_CAPTURE,
   LABOR_CAPTURE,
   POS_CAPTURE,
@@ -28,13 +30,15 @@ const LABOR_PAGE = readFileSync(
 const THREE_P_PAGE = readFileSync(resolve(__dirname, '../app/third-party-delivery-fee-truth/page.tsx'), 'utf8');
 
 describe('2026-09-16 capture landings', () => {
-  it('keeps the four search slugs and leaves homepage as One Seat', () => {
+  it('ships Tom first, then Marcus, Dana, and Jess, and leaves homepage as One Seat', () => {
+    expect([...CAPTURE_SHIP_ORDER]).toEqual(['labor', 'pos', 'invoices', 'threeP']);
     expect(CAPTURE_LANDING_SLUGS).toEqual([
+      '/restaurant-labor-cost-overtime-prime-cost',
       '/restaurant-pos-alternative-toast-aloha-pdq',
       '/restaurant-invoice-price-increase-check',
-      '/restaurant-labor-cost-overtime-prime-cost',
       '/third-party-delivery-fee-truth',
     ]);
+    expect(CAPTURE_SITEMAP_PRIORITY.labor).toBeGreaterThan(CAPTURE_SITEMAP_PRIORITY.pos);
     expect(HOME_PAGE).toMatch(/One Seat/);
     expect(HOME_PAGE).not.toMatch(/command-center/i);
     expect(HOME_PAGE).toContain("canonical: 'https://www.never86.ai/'");
@@ -71,8 +75,12 @@ describe('2026-09-16 capture landings', () => {
     expect(LABOR_CAPTURE.primeBandNote).toMatch(/we do not invent “you’ll hit 65%.”/i);
     expect(LABOR_PAGE).toContain('ONE_SEAT_PATHS.checkLabor');
     expect(LABOR_PAGE).toContain('GOLD_LABOR.driftHours');
+    expect(LABOR_PAGE).toContain('HonestyLegend');
+    expect(LABOR_PAGE).toMatch(/Honesty labels only/);
+    expect(LABOR_PAGE).not.toContain('GOLD_LABOR.sampleDollars');
+    expect(LABOR_PAGE).not.toContain('GOLD_LABOR.claimBoundary');
+    expect(LABOR_PAGE).toMatch(/hours, not dollars/);
     expect(LABOR_CAPTURE.related.map((link) => link.href)).toContain('/check/labor');
-    expect(LABOR_PAGE).not.toMatch(/you.?ll hit 65/i);
     expect(LABOR_PAGE).not.toMatch(/guaranteed.*65/);
   });
 
@@ -109,6 +117,10 @@ describe('2026-09-16 capture landings', () => {
     for (const path of Object.values(CAPTURE_LANDING_PATHS)) {
       expect(urls.has(`${WWW}${path}`), path).toBe(true);
     }
+    const captureUrls = entries
+      .filter((entry) => CAPTURE_LANDING_SLUGS.some((path) => entry.url === `${WWW}${path}`))
+      .map((entry) => entry.url);
+    expect(captureUrls[0]).toBe(`${WWW}${CAPTURE_LANDING_PATHS.labor}`);
     expect([...ROBOTS_DISALLOW]).toContain('/command-center/');
     const doc = robots();
     const rule = Array.isArray(doc.rules) ? doc.rules[0] : doc.rules;

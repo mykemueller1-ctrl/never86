@@ -11,14 +11,24 @@ import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const CAPTURE_LANDING_LASTMOD = new Date('2026-09-16T18:00:00Z');
 
+/** Myke ship order 2026-09-16: Tom first, then Marcus, Dana, Jess. Same PR. */
+export const CAPTURE_SHIP_ORDER = ['labor', 'pos', 'invoices', 'threeP'] as const;
+
 export const CAPTURE_LANDING_PATHS = {
+  labor: '/restaurant-labor-cost-overtime-prime-cost',
   pos: '/restaurant-pos-alternative-toast-aloha-pdq',
   invoices: '/restaurant-invoice-price-increase-check',
-  labor: '/restaurant-labor-cost-overtime-prime-cost',
   threeP: '/third-party-delivery-fee-truth',
 } as const;
 
-export const CAPTURE_LANDING_SLUGS = Object.values(CAPTURE_LANDING_PATHS);
+export const CAPTURE_LANDING_SLUGS = CAPTURE_SHIP_ORDER.map((key) => CAPTURE_LANDING_PATHS[key]);
+
+export const CAPTURE_SITEMAP_PRIORITY: Record<(typeof CAPTURE_SHIP_ORDER)[number], number> = {
+  labor: 0.99,
+  pos: 0.96,
+  invoices: 0.96,
+  threeP: 0.95,
+};
 
 export type CaptureRelatedLink = { href: string; label: string };
 
@@ -126,7 +136,7 @@ export const THREE_P_CAPTURE = {
   relatedAnswers: readonly string[];
 };
 
-export const CAPTURE_LANDINGS = [POS_CAPTURE, INVOICE_CAPTURE, LABOR_CAPTURE, THREE_P_CAPTURE] as const;
+export const CAPTURE_LANDINGS = [LABOR_CAPTURE, POS_CAPTURE, INVOICE_CAPTURE, THREE_P_CAPTURE] as const;
 
 export const ONE_SEAT_STAYS_HOME = ONE_SEAT_CLAIM;
 

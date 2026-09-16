@@ -2,7 +2,12 @@ import type { MetadataRoute } from 'next';
 import { listPublishedAnswers } from '@/lib/answersDb';
 import { AGENT_SPECS } from '@/lib/agentSpecs';
 import { POS_SPECS } from '@/lib/posSpecs';
-import { CAPTURE_LANDING_LASTMOD, CAPTURE_LANDING_SLUGS } from '@/lib/captureLandings';
+import {
+  CAPTURE_LANDING_LASTMOD,
+  CAPTURE_LANDING_PATHS,
+  CAPTURE_SITEMAP_PRIORITY,
+  CAPTURE_SHIP_ORDER,
+} from '@/lib/captureLandings';
 import { AEO_PAGE_LASTMOD, ISSUE_122_3P_SLUGS, SITE_LASTMOD, WWW } from '@/lib/seoAeo';
 
 export const dynamic = 'force-dynamic';
@@ -64,11 +69,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/check/invoices`, lastModified: now, changeFrequency: 'weekly', priority: 0.98 },
     { url: `${BASE}/check/labor`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/check/menu`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    ...CAPTURE_LANDING_SLUGS.map((path) => ({
-      url: `${BASE}${path}`,
+    ...CAPTURE_SHIP_ORDER.map((key) => ({
+      url: `${BASE}${CAPTURE_LANDING_PATHS[key]}`,
       lastModified: CAPTURE_LANDING_LASTMOD,
       changeFrequency: 'weekly' as const,
-      priority: 0.97,
+      priority: CAPTURE_SITEMAP_PRIORITY[key],
     })),
     { url: `${BASE}/operators`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/answers`, lastModified: stamp('/answers'), changeFrequency: 'daily', priority: 0.9 },
