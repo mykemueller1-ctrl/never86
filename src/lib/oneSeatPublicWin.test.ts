@@ -39,6 +39,7 @@ describe('Grok-native One Seat public door', () => {
     expect(SELECTED_SITES_CONTACT_URL).toBe('/contact');
     expect(SELECTED_SITES_CHECK_URLS.invoices).toBe('/check/invoices');
     expect(config).not.toMatch(/chatgpt\.site/);
+    expect(config).toMatch(/allowedDevOrigins/);
     expect(config).not.toContain(CHATGPT_SITES_ARCHIVE_URL);
     expect(home).not.toMatch(/chatgpt\.site/);
     expect(read('src/components/HumanSiteShell.tsx')).not.toMatch(/chatgpt\.site/);
