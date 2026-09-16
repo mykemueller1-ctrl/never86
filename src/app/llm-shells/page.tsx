@@ -19,6 +19,17 @@ const STARTERS = [
 
 const PROVIDERS = [
   {
+    name: 'Grok',
+    status: 'Preferred explain path · remote MCP + optional XAI_API_KEY',
+    steps: [
+      'The free owner seat is on never86.ai. Do not onboard operators on ChatGPT.',
+      'Optional: set XAI_API_KEY so One Seat can ask Grok to explain a formula card.',
+      'Or open grok.com/connectors → New Connector → Custom and enter the public MCP URL.',
+    ],
+    href: 'https://docs.x.ai/grok/connectors',
+    linkLabel: 'xAI setup guide',
+  },
+  {
     name: 'ChatGPT',
     status: 'Remote MCP · developer mode',
     steps: [
@@ -50,17 +61,6 @@ const PROVIDERS = [
     ],
     href: 'https://www.perplexity.ai/help-center/en/articles/13915507-adding-custom-remote-connectors',
     linkLabel: 'Perplexity setup guide',
-  },
-  {
-    name: 'Grok',
-    status: 'Remote MCP · custom connector',
-    steps: [
-      'Go to grok.com/connectors and choose New Connector → Custom.',
-      'Enter the Never86’d public MCP endpoint and save the connector.',
-      'Business / Enterprise workspaces may require an admin to provision the connector first.',
-    ],
-    href: 'https://docs.x.ai/grok/connectors',
-    linkLabel: 'xAI setup guide',
   },
   {
     name: 'Gemini API',
@@ -95,9 +95,9 @@ export default function LlmShellsPage() {
           One public connector. <em>Multiple AI clients.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
-          The public Never86&apos;d connector reads only the numbers or CSV you deliberately send in the conversation.
-          It can check labor drift, compare invoice prices SKU by SKU, and turn a close into a short review list.
-          It cannot log into your POS, contact a vendor, write up an employee, change a schedule, or move money.
+          The public operator door is One Seat on never86.ai. Operators claim the free owner seat here, not on ChatGPT.
+          Grok can explain a card after the formula runs when <code>XAI_API_KEY</code> is set. This is not a Grok-resale product.
+          The public MCP still reads only the numbers or CSV you deliberately send. It cannot log into a POS or move money.
         </p>
 
         <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mt-10">

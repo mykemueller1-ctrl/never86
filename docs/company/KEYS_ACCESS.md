@@ -53,7 +53,7 @@ The probe calls `GET /v1/models` only. It does not send a chat completion and do
 
 Chat completions, when a later job needs them, default to model **`grok-4.6`** at `https://api.x.ai/v1`. Override with public env `XAI_MODEL`. The only secret is `XAI_API_KEY`.
 
-Factory workers that only call public MCP do **not** need this key. Add it when a job must call the Grok model API from the app or a script.
+Factory workers that only call public MCP do **not** need this key. One Seat `/api/one-seat/explain` uses it as an optional explain voice. Formulas still decide without it. See `docs/GROK-ONE-SEAT.md`.
 
 ## Grok command hub and Cursor workers
 

@@ -2,25 +2,35 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { HOUSE_CODE_BRAND_BLUE, HOUSE_CODE_SEAT_DOOR } from './houseCode';
-import { SELECTED_SITES_BASE_URL, SELECTED_SITES_CONTACT_URL } from './selectedSites';
+import { ONE_SEAT_ORIGIN, SELECTED_SITES_BASE_URL, SELECTED_SITES_CONTACT_URL } from './selectedSites';
 
 function read(path: string): string {
   return readFileSync(resolve(path), 'utf8');
 }
 
 describe('post-merge deploy-verify locks', () => {
-  it('keeps the stranger funnel email-first through selected Sites V28', () => {
+  it('keeps the stranger funnel email-first on never86.ai One Seat', () => {
+    const liveHome = read('src/app/page.tsx');
+    const ownerHome = read('src/components/OwnerHome.tsx');
     const home = read('src/components/HomePage.tsx');
     const shell = read('src/components/HumanSiteShell.tsx');
     const config = read('next.config.js');
+    expect(liveHome).toContain("from '@/components/OwnerHome'");
+    expect(ownerHome).toContain('Claim free owner seat');
+    expect(ownerHome).toContain('ONE_SEAT_PATHS.checkInvoices');
+    expect(ownerHome).not.toMatch(/\bdesk\b/i);
+    expect(ownerHome).not.toMatch(/chatgpt\.site/);
     expect(home).toMatch(/Request the free owner seat/);
     expect(home).toContain('href="/contact"');
     expect(home).not.toMatch(/Start playing/);
+    expect(home).not.toMatch(/chatgpt\.site/);
     expect(shell).toMatch(/href="\/contact"/);
-    expect(shell).toMatch(/SELECTED_SITES_BASE_URL/);
-    expect(SELECTED_SITES_CONTACT_URL).toBe(`${SELECTED_SITES_BASE_URL}/contact`);
-    expect(config).toContain("source: '/onboard'");
-    expect(config).toContain("destination: `${SELECTED_SITES_BASE_URL}/contact`");
+    expect(shell).toMatch(/ONE_SEAT_PATHS\.onboard/);
+    expect(SELECTED_SITES_BASE_URL).toBe(ONE_SEAT_ORIGIN);
+    expect(SELECTED_SITES_CONTACT_URL).toBe('/contact');
+    expect(config).not.toMatch(/chatgpt\.site/);
+    expect(config).not.toContain("source: '/onboard'");
+    expect(config).not.toContain("source: '/check/invoices'");
   });
 
   it('redirects /communities to the house-code /portal door', () => {

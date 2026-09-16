@@ -42,7 +42,9 @@ export async function GET() {
 - [Evidence, privacy, and corrections standard](https://www.never86.ai/evidence-standard) — public sourcing, claim, redaction, independence, and correction rules
 
 ## Try it free
-- [Free owner seat](https://www.never86.ai/onboard) — one owner, one restaurant, free to start
+- [Two-invoice price check](https://www.never86.ai/try) — fictional mozzarella $48 → $56 sample on never86.ai. No ChatGPT sign-in.
+- [Check invoice prices](https://www.never86.ai/check/invoices) — same vendor + SKU + pack. Formulas decide.
+- [Free owner seat](https://www.never86.ai/onboard) — one owner, one restaurant, free to start. Operators do not onboard on ChatGPT.
 - [Free 3P cost snapshot and statement audit](https://www.never86.ai/audit) — calculate from statement totals with no login or email gate, then optionally request a source-stamped review
 - [Payout mismatch calculator](https://www.never86.ai/audit/payout-mismatch) — bridge eligible sales and documented deductions to expected payout
 - [Promotions and ads cost calculator](https://www.never86.ai/audit/promotions-ads) — keep restaurant-funded incentives separate from commission

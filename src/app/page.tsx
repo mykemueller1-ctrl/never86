@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import HomePage from '@/components/OwnerHome';
 
 export const metadata: Metadata = {
-  title: "Check invoice prices, labor drift and recipe costs | Never86’d",
+  title: "One Seat — invoice, labor, and plate checks | Never86’d",
   description:
-    "Check invoice price changes, compare schedules with time clock reports, and understand recipe costs. Built by restaurant operator Myke Mueller. First owner seat free.",
+    "One Seat is Action Shift for 1–5 unit independents. Try the two-invoice mozzarella sample, then claim the free owner seat on never86.ai. No ChatGPT onboarding.",
   alternates: { canonical: 'https://www.never86.ai/' },
   openGraph: {
     title: "You run the restaurant. Let’s check the numbers. | Never86’d",

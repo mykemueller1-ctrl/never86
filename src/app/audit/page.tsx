@@ -228,7 +228,7 @@ export default function AuditCampaignPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-3xl">
-              <p className="compass-eyebrow">— Operator evidence desk</p>
+              <p className="compass-eyebrow">— Operator evidence seat</p>
               <h2 className="compass-display mt-5 text-4xl md:text-6xl">Check the method before you send a file.</h2>
               <p className="compass-body mt-5 text-lg">Use the same statement, payout, contract, and bank rules Never86&apos;d applies. Every guide states what the evidence can prove and where it stops.</p>
             </div>

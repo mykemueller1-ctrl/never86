@@ -61,7 +61,7 @@ export const XAI_API_KEY_NAME = 'XAI_API_KEY';
 export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   {
     name: XAI_API_KEY_NAME,
-    purpose: 'xAI Grok model API (OpenAI-compatible). Optional for command-center workers that only use public MCP.',
+    purpose: 'xAI Grok model API (OpenAI-compatible). Optional explain voice inside One Seat. Formulas still decide without it. Not required for public MCP.',
     surfaces: ['xai-console', 'vercel', 'local-env', 'cursor-factory'],
     kind: 'secret',
     required: false,
@@ -84,7 +84,7 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
     kind: 'public',
     required: false,
     placeholder: 'grok-4.6',
-    setup: 'Leave unset to use grok-4.6. YouTube desk and other Grok model callers share this default.',
+    setup: 'Leave unset to use grok-4.6. One Seat explain and other Grok model callers share this default.',
   },
   {
     name: 'NEVER86_ORCHESTRATOR_TOKEN',
@@ -312,7 +312,7 @@ export async function probeXaiModels(
   fetchFn: FetchLike = fetch,
 ): Promise<{ status: ProbeStatus; httpStatus?: number; modelCount?: number; detail?: string }> {
   const key = env[XAI_API_KEY_NAME]?.trim();
-  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. Grok Bot and public MCP do not need this key.' };
+  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. One Seat formulas still decide. Grok explain stays off. Public MCP does not need this key.' };
 
   const response = await fetchFn(`${xaiApiBase(env)}/models`, {
     method: 'GET',

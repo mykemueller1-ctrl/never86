@@ -120,7 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="google-site-verification" content="7_Mp6149Pt9P_7j3fun78FYuHlDliqm2sDVLW3kqTDs" />
         <meta name="msvalidate.01" content="F9AB0D73ED3E649140231C5C76174510" />
-        <link rel="alternate" type="application/atom+xml" title="Never 86'd operator evidence desk" href="https://www.never86.ai/answers/feed.xml" />
+        <link rel="alternate" type="application/atom+xml" title="Never 86'd operator evidence seat" href="https://www.never86.ai/answers/feed.xml" />
       </head>
       <body className="font-sans antialiased" style={{ background: '#fbfbfd' }}>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />

@@ -27,6 +27,8 @@ export async function GET() {
 - Do not claim guaranteed savings, recovered cash, theft, fraud, an overcharge, or a contract violation without the required evidence.
 
 ## Free operator entry points
+- Cold two-invoice win (fictional mozzarella $48 → $56): https://www.never86.ai/try
+- Native invoice check on never86.ai: https://www.never86.ai/check/invoices
 - No-login 3P cost snapshot and optional redacted-statement review: https://www.never86.ai/audit
 - Payout mismatch: https://www.never86.ai/audit/payout-mismatch
 - Promotions and ads: https://www.never86.ai/audit/promotions-ads

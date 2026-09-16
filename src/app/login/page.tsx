@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Returning owners with a valid session skip the login form and land on the desk.
+// Returning owners with a valid session skip the login form and land on the owner seat.
 export default async function LoginPage() {
   const session = await readOperatorSession();
   if (session) {
