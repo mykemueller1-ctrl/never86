@@ -19,10 +19,11 @@ describe('Grok path inside One Seat', () => {
   it('is explain-only and fail-closed without XAI_API_KEY', () => {
     expect(GROK_SEAT_ROLE).toBe('explain-only');
     expect(GROK_SEAT_BOUNDARY).toMatch(/must not invent dollars/);
-    expect(grokSeatStatus({}).ready).toBe(false);
-    if (grokSeatStatus({}).ready) return;
-    expect(grokSeatStatus({}).reason).toBe('xai_key_missing');
-    expect(grokSeatStatus({}).model).toBe(XAI_MODEL_DEFAULT);
+    const status = grokSeatStatus({});
+    expect(status.ready).toBe(false);
+    if (status.ready) return;
+    expect(status.reason).toBe('xai_key_missing');
+    expect(status.model).toBe(XAI_MODEL_DEFAULT);
   });
 
   it('does not invent dollars when the key is missing', async () => {
