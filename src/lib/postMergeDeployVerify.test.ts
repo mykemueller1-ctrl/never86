@@ -17,7 +17,7 @@ describe('post-merge deploy-verify locks', () => {
     const config = read('next.config.js');
     expect(liveHome).toContain("from '@/components/OwnerHome'");
     expect(ownerHome).toContain('Claim free owner seat');
-    expect(ownerHome).toContain('/check/invoices');
+    expect(ownerHome).toContain('ONE_SEAT_PATHS.checkInvoices');
     expect(ownerHome).not.toMatch(/\bdesk\b/i);
     expect(ownerHome).not.toMatch(/chatgpt\.site/);
     expect(home).toMatch(/Request the free owner seat/);
