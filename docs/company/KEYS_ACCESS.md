@@ -76,6 +76,7 @@ See `.env.example`. Names used by the site:
 
 - `DATABASE_URL` · `OPS_DATABASE_URL` · `ANTHROPIC_API_KEY` · `RESEND_API_KEY` · `CRON_SECRET` · `ADMIN_API_SECRET` · `OWNER_EMAIL`
 - Staff claim (fail-closed until Myke enables): `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `STAFF_SEAT_LOGIN_ENABLED`
+- Operator papers Connect (same Google client): `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `PAPERS_GOOGLE_REDIRECT` — see `docs/PAPERS-GOOGLE.md`
 
 Do not set `STAFF_SEAT_LOGIN_ENABLED=true` from a factory job. Do not apply Neon from here.
 

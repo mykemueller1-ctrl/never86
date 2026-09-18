@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
+  PAPERS_BOH_FOLDERS,
   PAPERS_GOOGLE_SCOPES,
   PAPERS_INTAKE_ORDER,
   buildGmailWatchQuery,
+  classifyPapersFolder,
   evaluatePapersInboxEnablement,
+  looksLikeInvoicePaper,
   looksLikeOperatorPaper,
   outlookV2Plan,
   papersIntakeCopy,
+  papersMissingSecretNames,
+  papersSeatHonesty,
 } from './papersInbox';
 import {
   papersConnectionFor,
@@ -29,8 +34,12 @@ describe('papers inbox — Google first', () => {
         GOOGLE_CLIENT_SECRET: 'GOCSPX-x',
       }).ready,
     ).toBe(true);
+    expect(evaluatePapersInboxEnablement({}).honesty).toBe('Missing');
+    expect(papersMissingSecretNames({})).toEqual(['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']);
     expect(PAPERS_GOOGLE_SCOPES.join(' ')).toMatch(/gmail.readonly/);
     expect(PAPERS_GOOGLE_SCOPES.join(' ')).toMatch(/drive.readonly/);
+    expect(PAPERS_GOOGLE_SCOPES.join(' ')).toMatch(/drive.file/);
+    expect(PAPERS_BOH_FOLDERS.map((folder) => folder.name)).toEqual(['Invoices', 'Z-EOD', 'Labor', 'Liquor-Beer']);
   });
 
   it('builds a last-week Gmail watch query and keeps operator-paper filenames', () => {
@@ -57,6 +66,7 @@ describe('papers inbox — Google first', () => {
     if (!started.ok) return;
     expect(started.authorizationUrl).toMatch(/gmail.readonly/);
     expect(started.authorizationUrl).toMatch(/drive.readonly/);
+    expect(started.authorizationUrl).toMatch(/drive.file/);
     expect(started.authorizationUrl).toMatch(/access_type=offline/);
 
     const empty = await pullLastWeekPapers({ operatorId: 'seat:1' });
@@ -80,6 +90,12 @@ describe('papers inbox — Google first', () => {
     ]);
     expect(pulled.skipped).toBe(1);
     expect(pulled.nextAction).toMatch(/Landed 2 papers/);
+    expect(pulled.honesty).toBe('Estimated');
+    expect(pulled.pulled.find((row) => row.filename === 'invoice-truck.pdf')?.folder).toBe('invoices');
+    expect(pulled.pulled.find((row) => row.filename.startsWith('SalesSummary'))?.folder).toBe('z-eod');
+    expect(looksLikeInvoicePaper('Sysco-invoice.pdf')).toBe(true);
+    expect(classifyPapersFolder('LaborBreakDown.csv')).toBe('labor');
+    expect(papersSeatHonesty({ ready: false, connected: false })).toBe('Missing');
   });
 
   it('keeps Outlook designed, not live, and never says desk to the operator', () => {
@@ -92,6 +108,13 @@ describe('papers inbox — Google first', () => {
     expect(phone).toMatch(/Connect Gmail/);
     expect(phone).toMatch(/Connect Drive/);
     expect(phone).toMatch(/copy\.outlook/);
+    expect(phone).toMatch(/Missing/);
+    expect(phone).toMatch(/disabled=\{busy \|\| !ready\}/);
     expect(copy.outlook).toMatch(/Outlook is next/);
+    const onboard = readFileSync(resolve('src/app/onboard/OnboardClient.tsx'), 'utf8');
+    expect(onboard).toMatch(/PapersInboxConnect/);
+    expect(onboard).not.toMatch(/chatgpt\.site/);
+    const compare = readFileSync(resolve('src/components/InvoiceCompareClient.tsx'), 'utf8');
+    expect(compare).toMatch(/Load from connected papers/);
   });
 });

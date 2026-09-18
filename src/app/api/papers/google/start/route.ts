@@ -13,7 +13,18 @@ function mintState(operatorId: string): string {
 export async function POST(req: NextRequest) {
   return withSimpleOwnerTenant(req, async (operatorId) => {
     const gate = evaluatePapersInboxEnablement();
-    if (!gate.ready) return jsonError(503, gate.error ?? 'Gmail stays off.', 'papers_google_closed');
+    if (!gate.ready) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: gate.error ?? 'Gmail stays off.',
+          code: 'papers_google_closed',
+          honesty: 'Missing',
+          missingSecrets: gate.missingSecrets,
+        },
+        { status: 503 },
+      );
+    }
     const started = startPapersGoogleOAuth({ state: mintState(operatorId) });
     if (!started.ok) return jsonError(503, started.error, 'papers_google_closed');
     return NextResponse.json({

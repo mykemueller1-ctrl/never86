@@ -12,11 +12,54 @@ export const PAPERS_GOOGLE_SCOPES = [
   'email',
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/drive.readonly',
+  'https://www.googleapis.com/auth/drive.file',
 ] as const;
 
 export const PAPERS_GOOGLE_REDIRECT_DEFAULT = 'https://www.never86.ai/api/papers/google/callback';
 
 export const PAPERS_LOOKBACK_DAYS = 8;
+
+export const PAPERS_HONESTY = ['Verified', 'Estimated', 'Missing'] as const;
+export type PapersHonesty = (typeof PAPERS_HONESTY)[number];
+
+export const PAPERS_ROOT_FOLDER = 'Never86 Papers';
+
+export const PAPERS_BOH_FOLDERS = [
+  {
+    id: 'invoices',
+    name: 'Invoices',
+    aliases: ['invoice', 'invoice / truck', 'truck', 'vendor'],
+    plate: 'invoice-truck',
+  },
+  {
+    id: 'z-eod',
+    name: 'Z-EOD',
+    aliases: ['z', 'eod', 'z-report', 'z report', 'sales summary'],
+    plate: null,
+  },
+  {
+    id: 'labor',
+    name: 'Labor',
+    aliases: ['labor', 'schedule', 'labor cards', 'timeclock'],
+    plate: 'schedule',
+  },
+  {
+    id: 'liquor-beer',
+    name: 'Liquor-Beer',
+    aliases: ['liquor', 'beer', 'wine', 'beverage', 'pop'],
+    plate: 'invoice-truck',
+  },
+] as const;
+
+export type PapersBohFolderId = (typeof PAPERS_BOH_FOLDERS)[number]['id'];
+
+export type PapersBohFolder = {
+  id: PapersBohFolderId;
+  name: string;
+  driveId: string | null;
+  status: 'created' | 'found' | 'missing';
+  honesty: PapersHonesty;
+};
 
 export type PapersProvider = 'gmail' | 'drive' | 'outlook';
 
@@ -25,6 +68,8 @@ export type PapersInboxEnablement = {
   googleFirst: true;
   outlookLive: false;
   error: string | null;
+  missingSecrets: string[];
+  honesty: PapersHonesty;
 };
 
 export type PapersConnectionState = {
@@ -38,19 +83,33 @@ export type PapersPullHit = {
   provider: 'gmail' | 'drive';
   filename: string;
   reason: string;
+  folder: PapersBohFolderId;
+  honesty: PapersHonesty;
 };
+
+export function papersMissingSecretNames(
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  const missing: string[] = [];
+  if (!env.GOOGLE_CLIENT_ID?.trim()) missing.push('GOOGLE_CLIENT_ID');
+  if (!env.GOOGLE_CLIENT_SECRET?.trim()) missing.push('GOOGLE_CLIENT_SECRET');
+  return missing;
+}
 
 export function evaluatePapersInboxEnablement(
   env: Record<string, string | undefined> = process.env,
 ): PapersInboxEnablement {
-  const ready = Boolean(env.GOOGLE_CLIENT_ID?.trim() && env.GOOGLE_CLIENT_SECRET?.trim());
+  const missingSecrets = papersMissingSecretNames(env);
+  const ready = missingSecrets.length === 0;
   return {
     ready,
     googleFirst: true,
     outlookLive: false,
+    missingSecrets,
+    honesty: ready ? 'Estimated' : 'Missing',
     error: ready
       ? null
-      : 'Gmail and Drive stay off until Google client id + secret exist. No homework form. No invented papers.',
+      : 'Missing — Gmail and Drive stay off until Google client id + secret exist. No homework form. No invented papers.',
   };
 }
 
@@ -83,6 +142,53 @@ export function looksLikeOperatorPaper(filename: string, subject = ''): boolean 
   );
 }
 
+export function looksLikeInvoicePaper(filename: string, subject = ''): boolean {
+  const blob = `${filename} ${subject}`.toLowerCase();
+  if (!blob.trim()) return false;
+  return /\b(invoice|truck|sysco|pfg|us\s*foods|vendor|sku)\b/.test(blob);
+}
+
+export function classifyPapersFolder(filename: string, subject = '', folderName = ''): PapersBohFolderId {
+  const blob = `${folderName} ${filename} ${subject}`.toLowerCase();
+  if (/z[-_\s]?report|\beod\b|sales[_-\s]?summary|\bhourly\b/.test(blob)) return 'z-eod';
+  if (/labor|schedule|timeclock|punch/.test(blob)) return 'labor';
+  if (/\b(liquor|beer|wine|beverage|pop)\b/.test(blob) && !/\binvoice\b/.test(blob)) return 'liquor-beer';
+  if (/\b(liquor|beer|wine)\b/.test(blob)) return 'liquor-beer';
+  return 'invoices';
+}
+
+export function matchBohFolderName(name: string): (typeof PAPERS_BOH_FOLDERS)[number] | null {
+  const n = name.trim().toLowerCase();
+  if (!n) return null;
+  return (
+    PAPERS_BOH_FOLDERS.find((folder) => folder.name.toLowerCase() === n)
+    || PAPERS_BOH_FOLDERS.find((folder) => folder.aliases.some((alias) => n === alias || n.includes(alias)))
+    || null
+  );
+}
+
+export function emptyBohFolders(): PapersBohFolder[] {
+  return PAPERS_BOH_FOLDERS.map((folder) => ({
+    id: folder.id,
+    name: folder.name,
+    driveId: null,
+    status: 'missing',
+    honesty: 'Missing',
+  }));
+}
+
+export function papersSeatHonesty(input: {
+  ready: boolean;
+  connected: boolean;
+  invoiceCount?: number;
+  verifiedCompare?: boolean;
+}): PapersHonesty {
+  if (!input.ready || !input.connected) return 'Missing';
+  if (input.verifiedCompare) return 'Verified';
+  if ((input.invoiceCount ?? 0) > 0) return 'Estimated';
+  return 'Missing';
+}
+
 export function emptyPapersConnection(): PapersConnectionState {
   return { gmail: false, drive: false, outlook: false, email: null };
 }
@@ -97,9 +203,9 @@ export function papersIntakeCopy(): {
 } {
   return {
     headline: "We'll go get last week's papers.",
-    promise: 'Gmail first. One photo if you have it. Chat maps what is still Missing. No SOP. No form.',
-    gmail: 'Connect Gmail — Never86 pulls last-week invoices, EODs, and sheets.',
-    drive: 'Connect Drive — we read the folder you already dump papers in.',
+    promise: 'Gmail first. Invoices and SKU lines land on this seat. One photo if you have it. Chat maps what is still Missing. No SOP. No form.',
+    gmail: 'Connect Gmail — Never86 pulls last-week invoice PDFs, EODs, and sheets.',
+    drive: 'Connect Drive — we find or make Invoices / Z-EOD / Labor / Liquor-Beer, then read what you already dump there.',
     outlook: 'Outlook is next. Google inbox first so we can win the first ten minutes.',
     photo: 'Or drop photos / files here — one tap, many papers.',
   };

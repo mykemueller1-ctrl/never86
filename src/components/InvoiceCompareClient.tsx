@@ -44,6 +44,57 @@ export function InvoiceCompareClient() {
   const [rows, setRows] = useState<CompareRow[]>([]);
   const [disclosedSample, setDisclosedSample] = useState(false);
   const [explain, setExplain] = useState('');
+  const [papersHonesty, setPapersHonesty] = useState<HonestyLabel | null>(null);
+  const [papersNote, setPapersNote] = useState('');
+
+  async function loadFromPapers() {
+    setStatus('loading');
+    setMessage('');
+    try {
+      const res = await fetch('/api/papers/invoices', { method: 'GET', signal: AbortSignal.timeout(8000) });
+      const data = (await res.json()) as {
+        success?: boolean;
+        honesty?: HonestyLabel;
+        error?: string | null;
+        missingSecrets?: string[];
+        documents?: Array<{ text: string; filename: string }>;
+        invoices?: Array<{ text: string; filename: string; note?: string }>;
+      };
+      const honesty = data.honesty ?? 'Missing';
+      setPapersHonesty(honesty);
+      if (!res.ok || data.error) {
+        setStatus('error');
+        setPapersNote(
+          data.error
+            ?? (data.missingSecrets?.length
+              ? `Missing — ${data.missingSecrets.join(', ')} are not on this deploy.`
+              : 'Missing — Connect Gmail + Drive first.'),
+        );
+        setMessage(data.error || 'Missing — papers are not connected.');
+        return;
+      }
+      const docs = data.documents?.filter((doc) => doc.text.trim()) ?? [];
+      if (docs.length >= 2) {
+        setPrior(docs[0].text);
+        setCurrent(docs[1].text);
+        setPapersNote('Loaded two invoices from connected papers. Compare uses formulas, not invented $.');
+      } else if (docs.length === 1) {
+        setCurrent(docs[0].text);
+        setPapersNote('One invoice loaded. Prior stays Missing — not $0.');
+      } else if (data.invoices?.[0]) {
+        setCurrent(data.invoices[0].text);
+        setPapersNote(data.invoices[0].note || 'Invoice landed. Second paper is Missing.');
+      } else {
+        setPapersNote('Missing — no invoice PDFs matched on this seat. Connect Gmail + Drive, then pull.');
+      }
+      setStatus('idle');
+    } catch {
+      setStatus('error');
+      setPapersHonesty('Missing');
+      setPapersNote('Missing — papers invoice load failed. No invented $.');
+      setMessage('Missing — could not load connected papers.');
+    }
+  }
 
   async function runCompare() {
     setStatus('loading');
@@ -96,9 +147,11 @@ export function InvoiceCompareClient() {
       <p className={styles.eyebrow}>YOUR PAPERS · FORMULAS FIRST</p>
       <h2>Paste two invoices from the same vendor.</h2>
       <p className={styles.note}>
-        Native CSV or invoice text. Same SKU and pack. Missing prior stays Missing — not $0.
+        Native CSV or invoice PDF text. Same SKU and pack. Missing prior stays Missing — not $0.
+        Connect Gmail + Drive on the owner seat, then load the last two invoices. No homework form.
         Grok can explain the card when <code>XAI_API_KEY</code> is set. It does not invent the dollars.
       </p>
+      {papersHonesty ? <HonestyLegend active={papersHonesty} note={papersNote} /> : null}
       <div className={styles.grid}>
         <label>
           Prior invoice
@@ -112,6 +165,9 @@ export function InvoiceCompareClient() {
       <div className={styles.actions}>
         <button type="button" className={styles.primary} onClick={() => void runCompare()} disabled={status === 'loading'}>
           {status === 'loading' ? 'Comparing…' : 'Compare these two'}
+        </button>
+        <button type="button" className={styles.secondary} onClick={() => void loadFromPapers()} disabled={status === 'loading'}>
+          Load from connected papers
         </button>
       </div>
       {status === 'error' ? <p className={styles.note}>{message}</p> : null}

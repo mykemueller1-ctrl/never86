@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePapersInboxEnablement, papersGoogleRedirect } from '@/lib/papersInbox';
-import { rememberPapersToken } from '@/lib/papersInboxHttp';
+import { googleUserEmail } from '@/lib/papersGoogle';
+import { connectPapersFolders, rememberPapersToken } from '@/lib/papersInboxHttp';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,9 @@ export async function GET(req: NextRequest) {
   const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://www.never86.ai';
   const fail = new URL('/operator', site);
   fail.searchParams.set('papers', 'closed');
+  fail.hash = 'papers-settings';
   if (!gate.ready) {
+    fail.searchParams.set('honesty', 'Missing');
     return NextResponse.redirect(fail);
   }
 
@@ -46,14 +49,29 @@ export async function GET(req: NextRequest) {
     fail.searchParams.set('papers', 'token');
     return NextResponse.redirect(fail);
   }
-  const tokenBody = (await tokenRes.json()) as { access_token?: string };
+  const tokenBody = (await tokenRes.json()) as {
+    access_token?: string;
+    refresh_token?: string;
+    scope?: string;
+  };
   if (!tokenBody.access_token) {
     fail.searchParams.set('papers', 'token');
     return NextResponse.redirect(fail);
   }
 
-  rememberPapersToken({ operatorId, accessToken: tokenBody.access_token });
+  const scopes = tokenBody.scope?.split(/\s+/).filter(Boolean) ?? [];
+  const email = await googleUserEmail(tokenBody.access_token);
+  rememberPapersToken({
+    operatorId,
+    accessToken: tokenBody.access_token,
+    refreshToken: tokenBody.refresh_token ?? null,
+    email,
+    scopes: scopes.length ? scopes : undefined,
+  });
+  await connectPapersFolders(operatorId).catch(() => undefined);
+
   const ok = new URL('/operator', site);
   ok.searchParams.set('papers', 'connected');
+  ok.hash = 'papers-settings';
   return NextResponse.redirect(ok);
 }
