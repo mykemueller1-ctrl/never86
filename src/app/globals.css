@@ -1384,6 +1384,47 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   font-size: 0.78rem;
   color: #8B949E;
 }
+.owner-seat-honesty {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.35rem 0 0;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.owner-seat-honesty.is-missing {
+  color: #f4f1ea;
+  background: #6b7280;
+}
+.owner-seat-honesty.is-estimated {
+  color: #0B0D10;
+  background: #d97706;
+}
+.owner-seat-honesty.is-verified {
+  color: #0B0D10;
+  background: #16a34a;
+}
+.owner-seat-papers-folders {
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+.owner-seat-papers-folders li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: #e8eaed;
+}
+.owner-seat-papers.is-claim {
+  background: #0B0D10;
+  color: #f4f1ea;
+}
 .owner-desk-mouth {
   position: relative;
   bottom: auto;

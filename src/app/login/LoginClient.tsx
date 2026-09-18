@@ -184,6 +184,13 @@ export default function OperatorLoginPage() {
           {' '}
           and fail-closed until a code is issued. No PIN, no staff name.
         </p>
+        <p className="compass-body text-[13px] mt-3" style={{ color: '#6e6e73' }}>
+          After sign-in, Connect Gmail + Drive on the owner seat at{' '}
+          <Link href="/operator#papers-settings" className="underline" style={{ color: '#0066ff' }}>
+            /operator#papers-settings
+          </Link>
+          . Missing <code>GOOGLE_CLIENT_ID</code> or <code>GOOGLE_CLIENT_SECRET</code> stays Missing — no invented papers.
+        </p>
       </section>
     </main>
   );

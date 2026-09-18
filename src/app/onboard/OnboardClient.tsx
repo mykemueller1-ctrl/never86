@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { PapersInboxConnect } from '@/components/PapersInboxConnect';
 import { trackEvent } from '@/lib/track';
 
 type Status = 'idle' | 'loading' | 'sent' | 'error';
@@ -123,6 +124,14 @@ export default function OnboardPage() {
                 </button>
                 {message ? <p className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
               </form>
+              {status === 'sent' ? (
+                <div className="mt-6">
+                  <p className="compass-body text-sm">
+                    Next: Connect Gmail + Drive so agents can pull invoice PDFs. No homework form.
+                  </p>
+                  <PapersInboxConnect variant="claim" />
+                </div>
+              ) : null}
               <p className="mt-4 text-[11px] leading-relaxed text-[#86868b]">
                 We use this email for account access and essential product help — thank-you, tips, education. No hard sales list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
               </p>
