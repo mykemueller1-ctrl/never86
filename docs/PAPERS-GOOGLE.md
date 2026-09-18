@@ -17,7 +17,9 @@ Set on the **Vercel project that deploys www.never86.ai** → Settings → Envir
 | `DATABASE_URL` | Recommended | secret | Persists refresh tokens across Vercel isolates. Missing → Connect can work in-memory only and may look Missing on the next request |
 | `ANTHROPIC_API_KEY` | No | secret | Not used to invent invoice $. SKU lines come from native PDF/CSV parse + `/try` formulas |
 
-There is no `PAPERS_ENABLED` flag. Missing client id or secret fail-closes the UI with honesty **Missing**.
+There is no `PAPERS_ENABLED` flag. Missing client id or secret fail-closes Connect, pull, folders POST, and invoices GET/POST with HTTP **503** `papers_google_closed`, honesty **Missing**, and `requiredEnv: ["GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET"]`. `envChecklist` lists presence only — never values.
+
+`GET /api/papers/status` always returns `missingSecrets`, `requiredEnv`, `redirectUri`, and `envChecklist` (booleans). UI shows the exact names. Buttons stay disabled until both secrets exist.
 
 ## Google Cloud Console (Myke Yes)
 

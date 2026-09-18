@@ -17,6 +17,10 @@ export const PAPERS_GOOGLE_SCOPES = [
 
 export const PAPERS_GOOGLE_REDIRECT_DEFAULT = 'https://www.never86.ai/api/papers/google/callback';
 
+/** Exact Vercel names. Never invent values. Connect stays Missing until both secrets exist. */
+export const PAPERS_REQUIRED_SECRET_NAMES = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] as const;
+export const PAPERS_OPTIONAL_ENV_NAMES = ['PAPERS_GOOGLE_REDIRECT', 'NEXT_PUBLIC_SITE_URL', 'DATABASE_URL'] as const;
+
 export const PAPERS_LOOKBACK_DAYS = 8;
 
 export const PAPERS_HONESTY = ['Verified', 'Estimated', 'Missing'] as const;
@@ -208,6 +212,48 @@ export function papersIntakeCopy(): {
     drive: 'Connect Drive — we find or make Invoices / Z-EOD / Labor / Liquor-Beer, then read what you already dump there.',
     outlook: 'Outlook is next. Google inbox first so we can win the first ten minutes.',
     photo: 'Or drop photos / files here — one tap, many papers.',
+  };
+}
+
+export function papersEnvChecklist(
+  env: Record<string, string | undefined> = process.env,
+): Array<{ name: string; required: boolean; present: boolean }> {
+  return [
+    ...PAPERS_REQUIRED_SECRET_NAMES.map((name) => ({
+      name,
+      required: true,
+      present: Boolean(env[name]?.trim()),
+    })),
+    ...PAPERS_OPTIONAL_ENV_NAMES.map((name) => ({
+      name,
+      required: false,
+      present: Boolean(env[name]?.trim()),
+    })),
+  ];
+}
+
+export function papersFailClosedBody(
+  env: Record<string, string | undefined> = process.env,
+): {
+  success: false;
+  honesty: 'Missing';
+  code: 'papers_google_closed';
+  error: string;
+  missingSecrets: string[];
+  requiredEnv: string[];
+  redirectUri: string;
+  envChecklist: Array<{ name: string; required: boolean; present: boolean }>;
+} {
+  const gate = evaluatePapersInboxEnablement(env);
+  return {
+    success: false,
+    honesty: 'Missing',
+    code: 'papers_google_closed',
+    error: gate.error ?? 'Missing — Gmail and Drive stay off.',
+    missingSecrets: gate.missingSecrets,
+    requiredEnv: [...PAPERS_REQUIRED_SECRET_NAMES],
+    redirectUri: papersGoogleRedirect(env),
+    envChecklist: papersEnvChecklist(env),
   };
 }
 

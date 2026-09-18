@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { evaluatePapersInboxEnablement } from '@/lib/papersInbox';
+import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { hydratePapersConnection, papersInvoicesFor, pullLastWeekPapers } from '@/lib/papersInboxHttp';
 import { papersInvoiceCompare } from '@/lib/papersInvoicePath';
-import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
+import { withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,15 +10,18 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   return withSimpleOwnerTenant(req, async (operatorId) => {
     const gate = evaluatePapersInboxEnablement();
+    if (!gate.ready) {
+      return NextResponse.json({ ...papersFailClosedBody(), invoices: [], documents: [] }, { status: 503 });
+    }
     await hydratePapersConnection(operatorId);
     const invoices = papersInvoicesFor(operatorId);
     const compare = invoices.length ? papersInvoiceCompare(invoices) : null;
     return NextResponse.json({
       success: true,
       ready: gate.ready,
-      honesty: gate.ready ? compare?.honesty ?? (invoices.length ? 'Estimated' : 'Missing') : 'Missing',
+      honesty: compare?.honesty ?? (invoices.length ? 'Estimated' : 'Missing'),
       missingSecrets: gate.missingSecrets,
-      error: gate.ready ? null : gate.error,
+      error: null,
       invoices: invoices.map((row) => ({
         filename: row.filename,
         text: row.text,
@@ -35,7 +38,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return withSimpleOwnerTenant(req, async (operatorId) => {
     const gate = evaluatePapersInboxEnablement();
-    if (!gate.ready) return jsonError(503, gate.error ?? 'Gmail stays off.', 'papers_google_closed');
+    if (!gate.ready) return NextResponse.json(papersFailClosedBody(), { status: 503 });
     await hydratePapersConnection(operatorId);
     const pulled = await pullLastWeekPapers({ operatorId });
     return NextResponse.json({

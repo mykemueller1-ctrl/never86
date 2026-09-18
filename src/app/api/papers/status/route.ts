@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { evaluatePapersInboxEnablement, outlookV2Plan, papersIntakeCopy, papersSeatHonesty } from '@/lib/papersInbox';
+import {
+  PAPERS_REQUIRED_SECRET_NAMES,
+  evaluatePapersInboxEnablement,
+  outlookV2Plan,
+  papersEnvChecklist,
+  papersGoogleRedirect,
+  papersIntakeCopy,
+  papersSeatHonesty,
+} from '@/lib/papersInbox';
 import {
   hydratePapersConnection,
   papersConnectionFor,
@@ -32,6 +40,9 @@ export async function GET(req: NextRequest) {
         invoiceCount: invoices.filter((row) => row.honesty !== 'Missing').length,
       }),
       missingSecrets: gate.missingSecrets,
+      requiredEnv: [...PAPERS_REQUIRED_SECRET_NAMES],
+      redirectUri: papersGoogleRedirect(),
+      envChecklist: papersEnvChecklist(),
       error: gate.error,
       durable: papersDurableStore(),
       connection,

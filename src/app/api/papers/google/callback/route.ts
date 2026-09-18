@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePapersInboxEnablement, papersGoogleRedirect } from '@/lib/papersInbox';
 import { googleUserEmail } from '@/lib/papersGoogle';
-import { connectPapersFolders, rememberPapersToken } from '@/lib/papersInboxHttp';
+import { connectPapersFolders, pullLastWeekPapers, rememberPapersToken } from '@/lib/papersInboxHttp';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -69,6 +69,7 @@ export async function GET(req: NextRequest) {
     scopes: scopes.length ? scopes : undefined,
   });
   await connectPapersFolders(operatorId).catch(() => undefined);
+  await pullLastWeekPapers({ operatorId }).catch(() => undefined);
 
   const ok = new URL('/operator', site);
   ok.searchParams.set('papers', 'connected');

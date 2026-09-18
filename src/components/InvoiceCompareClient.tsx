@@ -51,26 +51,29 @@ export function InvoiceCompareClient() {
     setStatus('loading');
     setMessage('');
     try {
-      const res = await fetch('/api/papers/invoices', { method: 'GET', signal: AbortSignal.timeout(8000) });
+      const res = await fetch('/api/papers/invoices', { method: 'POST', signal: AbortSignal.timeout(20000) });
       const data = (await res.json()) as {
         success?: boolean;
         honesty?: HonestyLabel;
         error?: string | null;
+        code?: string;
         missingSecrets?: string[];
+        requiredEnv?: string[];
         documents?: Array<{ text: string; filename: string }>;
         invoices?: Array<{ text: string; filename: string; note?: string }>;
       };
       const honesty = data.honesty ?? 'Missing';
       setPapersHonesty(honesty);
-      if (!res.ok || data.error) {
+      const names = data.missingSecrets?.length
+        ? data.missingSecrets
+        : data.requiredEnv?.length
+          ? data.requiredEnv
+          : ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+      if (!res.ok || data.code === 'papers_google_closed' || data.error) {
         setStatus('error');
-        setPapersNote(
-          data.error
-            ?? (data.missingSecrets?.length
-              ? `Missing — ${data.missingSecrets.join(', ')} are not on this deploy.`
-              : 'Missing — Connect Gmail + Drive first.'),
-        );
-        setMessage(data.error || 'Missing — papers are not connected.');
+        const note = `Missing — ${names.join(', ')} are not on this deploy. No invented $.`;
+        setPapersNote(data.error ? `${data.error} Need: ${names.join(', ')}.` : note);
+        setMessage(data.error || note);
         return;
       }
       const docs = data.documents?.filter((doc) => doc.text.trim()) ?? [];

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSimpleOwnerDemoService, isServiceError } from '@/lib/simpleOwnerDemo/runtime';
 import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
+import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { pullLastWeekPapers } from '@/lib/papersInboxHttp';
 
 export const runtime = 'nodejs';
@@ -8,6 +9,8 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   return withSimpleOwnerTenant(req, async (operatorId, restaurantName) => {
+    const gate = evaluatePapersInboxEnablement();
+    if (!gate.ready) return NextResponse.json(papersFailClosedBody(), { status: 503 });
     const service = getSimpleOwnerDemoService();
     if (isServiceError(service)) {
       return jsonError(service.status, service.error, service.code);

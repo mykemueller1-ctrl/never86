@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { evaluatePapersInboxEnablement } from '@/lib/papersInbox';
+import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { startPapersGoogleOAuth } from '@/lib/papersInboxHttp';
 import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
@@ -14,16 +14,7 @@ export async function POST(req: NextRequest) {
   return withSimpleOwnerTenant(req, async (operatorId) => {
     const gate = evaluatePapersInboxEnablement();
     if (!gate.ready) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: gate.error ?? 'Gmail stays off.',
-          code: 'papers_google_closed',
-          honesty: 'Missing',
-          missingSecrets: gate.missingSecrets,
-        },
-        { status: 503 },
-      );
+      return NextResponse.json(papersFailClosedBody(), { status: 503 });
     }
     const started = startPapersGoogleOAuth({ state: mintState(operatorId) });
     if (!started.ok) return jsonError(503, started.error, 'papers_google_closed');
