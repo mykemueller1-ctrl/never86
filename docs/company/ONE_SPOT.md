@@ -59,7 +59,8 @@ Myke authorized app/Chrome/desktop use for owned jobs on 28 Aug. Cloud agents st
 |---|---|
 | Gmail send | MCP `needsAuth` — Cursor desktop → Settings → MCP → Connect Gmail. Still draft-only until Myke approves the exact send. |
 | X live search/post | MCP `needsAuth` — Connect X on desktop. Drafts only until approve. Apollo stays off. |
-| Sentia+ CRM | Signed-in app; browser-controlled until Sentia exposes an MCP/API. No CRM write without exact approval. |
+| HubSpot product CRM | Spec drafted 2026-09-09: [`HUBSPOT_CRM_SPEC.md`](HUBSPOT_CRM_SPEC.md). Kristin owns the CRM. Myke is sales source, not overwrite. Factory: no write, no merge, no delete. Portal not live-read from cloud workers. |
+| Sentia+ CRM | Still named in older intake as a CRM surface; signed-in app; browser-controlled until Sentia exposes an MCP/API. Overlap with HubSpot is a Kristin hygiene ticket, not an auto-merge. No CRM write without exact approval. |
 | Google Calendar | MCP `needsAuth` — Connect Google Calendar on desktop. |
 | Google Drive | **Ready** on this cloud worker. HQ Drive doc ID was not found on the connected account. |
 | `get_hunter_standup` on production | **LIVE** v3.1.0 — `tools/call` 200 on 29 Aug 11:18 PM CT |
