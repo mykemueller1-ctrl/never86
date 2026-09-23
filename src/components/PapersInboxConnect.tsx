@@ -51,7 +51,7 @@ export function PapersInboxConnect({
         setStatus(body);
         if (!body.ready || papers === 'closed' || papers === 'token') {
           setLine(missingGoogleLine(body));
-        } else if (papers === 'connected' && (body.connection?.gmail || body.connection?.drive)) {
+        } else if (papers === 'connected' && body.connection?.gmail === true) {
           setLine('This inbox is connected. Pulling last-week invoices…');
           setBusy(true);
           try {
@@ -102,12 +102,13 @@ export function PapersInboxConnect({
   }, []);
 
   const ready = Boolean(status.ready);
-  const connected = Boolean(status.connection?.gmail || status.connection?.drive);
-  const honesty: PapersHonesty = connected
+  const gmail = status.connection?.gmail === true;
+  const drive = status.connection?.drive === true;
+  const honesty: PapersHonesty = gmail
     ? (status.honesty === 'Verified' || status.honesty === 'Estimated' ? status.honesty : 'Missing')
     : 'Missing';
   const folders = (status.folders ?? []).map((folder) => (
-    connected ? folder : { ...folder, honesty: 'Missing' as const, status: 'missing' }
+    gmail ? folder : { ...folder, honesty: 'Missing' as const, status: 'missing' }
   ));
   const missingSecrets = status.missingSecrets ?? [];
 
@@ -181,16 +182,16 @@ export function PapersInboxConnect({
         <p className="owner-seat-receipt" role="status">
           {missingGoogleLine(status)}
         </p>
-      ) : connected && status.connection?.email ? (
-        <p className="owner-seat-papers-outlook">Connected as {status.connection.email}</p>
+      ) : gmail && status.connection?.email ? (
+        <p className="owner-seat-papers-outlook">Gmail is connected as {status.connection.email}</p>
       ) : null}
-      {!connected && loaded ? (
+      {!gmail && loaded ? (
         <p className="owner-seat-receipt" role="status">
-          Gmail is not connected. Drive is not connected. Drop a photo, a PDF, or use chat. Folders stay Missing.
+          Gmail is not connected. {drive ? 'Drive is connected.' : 'Drive is not connected.'} Drop a photo, a PDF, or use chat. Folders stay Missing.
         </p>
       ) : null}
       <div className="owner-seat-papers-actions">
-        {!connected && loaded ? (
+        {!gmail && loaded ? (
           <>
             <a className="owner-desk-primary" href="/chat#photo">Drop a photo</a>
             <a className="owner-desk-primary" href="/check/invoices">Drop a PDF</a>
@@ -199,13 +200,13 @@ export function PapersInboxConnect({
         ) : null}
         <button
           type="button"
-          className={connected ? 'owner-desk-primary' : 'owner-desk-secondary'}
+          className={gmail ? 'owner-desk-primary' : 'owner-desk-secondary'}
           disabled={busy || !ready}
           onClick={() => void connectGoogle()}
         >
           {busy && ready ? 'Opening…' : 'Connect Gmail'}
         </button>
-        {!connected ? <span className="owner-seat-honesty is-missing">Missing</span> : null}
+        {!gmail ? <span className="owner-seat-honesty is-missing">Missing</span> : null}
         <button
           type="button"
           className="owner-desk-secondary"
@@ -214,7 +215,7 @@ export function PapersInboxConnect({
         >
           Connect Drive
         </button>
-        {connected && ready ? (
+        {gmail && ready ? (
           <button type="button" className="owner-desk-secondary" disabled={busy} onClick={() => void pullPapers()}>
             Pull last-week invoices
           </button>

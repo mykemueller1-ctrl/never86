@@ -118,6 +118,11 @@ describe('papers inbox — Google first', () => {
     const phone = readFileSync(resolve('src/components/PapersInboxConnect.tsx'), 'utf8');
     expect(phone).toMatch(/Connect Gmail/);
     expect(phone).toMatch(/Drop a photo, a PDF, or use chat/);
+    expect(phone).toMatch(/status\.connection\?\.gmail === true/);
+    expect(phone.indexOf('href="/chat#photo"')).toBeGreaterThan(-1);
+    expect(phone.indexOf('href="/check/invoices"')).toBeGreaterThan(phone.indexOf('href="/chat#photo"'));
+    expect(phone.indexOf('Connect Gmail')).toBeGreaterThan(phone.indexOf('href="/check/invoices"'));
+    expect(readFileSync(resolve('src/lib/papersInboxHttp.ts'), 'utf8')).toMatch(/scopes\.includes\('gmail'\)/);
     expect(phone).not.toMatch(/papers === 'connected'\) \{\n\s+setLine\('Gmail \+ Drive connected/);
     expect(phone).toMatch(/Connect Drive/);
     expect(phone).toMatch(/copy\.outlook/);
