@@ -1,7 +1,7 @@
 /**
  * Papers chat step — maps Missing papers. Not a chatbot.
  * A named paper stays Missing until a file parses. Chat text never becomes $.
- * Google stays Missing until GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET exist.
+ * A ready Google client is not a connected inbox. Papers stay Missing until a pull lands.
  */
 
 import type { HonestyLabel } from './oneSeatPublicWin';
@@ -49,19 +49,14 @@ export function chatIntakeMap(input: {
   googleReady: boolean;
   marks: Partial<Record<ChatSlotId, ChatPaperMark>>;
 }): ChatIntakeRow[] {
-  const google: ChatIntakeRow = input.googleReady
-    ? {
-        id: 'google',
-        label: 'Gmail + Drive',
-        honesty: 'Estimated',
-        note: 'Google client is present. This chat does not pull mail. Papers are not Verified until a connected seat reads them. No invented papers.',
-      }
-    : {
-        id: 'google',
-        label: 'Gmail + Drive',
-        honesty: 'Missing',
-        note: 'Missing — GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are not on this deploy. Gmail stays off. No invented papers.',
-      };
+  const google: ChatIntakeRow = {
+    id: 'google',
+    label: 'Gmail + Drive',
+    honesty: 'Missing',
+    note: input.googleReady
+      ? 'Google client is ready. This chat does not pull mail. Papers stay Missing until Gmail is connected. No invented papers.'
+      : 'Missing — GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are not on this deploy. Gmail stays off. No invented papers.',
+  };
 
   const slots: ChatIntakeRow[] = CHAT_INTAKE_SLOTS.map((slot) => {
     const mark = input.marks[slot.id] ?? 'absent';

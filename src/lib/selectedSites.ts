@@ -8,6 +8,7 @@ export const ONE_SEAT_ORIGIN = 'https://www.never86.ai';
 export const ONE_SEAT_PATHS = {
   home: '/',
   try: '/try',
+  seat: '/seat',
   chat: '/chat',
   tryLabor: '/try/labor',
   tryRecipes: '/try/recipes',

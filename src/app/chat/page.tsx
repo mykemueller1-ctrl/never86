@@ -1,22 +1,23 @@
 import type { Metadata } from 'next';
-import { PapersChatIntake } from '@/components/PapersChatIntake';
+import { OneSeatPanels } from '@/components/OneSeatPanels';
 import { OneSeatPublicShell } from '@/components/OneSeatPublicShell';
+import { PapersChatIntake } from '@/components/PapersChatIntake';
 
 export const metadata: Metadata = {
-  title: 'Chat maps Missing papers | Never86’d One Seat',
+  title: 'Ask Never86’d | One Seat',
   description:
-    'Gmail, then a photo, then chat. The map labels each paper Verified, Estimated, or Missing. No invented dollars. Google stays Missing until client secrets exist.',
+    'Ask maps invoices, labor, menu, and what is still Missing. A sentence is not a price. Gmail stays Missing until a pull lands.',
   alternates: { canonical: 'https://www.never86.ai/chat' },
 };
 
 export default function ChatPage() {
   return (
     <OneSeatPublicShell
-      eyebrow="ONE SEAT · PAPERS CHAT"
-      title="Chat maps what is still Missing."
-      lede="This is the third papers step: Gmail, then a photo, then chat. Name a paper or drop a file. Honesty stays Verified, Estimated, or Missing. A sentence is not a price."
+      eyebrow="ONE SEAT · ASK"
+      title="Ask what is still Missing."
+      lede="Ask routes to a paper. Name a file or drop a PDF. Honesty stays Verified, Estimated, or Missing. A sentence is not a price."
     >
-      <PapersChatIntake />
+      <OneSeatPanels initial="ask" ask={<PapersChatIntake />} />
     </OneSeatPublicShell>
   );
 }

@@ -25,7 +25,8 @@ describe('GET /api/papers/readiness', () => {
     process.env.GOOGLE_CLIENT_ID = 'secret-value-do-not-echo.apps.googleusercontent.com';
     process.env.GOOGLE_CLIENT_SECRET = 'GOCSPX-do-not-echo';
     const open = await (await GET()).json();
-    expect(open.honesty).toBe('Estimated');
+    expect(open.honesty).toBe('Missing');
+    expect(open.note).toMatch(/Papers stay Missing/);
     expect(open.ready).toBe(true);
     expect(open.missingSecrets).toEqual([]);
     expect(JSON.stringify(open)).not.toMatch(/secret-value|GOCSPX/);

@@ -21,10 +21,11 @@ describe('papers chat intake', () => {
     expect(reply).not.toMatch(/\$48|\$56/);
   });
 
-  it('marks Google Estimated only when the client is present', () => {
+  it('keeps Google Missing when the client is ready and Gmail is not connected', () => {
     const ready = chatIntakeMap({ googleReady: true, marks: {} });
-    expect(ready.find((row) => row.id === 'google')?.honesty).toBe('Estimated');
-    expect(ready.every((row) => row.id === 'google' || row.honesty === 'Missing')).toBe(true);
+    expect(ready.find((row) => row.id === 'google')?.honesty).toBe('Missing');
+    expect(ready.find((row) => row.id === 'google')?.note).toMatch(/client is ready/);
+    expect(ready.every((row) => row.honesty === 'Missing')).toBe(true);
     const page = readFileSync(resolve('src/app/chat/page.tsx'), 'utf8');
     expect(page).toMatch(/PapersChatIntake/);
     expect(page).not.toMatch(/\bdesk\b/i);

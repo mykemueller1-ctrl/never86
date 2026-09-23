@@ -38,7 +38,7 @@ export function PapersChatIntake() {
       try {
         const res = await fetch('/api/papers/readiness', { signal: AbortSignal.timeout(8000) });
         const data = (await res.json()) as { ready?: boolean; honesty?: HonestyLabel };
-        if (!cancelled) setGoogleReady(Boolean(data.ready) && data.honesty !== 'Missing');
+        if (!cancelled) setGoogleReady(Boolean(data.ready));
       } catch {
         if (!cancelled) setGoogleReady(false);
       }
@@ -108,7 +108,7 @@ export function PapersChatIntake() {
       <p className={styles.eyebrow}>GMAIL → PHOTO → CHAT</p>
       <h2>What is still Missing</h2>
       <p className={styles.note}>
-        Naming a paper does not make it Verified. A parsed file is Estimated. Google stays Missing until the client secrets exist. No invented $.
+        Naming a paper does not make it Verified. A parsed file is Estimated. A ready Google client is not a connected inbox. Papers stay Missing until Gmail connects. No invented $.
       </p>
       <ul className={styles.list}>
         {rows.map((row) => (

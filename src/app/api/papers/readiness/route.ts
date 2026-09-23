@@ -10,9 +10,12 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     ready: gate.ready,
-    honesty: gate.ready ? 'Estimated' : 'Missing',
+    honesty: 'Missing',
     missingSecrets: gate.missingSecrets,
     requiredEnv: [...PAPERS_REQUIRED_SECRET_NAMES],
-    error: gate.error,
+    error: gate.ready ? null : gate.error,
+    note: gate.ready
+      ? 'Google client is ready. Gmail is not connected on this page. Papers stay Missing until a pull lands.'
+      : gate.error,
   });
 }

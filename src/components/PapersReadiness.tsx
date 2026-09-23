@@ -22,15 +22,14 @@ export function PapersReadiness({ heading = 'Google papers' }: { heading?: strin
         const res = await fetch('/api/papers/readiness', { signal: AbortSignal.timeout(8000) });
         const data = (await res.json()) as Readiness;
         if (cancelled) return;
-        const label: HonestyLabel = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
         const names = data.missingSecrets?.length
           ? data.missingSecrets.join(', ')
           : 'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET';
-        setHonesty(label);
+        setHonesty('Missing');
         setNote(
-          label === 'Missing'
-            ? (data.error || `Missing — ${names} are not on this deploy. No invented papers.`)
-            : 'Google client is present. This page does not pull mail. Papers are not Verified until an owner connects. No invented $.',
+          data.ready
+            ? 'Google client is ready. Gmail is not connected on this page. Papers stay Missing until a pull lands. No invented $.'
+            : (data.error || `Missing — ${names} are not on this deploy. No invented papers.`),
         );
       } catch {
         if (!cancelled) {

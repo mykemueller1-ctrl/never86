@@ -25,8 +25,14 @@ describe('operator seat thicken', () => {
     expect(page).toMatch(/PapersReadiness/);
     expect(page).toMatch(/STEP 3/);
     expect(page).toMatch(/ONE_SEAT_PATHS\.chat/);
+    expect(page).toMatch(/OneSeatPanels/);
     expect(page).not.toMatch(/\bdesk\b/i);
     expect(page).not.toMatch(/chatgpt\.site/);
+    const seat = read('src/app/seat/page.tsx');
+    expect(seat).toMatch(/OneSeatPanels/);
+    expect(seat).toMatch(/PapersChatIntake/);
+    expect(seat).not.toMatch(/\bdesk\b/i);
+    expect(seat).not.toMatch(/chatgpt\.site/);
   });
 
   it('shows Missing instead of a fake activation or login success', () => {

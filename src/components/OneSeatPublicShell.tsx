@@ -20,6 +20,7 @@ export function OneSeatPublicShell({
           <b>86</b> Never86’d
         </Link>
         <nav className={styles.nav} aria-label="One Seat">
+          <Link href={ONE_SEAT_PATHS.seat}>Seat</Link>
           <Link href={ONE_SEAT_PATHS.try}>Try the sample</Link>
           <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
           <Link href={ONE_SEAT_PATHS.checkInvoices}>Check invoices</Link>
