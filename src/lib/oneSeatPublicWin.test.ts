@@ -61,8 +61,9 @@ describe('Grok-native One Seat public door', () => {
   it('does not redirect login, onboard, or the three checks off never86.ai', () => {
     expect(config).toMatch(/source: '\/communities'/);
     expect(config).toMatch(/destination: '\/portal'/);
-    expect(config).toContain("source: '/seat'");
-    expect(config).toContain("destination: '/onboard'");
+    expect(config).not.toContain("source: '/seat'");
+    expect(read('src/app/seat/page.tsx')).toMatch(/OneSeatPanels/);
+    expect(read('src/app/seat/page.tsx')).not.toMatch(/chatgpt\.site/);
     for (const path of ['/check/invoices', '/check/labor', '/check/menu', '/login', '/onboard']) {
       expect(config).not.toContain(`source: '${path}'`);
     }
