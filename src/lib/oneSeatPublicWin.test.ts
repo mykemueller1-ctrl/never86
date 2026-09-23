@@ -101,6 +101,19 @@ describe('Grok-native One Seat public door', () => {
     expect(isGoldSampleInvoices(GOLD_PRIOR_INVOICE_CSV, GOLD_CURRENT_INVOICE_CSV)).toBe(true);
     expect(isGoldSampleInvoices(GOLD_CURRENT_INVOICE_CSV, GOLD_PRIOR_INVOICE_CSV)).toBe(true);
     expect(publicDoorHonesty({ row: mozzarella, disclosedSample: true })).toBe('Estimated');
+    const reshapedPrior = [
+      'Vendor,SKU,Description,Pack,Period,Unit Price,Qty',
+      'Sample Dairy,MZ-452,Whole Milk Mozzarella 20 LB case,20 lb,2026-09-01,48.00,1',
+      'Sample Dairy,FL-100,All Purpose Flour 50 LB,50 lb,2026-09-01,25.00,1',
+    ].join('\n');
+    const reshapedCurrent = [
+      'Vendor,SKU,Description,Pack,Period,Unit Price,Qty',
+      'Sample Dairy,MZ-452,Whole Milk Mozzarella 20 LB case,20 lb,2026-09-08,56.00,1',
+      'Sample Dairy,FL-100,All Purpose Flour 50 LB,50 lb,2026-09-08,25.00,1',
+    ].join('\n');
+    expect(isGoldSampleInvoices(reshapedPrior, reshapedCurrent)).toBe(true);
+    expect(attachPublicHonesty(compare.rows, isGoldSampleInvoices(reshapedPrior, reshapedCurrent)).every((row) => row.honesty === 'Estimated')).toBe(true);
+    expect(isGoldSampleInvoices('Vendor,SKU,Unit Price\nSysco,ABC,48.00', 'Vendor,SKU,Unit Price\nSysco,ABC,56.00')).toBe(false);
     const sampleRows = attachPublicHonesty(compare.rows, true);
     expect(sampleRows).toHaveLength(2);
     expect(sampleRows.every((row) => row.honesty === 'Estimated')).toBe(true);

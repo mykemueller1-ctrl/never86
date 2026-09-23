@@ -128,10 +128,22 @@ export function publicDoorHonesty(input: {
   return fromPaper;
 }
 
+/** Prior is the $48 case. Current is the $56 case. Both prices on one file is not a side. */
+function goldSampleSide(text: string): 'prior' | 'current' | null {
+  if (!/Sample Dairy/i.test(text) || !/\bMZ-452\b/.test(text) || !/\bFL-100\b/.test(text)) return null;
+  const has48 = /(?:^|[^\d])48\.00(?:[^\d]|$)/.test(text);
+  const has56 = /(?:^|[^\d])56\.00(?:[^\d]|$)/.test(text);
+  if (has48 === has56) return null;
+  return has48 ? 'prior' : 'current';
+}
+
 export function isGoldSampleInvoices(prior: string, current: string): boolean {
   const texts = [prior.trim(), current.trim()].sort();
   const gold = [GOLD_PRIOR_INVOICE_CSV.trim(), GOLD_CURRENT_INVOICE_CSV.trim()].sort();
-  return texts[0] === gold[0] && texts[1] === gold[1];
+  if (texts[0] === gold[0] && texts[1] === gold[1]) return true;
+  const left = goldSampleSide(prior);
+  const right = goldSampleSide(current);
+  return (left === 'prior' && right === 'current') || (left === 'current' && right === 'prior');
 }
 
 export function attachPublicHonesty<T extends VendorDriftSkuRow>(
