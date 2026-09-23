@@ -58,6 +58,9 @@ export function InvoiceCompareClient() {
     try {
       const body = new FormData();
       body.set('file', file);
+      const persist = new FormData();
+      persist.set('file', file);
+      void fetch('/api/papers/upload', { method: 'POST', body: persist });
       const res = await fetch('/api/one-seat/invoice-file', { method: 'POST', body });
       const data = (await res.json()) as {
         honesty?: HonestyLabel;

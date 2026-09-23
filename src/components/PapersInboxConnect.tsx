@@ -11,6 +11,7 @@ type PapersStatus = {
   requiredEnv?: string[];
   connection?: { gmail: boolean; drive: boolean; email: string | null };
   folders?: Array<{ id: string; name: string; status: string; honesty: PapersHonesty }>;
+  intake?: Array<{ id: string; kind: string; filename: string; honesty: PapersHonesty; note: string }>;
   nextAction?: string;
 };
 
@@ -191,19 +192,20 @@ export function PapersInboxConnect({
       <div className="owner-seat-papers-actions">
         {!connected && loaded ? (
           <>
-            <a href="/chat#photo">Drop a photo</a>
-            <a href="/check/invoices">Drop a PDF</a>
-            <a href="/chat">Open chat intake</a>
+            <a className="owner-desk-primary" href="/chat#photo">Drop a photo</a>
+            <a className="owner-desk-primary" href="/check/invoices">Drop a PDF</a>
+            <a className="owner-desk-primary" href="/chat">Open chat intake</a>
           </>
         ) : null}
         <button
           type="button"
-          className="owner-desk-primary"
+          className={connected ? 'owner-desk-primary' : 'owner-desk-secondary'}
           disabled={busy || !ready}
           onClick={() => void connectGoogle()}
         >
           {busy && ready ? 'Opening…' : 'Connect Gmail'}
         </button>
+        {!connected ? <span className="owner-seat-honesty is-missing">Missing</span> : null}
         <button
           type="button"
           className="owner-desk-secondary"
@@ -233,6 +235,17 @@ export function PapersInboxConnect({
       <p className="owner-seat-papers-outlook">
         <a href="/chat">Chat maps what is still Missing</a>
       </p>
+      {status.intake?.length ? (
+        <ul className="owner-seat-papers-folders">
+          {status.intake.map((paper) => (
+            <li key={paper.id}>
+              <span>{paper.kind}: {paper.filename}</span>
+              <span className={`owner-seat-honesty is-${paper.honesty.toLowerCase()}`}>{paper.honesty}</span>
+              <span>{paper.note}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {line ? (
         <p className="owner-seat-receipt" role="status" aria-live="polite">
           {line}

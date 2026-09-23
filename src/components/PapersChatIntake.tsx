@@ -118,6 +118,11 @@ export function PapersChatIntake() {
     if (!text) return;
     setDraft('');
     push(text);
+    void fetch('/api/papers/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
     const read = readChatIntakeLine(text);
     if (read.slot && read.slot !== 'google') {
       const next = {
@@ -136,7 +141,8 @@ export function PapersChatIntake() {
     try {
       const body = new FormData();
       body.set('file', file);
-      const res = await fetch('/api/one-seat/invoice-file', { method: 'POST', body });
+      const path = slot === 'photo' ? '/api/papers/photo' : '/api/papers/upload';
+      const res = await fetch(path, { method: 'POST', body });
       const data = (await res.json()) as { honesty?: HonestyLabel; note?: string; text?: string };
       const parsed = data.honesty === 'Estimated' && Boolean(data.text?.trim());
       const next = { ...marks, [slot]: parsed ? 'parsed' as const : 'named' as const };

@@ -12,6 +12,11 @@ describe('operator seat thicken', () => {
     expect(compare).toMatch(/type="file"/);
     expect(compare).toMatch(/INVOICE_UPLOAD_ACCEPT/);
     expect(compare).toMatch(/\/api\/one-seat\/invoice-file/);
+    expect(compare).toMatch(/\/api\/papers\/upload/);
+    const chat = read('src/components/PapersChatIntake.tsx');
+    expect(chat).toMatch(/\/api\/papers\/photo/);
+    expect(chat).toMatch(/\/api\/papers\/chat/);
+    expect(chat).toMatch(/\/api\/papers\/upload/);
     expect(compare).toMatch(/Load from connected papers/);
     expect(compare).not.toMatch(/\bdesk\b/i);
     const page = read('src/app/check/invoices/page.tsx');

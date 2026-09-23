@@ -13,6 +13,7 @@ import {
   hydratePapersConnection,
   papersConnectionFor,
   papersDurableStore,
+  listDirectPapers,
   papersFoldersFor,
   papersInvoicesFor,
 } from '@/lib/papersInboxHttp';
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
     await hydratePapersConnection(operatorId);
     const connection = papersConnectionFor(operatorId);
     const invoices = papersInvoicesFor(operatorId);
+    const intake = await listDirectPapers(operatorId);
     const folders = papersFoldersFor(operatorId);
     const connected = Boolean(connection.gmail || connection.drive);
     const fileFirst = papersFileFirstWhenInboxOff(connection);
@@ -56,6 +58,15 @@ export async function GET(req: NextRequest) {
       durable: papersDurableStore(),
       connection,
       folders: shownFolders,
+      intake: intake.map((paper) => ({
+        id: paper.id,
+        kind: paper.kind,
+        filename: paper.filename,
+        folder: paper.folder,
+        honesty: paper.honesty,
+        note: paper.note,
+        text: paper.text,
+      })),
       copy,
       outlook: outlookV2Plan(),
     });
