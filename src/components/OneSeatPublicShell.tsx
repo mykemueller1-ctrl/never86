@@ -21,6 +21,7 @@ export function OneSeatPublicShell({
         </Link>
         <nav className={styles.nav} aria-label="One Seat">
           <Link href={ONE_SEAT_PATHS.try}>Try the sample</Link>
+          <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
           <Link href={ONE_SEAT_PATHS.checkInvoices}>Check invoices</Link>
           <Link href={ONE_SEAT_PATHS.checkLabor}>Check labor</Link>
           <Link href={ONE_SEAT_PATHS.checkMenu}>Check a plate</Link>
@@ -38,6 +39,7 @@ export function OneSeatPublicShell({
       <footer className={styles.footer}>
         <Link href="/">Home</Link>
         <Link href={ONE_SEAT_PATHS.onboard}>Free owner seat</Link>
+        <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
         <Link href={ONE_SEAT_PATHS.login}>Sign in</Link>
         <Link href="/privacy">Privacy</Link>
         <p>One Seat = Action Shift. Operators stay on never86.ai. Grok explains. Formulas decide.</p>

@@ -102,10 +102,20 @@ describe('email+password live door', () => {
   });
 
   it('does not reintroduce Pulse or invented honesty labels on the auth door', () => {
+    const closedDoor = new Set([
+      'src/app/login/LoginClient.tsx',
+      'src/app/activate/ActivateClient.tsx',
+      'src/app/api/operator/login/route.ts',
+    ]);
     for (const file of AUTH_FILES) {
       const source = read(file);
       expect(source).not.toMatch(/\bPulse\b/);
-      expect(source).not.toMatch(/honesty/i);
+      if (closedDoor.has(file)) {
+        expect(source).toMatch(/Missing|operatorLoginUnavailableBody/);
+        expect(source).not.toMatch(/\b(Calculated|Unverified|Guaranteed)\b/);
+      } else {
+        expect(source).not.toMatch(/honesty/i);
+      }
     }
   });
 });

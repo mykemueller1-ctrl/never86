@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { AuthHonestyLine } from '@/components/AuthHonestyLine';
 import { PapersInboxConnect } from '@/components/PapersInboxConnect';
+import { PapersReadiness } from '@/components/PapersReadiness';
+import type { HonestyLabel } from '@/lib/oneSeatPublicWin';
 import { trackEvent } from '@/lib/track';
 
 type Status = 'idle' | 'loading' | 'sent' | 'error';
@@ -22,6 +25,7 @@ export default function OnboardPage() {
   const [storeName, setStoreName] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
+  const [honesty, setHonesty] = useState<HonestyLabel | null>(null);
 
   useEffect(() => { trackEvent('onboard_view'); }, []);
 
@@ -35,6 +39,7 @@ export default function OnboardPage() {
     }
     setStatus('loading');
     setMessage('');
+    setHonesty(null);
     trackEvent('onboard_submit', { meta: { path: 'email_store' } });
     try {
       const res = await fetch('/api/onboard/request', {
@@ -42,15 +47,33 @@ export default function OnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, restaurantName, storeName: restaurantName, sourcePage: '/onboard' }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
+      const data = await res.json() as {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        code?: string;
+        honesty?: HonestyLabel;
+      };
+      if (!res.ok || !data.success) {
+        const missing = data.honesty === 'Missing'
+          || data.code === 'activation_email_unavailable'
+          || data.code === 'neon_unavailable';
+        setHonesty(missing ? 'Missing' : null);
+        const error = data.error || 'Could not send the link.';
+        setStatus('error');
+        setMessage(missing ? `${error} Honesty: Missing. The seat was not opened.` : error);
+        trackEvent('onboard_submit_error', { meta: { path: 'email_store', error } });
+        return;
+      }
+      setHonesty(null);
       setStatus('sent');
       setMessage(data.message || 'Check your email for a set-password link.');
       trackEvent('onboard_submit_success', { meta: { path: 'email_store' } });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Could not send the link.';
+      setHonesty('Missing');
       setStatus('error');
-      setMessage(error);
+      setMessage(`${error} Honesty: Missing. The seat was not opened.`);
       trackEvent('onboard_submit_error', { meta: { path: 'email_store', error } });
     }
   }
@@ -122,7 +145,11 @@ export default function OnboardPage() {
                 <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
                   {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your email ✓' : 'Open Never 86’d →'}
                 </button>
-                {message ? <p className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
+                <AuthHonestyLine
+                  honesty={honesty}
+                  message={message}
+                  className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}
+                />
               </form>
               {status === 'sent' ? (
                 <div className="mt-6">
@@ -131,7 +158,11 @@ export default function OnboardPage() {
                   </p>
                   <PapersInboxConnect variant="claim" />
                 </div>
-              ) : null}
+              ) : (
+                <div className="mt-6">
+                  <PapersReadiness heading="Google papers" />
+                </div>
+              )}
               <p className="mt-4 text-[11px] leading-relaxed text-[#86868b]">
                 We use this email for account access and essential product help — thank-you, tips, education. No hard sales list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
               </p>

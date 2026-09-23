@@ -6,6 +6,7 @@ import {
   planActivateHttpResponse,
 } from '@/lib/operatorActivateHttp';
 import { operatorSessionSecret, signOperatorSession } from '@/lib/operatorSession';
+import { operatorLoginUnavailableBody } from '@/lib/authHonesty';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,10 +28,7 @@ export async function POST(req: Request) {
     const data = bodySchema.parse(json);
 
     if (!operatorSessionSecret()) {
-      return NextResponse.json(
-        { success: false, error: "Operator login isn't switched on yet." },
-        { status: 503 },
-      );
+      return NextResponse.json(operatorLoginUnavailableBody(true), { status: 503 });
     }
 
     const result = await activateOperatorSeat({

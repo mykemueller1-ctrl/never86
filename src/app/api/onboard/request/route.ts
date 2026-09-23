@@ -15,6 +15,7 @@ import { Resend } from 'resend';
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowAuthAttempt } from '@/lib/authThrottle';
 import { activationEmailPayload, buildOwnerDeskActivationLink } from '@/lib/ownerDeskAuth';
+import { withMissingHonesty } from '@/lib/authHonesty';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -103,10 +104,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.ok) {
-      return NextResponse.json(
-        { success: false, error: result.error, ...(result.code ? { code: result.code } : {}) },
-        { status: result.status },
-      );
+      const body = { success: false as const, error: result.error, ...(result.code ? { code: result.code } : {}) };
+      return NextResponse.json(withMissingHonesty(body, result.status), { status: result.status });
     }
 
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.never86.ai';
@@ -121,7 +120,7 @@ export async function POST(req: NextRequest) {
       const failure =
         err instanceof ActivationEmailSendError ? err.failure : activationEmailUnavailable();
       return NextResponse.json(
-        { success: false, error: failure.error, code: failure.code },
+        withMissingHonesty({ success: false, error: failure.error, code: failure.code }, failure.status),
         { status: failure.status },
       );
     }

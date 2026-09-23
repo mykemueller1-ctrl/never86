@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { AuthHonestyLine } from '@/components/AuthHonestyLine';
+import { PapersReadiness } from '@/components/PapersReadiness';
 import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN, OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import type { HonestyLabel } from '@/lib/oneSeatPublicWin';
 
 const inputClass =
   'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
@@ -16,11 +19,21 @@ export default function OperatorLoginPage() {
   const [seats, setSeats] = useState<SeatChoice[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [honesty, setHonesty] = useState<HonestyLabel | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
+
+  function showClosed(data: { error?: string; honesty?: HonestyLabel; code?: string }, fallback: string) {
+    const missing = data.honesty === 'Missing' || data.code === 'operator_login_unavailable' || data.code === 'activation_email_unavailable' || data.code === 'neon_unavailable';
+    setHonesty(missing ? 'Missing' : null);
+    setStatus('error');
+    const error = data.error || fallback;
+    setMessage(missing ? `${error} Honesty: Missing. Sign-in did not succeed.` : error);
+  }
 
   async function onPasswordSubmit(restaurantName: string) {
     setStatus('loading');
     setMessage('');
+    setHonesty(null);
     try {
       const res = await fetch('/api/operator/login', {
         method: 'POST',
@@ -37,8 +50,13 @@ export default function OperatorLoginPage() {
         error?: string;
         redirect?: string;
         code?: string;
+        honesty?: HonestyLabel;
         seats?: SeatChoice[];
       };
+      if (data.honesty === 'Missing' || data.code === 'operator_login_unavailable' || res.status === 503) {
+        showClosed(data, "Operator login isn't switched on yet.");
+        return;
+      }
       if (data.code === 'pick_store' || data.code === 'unknown_store') {
         setSeats(Array.isArray(data.seats) ? data.seats : []);
         setStatus('error');
@@ -48,6 +66,7 @@ export default function OperatorLoginPage() {
       if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
       window.location.assign(data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
     } catch (err: unknown) {
+      setHonesty(null);
       setStatus('error');
       setMessage(err instanceof Error ? err.message : 'Wrong email or password.');
     }
@@ -57,19 +76,25 @@ export default function OperatorLoginPage() {
     e.preventDefault();
     setStatus('loading');
     setMessage('');
+    setHonesty(null);
     try {
       const res = await fetch('/api/onboard/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, purpose: 'reset', sourcePage: '/login/reset' }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the reset link.');
+      const data = await res.json() as { success?: boolean; error?: string; message?: string; code?: string; honesty?: HonestyLabel };
+      if (!res.ok || !data.success) {
+        showClosed(data, 'Could not send the reset link.');
+        return;
+      }
+      setHonesty(null);
       setStatus('sent');
       setMessage(data.message || 'Check your email for a set-password link.');
     } catch (err: unknown) {
+      setHonesty('Missing');
       setStatus('error');
-      setMessage(err instanceof Error ? err.message : 'Could not send the reset link.');
+      setMessage(`${err instanceof Error ? err.message : 'Could not send the reset link.'} Honesty: Missing. Sign-in did not succeed.`);
     }
   }
 
@@ -133,7 +158,11 @@ export default function OperatorLoginPage() {
               ? (status === 'loading' ? 'Sending…' : status === 'sent' ? 'Link sent ✓' : 'Email me a set-password link →')
               : (status === 'loading' ? 'Signing in…' : 'Sign in →')}
           </button>
-          {message ? <p className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
+          <AuthHonestyLine
+            honesty={honesty}
+            message={message}
+            className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}
+          />
           {seats.length > 1 ? (
             <div className="flex flex-wrap gap-2 justify-center">
               {seats.map((seat) => (
@@ -191,6 +220,7 @@ export default function OperatorLoginPage() {
           </Link>
           . Missing <code>GOOGLE_CLIENT_ID</code> or <code>GOOGLE_CLIENT_SECRET</code> stays Missing — no invented papers.
         </p>
+        <PapersReadiness heading="Google papers" />
       </section>
     </main>
   );

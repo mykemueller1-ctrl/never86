@@ -213,6 +213,9 @@ export function PapersInboxConnect({
         </ul>
       ) : null}
       <p className="owner-seat-papers-outlook">{copy.outlook}</p>
+      <p className="owner-seat-papers-outlook">
+        <a href="/chat">Chat maps what is still Missing</a>
+      </p>
       {line ? (
         <p className="owner-seat-receipt" role="status" aria-live="polite">
           {line}

@@ -9,6 +9,7 @@ import {
   money,
   type HonestyLabel,
 } from '@/lib/oneSeatPublicWin';
+import { INVOICE_UPLOAD_ACCEPT } from '@/lib/invoiceFileIntake';
 import { oneSeatStyles as styles } from './OneSeatPublicShell';
 
 type CompareRow = {
@@ -46,6 +47,46 @@ export function InvoiceCompareClient() {
   const [explain, setExplain] = useState('');
   const [papersHonesty, setPapersHonesty] = useState<HonestyLabel | null>(null);
   const [papersNote, setPapersNote] = useState('');
+  const [priorName, setPriorName] = useState('prior.csv');
+  const [currentName, setCurrentName] = useState('current.csv');
+  const [priorFile, setPriorFile] = useState<{ honesty: HonestyLabel; note: string } | null>(null);
+  const [currentFile, setCurrentFile] = useState<{ honesty: HonestyLabel; note: string } | null>(null);
+
+  async function ingestFile(slot: 'prior' | 'current', file: File) {
+    setStatus('loading');
+    setMessage('');
+    try {
+      const body = new FormData();
+      body.set('file', file);
+      const res = await fetch('/api/one-seat/invoice-file', { method: 'POST', body });
+      const data = (await res.json()) as {
+        honesty?: HonestyLabel;
+        note?: string;
+        text?: string;
+        filename?: string;
+        error?: string;
+      };
+      const honesty: HonestyLabel = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
+      const note = data.note || data.error || 'Invoice text is Missing. No invented $.';
+      const landed = { honesty, note };
+      if (slot === 'prior') {
+        setPriorFile(landed);
+        setPriorName(data.filename || file.name || 'prior');
+        setPrior(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+      } else {
+        setCurrentFile(landed);
+        setCurrentName(data.filename || file.name || 'current');
+        setCurrent(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+      }
+      setStatus('idle');
+    } catch {
+      const landed = { honesty: 'Missing' as const, note: 'Missing — that file did not read. No invented $.' };
+      if (slot === 'prior') setPriorFile(landed);
+      else setCurrentFile(landed);
+      setStatus('error');
+      setMessage(landed.note);
+    }
+  }
 
   async function loadFromPapers() {
     setStatus('loading');
@@ -112,8 +153,8 @@ export function InvoiceCompareClient() {
         body: JSON.stringify({
           store: 'Your store',
           documents: [
-            { text: prior, filename: 'prior.csv' },
-            { text: current, filename: 'current.csv' },
+            { text: prior, filename: priorName },
+            { text: current, filename: currentName },
           ],
         }),
       });
@@ -148,9 +189,9 @@ export function InvoiceCompareClient() {
   return (
     <div className={styles.card}>
       <p className={styles.eyebrow}>YOUR PAPERS · FORMULAS FIRST</p>
-      <h2>Paste two invoices from the same vendor.</h2>
+      <h2>Paste two invoices, or drop a PDF or CSV.</h2>
       <p className={styles.note}>
-        Native CSV or invoice PDF text. Same SKU and pack. Missing prior stays Missing — not $0.
+        Native CSV, TXT, or invoice PDF text. HEIC photos stay Missing — no OCR, no invented $. Same SKU and pack. Missing prior stays Missing — not $0.
         Connect Gmail + Drive on the owner seat, then load the last two invoices. No homework form.
         Grok can explain the card when <code>XAI_API_KEY</code> is set. It does not invent the dollars.
       </p>
@@ -158,11 +199,33 @@ export function InvoiceCompareClient() {
       <div className={styles.grid}>
         <label>
           Prior invoice
+          <input
+            className={styles.file}
+            type="file"
+            accept={INVOICE_UPLOAD_ACCEPT}
+            aria-label="Prior invoice file"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void ingestFile('prior', file);
+            }}
+          />
           <textarea className={styles.area} value={prior} onChange={(e) => setPrior(e.target.value)} />
+          {priorFile ? <HonestyLegend active={priorFile.honesty} note={priorFile.note} /> : null}
         </label>
         <label>
           Current invoice
+          <input
+            className={styles.file}
+            type="file"
+            accept={INVOICE_UPLOAD_ACCEPT}
+            aria-label="Current invoice file"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void ingestFile('current', file);
+            }}
+          />
           <textarea className={styles.area} value={current} onChange={(e) => setCurrent(e.target.value)} />
+          {currentFile ? <HonestyLegend active={currentFile.honesty} note={currentFile.note} /> : null}
         </label>
       </div>
       <div className={styles.actions}>
