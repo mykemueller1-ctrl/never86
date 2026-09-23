@@ -62,6 +62,7 @@ export function OneSeatPanels({
 
       {tab === 'missing' ? (
         <div role="tabpanel" id="seat-panel-missing" aria-labelledby="seat-tab-missing">
+          <p className={styles.eyebrow}>STEP 1 · WHAT’S MISSING</p>
           <p className={styles.note}>
             Gmail is not connected. Drive is not connected. A photo, a PDF, or chat is the paper. Folders stay Missing. No invented $.
           </p>
@@ -83,6 +84,7 @@ export function OneSeatPanels({
       {tab === 'labor' ? (
         <div role="tabpanel" id="seat-panel-labor" aria-labelledby="seat-tab-labor">
           <article className={styles.card}>
+            <p className={styles.eyebrow}>STEP 3 · LABOR</p>
             <h2>Labor</h2>
             <p>
               Scheduled {GOLD_LABOR.scheduledHours.toFixed(2)} h → clocked {GOLD_LABOR.clockedHours.toFixed(2)} h.
@@ -102,6 +104,7 @@ export function OneSeatPanels({
       {tab === 'menu' ? (
         <div role="tabpanel" id="seat-panel-menu" aria-labelledby="seat-tab-menu">
           <article className={styles.card}>
+            <p className={styles.eyebrow}>STEP 3 · MENU</p>
             <h2>Menu</h2>
             <p>
               Plate {money(GOLD_RECIPE.plateCost)} on menu {money(GOLD_RECIPE.menuPrice)}. Sample food cost {pctLabel(GOLD_RECIPE.foodCostPct)}.
@@ -119,6 +122,8 @@ export function OneSeatPanels({
 
       {tab === 'ask' ? (
         <div role="tabpanel" id="seat-panel-ask" aria-labelledby="seat-tab-ask">
+          <p className={styles.eyebrow}>STEP 4 · ASK</p>
+          <p className={styles.note}>A typed dollar is Estimated. It is not a SKU price. No invented $.</p>
           <form onSubmit={onAsk} className={styles.grid}>
             <label>
               Ask Never86’d

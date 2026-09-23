@@ -15,7 +15,7 @@ export default function ChatPage() {
     <OneSeatPublicShell
       eyebrow="ONE SEAT · ASK"
       title="Ask what is still Missing."
-      lede="Ask routes to a paper. Name a file or drop a PDF. Honesty stays Verified, Estimated, or Missing. A sentence is not a price."
+      lede="Ask routes to a paper. Name a file or drop a PDF. A typed dollar is Estimated. It is not a SKU price. Honesty stays Verified, Estimated, or Missing."
     >
       <OneSeatPanels initial="ask" ask={<PapersChatIntake />} />
     </OneSeatPublicShell>

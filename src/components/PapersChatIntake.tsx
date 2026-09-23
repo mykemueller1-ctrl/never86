@@ -106,7 +106,7 @@ export function PapersChatIntake() {
         };
         if (!cancelled) {
           setGoogleReady(Boolean(data.ready));
-          setFileFirst(!(data.connection?.gmail === true || data.connection?.drive === true));
+          setFileFirst(data.connection?.gmail !== true);
         }
       } catch {
         if (!cancelled) setGoogleReady(false);
