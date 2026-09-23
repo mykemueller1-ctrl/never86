@@ -6,6 +6,8 @@
 import { invoiceUploadTooLarge, isHeicUpload, MAX_INVOICE_UPLOAD_BYTES, readPublicInvoiceUpload } from '@/lib/invoiceFileIntake';
 import { classifyPapersFolder, type PapersHonesty } from '@/lib/papersInbox';
 import { chatIntakeMap, chatReplyForLine, readChatIntakeLine } from '@/lib/papersChatIntake';
+import { matchStagedVendorPaper } from '@/lib/stagedVendorFixtures';
+import { decodeInvoiceSource } from '@/lib/vendorInvoiceParse';
 
 export const PAPERS_DIRECT_KINDS = ['upload', 'photo', 'chat'] as const;
 export type PapersDirectKind = (typeof PAPERS_DIRECT_KINDS)[number];
@@ -23,7 +25,28 @@ export function redactTypedDollars(text: string): string {
   return text.replace(/\$\s*\d[\d,]*(?:\.\d+)?/g, '[amount omitted]');
 }
 
+function safeName(filename: string, fallback: string): string {
+  return filename.trim().split(/[/\\]/).pop() || fallback;
+}
+
+function stagedDraft(kind: 'upload' | 'photo', bytes: Uint8Array, filename: string): PapersDirectDraft | null {
+  const name = safeName(filename, kind);
+  const raw = decodeInvoiceSource(bytes, name);
+  const staged = matchStagedVendorPaper(`${raw}\n${name}`, name);
+  if (!staged) return null;
+  return {
+    kind,
+    filename: name,
+    folder: staged.folder,
+    honesty: 'Estimated',
+    note: staged.note,
+    text: staged.line,
+  };
+}
+
 export function paperFromUpload(bytes: Uint8Array, filename = 'invoice', contentType = ''): PapersDirectDraft {
+  const staged = stagedDraft('upload', bytes, filename);
+  if (staged) return staged;
   const read = readPublicInvoiceUpload(bytes, filename, contentType);
   const folder = classifyPapersFolder(read.filename);
   return {
@@ -37,7 +60,7 @@ export function paperFromUpload(bytes: Uint8Array, filename = 'invoice', content
 }
 
 export function paperFromPhoto(bytes: Uint8Array, filename = 'photo', contentType = ''): PapersDirectDraft {
-  const name = filename.trim().split(/[/\\]/).pop() || 'photo';
+  const name = safeName(filename, 'photo');
   const lower = `${name} ${contentType}`.toLowerCase();
   const image = isHeicUpload(bytes, name, contentType)
     || /\.(jpe?g|png|gif|webp|heic|heif)$/.test(name.toLowerCase())
@@ -54,6 +77,8 @@ export function paperFromPhoto(bytes: Uint8Array, filename = 'photo', contentTyp
       text: '',
     };
   }
+  const staged = stagedDraft('photo', bytes, name);
+  if (staged) return staged;
   const read = readPublicInvoiceUpload(bytes, name, contentType);
   return {
     kind: 'photo',
