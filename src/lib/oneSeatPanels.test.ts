@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { answerSeatAsk, SEAT_TABS } from './oneSeatPanels';
+import { answerSeatAsk, SEAT_TABS, tabFromSeatHash } from './oneSeatPanels';
 
 describe('one seat panels', () => {
   it('names the five public papers and never returns Verified from Ask', () => {
@@ -36,6 +36,12 @@ describe('one seat panels', () => {
     expect(invoice.reply).toMatch(/not evidence/);
     expect(invoice.reply).not.toMatch(/\$999/);
     expect(invoice.reply).not.toMatch(/\$48|\$56/);
+
+    expect(tabFromSeatHash('#photo')).toBe('ask');
+    expect(tabFromSeatHash('#pdf')).toBe('invoices');
+    expect(tabFromSeatHash('#labor')).toBe('labor');
+    expect(tabFromSeatHash('#menu')).toBe('menu');
+    expect(tabFromSeatHash('')).toBeNull();
 
     const labor = answerSeatAsk('labor drift');
     expect(labor.reply).toMatch(/8\.00 h/);

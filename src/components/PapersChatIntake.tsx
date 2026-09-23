@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { HashScroll } from '@/components/HashScroll';
 import { HonestyLegend } from '@/components/HonestyLegend';
 import { oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { INVOICE_UPLOAD_ACCEPT } from '@/lib/invoiceFileIntake';
@@ -17,6 +18,7 @@ import {
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 type ThreadLine = { id: string; text: string };
+type ChatReceipt = { honesty: 'Estimated' | 'Missing'; note: string };
 
 function SlotActions({
   id,
@@ -49,7 +51,7 @@ function FileDrops({
   onFile: (slot: ChatSlotId, file: File) => void;
 }) {
   return (
-    <div className={styles.grid} id="photo">
+    <div className={styles.grid} id="photo" style={{ scrollMarginTop: 24 }}>
       <label>
         Photo (HEIC stays Missing — no OCR)
         <input
@@ -92,6 +94,7 @@ export function PapersChatIntake() {
     },
   ]);
   const [busy, setBusy] = useState(false);
+  const [receipt, setReceipt] = useState<ChatReceipt | null>(null);
 
   const rows = chatIntakeMap({ googleReady, marks });
 
@@ -156,7 +159,14 @@ export function PapersChatIntake() {
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ text }),
         });
-        const data = (await res.json()) as { note?: string };
+        const data = (await res.json()) as { note?: string; honesty?: string };
+        const honesty = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
+        setReceipt({
+          honesty,
+          note: data.note || (honesty === 'Estimated'
+            ? 'Estimated. Typed in chat. Not a SKU price. No invented $.'
+            : 'Missing. No invented $.'),
+        });
         push(data.note || 'Missing. No invented $.');
       } catch {
         push(chatReplyForLine(text, chatIntakeMap({ googleReady, marks })));
@@ -217,6 +227,8 @@ export function PapersChatIntake() {
         <button type="submit" className={styles.primary}>Map it</button>
       </form>
       {fileFirst ? null : <FileDrops busy={busy} onFile={onFile} />}
+      <HashScroll id="photo" />
+      {receipt ? <HonestyLegend active={receipt.honesty} note={receipt.note} /> : null}
       <div aria-live="polite">
         {thread.map((line) => (
           <p className={styles.note} key={line.id}>{line.text}</p>

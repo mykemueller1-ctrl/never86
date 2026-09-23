@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HonestyLegend } from '@/components/HonestyLegend';
 import { oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
@@ -11,7 +11,7 @@ import {
   pctLabel,
   type HonestyLabel,
 } from '@/lib/oneSeatPublicWin';
-import { answerSeatAsk, SEAT_TABS, type SeatTabId } from '@/lib/oneSeatPanels';
+import { answerSeatAsk, SEAT_TABS, tabFromSeatHash, type SeatTabId } from '@/lib/oneSeatPanels';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export function OneSeatPanels({
@@ -31,6 +31,36 @@ export function OneSeatPanels({
   const [question, setQuestion] = useState('');
   const [reply, setReply] = useState<string | null>(null);
   const [honesty, setHonesty] = useState<HonestyLabel>('Missing');
+
+  useEffect(() => {
+    function sync() {
+      const next = tabFromSeatHash(window.location.hash);
+      if (next) setTab(next);
+    }
+    sync();
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    if (hash === '#photo') {
+      document.getElementById('photo')?.scrollIntoView({ block: 'start' });
+      return;
+    }
+    const id = tabFromSeatHash(hash);
+    if (!id || id !== tab) return;
+    document.getElementById(`seat-panel-${id}`)?.scrollIntoView({ block: 'start' });
+  }, [tab]);
+
+  function selectTab(next: SeatTabId) {
+    setTab(next);
+    const nextHash = `#${next}`;
+    if (window.location.hash !== nextHash) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${nextHash}`);
+    }
+  }
 
   function onAsk(event: React.FormEvent) {
     event.preventDefault();
@@ -52,7 +82,7 @@ export function OneSeatPanels({
             aria-selected={tab === item.id}
             aria-controls={`seat-panel-${item.id}`}
             className={tab === item.id ? styles.tabOn : styles.tab}
-            onClick={() => setTab(item.id)}
+            onClick={() => selectTab(item.id)}
           >
             {item.label}
           </button>

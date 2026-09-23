@@ -26,10 +26,25 @@ export default function TryPage() {
       lede={`${ONE_SEAT_EQUALS}. Five papers on one seat: what’s missing, invoices, labor, menu, and Ask. Operators stay on never86.ai.`}
     >
       <ol className={styles.list}>
-        <li>STEP 1 · What’s missing — Gmail is not connected. Drop a photo, a PDF, or use chat.</li>
-        <li>STEP 2 · Invoices — paste or drop a PDF. HEIC stays Missing. Sample dollars are Demo · Estimated.</li>
-        <li>STEP 3 · Labor and menu — disclosed sample hours and plate math. Demo · Estimated.</li>
-        <li>STEP 4 · Ask — a typed dollar is Estimated. It is not a SKU price.</li>
+        <li>
+          <a href="#missing">STEP 1 · What’s missing — Gmail is not connected. Drop a photo, a PDF, or use chat.</a>
+          <HonestyLegend active="Missing" note="Gmail is not connected. Folders stay Missing. No invented $." />
+        </li>
+        <li>
+          <a href="#invoices">STEP 2 · Invoices — paste or drop a PDF. HEIC stays Missing. Sample dollars are Demo · Estimated.</a>
+          <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
+        </li>
+        <li>
+          <a href="#labor">STEP 3 · Labor and menu — disclosed sample hours and plate math. Demo · Estimated.</a>
+          {' '}
+          <a href="#menu">Open the menu step.</a>
+          <HonestyLegend demo active="Estimated" note="Demo · Estimated. Fictional sample hours and plate math. A missing punch stays Missing — not $0." />
+        </li>
+        <li>
+          <a href="#ask">STEP 4 · Ask — a typed dollar is Estimated. It is not a SKU price.</a>
+          <HonestyLegend active="Missing" note="A named paper stays Missing until a file parses." />
+          <HonestyLegend active="Estimated" note="A typed dollar is Estimated. It is not a SKU price. No invented $." />
+        </li>
       </ol>
       <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
       <OperatorGoldLinks />

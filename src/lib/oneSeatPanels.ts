@@ -23,6 +23,27 @@ export const SEAT_TABS = [
 
 export type SeatTabId = (typeof SEAT_TABS)[number]['id'];
 
+const HASH_TABS: Record<string, SeatTabId> = {
+  missing: 'missing',
+  'seat-panel-missing': 'missing',
+  invoices: 'invoices',
+  pdf: 'invoices',
+  'seat-panel-invoices': 'invoices',
+  labor: 'labor',
+  'seat-panel-labor': 'labor',
+  menu: 'menu',
+  'seat-panel-menu': 'menu',
+  ask: 'ask',
+  photo: 'ask',
+  'seat-panel-ask': 'ask',
+};
+
+/** Hash on /try, /seat, and /chat. #photo opens Ask so the photo drop is mounted. */
+export function tabFromSeatHash(hash: string): SeatTabId | null {
+  const id = hash.replace(/^#/, '').split('&')[0];
+  return HASH_TABS[id] ?? null;
+}
+
 export type SeatAskAnswer = {
   tab: SeatTabId;
   honesty: HonestyLabel;

@@ -29,6 +29,11 @@ describe('operator seat thicken', () => {
     expect(page).toMatch(/InvoiceCompareClient/);
     expect(page).toMatch(/PapersReadiness/);
     expect(page).toMatch(/STEP 3/);
+    expect(page).toMatch(/href="#missing"/);
+    expect(page).toMatch(/href="#invoices"/);
+    expect(page).toMatch(/href="#labor"/);
+    expect(page).toMatch(/href="#ask"/);
+    expect(page).toMatch(/Demo · Estimated/);
     expect(page).toMatch(/ONE_SEAT_PATHS\.chat/);
     expect(page).toMatch(/OneSeatPanels/);
     expect(page).toMatch(/OperatorGoldLinks/);
