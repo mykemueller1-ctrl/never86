@@ -11,7 +11,7 @@ import { oneSeatStyles as styles } from './OneSeatPublicShell';
 export function InvoiceWinCard({ heading = 'Same cheese. Higher price.' }: { heading?: string }) {
   return (
     <article className={styles.card}>
-      <div className={styles.eyebrow}>SAME VENDOR · SAME SKU · SAME PACK · FICTIONAL EXAMPLE</div>
+      <div className={styles.eyebrow}>DEMO · FICTIONAL SAMPLE · SAME VENDOR · SAME SKU · SAME PACK</div>
       <h2>{heading}</h2>
       <p className={styles.note}>
         {GOLD_MOZZARELLA.vendor} · {GOLD_MOZZARELLA.sku} · {GOLD_MOZZARELLA.pack} · {GOLD_MOZZARELLA.days} days
@@ -31,7 +31,7 @@ export function InvoiceWinCard({ heading = 'Same cheese. Higher price.' }: { hea
         <strong>+{money(GOLD_MOZZARELLA.delta)} <small>per case</small></strong>
         <b>+{pctLabel(GOLD_MOZZARELLA.driftPct)}</b>
       </div>
-      <HonestyLegend active={GOLD_SAMPLE_HONESTY} note={GOLD_SAMPLE_HONESTY_NOTE} />
+      <HonestyLegend demo active={GOLD_SAMPLE_HONESTY} note={GOLD_SAMPLE_HONESTY_NOTE} />
       <div className={styles.next}>
         <small>YOUR NEXT MOVE</small>
         <p>{GOLD_MOZZARELLA.nextMove}</p>

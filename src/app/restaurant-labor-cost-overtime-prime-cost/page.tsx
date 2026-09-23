@@ -75,8 +75,9 @@ export default function RestaurantLaborPrimeCostPage() {
           <b>hours, not dollars</b>
         </div>
         <HonestyLegend
+          demo
           active="Estimated"
-          note="Estimated fictional hours. Honesty label only. A missing punch stays Missing. Matching live clock and schedule become Verified."
+          note="Demo · Estimated. Fictional sample hours. A missing punch stays Missing — not $0."
         />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>

@@ -30,8 +30,9 @@ export default function CheckMenuPage() {
           <b>sample food cost</b>
         </div>
         <HonestyLegend
+          demo
           active="Estimated"
-          note="Estimated fictional plate math. No count stays Missing. Invoice ≠ COGS. We do not invent food cost."
+          note="Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS."
         />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>

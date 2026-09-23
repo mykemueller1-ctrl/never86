@@ -102,7 +102,11 @@ export const PUBLIC_DOOR_VOICE = {
 
 export const GOLD_SAMPLE_HONESTY: HonestyLabel = 'Estimated';
 export const GOLD_SAMPLE_HONESTY_NOTE =
-  'This mozzarella sample is Estimated. Matching live papers become Verified. One invoice stays Missing — not $0.';
+  'Demo · Estimated. Fictional sample prices. Not a live store. Not recovered cash. One invoice stays Missing — not $0.';
+export const GOLD_LABOR_DEMO_NOTE =
+  'Demo · Estimated. Fictional sample hours and dollars. A missing punch stays Missing — not $0.';
+export const GOLD_RECIPE_DEMO_NOTE =
+  'Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS.';
 
 export function honestyFromVendorRow(
   row: Pick<VendorDriftSkuRow, 'evidenceState' | 'priorPrice' | 'currentPrice'>,

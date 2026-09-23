@@ -137,14 +137,16 @@ describe('Grok-native One Seat public door', () => {
     expect(home).toContain(GOLD_SAMPLE_HONESTY);
     expect(home).toContain(GOLD_SAMPLE_HONESTY_NOTE);
 
+    expect(GOLD_SAMPLE_HONESTY_NOTE).toMatch(/Demo · Estimated/);
+    expect(GOLD_SAMPLE_HONESTY_NOTE).not.toMatch(/Verified/);
     const win = renderToStaticMarkup(createElement(InvoiceWinCard));
     const invoices = renderToStaticMarkup(createElement(CheckInvoices));
     for (const html of [win, invoices]) {
       expect(html).toContain(money(GOLD_MOZZARELLA.priorPrice));
       expect(html).toContain(money(GOLD_MOZZARELLA.currentPrice));
-      expect(html).toContain('Verified');
-      expect(html).toContain('Estimated');
+      expect(html).toContain('Demo · Estimated');
       expect(html).toContain('Missing');
+      expect(html).not.toMatch(/Verified/);
       expect(html).not.toMatch(/\bdesk\b/i);
       expect(html).not.toMatch(/chatgpt\.site/);
     }

@@ -89,8 +89,9 @@ export function OneSeatPanels({
               Sample ${GOLD_LABOR.sampleDollars}. Fictional.
             </p>
             <HonestyLegend
+              demo
               active="Estimated"
-              note="Estimated fictional sample. A missing punch stays Missing. Matching live clock and schedule become Verified."
+              note="Demo · Estimated. Fictional sample hours and dollars. A missing punch stays Missing — not $0."
             />
             <p className={styles.note}>{GOLD_LABOR.claimBoundary}</p>
             <Link className={styles.secondary} href={ONE_SEAT_PATHS.tryLabor}>Open the labor sample</Link>
@@ -106,8 +107,9 @@ export function OneSeatPanels({
               Plate {money(GOLD_RECIPE.plateCost)} on menu {money(GOLD_RECIPE.menuPrice)}. Sample food cost {pctLabel(GOLD_RECIPE.foodCostPct)}.
             </p>
             <HonestyLegend
+              demo
               active="Estimated"
-              note="Estimated fictional plate math. No count stays Missing. Invoice ≠ COGS. We do not invent food cost."
+              note="Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS."
             />
             <p className={styles.note}>{GOLD_RECIPE.claimBoundary}</p>
             <Link className={styles.secondary} href={ONE_SEAT_PATHS.tryRecipes}>Open the plate sample</Link>

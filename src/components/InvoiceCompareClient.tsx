@@ -6,6 +6,7 @@ import {
   GOLD_CURRENT_INVOICE_CSV,
   GOLD_PRIOR_INVOICE_CSV,
   GOLD_SAMPLE_HONESTY_NOTE,
+  isGoldSampleInvoices,
   money,
   type HonestyLabel,
 } from '@/lib/oneSeatPublicWin';
@@ -196,9 +197,12 @@ export function InvoiceCompareClient() {
       <h2>Paste two invoices, or drop a PDF or CSV.</h2>
       <p className={styles.note}>
         Native CSV, TXT, or invoice PDF text. HEIC photos stay Missing — no OCR, no invented $. Same SKU and pack. Missing prior stays Missing — not $0.
-        Connect Gmail + Drive on the owner seat, then load the last two invoices. No homework form.
+        The boxes below start with a fictional demo. Gmail is not connected on this page.
         Grok can explain the card when <code>XAI_API_KEY</code> is set. It does not invent the dollars.
       </p>
+      {isGoldSampleInvoices(prior, current) ? (
+        <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
+      ) : null}
       {papersHonesty ? <HonestyLegend active={papersHonesty} note={papersNote} /> : null}
       <div className={styles.grid}>
         <label>
@@ -244,16 +248,22 @@ export function InvoiceCompareClient() {
       {actions ? (
         <div>
           <p>{actions.summary}</p>
-          {disclosedSample ? <HonestyLegend active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} /> : null}
-          {rows.map((row) => (
+          {disclosedSample ? <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} /> : null}
+          {rows.map((row) => {
+            const demoRow = disclosedSample || isGoldSampleInvoices(prior, current);
+            const honesty: HonestyLabel = demoRow ? 'Estimated' : row.honesty;
+            return (
             <div className={styles.next} key={`${row.vendor}-${row.sku}`}>
               <HonestyLegend
-                active={row.honesty}
+                demo={demoRow}
+                active={honesty}
                 note={
-                  row.honesty === 'Missing'
+                  demoRow
+                    ? 'Demo · Estimated. Fictional sample. Not a live store. Not recovered cash.'
+                    : honesty === 'Missing'
                     ? (row.missingEvidence || 'Prior invoice is Missing. That is not $0.')
-                    : row.honesty === 'Estimated'
-                      ? 'Estimated from partial or disclosed sample papers. Not invented dollars.'
+                    : honesty === 'Estimated'
+                      ? 'Estimated from the papers on this compare. Not invented dollars.'
                       : `${row.vendor} ${row.sku} is Verified from the two matching invoices. A price increase is not recovered cash.`
                 }
               />
@@ -265,7 +275,8 @@ export function InvoiceCompareClient() {
                 {row.flagged && row.dollarsObserved != null ? ` · +${money(row.dollarsObserved)}` : ''}
               </p>
             </div>
-          ))}
+            );
+          })}
           {actions.morningActions.map((action) => (
             <div className={styles.next} key={action.title}>
               <small>ONE NEXT MOVE</small>
