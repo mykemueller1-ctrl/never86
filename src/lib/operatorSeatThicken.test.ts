@@ -31,13 +31,20 @@ describe('operator seat thicken', () => {
     expect(page).toMatch(/STEP 3/);
     expect(page).toMatch(/ONE_SEAT_PATHS\.chat/);
     expect(page).toMatch(/OneSeatPanels/);
+    expect(page).toMatch(/OperatorGoldLinks/);
+    expect(page).toMatch(/HonestyLegend/);
     expect(page).not.toMatch(/\bdesk\b/i);
-    expect(page).not.toMatch(/chatgpt\.site/);
     const seat = read('src/app/seat/page.tsx');
     expect(seat).toMatch(/OneSeatPanels/);
     expect(seat).toMatch(/PapersChatIntake/);
+    expect(seat).toMatch(/OperatorGoldLinks/);
     expect(seat).not.toMatch(/\bdesk\b/i);
-    expect(seat).not.toMatch(/chatgpt\.site/);
+    const gold = read('src/components/OperatorGoldLinks.tsx');
+    expect(gold).toMatch(/CHATGPT_ONE_SEAT_GOLD_URL/);
+    expect(gold).toMatch(/NEVER86_TRY_URL/);
+    const sites = read('src/lib/selectedSites.ts');
+    expect(sites).toMatch(/https:\/\/action-shift-one-seat-v2\.never86-d-9722\.chatgpt\.site\/seat/);
+    expect(sites).toMatch(/https:\/\/www\.never86\.ai\/try/);
   });
 
   it('shows Missing instead of a fake activation or login success', () => {

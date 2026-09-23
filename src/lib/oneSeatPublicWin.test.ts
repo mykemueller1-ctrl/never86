@@ -63,7 +63,7 @@ describe('Grok-native One Seat public door', () => {
     expect(config).toMatch(/destination: '\/portal'/);
     expect(config).not.toContain("source: '/seat'");
     expect(read('src/app/seat/page.tsx')).toMatch(/OneSeatPanels/);
-    expect(read('src/app/seat/page.tsx')).not.toMatch(/chatgpt\.site/);
+    expect(read('src/app/seat/page.tsx')).toMatch(/OperatorGoldLinks/);
     for (const path of ['/check/invoices', '/check/labor', '/check/menu', '/login', '/onboard']) {
       expect(config).not.toContain(`source: '${path}'`);
     }
@@ -170,11 +170,12 @@ describe('Grok-native One Seat public door', () => {
       expect(source).not.toMatch(/\bdesk\b/i);
       expect(source).not.toMatch(/chatgpt\.site/);
     }
-    for (const path of ['src/app/try/page.tsx', 'src/app/check/invoices/page.tsx']) {
-      const source = read(path);
-      expect(source).toMatch(/InvoiceWinCard/);
-      expect(source).not.toMatch(/\bdesk\b/i);
-      expect(source).not.toMatch(/chatgpt\.site/);
-    }
+    expect(read('src/app/try/page.tsx')).toMatch(/InvoiceWinCard/);
+    expect(read('src/app/try/page.tsx')).toMatch(/OperatorGoldLinks/);
+    expect(read('src/app/try/page.tsx')).not.toMatch(/\bdesk\b/i);
+    const invoices = read('src/app/check/invoices/page.tsx');
+    expect(invoices).toMatch(/InvoiceWinCard/);
+    expect(invoices).not.toMatch(/\bdesk\b/i);
+    expect(invoices).not.toMatch(/chatgpt\.site/);
   });
 });

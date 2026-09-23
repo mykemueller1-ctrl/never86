@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { HonestyLegend } from '@/components/HonestyLegend';
 import { InvoiceCompareClient } from '@/components/InvoiceCompareClient';
 import { InvoiceWinCard } from '@/components/InvoiceWinCard';
 import { OneSeatPanels } from '@/components/OneSeatPanels';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
+import { OperatorGoldLinks } from '@/components/OperatorGoldLinks';
 import { PapersChatIntake } from '@/components/PapersChatIntake';
 import { PapersReadiness } from '@/components/PapersReadiness';
-import { GOLD_MOZZARELLA, ONE_SEAT_EQUALS, ONE_SEAT_ICP } from '@/lib/oneSeatPublicWin';
+import { GOLD_MOZZARELLA, GOLD_SAMPLE_HONESTY_NOTE, ONE_SEAT_EQUALS, ONE_SEAT_ICP } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
@@ -29,6 +31,8 @@ export default function TryPage() {
         <li>STEP 3 · Labor and menu — disclosed sample hours and plate math. Demo · Estimated.</li>
         <li>STEP 4 · Ask — a typed dollar is Estimated. It is not a SKU price.</li>
       </ol>
+      <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
+      <OperatorGoldLinks />
       <OneSeatPanels
         sample={<InvoiceWinCard heading={`${GOLD_MOZZARELLA.item} moved.`} />}
         invoices={<InvoiceCompareClient />}

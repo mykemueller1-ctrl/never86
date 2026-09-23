@@ -23,9 +23,14 @@ export const ONE_SEAT_PATHS = {
   trial: '/trial',
 } as const;
 
-/** Archived ChatGPT Sites host. Do not send the public core win here. */
+/** Archived ChatGPT Sites host. The gold seat path is the operator reference. */
 export const CHATGPT_SITES_ARCHIVE_URL =
   'https://action-shift-one-seat-v2.never86-d-9722.chatgpt.site';
+
+export const CHATGPT_ONE_SEAT_GOLD_URL =
+  'https://action-shift-one-seat-v2.never86-d-9722.chatgpt.site/seat';
+
+export const NEVER86_TRY_URL = 'https://www.never86.ai/try';
 
 /** Native origin. Kept so older imports resolve on never86.ai, not chatgpt.site. */
 export const SELECTED_SITES_BASE_URL = ONE_SEAT_ORIGIN;

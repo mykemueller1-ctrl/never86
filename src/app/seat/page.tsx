@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { OperatorGoldLinks } from '@/components/OperatorGoldLinks';
 import { InvoiceCompareClient } from '@/components/InvoiceCompareClient';
 import { InvoiceWinCard } from '@/components/InvoiceWinCard';
 import { OneSeatPanels } from '@/components/OneSeatPanels';
@@ -29,6 +30,7 @@ export default function SeatPage() {
         papers={<PapersReadiness heading="Gmail stays Missing until a pull lands" />}
         ask={<PapersChatIntake />}
       />
+      <OperatorGoldLinks />
       <div className={styles.actions}>
         <Link className={styles.primary} href={ONE_SEAT_PATHS.onboard}>Claim free owner seat</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.chat}>Open the Missing map</Link>

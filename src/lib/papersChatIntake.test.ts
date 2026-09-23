@@ -29,7 +29,7 @@ describe('papers chat intake', () => {
     expect(ready.every((row) => row.honesty === 'Missing')).toBe(true);
     const page = readFileSync(resolve('src/app/chat/page.tsx'), 'utf8');
     expect(page).toMatch(/PapersChatIntake/);
+    expect(page).toMatch(/OperatorGoldLinks/);
     expect(page).not.toMatch(/\bdesk\b/i);
-    expect(page).not.toMatch(/chatgpt\.site/);
   });
 });
