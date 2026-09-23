@@ -129,7 +129,8 @@ export function InvoiceCompareClient() {
         setCurrent(data.invoices[0].text);
         setPapersNote(data.invoices[0].note || 'Invoice landed. Second paper is Missing.');
       } else {
-        setPapersNote('Missing — no invoice PDFs matched on this seat. Connect Gmail + Drive, then pull.');
+        setPapersHonesty('Missing');
+        setPapersNote('Missing — Gmail is not connected. No invoice PDF matched. Drop a PDF above, or a photo in chat. No invented $.');
       }
       setStatus('idle');
     } catch {

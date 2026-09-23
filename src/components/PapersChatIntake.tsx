@@ -18,14 +18,54 @@ import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 type ThreadLine = { id: string; text: string };
 
+function FileDrops({
+  busy,
+  onFile,
+}: {
+  busy: boolean;
+  onFile: (slot: ChatSlotId, file: File) => void;
+}) {
+  return (
+    <div className={styles.grid} id="photo">
+      <label>
+        Photo (HEIC stays Missing — no OCR)
+        <input
+          className={styles.file}
+          type="file"
+          accept={INVOICE_UPLOAD_ACCEPT}
+          disabled={busy}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onFile('photo', file);
+          }}
+        />
+      </label>
+      <label>
+        Invoice PDF, CSV, or TXT
+        <input
+          className={styles.file}
+          type="file"
+          accept={INVOICE_UPLOAD_ACCEPT}
+          disabled={busy}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onFile('invoices', file);
+          }}
+        />
+      </label>
+    </div>
+  );
+}
+
 export function PapersChatIntake() {
   const [googleReady, setGoogleReady] = useState(false);
   const [marks, setMarks] = useState<Partial<Record<ChatSlotId, ChatPaperMark>>>({});
   const [draft, setDraft] = useState('');
+  const [fileFirst, setFileFirst] = useState(true);
   const [thread, setThread] = useState<ThreadLine[]>([
     {
       id: 'open',
-      text: 'Gmail, then a photo, then this chat. I map what is still Missing. I do not invent dollars.',
+      text: 'Gmail is not connected. Drop a photo or a PDF, or name the paper here. Folders stay Missing. No invented $.',
     },
   ]);
   const [busy, setBusy] = useState(false);
@@ -37,8 +77,14 @@ export function PapersChatIntake() {
     void (async () => {
       try {
         const res = await fetch('/api/papers/readiness', { signal: AbortSignal.timeout(8000) });
-        const data = (await res.json()) as { ready?: boolean; honesty?: HonestyLabel };
-        if (!cancelled) setGoogleReady(Boolean(data.ready));
+        const data = (await res.json()) as {
+          ready?: boolean;
+          connection?: { gmail?: boolean; drive?: boolean };
+        };
+        if (!cancelled) {
+          setGoogleReady(Boolean(data.ready));
+          setFileFirst(!(data.connection?.gmail === true || data.connection?.drive === true));
+        }
       } catch {
         if (!cancelled) setGoogleReady(false);
       }
@@ -105,11 +151,14 @@ export function PapersChatIntake() {
 
   return (
     <div className={styles.card}>
-      <p className={styles.eyebrow}>GMAIL → PHOTO → CHAT</p>
+      <p className={styles.eyebrow}>{fileFirst ? 'PHOTO → PDF → CHAT' : 'GMAIL → PHOTO → CHAT'}</p>
       <h2>What is still Missing</h2>
       <p className={styles.note}>
-        Naming a paper does not make it Verified. A parsed file is Estimated. A ready Google client is not a connected inbox. Papers stay Missing until Gmail connects. No invented $.
+        {fileFirst
+          ? 'Gmail is not connected. Drive is not connected. A photo, a PDF, or this chat is the paper. A named paper stays Missing. No invented $.'
+          : 'Naming a paper does not make it Verified. A parsed file is Estimated. Each folder stays Missing until a file lands. No invented $.'}
       </p>
+      {fileFirst ? <FileDrops busy={busy} onFile={onFile} /> : null}
       <ul className={styles.list}>
         {rows.map((row) => (
           <li key={row.id}>
@@ -140,34 +189,7 @@ export function PapersChatIntake() {
         </label>
         <button type="submit" className={styles.primary}>Map it</button>
       </form>
-      <div className={styles.grid}>
-        <label>
-          Invoice PDF, CSV, or TXT
-          <input
-            className={styles.file}
-            type="file"
-            accept={INVOICE_UPLOAD_ACCEPT}
-            disabled={busy}
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void onFile('invoices', file);
-            }}
-          />
-        </label>
-        <label>
-          Photo (HEIC stays Missing — no OCR)
-          <input
-            className={styles.file}
-            type="file"
-            accept={INVOICE_UPLOAD_ACCEPT}
-            disabled={busy}
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void onFile('photo', file);
-            }}
-          />
-        </label>
-      </div>
+      {fileFirst ? null : <FileDrops busy={busy} onFile={onFile} />}
       <div aria-live="polite">
         {thread.map((line) => (
           <p className={styles.note} key={line.id}>{line.text}</p>

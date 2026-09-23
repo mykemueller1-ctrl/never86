@@ -24,7 +24,8 @@ describe('papers chat intake', () => {
   it('keeps Google Missing when the client is ready and Gmail is not connected', () => {
     const ready = chatIntakeMap({ googleReady: true, marks: {} });
     expect(ready.find((row) => row.id === 'google')?.honesty).toBe('Missing');
-    expect(ready.find((row) => row.id === 'google')?.note).toMatch(/client is ready/);
+    expect(ready.find((row) => row.id === 'google')?.note).toMatch(/not connected/);
+    expect(ready.find((row) => row.id === 'google')?.note).toMatch(/PDF/);
     expect(ready.every((row) => row.honesty === 'Missing')).toBe(true);
     const page = readFileSync(resolve('src/app/chat/page.tsx'), 'utf8');
     expect(page).toMatch(/PapersChatIntake/);

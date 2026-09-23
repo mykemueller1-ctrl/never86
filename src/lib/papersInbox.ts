@@ -181,6 +181,42 @@ export function emptyBohFolders(): PapersBohFolder[] {
   }));
 }
 
+/** File paths that work with no operator OAuth. Canonical order stays Gmail → photo → chat. */
+export const PAPERS_FILE_FIRST = ['photo', 'pdf', 'chat'] as const;
+
+export function papersFileFirstWhenInboxOff(connection?: { gmail?: boolean; drive?: boolean } | null): {
+  inboxOff: boolean;
+  gmail: boolean;
+  drive: boolean;
+  honesty: 'Missing';
+  lead: readonly ['photo', 'pdf', 'chat'] | readonly ['gmail', 'photo', 'pdf', 'chat'];
+  folders: PapersBohFolder[];
+  note: string;
+} {
+  const gmail = connection?.gmail === true;
+  const drive = connection?.drive === true;
+  if (!gmail && !drive) {
+    return {
+      inboxOff: true,
+      gmail: false,
+      drive: false,
+      honesty: 'Missing',
+      lead: PAPERS_FILE_FIRST,
+      folders: emptyBohFolders(),
+      note: 'Gmail is not connected. Drive is not connected. Drop a photo, a PDF, or use chat. Papers stay Missing. Invoices, Z-EOD, Labor, and Liquor-Beer stay Missing. No invented $.',
+    };
+  }
+  return {
+    inboxOff: false,
+    gmail,
+    drive,
+    honesty: 'Missing',
+    lead: ['gmail', 'photo', 'pdf', 'chat'],
+    folders: emptyBohFolders(),
+    note: 'Each folder stays Missing until a file lands in it. No invented $.',
+  };
+}
+
 export function papersSeatHonesty(input: {
   ready: boolean;
   connected: boolean;

@@ -51,7 +51,7 @@ export function PapersInboxConnect({
         if (!body.ready || papers === 'closed' || papers === 'token') {
           setLine(missingGoogleLine(body));
         } else if (papers === 'connected' && (body.connection?.gmail || body.connection?.drive)) {
-          setLine('Gmail + Drive connected. Pulling last-week invoices…');
+          setLine('This inbox is connected. Pulling last-week invoices…');
           setBusy(true);
           try {
             const pullRes = await fetch('/api/papers/pull', { method: 'POST', signal: AbortSignal.timeout(20000) });
@@ -66,7 +66,7 @@ export function PapersInboxConnect({
             if (!pullRes.ok) {
               setLine(missingGoogleLine(pullBody));
             } else {
-              setLine(pullBody.nextAction ?? 'Gmail + Drive connected. Last-week pull finished.');
+              setLine(pullBody.nextAction ?? 'This inbox is connected. Last-week pull finished.');
               if (pullBody.honesty) setStatus((prev) => ({ ...prev, honesty: pullBody.honesty }));
               if (pullBody.nextAction) onPulled?.(pullBody.nextAction);
             }
@@ -76,7 +76,7 @@ export function PapersInboxConnect({
             if (!cancelled) setBusy(false);
           }
         } else if (papers === 'connected') {
-          setLine('Gmail + Drive connected. Pull last-week invoices when you are ready.');
+          setLine('Missing — Gmail is not connected. Drop a photo, a PDF, or use chat. No invented papers.');
         }
       } catch {
         if (!cancelled) {
@@ -101,8 +101,13 @@ export function PapersInboxConnect({
   }, []);
 
   const ready = Boolean(status.ready);
-  const honesty: PapersHonesty = status.honesty ?? (ready ? 'Estimated' : 'Missing');
   const connected = Boolean(status.connection?.gmail || status.connection?.drive);
+  const honesty: PapersHonesty = connected
+    ? (status.honesty === 'Verified' || status.honesty === 'Estimated' ? status.honesty : 'Missing')
+    : 'Missing';
+  const folders = (status.folders ?? []).map((folder) => (
+    connected ? folder : { ...folder, honesty: 'Missing' as const, status: 'missing' }
+  ));
   const missingSecrets = status.missingSecrets ?? [];
 
   async function connectGoogle() {
@@ -178,7 +183,19 @@ export function PapersInboxConnect({
       ) : connected && status.connection?.email ? (
         <p className="owner-seat-papers-outlook">Connected as {status.connection.email}</p>
       ) : null}
+      {!connected && loaded ? (
+        <p className="owner-seat-receipt" role="status">
+          Gmail is not connected. Drive is not connected. Drop a photo, a PDF, or use chat. Folders stay Missing.
+        </p>
+      ) : null}
       <div className="owner-seat-papers-actions">
+        {!connected && loaded ? (
+          <>
+            <a href="/chat#photo">Drop a photo</a>
+            <a href="/check/invoices">Drop a PDF</a>
+            <a href="/chat">Open chat intake</a>
+          </>
+        ) : null}
         <button
           type="button"
           className="owner-desk-primary"
@@ -201,9 +218,9 @@ export function PapersInboxConnect({
           </button>
         ) : null}
       </div>
-      {status.folders?.length ? (
+      {folders.length ? (
         <ul className="owner-seat-papers-folders">
-          {status.folders.map((folder) => (
+          {folders.map((folder) => (
             <li key={folder.id}>
               <span>{folder.name}</span>
               <span className={`owner-seat-honesty is-${folder.honesty.toLowerCase()}`}>{folder.honesty}</span>

@@ -24,7 +24,7 @@ export default function TryPage() {
       lede={`${ONE_SEAT_EQUALS}. Five papers on one seat: what’s missing, invoices, labor, menu, and Ask. Operators stay on never86.ai.`}
     >
       <ol className={styles.list}>
-        <li>What’s missing — Gmail stays Missing until a pull lands.</li>
+        <li>What’s missing — Gmail is not connected. Drop a photo, a PDF, or use chat.</li>
         <li>Invoices — paste or drop a PDF. HEIC stays Missing.</li>
         <li>STEP 3 · Labor and menu — disclosed sample hours and plate math.</li>
         <li>Ask Never86’d — a sentence is not a price.</li>

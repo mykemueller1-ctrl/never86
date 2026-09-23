@@ -44,7 +44,8 @@ describe('one seat panels', () => {
 
     const ready = answerSeatAsk('gmail', { googleReady: true });
     expect(ready.honesty).toBe('Missing');
-    expect(ready.reply).toMatch(/client is ready/);
+    expect(ready.reply).toMatch(/not connected/);
+    expect(ready.reply).toMatch(/PDF/);
     expect(ready.reply).toMatch(/Papers stay Missing/);
   });
 });

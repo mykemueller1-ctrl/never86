@@ -63,7 +63,7 @@ export function OneSeatPanels({
       {tab === 'missing' ? (
         <div role="tabpanel" id="seat-panel-missing" aria-labelledby="seat-tab-missing">
           <p className={styles.note}>
-            What’s missing is the first paper. A ready Google client is not a connected inbox. No invented $.
+            Gmail is not connected. Drive is not connected. A photo, a PDF, or chat is the paper. Folders stay Missing. No invented $.
           </p>
           {sample}
           {papers}

@@ -37,8 +37,8 @@ export function answerSeatAsk(question: string, input?: { googleReady?: boolean 
   const text = question.trim();
   const extra = dollarNote(text);
   const googleNote = input?.googleReady
-    ? 'Google client is ready. Gmail is not connected on this page. Papers stay Missing until a pull lands.'
-    : 'Gmail stays Missing until the Google client exists and an owner connects. No invented papers.';
+    ? 'Gmail is not connected. Drive is not connected. Drop a photo, a PDF, or use chat. Papers stay Missing. No invented $.'
+    : 'Gmail is not connected. Drop a photo, a PDF, or use chat. No invented papers.';
 
   if (!text) {
     return {

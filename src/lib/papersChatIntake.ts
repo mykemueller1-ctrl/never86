@@ -54,8 +54,8 @@ export function chatIntakeMap(input: {
     label: 'Gmail + Drive',
     honesty: 'Missing',
     note: input.googleReady
-      ? 'Google client is ready. This chat does not pull mail. Papers stay Missing until Gmail is connected. No invented papers.'
-      : 'Missing — GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are not on this deploy. Gmail stays off. No invented papers.',
+      ? 'Gmail is not connected. Drive is not connected. Drop a photo, a PDF, or stay in this chat. Papers stay Missing. No invented papers.'
+      : 'Missing — GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are not on this deploy. Gmail is not connected. Drop a photo, a PDF, or stay in this chat. No invented papers.',
   };
 
   const slots: ChatIntakeRow[] = CHAT_INTAKE_SLOTS.map((slot) => {

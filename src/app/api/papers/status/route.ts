@@ -6,6 +6,7 @@ import {
   papersEnvChecklist,
   papersGoogleRedirect,
   papersIntakeCopy,
+  papersFileFirstWhenInboxOff,
   papersSeatHonesty,
 } from '@/lib/papersInbox';
 import {
@@ -29,9 +30,17 @@ export async function GET(req: NextRequest) {
     const invoices = papersInvoicesFor(operatorId);
     const folders = papersFoldersFor(operatorId);
     const connected = Boolean(connection.gmail || connection.drive);
+    const fileFirst = papersFileFirstWhenInboxOff(connection);
+    const shownFolders = fileFirst.inboxOff
+      ? fileFirst.folders
+      : folders.map((folder) => (
+        folder.status === 'missing' ? { ...folder, honesty: 'Missing' as const } : folder
+      ));
     return NextResponse.json({
       success: true,
       intakeOrder: ['gmail', 'photo', 'chat'],
+      fileFirst: fileFirst.inboxOff,
+      lead: fileFirst.lead,
       googleFirst: true,
       ready: gate.ready,
       honesty: papersSeatHonesty({
@@ -46,7 +55,7 @@ export async function GET(req: NextRequest) {
       error: gate.error,
       durable: papersDurableStore(),
       connection,
-      folders,
+      folders: shownFolders,
       copy,
       outlook: outlookV2Plan(),
     });
