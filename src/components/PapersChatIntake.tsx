@@ -18,6 +18,29 @@ import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 type ThreadLine = { id: string; text: string };
 
+function SlotActions({
+  id,
+  label,
+  onName,
+  onClear,
+}: {
+  id: ChatSlotId;
+  label: string;
+  onName: (id: ChatSlotId) => void;
+  onClear: (id: ChatSlotId) => void;
+}) {
+  return (
+    <div className={styles.actions}>
+      <button type="button" className={styles.secondary} onClick={() => onName(id)}>
+        I have {label}
+      </button>
+      <button type="button" className={styles.ghost} onClick={() => onClear(id)}>
+        Still missing
+      </button>
+    </div>
+  );
+}
+
 function FileDrops({
   busy,
   onFile,
@@ -118,22 +141,27 @@ export function PapersChatIntake() {
     if (!text) return;
     setDraft('');
     push(text);
-    void fetch('/api/papers/chat', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    const read = readChatIntakeLine(text);
-    if (read.slot && read.slot !== 'google') {
-      const next = {
-        ...marks,
-        [read.slot]: marks[read.slot] === 'parsed' ? 'parsed' as const : 'named' as const,
-      };
-      setMarks(next);
-      push(chatReplyForLine(text, chatIntakeMap({ googleReady, marks: next })));
-      return;
+    const slot = readChatIntakeLine(text).slot;
+    if (slot && slot !== 'google') {
+      const named = slot;
+      setMarks((prev) => ({
+        ...prev,
+        [named]: prev[named] === 'parsed' ? 'parsed' as const : 'named' as const,
+      }));
     }
-    push(chatReplyForLine(text, chatIntakeMap({ googleReady, marks })));
+    void (async () => {
+      try {
+        const res = await fetch('/api/papers/chat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const data = (await res.json()) as { note?: string };
+        push(data.note || 'Missing. No invented $.');
+      } catch {
+        push(chatReplyForLine(text, chatIntakeMap({ googleReady, marks })));
+      }
+    })();
   }
 
   async function onFile(slot: ChatSlotId, file: File) {
@@ -170,14 +198,7 @@ export function PapersChatIntake() {
           <li key={row.id}>
             <HonestyLegend active={row.honesty} note={`${row.label}. ${row.note}`} />
             {row.id !== 'google' ? (
-              <div className={styles.actions}>
-                <button type="button" className={styles.secondary} onClick={() => nameSlot(row.id)}>
-                  I have {row.label}
-                </button>
-                <button type="button" className={styles.ghost} onClick={() => clearSlot(row.id)}>
-                  Still missing
-                </button>
-              </div>
+              <SlotActions id={row.id} label={row.label} onName={nameSlot} onClear={clearSlot} />
             ) : null}
           </li>
         ))}

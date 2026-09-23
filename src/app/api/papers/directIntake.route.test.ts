@@ -13,25 +13,46 @@ function cookieFrom(res: Response): string {
 }
 
 describe('POST /api/papers/upload, /photo, /chat', () => {
-  it('persists a file price only from the file, a photo as Missing, and chat dollars as not evidence', async () => {
+  it('peels a literal TOTAL/DUE, keeps a SKU price Missing, and labels a chat-typed dollar Estimated', async () => {
     resetPapersTokenStore();
+    const totals = new FormData();
+    totals.append('files', new File(['Vendor note TOTAL DUE $19.00\n'], 'a.txt', { type: 'text/plain' }));
+    totals.append('files', new File(['Other note TOTAL DUE $20.00\n'], 'b.txt', { type: 'text/plain' }));
+    const uploaded = await uploadPost(new NextRequest('http://localhost/api/papers/upload', { method: 'POST', body: totals }));
+    const uploadBody = await uploaded.json();
+    expect(uploaded.status).toBe(200);
+    expect(uploadBody.honesty).toBe('Estimated');
+    expect(uploadBody.papers).toHaveLength(2);
+    expect(uploadBody.papers.map((row: { text: string }) => row.text)).toEqual([
+      'TOTAL DUE $19.00',
+      'TOTAL DUE $20.00',
+    ]);
+    expect(uploadBody.text).not.toMatch(/39\.00|56\.00/);
+    expect(uploadBody.connection.gmail).toBe(false);
+    expect(uploadBody.connection.drive).toBe(false);
+    expect(uploadBody.elevated).toBe(true);
+    expect(uploadBody.lead).toEqual(['photo', 'upload', 'chat']);
+    const cookie = cookieFrom(uploaded);
+
     const csv = new FormData();
     csv.set(
       'file',
       new File(
         ['Vendor,SKU,Description,Period,Unit Price,Qty\nSample Dairy,MZ-452,Whole Milk Mozzarella,2026-09-08,56.00,1\n'],
-        'vestis-sample.csv',
+        'sku-sample.csv',
         { type: 'text/csv' },
       ),
     );
-    const uploaded = await uploadPost(new NextRequest('http://localhost/api/papers/upload', { method: 'POST', body: csv }));
-    const uploadBody = await uploaded.json();
-    expect(uploaded.status).toBe(200);
-    expect(uploadBody.honesty).toBe('Estimated');
-    expect(uploadBody.text).toMatch(/56\.00/);
-    expect(uploadBody.connection.gmail).toBe(false);
-    expect(uploadBody.connection.drive).toBe(false);
-    const cookie = cookieFrom(uploaded);
+    const sku = await uploadPost(new NextRequest('http://localhost/api/papers/upload', {
+      method: 'POST',
+      body: csv,
+      headers: cookie ? { cookie } : {},
+    }));
+    const skuBody = await sku.json();
+    expect(sku.status).toBe(200);
+    expect(skuBody.honesty).toBe('Missing');
+    expect(skuBody.text).toBe('');
+    expect(JSON.stringify(skuBody)).not.toMatch(/56\.00/);
 
     const heic = new FormData();
     heic.set(
@@ -57,10 +78,15 @@ describe('POST /api/papers/upload, /photo, /chat', () => {
     }));
     const chatBody = await chat.json();
     expect(chat.status).toBe(200);
-    expect(chatBody.honesty).toBe('Missing');
-    expect(chatBody.note).toMatch(/not evidence/);
-    expect(JSON.stringify(chatBody)).not.toMatch(/999/);
+    expect(chatBody.honesty).toBe('Estimated');
+    expect(chatBody.text).toBe('$999');
+    expect(chatBody.note).toMatch(/Estimated/);
+    expect(chatBody.note).toContain('Not Verified');
+    expect(chatBody.honesty).not.toBe('Verified');
+    expect(chatBody.text).not.toMatch(/999\.00|1,000/);
     expect(chatBody.connection.gmail).toBe(false);
+    expect(chatBody.elevated).toBe(true);
+    expect(chatBody.lead).toEqual(['photo', 'upload', 'chat']);
 
     const status = await statusGet(new NextRequest('http://localhost/api/papers/status', {
       headers: cookie ? { cookie } : {},
@@ -72,10 +98,14 @@ describe('POST /api/papers/upload, /photo, /chat', () => {
     expect(statusBody.honesty).toBe('Missing');
     expect(statusBody.intake.map((row: { kind: string; honesty: string }) => `${row.kind}:${row.honesty}`)).toEqual([
       'upload:Estimated',
+      'upload:Estimated',
+      'upload:Missing',
       'photo:Missing',
-      'chat:Missing',
+      'chat:Estimated',
     ]);
-    expect(JSON.stringify(statusBody.intake)).not.toMatch(/999/);
+    const chatRow = statusBody.intake.find((row: { kind: string }) => row.kind === 'chat');
+    expect(chatRow.text).toBe('$999');
+    expect(JSON.stringify(statusBody.intake)).not.toMatch(/56\.00/);
   });
 
   it('fail-closes an empty upload and an empty chat', async () => {

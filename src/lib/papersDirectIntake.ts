@@ -3,9 +3,10 @@
  * A typed dollar amount is not a SKU price. Native text from a file can be Estimated.
  */
 
-import { invoiceUploadTooLarge, isHeicUpload, MAX_INVOICE_UPLOAD_BYTES, readPublicInvoiceUpload } from '@/lib/invoiceFileIntake';
+import { invoiceUploadTooLarge, isHeicUpload, MAX_INVOICE_UPLOAD_BYTES } from '@/lib/invoiceFileIntake';
 import { classifyPapersFolder, type PapersHonesty } from '@/lib/papersInbox';
 import { chatIntakeMap, chatReplyForLine, readChatIntakeLine } from '@/lib/papersChatIntake';
+import { literalTypedDollars, peelLiteralTotals } from '@/lib/papersIntakeHelpers';
 import { matchStagedVendorPaper } from '@/lib/stagedVendorFixtures';
 import { decodeInvoiceSource } from '@/lib/vendorInvoiceParse';
 
@@ -44,19 +45,40 @@ function stagedDraft(kind: 'upload' | 'photo', bytes: Uint8Array, filename: stri
   };
 }
 
-export function paperFromUpload(bytes: Uint8Array, filename = 'invoice', contentType = ''): PapersDirectDraft {
-  const staged = stagedDraft('upload', bytes, filename);
+function draftFromNativeText(kind: 'upload' | 'photo', bytes: Uint8Array, filename: string): PapersDirectDraft {
+  const staged = stagedDraft(kind, bytes, filename);
   if (staged) return staged;
-  const read = readPublicInvoiceUpload(bytes, filename, contentType);
-  const folder = classifyPapersFolder(read.filename);
+  const name = safeName(filename, kind);
+  let raw = '';
+  try {
+    raw = decodeInvoiceSource(bytes, name);
+  } catch {
+    raw = '';
+  }
+  const totals = peelLiteralTotals(raw);
+  const folder = classifyPapersFolder(name);
+  if (totals.length > 0) {
+    return {
+      kind,
+      filename: name,
+      folder,
+      honesty: 'Estimated',
+      note: 'Estimated from a literal TOTAL/DUE line on this file. Not Verified. Not recovered cash. No invented $.',
+      text: totals.join('\n'),
+    };
+  }
   return {
-    kind: 'upload',
-    filename: read.filename,
+    kind,
+    filename: name,
     folder,
-    honesty: read.honesty,
-    note: read.note,
-    text: read.honesty === 'Estimated' ? read.text : '',
+    honesty: 'Missing',
+    note: 'No literal TOTAL/DUE line on this file. The paper stays Missing — not $0. No invented $.',
+    text: '',
   };
+}
+
+export function paperFromUpload(bytes: Uint8Array, filename = 'invoice', _contentType = ''): PapersDirectDraft {
+  return draftFromNativeText('upload', bytes, filename);
 }
 
 export function paperFromPhoto(bytes: Uint8Array, filename = 'photo', contentType = ''): PapersDirectDraft {
@@ -77,17 +99,7 @@ export function paperFromPhoto(bytes: Uint8Array, filename = 'photo', contentTyp
       text: '',
     };
   }
-  const staged = stagedDraft('photo', bytes, name);
-  if (staged) return staged;
-  const read = readPublicInvoiceUpload(bytes, name, contentType);
-  return {
-    kind: 'photo',
-    filename: read.filename,
-    folder: classifyPapersFolder(read.filename),
-    honesty: read.honesty,
-    note: read.note,
-    text: read.honesty === 'Estimated' ? read.text : '',
-  };
+  return draftFromNativeText('photo', bytes, name);
 }
 
 export function paperFromChat(text: string): PapersDirectDraft {
@@ -104,6 +116,18 @@ export function paperFromChat(text: string): PapersDirectDraft {
         : read.slot === 'photo'
           ? 'photo'
           : 'chat';
+  const typed = literalTypedDollars(text.trim().slice(0, 8000));
+  if (typed.length > 0) {
+    const amounts = typed.join(', ');
+    return {
+      kind: 'chat',
+      filename: read.slot && read.slot !== 'google' ? read.slot : 'chat',
+      folder,
+      honesty: 'Estimated',
+      note: `Estimated. Typed in chat: ${amounts}. Not Verified. Not a SKU price. No invented $.`,
+      text: typed.join('\n'),
+    };
+  }
   return {
     kind: 'chat',
     filename: read.slot && read.slot !== 'google' ? read.slot : 'chat',

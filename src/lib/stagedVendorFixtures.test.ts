@@ -35,12 +35,26 @@ describe('staged vendor fixture totals', () => {
   it('does not stamp a fixture total onto a different amount or a chat line', () => {
     expect(matchStagedVendorPaper('Vestis 6340606762 TOTAL DUE $999.00', 'vestis.txt')).toBeNull();
     const wrong = upload('Vestis 6340606762 TOTAL DUE $999.00', 'vestis.txt');
+    expect(wrong.honesty).toBe('Estimated');
+    expect(wrong.text).toMatch(/TOTAL DUE \$999\.00/);
     expect(wrong.text).not.toContain('256.90');
     expect(wrong.honesty).not.toBe('Verified');
 
     const chat = paperFromChat('Vestis 6340606762 TOTAL DUE $256.90');
-    expect(chat.honesty).toBe('Missing');
-    expect(chat.text).toBe('');
-    expect(chat.note).not.toContain('256.90');
+    expect(chat.honesty).toBe('Estimated');
+    expect(chat.text).toBe('$256.90');
+    expect(chat.text).not.toContain('09/17/2026');
+    expect(chat.note).toMatch(/Estimated/);
+    expect(chat.note).toContain('Not Verified');
+    expect(chat.honesty).not.toBe('Verified');
+
+    const other = paperFromChat('the truck was $10');
+    expect(other.honesty).toBe('Estimated');
+    expect(other.text).toBe('$10');
+    expect(other.text).not.toContain('256.90');
+
+    const named = paperFromChat('the vestis invoice is on the truck');
+    expect(named.honesty).toBe('Missing');
+    expect(named.text).toBe('');
   });
 });
