@@ -47,9 +47,23 @@ export type PapersTokenStore = {
 
 const memory: PapersTokenStore = { connections: new Map(), invoices: new Map() };
 
+export type PapersDirectPaper = {
+  id: string;
+  kind: 'upload' | 'photo' | 'chat';
+  filename: string;
+  folder: string;
+  honesty: PapersHonesty;
+  note: string;
+  text: string;
+  createdAt: string;
+};
+
+const directPapers = new Map<string, PapersDirectPaper[]>();
+
 export function resetPapersTokenStore(): void {
   memory.connections.clear();
   memory.invoices.clear();
+  directPapers.clear();
 }
 
 export function papersConnectionFor(operatorId: string): PapersConnectionState {
@@ -337,4 +351,88 @@ export async function pullLastWeekPapers(input: {
 
 export function papersDurableStore(env: Record<string, string | undefined> = process.env): boolean {
   return Boolean(env.DATABASE_URL?.trim());
+}
+
+async function ensureDirectIntakeSchema(databaseUrl: string): Promise<void> {
+  const sql = neon(databaseUrl);
+  await sql`
+    create table if not exists papers_direct_intake (
+      id text primary key,
+      operator_id text not null,
+      kind text not null,
+      filename text not null,
+      folder text not null,
+      honesty text not null,
+      note text not null,
+      text_body text not null default '',
+      created_at timestamptz not null default now()
+    )
+  `;
+}
+
+export async function listDirectPapers(operatorId: string): Promise<PapersDirectPaper[]> {
+  if (directPapers.has(operatorId)) return directPapers.get(operatorId) ?? [];
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url) {
+    directPapers.set(operatorId, []);
+    return [];
+  }
+  try {
+    await ensureDirectIntakeSchema(url);
+    const sql = neon(url);
+    const rows = await sql`
+      select id, kind, filename, folder, honesty, note, text_body, created_at
+      from papers_direct_intake
+      where operator_id = ${operatorId}
+      order by created_at asc
+      limit 40
+    `;
+    const papers = rows.map((row) => ({
+      id: String(row.id),
+      kind: row.kind === 'photo' || row.kind === 'chat' ? row.kind : 'upload',
+      filename: String(row.filename ?? ''),
+      folder: String(row.folder ?? 'chat'),
+      honesty: row.honesty === 'Verified' || row.honesty === 'Estimated' ? row.honesty : 'Missing',
+      note: String(row.note ?? ''),
+      text: String(row.text_body ?? ''),
+      createdAt: String(row.created_at ?? ''),
+    })) as PapersDirectPaper[];
+    directPapers.set(operatorId, papers);
+    return papers;
+  } catch {
+    directPapers.set(operatorId, []);
+    return [];
+  }
+}
+
+export async function rememberDirectPaper(
+  operatorId: string,
+  draft: Omit<PapersDirectPaper, 'id' | 'createdAt'>,
+): Promise<PapersDirectPaper> {
+  const existing = await listDirectPapers(operatorId);
+  const paper: PapersDirectPaper = {
+    ...draft,
+    honesty: draft.honesty === 'Verified' ? 'Estimated' : draft.honesty,
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+  };
+  const next = [...existing, paper].slice(-40);
+  directPapers.set(operatorId, next);
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url) return paper;
+  try {
+    await ensureDirectIntakeSchema(url);
+    const sql = neon(url);
+    await sql`
+      insert into papers_direct_intake (
+        id, operator_id, kind, filename, folder, honesty, note, text_body, created_at
+      ) values (
+        ${paper.id}, ${operatorId}, ${paper.kind}, ${paper.filename}, ${paper.folder},
+        ${paper.honesty}, ${paper.note}, ${paper.text}, ${paper.createdAt}::timestamptz
+      )
+    `;
+  } catch {
+    return paper;
+  }
+  return paper;
 }

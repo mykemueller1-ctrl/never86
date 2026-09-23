@@ -30,9 +30,14 @@ export function decideActivateClientOutcome(input: {
   success?: boolean;
   error?: string;
   redirect?: string;
-}): { kind: 'open-operator'; href: string } | { kind: 'error'; message: string } {
+  honesty?: 'Missing';
+}): { kind: 'open-operator'; href: string } | { kind: 'error'; message: string; honesty?: 'Missing' } {
   if (!input.httpOk || !input.success) {
-    return { kind: 'error', message: input.error || 'Sign-in failed' };
+    return {
+      kind: 'error',
+      message: input.error || 'Sign-in failed',
+      ...(input.honesty === 'Missing' ? { honesty: 'Missing' as const } : {}),
+    };
   }
   return { kind: 'open-operator', href: input.redirect || OWNER_DESK_POST_AUTH_REDIRECT };
 }
@@ -56,6 +61,7 @@ export function planActivateHttpResponse(
       status: 503,
       body: {
         success: false,
+        honesty: 'Missing',
         error: 'Activated, but session signing failed. Sign in at /login.',
       },
       cookie: { kind: 'none' },

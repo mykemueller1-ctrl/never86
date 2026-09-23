@@ -27,6 +27,7 @@ import {
 import { pickTrustedClientIp } from '@/lib/trustedClientIp';
 import { allowDurableLoginAttempt } from '@/lib/authThrottle';
 import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { operatorLoginUnavailableBody } from '@/lib/authHonesty';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,10 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Enter your email and password.' }, { status: 400 });
   }
   if (!operatorSessionSecret()) {
-    return NextResponse.json(
-      { success: false, error: "Operator login isn't switched on yet." },
-      { status: 503 },
-    );
+    return NextResponse.json(operatorLoginUnavailableBody(true), { status: 503 });
   }
 
   const ip = pickTrustedClientIp(req.headers);
@@ -112,10 +110,7 @@ export async function POST(req: NextRequest) {
 
     const token = await signOperatorSession(picked.seat.operatorId, normalized, Date.now());
     if (!token) {
-      return NextResponse.json(
-        { success: false, error: "Operator login isn't switched on yet." },
-        { status: 503 },
-      );
+      return NextResponse.json(operatorLoginUnavailableBody(false), { status: 503 });
     }
     touchPersonLogin(normalized).catch(() => {});
     if (picked.seat.plane === 'neon') {
@@ -141,10 +136,7 @@ export async function POST(req: NextRequest) {
 
   const token = await signOperatorSession(cred.operatorId, cred.email, Date.now());
   if (!token) {
-    return NextResponse.json(
-      { success: false, error: "Operator login isn't switched on yet." },
-      { status: 503 },
-    );
+    return NextResponse.json(operatorLoginUnavailableBody(false), { status: 503 });
   }
 
   touchOperatorLogin(cred.operatorId, cred.email).catch(() => {});

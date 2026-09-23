@@ -29,8 +29,9 @@ export default function TryRecipesPage() {
           <b>sample only</b>
         </div>
         <HonestyLegend
+          demo
           active="Estimated"
-          note="Estimated fictional plate math. No count stays Missing. Invoice ≠ COGS. We do not invent food cost."
+          note="Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS."
         />
         <p className={styles.note}>
           Uses the fictional mozzarella case at {money(GOLD_MOZZARELLA.currentPrice)}. {GOLD_RECIPE.nextMove}

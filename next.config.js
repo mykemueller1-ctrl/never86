@@ -20,9 +20,7 @@ const nextConfig = {
     return [
       // Preserve the local Community house-code path.
       { source: '/communities', destination: '/portal', permanent: false },
-      // Old ChatGPT Sites “/seat” bookmark stays on never86.ai.
-      { source: '/seat', destination: '/onboard', permanent: false },
-      // Public core win stays on never86.ai. ChatGPT Sites redirects retired.
+      // /seat is the public One Seat page. The old bookmark stays on never86.ai.
     ];
   },
   async rewrites() {

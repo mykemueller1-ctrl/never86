@@ -29,8 +29,9 @@ export default function TryLaborPage() {
           <b>sample ${GOLD_LABOR.sampleDollars}</b>
         </div>
         <HonestyLegend
+          demo
           active="Estimated"
-          note="Estimated fictional sample. A missing punch stays Missing. Matching live clock and schedule become Verified."
+          note="Demo · Estimated. Fictional sample hours and dollars. A missing punch stays Missing — not $0."
         />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>
