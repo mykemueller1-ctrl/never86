@@ -58,6 +58,7 @@ export function OneSeatPanels({
           </button>
         ))}
       </div>
+      {reply ? <HonestyLegend active={honesty} note={reply} /> : null}
 
       {tab === 'missing' ? (
         <div role="tabpanel" id="seat-panel-missing" aria-labelledby="seat-tab-missing">
@@ -130,7 +131,6 @@ export function OneSeatPanels({
             </label>
             <button type="submit" className={styles.primary}>Ask</button>
           </form>
-          {reply ? <HonestyLegend active={honesty} note={reply} /> : null}
           {ask}
         </div>
       ) : null}
