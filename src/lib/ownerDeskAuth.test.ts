@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  EMAIL_BRAND_BLUE,
   OWNER_DESK_EMAIL_BODY,
   OWNER_DESK_EMAIL_CTA,
   OWNER_DESK_EMAIL_HEADLINE,
@@ -12,6 +13,7 @@ import {
   activationEmailHtml,
   activationEmailLooksCheap,
   activationEmailPayload,
+  activationEmailText,
   buildOwnerDeskActivationLink,
 } from './ownerDeskAuth';
 
@@ -96,36 +98,58 @@ describe('magic-link owner-desk email', () => {
   const expiresAt = new Date('2026-09-06T12:00:00.000Z');
   const link = buildOwnerDeskActivationLink('https://www.never86.ai/', 'token+value');
   const html = activationEmailHtml(link, expiresAt);
+  const text = activationEmailText(link, expiresAt);
   const payload = activationEmailPayload('owner@example.com', link, expiresAt);
 
-  it('uses Void Hunter #0066ff only — no gold, amber, or cream-on-black', () => {
+  it('uses Never86 brand blue #285be8 on a white card — no gold, amber, or cream-on-black', () => {
     expect(VOID_HUNTER_BLUE).toBe('#0066ff');
-    expect(html).toContain('#0066ff');
+    expect(EMAIL_BRAND_BLUE).toBe('#285be8');
+    expect(html).toContain('#285be8');
     expect(html).toContain('background:#ffffff');
+    expect(html).toContain('background:#f4f5f7');
     expect(activationEmailLooksCheap(html)).toBe(false);
     expect(html.toLowerCase()).not.toMatch(/#d4a017|#eab308|#f59e0b|#ff9500|#e66b27|gold|amber|#111[;"]/);
     expect(html).not.toMatch(/background:#111/);
     expect(html).not.toMatch(/Payroll|Prices|Process/);
   });
 
-  it('names Open your owner desk and points the CTA at the activate door', () => {
+  it('is table-based with inline styles and no external CSS or fonts', () => {
+    expect(html).toContain('role="presentation"');
+    expect(html).not.toMatch(/<link\b/i);
+    expect(html).not.toMatch(/<style\b/i);
+    expect(html).not.toMatch(/@import|fonts\.googleapis/i);
+    expect(html).toMatch(/font-family:Inter,/);
+  });
+
+  it('names Set your password and points the CTA at the activate door', () => {
     expect(payload.subject).toBe(OWNER_DESK_EMAIL_SUBJECT);
     expect(payload.subject).toBe('Set your password once.');
+    expect(payload.from).toBe("Never 86'd <hello@never86.ai>");
     expect(html).toContain(OWNER_DESK_EMAIL_HEADLINE);
     expect(html).toContain(OWNER_DESK_EMAIL_CTA);
     expect(html).toContain(OWNER_DESK_EMAIL_BODY);
     expect(html).toContain('Set your password');
     expect(html).toContain('href="https://www.never86.ai/activate?token=token%2Bvalue"');
+    expect(html).toContain('>https://www.never86.ai/activate?token=token%2Bvalue</a>');
     expect(html).toContain(expiresAt.toUTCString());
     expect(link).toContain('/activate?token=');
     expect(OWNER_DESK_POST_AUTH_REDIRECT).toBe('/operator');
   });
 
-  it('escapes the activation link in HTML and keeps seat 1 free copy', () => {
+  it('ships a plain-text version with the same link and expiry', () => {
+    expect(payload.text).toBe(text);
+    expect(text).toContain('https://www.never86.ai/activate?token=token%2Bvalue');
+    expect(text).toContain(expiresAt.toUTCString());
+    expect(text).toContain(OWNER_DESK_EMAIL_BODY);
+  });
+
+  it('escapes the activation link in HTML and keeps the copy short', () => {
     const injected = activationEmailHtml('https://www.never86.ai/activate?token="><img src=x>', expiresAt);
     expect(injected).toContain('token=&quot;&gt;&lt;img src=x&gt;');
     expect(injected).not.toContain('<img src=x>');
-    expect(html).toMatch(/Seat 1 stays free/i);
+    expect(html).not.toMatch(/Seat 1 stays free/i);
+    expect(html).not.toMatch(/No sales call/i);
+    expect(html).not.toMatch(/every store on this email/i);
     expect(html).not.toMatch(/seat 2|seat 3|checkout|payment|stripe/i);
   });
 
