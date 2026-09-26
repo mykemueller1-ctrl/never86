@@ -1630,17 +1630,56 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   outline-offset: 2px;
 }
 .owner-portal-form button {
-  min-height: 48px;
-  border: 0;
+  min-height: 44px;
+  border: 1px solid #dce2eb;
   border-radius: 10px;
-  background: #285be8;
-  color: #ffffff;
+  background: #ffffff;
+  color: #172335;
   font-size: 0.95rem;
   font-weight: 700;
-  box-shadow: 0 4px 10px rgba(40, 91, 232, 0.11);
 }
 .owner-portal-form button:hover {
-  background: #1945c1;
+  background: #f2f5fa;
+}
+.owner-portal-code {
+  margin-top: 0.35rem;
+  text-align: center;
+}
+.owner-portal-code > button {
+  display: inline;
+  width: auto;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #526175;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  box-shadow: none;
+}
+.owner-portal-code > button:hover {
+  background: transparent;
+  color: #172335;
+}
+.owner-portal-code > button:focus-visible {
+  outline: 3px solid #285be8;
+  outline-offset: 3px;
+}
+.owner-portal-code .owner-portal-form,
+.owner-portal-code .owner-portal-note {
+  text-align: left;
+}
+.owner-portal-code .owner-portal-form {
+  margin-top: 0.35rem;
+}
+.owner-portal-code .owner-portal-note {
+  margin-top: 0.65rem;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #526175;
 }
 .owner-answer-kicker {
   font-size: 11px;

@@ -34,6 +34,7 @@ export function PortalHouseForm() {
           placeholder="Store house code"
         />
       </label>
+      <p className="owner-portal-note">Store code only. Not your password.</p>
       <button type="submit">Open the seat →</button>
       {message ? (
         <p className="owner-desk-poetry" style={{ color: ok ? '#166534' : '#526175' }}>
@@ -41,5 +42,24 @@ export function PortalHouseForm() {
         </p>
       ) : null}
     </form>
+  );
+}
+
+export function PortalHouseDisclosure() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="owner-portal-code">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        Have a store house code?
+      </button>
+      {open ? (
+        <>
+          <p className="owner-portal-note">
+            This opens one store. It is not your password. The free owner seat still starts by email.
+          </p>
+          <PortalHouseForm />
+        </>
+      ) : null}
+    </div>
   );
 }

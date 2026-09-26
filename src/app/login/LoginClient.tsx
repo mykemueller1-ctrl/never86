@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MAX_FREE_SEAT_PASSWORD_LEN, MIN_FREE_SEAT_PASSWORD_LEN, OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { PortalHouseDisclosure } from '../portal/PortalHouseForm';
 
 const inputClass =
   'w-full bg-white border border-[#d2d2d7] rounded-xl px-4 py-3 text-ink-800 placeholder-[#a1a1a6] focus:outline-none focus:border-[#0066ff] transition-colors';
 
 type SeatChoice = { restaurantName: string };
 
-export default function OperatorLoginPage() {
+export default function OperatorLoginPage({ showHouseCode = false }: { showHouseCode?: boolean }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
@@ -105,7 +106,8 @@ export default function OperatorLoginPage() {
             : 'Email + password. One account opens every store on this email. Switch stores on the desk — no second login email.'}
         </p>
 
-        <form onSubmit={onSubmit} className="compass-card space-y-3">
+        <div className="compass-card space-y-3">
+        <form onSubmit={onSubmit} className="space-y-3">
           <input
             type="email"
             autoComplete="email"
@@ -152,6 +154,16 @@ export default function OperatorLoginPage() {
               ))}
             </div>
           ) : null}
+        </form>
+        {showHouseCode ? (
+          <PortalHouseDisclosure />
+        ) : (
+          <p className="text-center text-[13px]">
+            <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
+              Have a store house code?
+            </Link>
+          </p>
+        )}
           <button
             type="button"
             onClick={() => {
@@ -166,9 +178,8 @@ export default function OperatorLoginPage() {
           <p className="text-center text-[11px] leading-relaxed text-[#86868b]">
             Account email only — access plus essential product help. No marketing list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
           </p>
-        </form>
-
-        <p className="compass-body text-[13px] mt-6" style={{ color: '#6e6e73' }}>
+        </div>
+        <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
           Magic link is set-password / reset only. Daily door is email + password.
         </p>
         <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
@@ -177,12 +188,7 @@ export default function OperatorLoginPage() {
             Claim the free owner seat
           </Link>
           {' '}
-          with email + store name. House-code seats stay at{' '}
-          <Link href="/portal" className="underline" style={{ color: '#0066ff' }}>
-            /portal
-          </Link>
-          {' '}
-          and fail-closed until a code is issued. No PIN, no staff name.
+          with email and your store name.
         </p>
         <p className="compass-body text-[13px] mt-3" style={{ color: '#6e6e73' }}>
           After sign-in, Connect Gmail + Drive on the owner seat at{' '}
