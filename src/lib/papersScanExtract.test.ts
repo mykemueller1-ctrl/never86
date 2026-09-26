@@ -20,6 +20,11 @@ describe('papers scan extractors', () => {
   it('reads labeled fixture fields and never promotes 999.99', () => {
     const rows = fixturePapersScanRows();
     expect(rows).toHaveLength(PAPERS_SCAN_FIXTURE_DOCS.length);
+    const skuLayout = rows.find((row) => row.filename.includes('sku-layout'));
+    expect(skuLayout?.isoWeek).toBe('2026-W23');
+    expect(skuLayout?.vendorName).toMatchObject({ honesty: 'Verified', value: 'Performance Foodservice' });
+    expect(skuLayout?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(skuLayout?.lineItems[0].category.value).toBe('food');
     expect(rows.every((row) => row.fixture && row.note.startsWith('FIXTURE'))).toBe(true);
     const amounts = rows.flatMap((row) => [
       row.total.amount,

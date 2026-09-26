@@ -241,7 +241,10 @@ function extractLineItems(text: string): PapersLineItem[] {
       sku: skuIdx >= 0 ? cellText(cells[skuIdx]) : missingField(),
       description: descIdx >= 0 ? cellText(cells[descIdx]) : missingField(),
       quantity: qtyIdx >= 0 ? cellNumber(cells[qtyIdx]) : missingField(),
+      unit: missingField(),
       unitPrice: priceIdx >= 0 ? cellMoney(cells[priceIdx]) : missingField(),
+      extendedPrice: missingField(),
+      category: missingField(),
     };
     if (item.sku.honesty === 'Missing' && item.unitPrice.honesty === 'Missing') continue;
     items.push(item);
@@ -386,6 +389,7 @@ export function extractRestaurantPaper(input: {
     dates: extractDates(input.text, input.filename),
     total: extractTotal(input.category, input.text, delivery),
     lineItems,
+    isoWeek: null,
     shifts,
     delivery,
     note: 'Read from the paper text. Unlabeled numbers stay Missing.',

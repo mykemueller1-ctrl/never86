@@ -13,6 +13,8 @@ import {
   type VendorInvoiceLine,
 } from '@/lib/vendorInvoiceParse';
 import { looksLikeInvoicePaper, type PapersHonesty } from '@/lib/papersInbox';
+import { parsePapersSkuLines, vendorDocumentsFromSkuRows, type PapersSkuRow } from '@/lib/papersSkuParse';
+import { papersSkuRowsForStore } from '@/lib/papersSkuStore';
 
 export type PapersSkuLine = {
   vendor: string;
@@ -31,6 +33,7 @@ export type PapersInvoiceRecord = {
   note: string;
   document: VendorInvoiceDocument;
   lines: PapersSkuLine[];
+  skuRows: PapersSkuRow[];
 };
 
 export function skuHonesty(line: Pick<VendorInvoiceLine, 'status' | 'unitPrice' | 'sku' | 'vendor'>): HonestyLabel {
@@ -71,14 +74,35 @@ function csvCell(value: string): string {
   return /[",\n]/.test(v) ? `"${v}"` : v;
 }
 
+function documentFromSkuRows(filename: string, rows: PapersSkuRow[]): VendorInvoiceDocument {
+  const keyed = rows.map((row) => ({ ...row, documentKey: row.documentKey || filename }));
+  const documents = vendorDocumentsFromSkuRows(keyed);
+  const lines = documents.flatMap((doc) => doc.lines);
+  return {
+    vendor: documents[0]?.vendor ?? null,
+    invoiceNumber: documents[0]?.invoiceNumber ?? null,
+    invoiceDate: documents[0]?.invoiceDate ?? null,
+    period: documents.find((doc) => doc.period)?.period ?? null,
+    filename,
+    lines,
+    unreadableCount: lines.filter((line) => line.status === 'unreadable').length,
+    missingFields: documents.flatMap((doc) => doc.missingFields),
+  };
+}
+
 export function parseSeatInvoiceBytes(bytes: Uint8Array, filename: string): PapersInvoiceRecord {
   const text = decodeInvoiceSource(bytes, filename);
-  const document = parseVendorInvoice(text, filename);
+  const sku = parsePapersSkuLines({ filename, text, bytes });
+  const document = sku.lines.length
+    ? documentFromSkuRows(filename, sku.lines)
+    : parseVendorInvoice(text, filename);
   const readable = document.lines.some((line) => line.status === 'readable' && line.unitPrice != null);
   const nativeMissing = !text.trim();
   let honesty: PapersHonesty = 'Missing';
   let note = 'No invoice SKU lines landed. Missing is not $0.';
-  if (nativeMissing) {
+  if (sku.note.startsWith('Photo')) {
+    note = sku.note;
+  } else if (nativeMissing) {
     note = 'Scanned or empty PDF — native text Missing. No invented SKU $. Snap a clearer paper or drop CSV.';
   } else if (readable) {
     honesty = 'Estimated';
@@ -93,6 +117,7 @@ export function parseSeatInvoiceBytes(bytes: Uint8Array, filename: string): Pape
     note,
     document,
     lines: skuLinesFromDocument(document),
+    skuRows: sku.lines.map((row) => ({ ...row, documentKey: filename })),
   };
 }
 
@@ -121,6 +146,27 @@ export function pickTwoInvoicesForCompare(records: PapersInvoiceRecord[]): {
     current: sorted[sorted.length - 1],
     honesty: 'Estimated',
     missing: null,
+  };
+}
+
+export function papersSkuCompareForStore(storeId: string): ReturnType<typeof papersInvoiceCompare> | null {
+  const rows = papersSkuRowsForStore(storeId);
+  if (!rows.length) return null;
+  const documents = vendorDocumentsFromSkuRows(rows);
+  const compare = compareVendorInvoiceDocuments(documents);
+  const verified = compare.rows.some(
+    (row) => row.priorPrice != null && row.currentPrice != null && row.evidenceState !== 'missing-evidence',
+  );
+  return {
+    documents: documents.map((doc) => ({ text: invoiceDocumentToCompareText(doc), filename: doc.filename })),
+    compare: {
+      ...compare,
+      rows: attachPublicHonesty(compare.rows, false),
+    },
+    honesty: verified ? 'Verified' : (compare.rows.length ? 'Estimated' : 'Missing'),
+    missing: compare.missingEvidence[0] ?? (documents.length < 2
+      ? 'Need two invoices from the same vendor before a compare. One paper stays Missing — not $0.'
+      : null),
   };
 }
 

@@ -5,13 +5,16 @@
 
 import { createHash } from 'node:crypto';
 import { neon } from '@neondatabase/serverless';
-import { draftFromCandidateText } from '@/lib/papersScanExtract';
+import { draftFromCandidateText, type PapersExtractDraft } from '@/lib/papersScanExtract';
+import { parsePapersSkuLines, skuRowToLineItem, type PapersSkuRow } from '@/lib/papersSkuParse';
+import { replacePapersSkuDocument } from '@/lib/papersSkuStore';
 import { listDriveScanCandidates, listGmailScanCandidates } from '@/lib/papersScanSources';
 import { paperTextFromBytes } from '@/lib/papersScanText';
 import {
   PAPERS_SCAN_LOOKBACK_DAYS,
   PAPERS_SCAN_MAX_BYTES,
   amountField,
+  emptyDelivery,
   missingField,
   parsePapersMoney,
   textField,
@@ -184,6 +187,55 @@ async function persistRow(operatorId: string, row: PapersScanRow): Promise<void>
   `;
 }
 
+function applySkuLines(draft: PapersExtractDraft, lines: PapersSkuRow[]): void {
+  draft.lineItems = lines.map(skuRowToLineItem);
+  const weeks = [...new Set(lines.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
+  draft.isoWeek = weeks.length ? weeks.join(', ') : null;
+  const first = lines[0];
+  if (draft.vendorName.honesty === 'Missing' && first.vendor.honesty !== 'Missing') draft.vendorName = first.vendor;
+  if (draft.invoiceNumber.honesty === 'Missing' && first.documentNumber.honesty !== 'Missing') draft.invoiceNumber = first.documentNumber;
+  if (draft.dates.honesty === 'Missing' && first.documentDate.honesty !== 'Missing') draft.dates = first.documentDate;
+  const net = lines.find((line) => /net total|net payout/i.test(line.productName.value || ''));
+  if (draft.total.honesty === 'Missing' && net && net.extendedPrice.honesty !== 'Missing') draft.total = net.extendedPrice;
+  const sales = lines.find((line) => /^sales$/i.test(line.productName.value || ''));
+  if (draft.delivery.gross.honesty === 'Missing' && sales && sales.extendedPrice.honesty !== 'Missing') {
+    draft.delivery.gross = sales.extendedPrice;
+  }
+  if (draft.delivery.net.honesty === 'Missing' && net && net.extendedPrice.honesty !== 'Missing') {
+    draft.delivery.net = net.extendedPrice;
+  }
+  draft.note = `Read ${lines.length} line${lines.length === 1 ? '' : 's'} from the paper.`;
+}
+
+function draftFromSkuLines(filename: string, subject: string, lines: PapersSkuRow[]): PapersExtractDraft {
+  const category = lines.some((line) => line.category.value === 'labor')
+    ? 'labor'
+    : lines.some((line) => line.vendor.value === 'DoorDash')
+      ? 'delivery-app'
+      : lines.some((line) => /pop|liquor|beer|food/.test(line.category.value || '') && /z|eod/i.test(filename))
+        ? 'eod-z'
+        : lines.some((line) => line.category.value === 'beer' || line.category.value === 'liquor')
+          ? 'liquor-beer'
+          : 'vendor-invoice';
+  const draft: PapersExtractDraft = {
+    filename,
+    subject,
+    category,
+    categoryHonesty: 'Estimated',
+    vendorName: missingField(),
+    invoiceNumber: missingField(),
+    dates: missingField(),
+    total: missingField(),
+    lineItems: [],
+    isoWeek: null,
+    shifts: [],
+    delivery: emptyDelivery(),
+    note: '',
+  };
+  applySkuLines(draft, lines);
+  return draft;
+}
+
 function editText(current: PapersLabeledField, raw: string): PapersLabeledField {
   const trimmed = raw.trim();
   if (!trimmed) return missingField();
@@ -286,14 +338,21 @@ async function ingest(
       continue;
     }
     const text = paperTextFromBytes(candidate.filename, bytes);
-    const draft = draftFromCandidateText({
+    const sku = parsePapersSkuLines({ filename: candidate.filename, text, bytes });
+    let draft = draftFromCandidateText({
       filename: candidate.filename,
       subject: candidate.subject,
       text,
     });
+    if (!draft && sku.lines.length) draft = draftFromSkuLines(candidate.filename, candidate.subject ?? '', sku.lines);
     if (!draft) {
       job.skipped += 1;
       continue;
+    }
+    if (sku.lines.length) applySkuLines(draft, sku.lines);
+    else if (sku.note.startsWith('Photo')) draft.note = sku.note;
+    if (sku.lines.length) {
+      replacePapersSkuDocument(operatorId, dedupeKey, sku.lines.map((row) => ({ ...row, documentKey: dedupeKey })));
     }
     const row: PapersScanRow = {
       ...draft,

@@ -28,9 +28,11 @@ import {
 } from '@/lib/papersGoogle';
 import {
   papersInvoiceCompare,
+  papersSkuCompareForStore,
   parseSeatInvoiceBytes,
   type PapersInvoiceRecord,
 } from '@/lib/papersInvoicePath';
+import { hydratePapersSku, replacePapersSkuDocument } from '@/lib/papersSkuStore';
 
 export type PapersStoredConnection = {
   accessToken: string;
@@ -310,6 +312,9 @@ export async function pullLastWeekPapers(input: {
       const parsed = parseSeatInvoiceBytes(item.bytes, item.filename);
       invoices.push(parsed);
       honesty = parsed.honesty;
+      if (parsed.skuRows.length) {
+        replacePapersSkuDocument(input.operatorId, `${item.provider}:${item.filename}`, parsed.skuRows);
+      }
     }
     pulled.push({
       provider: item.provider,
@@ -321,7 +326,8 @@ export async function pullLastWeekPapers(input: {
   }
 
   memory.invoices.set(input.operatorId, invoices);
-  const compare = invoices.length ? papersInvoiceCompare(invoices) : null;
+  await hydratePapersSku(input.operatorId);
+  const compare = papersSkuCompareForStore(input.operatorId) ?? (invoices.length ? papersInvoiceCompare(invoices) : null);
   const honesty = papersSeatHonesty({
     ready: true,
     connected: true,

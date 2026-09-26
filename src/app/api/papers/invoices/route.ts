@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { hydratePapersConnection, papersInvoicesFor, pullLastWeekPapers } from '@/lib/papersInboxHttp';
-import { papersInvoiceCompare } from '@/lib/papersInvoicePath';
+import { papersInvoiceCompare, papersSkuCompareForStore } from '@/lib/papersInvoicePath';
+import { hydratePapersSku } from '@/lib/papersSkuStore';
 import { withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
 export const runtime = 'nodejs';
@@ -14,8 +15,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ...papersFailClosedBody(), invoices: [], documents: [] }, { status: 503 });
     }
     await hydratePapersConnection(operatorId);
+    await hydratePapersSku(operatorId);
     const invoices = papersInvoicesFor(operatorId);
-    const compare = invoices.length ? papersInvoiceCompare(invoices) : null;
+    const compare = papersSkuCompareForStore(operatorId) ?? (invoices.length ? papersInvoiceCompare(invoices) : null);
     return NextResponse.json({
       success: true,
       ready: gate.ready,

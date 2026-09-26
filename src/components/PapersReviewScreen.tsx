@@ -50,6 +50,20 @@ function FieldRow({
   );
 }
 
+function ReadField({ label, field }: { label: string; field?: PapersLabeledField }) {
+  const shown = field ?? { honesty: 'Missing' as const, value: null, amount: null, note: null };
+  return (
+    <p className="papers-review-field">
+      <span className="papers-review-field-label">
+        {label}
+        <Honesty value={shown.honesty} />
+      </span>
+      <span>{shown.value ?? 'Missing'}</span>
+      {shown.note ? <small>{shown.note}</small> : null}
+    </p>
+  );
+}
+
 function progressLine(job: PapersScanJobState | null, fixture: boolean): string {
   if (fixture) return PAPERS_SCAN_FIXTURE_BANNER;
   if (!job) return 'Connect Google. The scan fills this screen. No uploads.';
@@ -217,6 +231,7 @@ export function PapersReviewScreen({
                 {row.confirmed ? <span>Confirmed</span> : null}
               </header>
               <p className="papers-review-source">{row.fixture ? 'Fixture file' : row.source} · {row.note}</p>
+              <p className="papers-review-week">ISO week {row.isoWeek ?? 'Missing'}</p>
               <div className="papers-review-grid">
                 <FieldRow label="Vendor" field={row.vendorName} value={draftValue(row, 'vendorName', row.vendorName)} onChange={(value) => setDraft(row.id, 'vendorName', value)} />
                 <FieldRow label="Invoice number" field={row.invoiceNumber} value={draftValue(row, 'invoiceNumber', row.invoiceNumber)} onChange={(value) => setDraft(row.id, 'invoiceNumber', value)} />
@@ -245,7 +260,10 @@ export function PapersReviewScreen({
                       <span>{line.description.honesty === 'Missing' ? 'Missing' : line.description.value}</span>
                       <Honesty value={line.description.honesty} />
                       <FieldRow label="Qty" field={line.quantity} value={draftValue(row, `qty-${index}`, line.quantity)} onChange={(value) => setDraft(row.id, `qty-${index}`, value)} />
+                      <ReadField label="Unit" field={line.unit} />
                       <FieldRow label="Unit price" field={line.unitPrice} value={draftValue(row, `price-${index}`, line.unitPrice)} onChange={(value) => setDraft(row.id, `price-${index}`, value)} />
+                      <ReadField label="Extended" field={line.extendedPrice} />
+                      <ReadField label="Category" field={line.category} />
                     </li>
                   ))}
                 </ul>

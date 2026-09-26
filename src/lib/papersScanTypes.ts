@@ -36,7 +36,10 @@ export type PapersLineItem = {
   sku: PapersLabeledField;
   description: PapersLabeledField;
   quantity: PapersLabeledField;
+  unit: PapersLabeledField;
   unitPrice: PapersLabeledField;
+  extendedPrice: PapersLabeledField;
+  category: PapersLabeledField;
 };
 
 export type PapersShift = {
@@ -76,6 +79,7 @@ export type PapersScanRow = {
   dates: PapersLabeledField;
   total: PapersLabeledField;
   lineItems: PapersLineItem[];
+  isoWeek: string | null;
   shifts: PapersShift[];
   delivery: PapersDeliveryFields;
   confirmed: boolean;

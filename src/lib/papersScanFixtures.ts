@@ -4,6 +4,7 @@
  */
 
 import { draftFromCandidateText, type PapersExtractDraft } from '@/lib/papersScanExtract';
+import { parsePapersSkuLines, skuRowToLineItem } from '@/lib/papersSkuParse';
 import type { PapersScanRow } from '@/lib/papersScanTypes';
 
 export const PAPERS_SCAN_FIXTURE_BANNER =
@@ -103,6 +104,33 @@ export const PAPERS_SCAN_FIXTURE_DOCS: Array<{ id: string; filename: string; sub
     ].join('\n'),
   },
   {
+    id: 'sku-layout',
+    filename: 'FIXTURE-invoice-sku-layout.txt',
+    subject: 'FIXTURE invoice line layout',
+    text: [
+      'FIXTURE — not a real restaurant',
+      'Invoice Total: $12.50',
+      'Performance',
+      'Foodservice',
+      'Date:',
+      '06/05/26',
+      '06/05/26',
+      '900001',
+      'DRY',
+      '1',
+      'CS',
+      '6/#10Fixture',
+      'Sauce',
+      'TH100',
+      '1',
+      '1',
+      'EA',
+      '1.250',
+      '**',
+      '12.50',
+    ].join('\n'),
+  },
+  {
     id: 'menu',
     filename: 'FIXTURE-recipe-burger.txt',
     subject: 'FIXTURE recipe',
@@ -138,6 +166,16 @@ export function fixturePapersScanRows(): PapersScanRow[] {
       text: doc.text,
     });
     if (!draft) continue;
+    const sku = parsePapersSkuLines({ filename: doc.filename, text: doc.text });
+    if (sku.lines.length) {
+      const first = sku.lines[0];
+      draft.lineItems = sku.lines.map(skuRowToLineItem);
+      const weeks = [...new Set(sku.lines.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
+      draft.isoWeek = weeks.length ? weeks.join(', ') : null;
+      if (draft.vendorName.honesty === 'Missing' && first.vendor.honesty !== 'Missing') draft.vendorName = first.vendor;
+      if (draft.invoiceNumber.honesty === 'Missing' && first.documentNumber.honesty !== 'Missing') draft.invoiceNumber = first.documentNumber;
+      if (draft.dates.honesty === 'Missing' && first.documentDate.honesty !== 'Missing') draft.dates = first.documentDate;
+    }
     rows.push(rowFromDraft(doc.id, draft));
   }
   return rows;

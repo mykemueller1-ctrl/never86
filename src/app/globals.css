@@ -1497,6 +1497,11 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   display: grid;
   gap: 0.45rem;
 }
+.papers-review-week {
+  margin: 0.2rem 0 0;
+  color: #C5CDD6;
+  font-size: 0.92rem;
+}
 .papers-review-lines li {
   display: grid;
   gap: 0.35rem;
