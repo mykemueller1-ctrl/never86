@@ -25,7 +25,7 @@ export default function OperatorLoginPage() {
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
   const [seats, setSeats] = useState<SeatChoice[]>([]);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error' | 'pick'>('idle');
   const [message, setMessage] = useState('');
   const [honesty, setHonesty] = useState<HonestyLabel | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
@@ -65,10 +65,16 @@ export default function OperatorLoginPage() {
         showClosed(data, "Operator login isn't switched on yet.");
         return;
       }
-      if (data.code === 'pick_store' || data.code === 'unknown_store') {
+      if (data.code === 'pick_store') {
+        setSeats(Array.isArray(data.seats) ? data.seats : []);
+        setStatus('pick');
+        setMessage('Signed in. Which store?');
+        return;
+      }
+      if (data.code === 'unknown_store') {
         setSeats(Array.isArray(data.seats) ? data.seats : []);
         setStatus('error');
-        setMessage(data.error || 'Pick the store for this sign-in.');
+        setMessage(data.error || 'That store is not on this email.');
         return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
@@ -188,7 +194,7 @@ export default function OperatorLoginPage() {
             <AuthHonestyLine
               honesty={honesty}
               message={message}
-              className={`text-[14px] leading-5 ${status === 'error' ? 'text-[#b42318]' : 'text-[#067647]'}`}
+              className={`text-[14px] leading-5 ${status === 'error' ? 'text-[#b42318]' : status === 'pick' ? 'font-medium text-[#0f172a]' : 'text-[#067647]'}`}
             />
             {seats.length > 1 ? (
               <div className="flex flex-wrap gap-2">
@@ -229,6 +235,19 @@ export default function OperatorLoginPage() {
           <Link href="/onboard" className="font-medium hover:underline" style={{ color: EMAIL_BRAND_BLUE }}>
             Create your account
           </Link>
+        </p>
+        <p className="mt-2 text-center text-[14px] text-[#475569]">
+          <Link href="/portal" className="hover:underline" style={{ color: EMAIL_BRAND_BLUE }}>
+            Have a store house code?
+          </Link>
+        </p>
+        {/* Google papers connect after sign-in on the owner seat; a missing GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET stays Missing there. */}
+        <p className="mt-2 text-center text-[13px] text-[#64748b]">
+          After you sign in, connect Gmail + Drive in{' '}
+          <Link href="/operator#papers-settings" className="underline">
+            settings
+          </Link>
+          .
         </p>
         <p className="mt-3 text-center text-[12px] leading-5 text-[#98a2b3]">
           By continuing, you agree to our{' '}
