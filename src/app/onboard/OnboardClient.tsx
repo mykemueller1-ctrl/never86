@@ -45,7 +45,7 @@ export default function OnboardPage() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
       setStatus('sent');
-      setMessage(data.message || 'Check your email for a set-password link.');
+      setMessage('Check your inbox for a link to set your password.');
       trackEvent('onboard_submit_success', { meta: { path: 'email_store' } });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Could not send the link.';
@@ -81,7 +81,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Work email + store name. We email a set-password link once. After that, /login is email + password for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
+                Work email and restaurant name. You&apos;ll set your password from the link we email you. After that, sign in for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -96,34 +96,51 @@ export default function OnboardPage() {
 
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
-              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Store. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. Set a password once from the email link. Extra stores stay on this same email — no plus-alias.</p>
+              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Work email and restaurant name.</h2>
+              <p className="compass-body mt-3 text-sm">No card. These two fields open the free seat. Extra stores stay on this same email — no plus-alias.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@restaurant.com"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                  className={inputClass}
-                />
-                <input
-                  type="text"
-                  autoComplete="organization"
-                  placeholder="Store name"
-                  value={storeName}
-                  onChange={(event) => setStoreName(event.target.value)}
-                  required
-                  minLength={1}
-                  maxLength={120}
-                  className={inputClass}
-                />
+                <label className="block" htmlFor="onboard-email">
+                  <span className="mb-1.5 block text-[13px] font-semibold text-[#1d1d1f]">Work email</span>
+                  <input
+                    id="onboard-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@restaurant.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    className={inputClass}
+                  />
+                </label>
+                <label className="block" htmlFor="onboard-restaurant">
+                  <span className="mb-1.5 block text-[13px] font-semibold text-[#1d1d1f]">Restaurant name</span>
+                  <input
+                    id="onboard-restaurant"
+                    type="text"
+                    autoComplete="organization"
+                    placeholder="e.g. Community Tap"
+                    value={storeName}
+                    onChange={(event) => setStoreName(event.target.value)}
+                    required
+                    minLength={1}
+                    maxLength={120}
+                    className={inputClass}
+                  />
+                </label>
                 <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
-                  {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your email ✓' : 'Open Never 86’d →'}
+                  {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your inbox' : 'Open Never 86’d →'}
                 </button>
                 {message ? <p className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
               </form>
+              <p className="mt-4 text-sm leading-relaxed text-[#1d1d1f]">
+                You&apos;ll set your password from the link we email you.
+              </p>
+              <p className="mt-2 text-sm text-[#1d1d1f]">
+                Already have an account?{' '}
+                <Link href="/login" className="font-semibold text-[#0066ff] underline">
+                  Sign in
+                </Link>
+              </p>
               {status === 'sent' ? (
                 <div className="mt-6">
                   <p className="compass-body text-sm">
