@@ -257,9 +257,10 @@ describe('free operator demo pages stay off Neon and staff login', () => {
     expect(ui).not.toMatch(/\$[\d,]+/);
     expect(ui).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
     expect(card).not.toMatch(/#e66b27|#fff5f0|#faf6f0|#fffaf2|#9a4a00/);
-    expect(deskCss).toMatch(/#0B0D10/);
-    expect(deskCss).toMatch(/#1A1F26/);
-    expect(deskCss).toMatch(/#C9A46B/);
+    expect(deskCss).toMatch(/#fbfbf9/);
+    expect(deskCss).toMatch(/#285be8/);
+    expect(deskCss).toMatch(/#172335/);
+    expect(deskCss).not.toMatch(/#0B0D10|#1A1F26|#C9A46B/i);
     expect(deskCss).not.toMatch(/#0066ff|#003bb5/);
     expect(deskCss).toMatch(/owner-desk-watermark/);
     expect(deskCss).toMatch(/owner-desk-missing-rail/);

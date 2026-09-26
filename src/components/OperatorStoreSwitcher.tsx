@@ -57,10 +57,8 @@ export default function OperatorStoreSwitcher() {
   }
 
   return (
-    <div className="mx-auto flex max-w-md items-center justify-center gap-2 px-4 pt-3">
-      <label className="text-[11px] uppercase tracking-[0.12em] text-[#8B949E]" htmlFor="n86-store-switch">
-        Store
-      </label>
+    <div className="owner-desk-switch">
+      <label htmlFor="n86-store-switch">Store</label>
       <select
         id="n86-store-switch"
         value={current}
@@ -69,7 +67,6 @@ export default function OperatorStoreSwitcher() {
           setCurrent(event.target.value);
           void onChange(event.target.value);
         }}
-        className="rounded-full border border-[#2A313A] bg-[#1A1F26] px-3 py-1.5 text-sm text-[#f4f1ea]"
       >
         {seats.map((seat) => (
           <option key={seat.restaurantName} value={seat.restaurantName}>

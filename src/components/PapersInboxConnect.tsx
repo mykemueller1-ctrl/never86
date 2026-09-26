@@ -163,7 +163,7 @@ export function PapersInboxConnect({
       className={`owner-seat-papers ${variant === 'claim' ? 'is-claim' : ''}`}
       aria-label="Go get last-week papers"
     >
-      <p className="owner-desk-kicker">Papers in</p>
+      <p className="owner-desk-kicker">Papers</p>
       <p className={`owner-seat-honesty is-${honesty.toLowerCase()}`} role="status">
         {honesty}
       </p>
@@ -172,16 +172,22 @@ export function PapersInboxConnect({
       {!loaded ? (
         <p className="owner-seat-papers-outlook">Checking Google papers…</p>
       ) : !ready ? (
-        <p className="owner-seat-receipt" role="status">
-          {missingGoogleLine(status)}
-        </p>
+        <div className="owner-desk-status" role="status">
+          <p className="owner-desk-kicker">Connect</p>
+          <h3 className="owner-desk-status-title">Gmail is not connected on this seat.</h3>
+          <p className="owner-desk-poetry">{missingGoogleLine(status)}</p>
+          <p className="owner-desk-status-next">
+            <span>Next</span>
+            Add a photo or a file. Missing stays Missing.
+          </p>
+        </div>
       ) : connected && status.connection?.email ? (
         <p className="owner-seat-papers-outlook">Connected as {status.connection.email}</p>
       ) : null}
       <div className="owner-seat-papers-actions">
         <button
           type="button"
-          className="owner-desk-primary"
+          className={connected ? 'owner-desk-secondary' : 'owner-desk-primary'}
           disabled={busy || !ready}
           onClick={() => void connectGoogle()}
         >
@@ -196,7 +202,7 @@ export function PapersInboxConnect({
           Connect Drive
         </button>
         {connected && ready ? (
-          <button type="button" className="owner-desk-secondary" disabled={busy} onClick={() => void pullPapers()}>
+          <button type="button" className="owner-desk-primary" disabled={busy} onClick={() => void pullPapers()}>
             Pull last-week invoices
           </button>
         ) : null}
@@ -213,10 +219,15 @@ export function PapersInboxConnect({
         </ul>
       ) : null}
       <p className="owner-seat-papers-outlook">{copy.outlook}</p>
-      {line ? (
-        <p className="owner-seat-receipt" role="status" aria-live="polite">
-          {line}
-        </p>
+      {line && ready && !onPulled ? (
+        <div className="owner-desk-status" role="status" aria-live="polite">
+          <p className="owner-desk-kicker">Status</p>
+          <p className="owner-desk-poetry">{line}</p>
+          <p className="owner-desk-status-next">
+            <span>Next</span>
+            Confirm the store and the week. Missing stays Missing until a line is on the paper.
+          </p>
+        </div>
       ) : null}
     </article>
   );
