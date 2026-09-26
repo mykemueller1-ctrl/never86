@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { AuthHonestyLine } from '@/components/AuthHonestyLine';
 import {
   ACTIVATE_FAILURE_LOGOUT_PATH,
   decideActivateClientOutcome,
 } from '@/lib/operatorActivateHttp';
+import type { HonestyLabel } from '@/lib/oneSeatPublicWin';
 import {
   MAX_FREE_SEAT_PASSWORD_LEN,
   MIN_FREE_SEAT_PASSWORD_LEN,
@@ -25,6 +27,7 @@ export default function ActivateClient() {
   const [password, setPassword] = useState('');
   const [passwordStatus, setPasswordStatus] = useState<'idle' | 'saving' | 'error'>('idle');
   const [passwordError, setPasswordError] = useState('');
+  const [honesty, setHonesty] = useState<HonestyLabel | null>(null);
 
   function goToDesk() {
     window.location.replace(redirect);
@@ -52,16 +55,20 @@ export default function ActivateClient() {
           success?: boolean;
           error?: string;
           redirect?: string;
+          honesty?: 'Missing';
+          code?: string;
         };
         const outcome = decideActivateClientOutcome({
           httpOk: res.ok,
           success: data.success,
           error: data.error,
           redirect: data.redirect,
+          honesty: data.honesty === 'Missing' || data.code === 'operator_login_unavailable' ? 'Missing' : undefined,
         });
         if (outcome.kind === 'error') {
           setStatus('error');
-          setMessage(outcome.message);
+          setHonesty(outcome.honesty === 'Missing' ? 'Missing' : null);
+          setMessage(outcome.honesty === 'Missing' ? `${outcome.message} Honesty: Missing. The seat was not opened.` : outcome.message);
           void fetch(ACTIVATE_FAILURE_LOGOUT_PATH, { method: 'POST' });
           return;
         }
@@ -70,7 +77,8 @@ export default function ActivateClient() {
         setMessage('Email verified. Set a password so you don’t need a fresh email link next time.');
       } catch (err: unknown) {
         setStatus('error');
-        setMessage(err instanceof Error ? err.message : 'Sign-in failed');
+        setHonesty('Missing');
+        setMessage(`${err instanceof Error ? err.message : 'Sign-in failed'} Honesty: Missing. The seat was not opened.`);
         void fetch(ACTIVATE_FAILURE_LOGOUT_PATH, { method: 'POST' });
       }
     }
@@ -98,8 +106,21 @@ export default function ActivateClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not save your password.');
+      const data = await res.json() as { success?: boolean; error?: string; honesty?: HonestyLabel };
+      if (!res.ok || !data.success) {
+        const missing = data.honesty === 'Missing' || res.status === 503;
+        const error = data.error || 'Could not save your password.';
+        if (missing) {
+          const note = `${error} Honesty: Missing. The password was not saved.`;
+          setHonesty('Missing');
+          setPasswordStatus('error');
+          setPasswordError(note);
+          setMessage(note);
+          return;
+        }
+        setHonesty(null);
+        throw new Error(error);
+      }
       setStatus('done');
       setMessage('Password saved. Opening your operator…');
       goToDesk();
@@ -114,11 +135,15 @@ export default function ActivateClient() {
       <div className="mx-auto max-w-lg px-5 py-24 text-center">
         <p className="text-xs uppercase tracking-[0.2em] text-[#8fa898]">Never 86&apos;d · secure email sign-in</p>
         <h1 className="mt-4 font-serif text-4xl tracking-tight text-white">
-          {status === 'error' ? 'That link did not open.' : 'You’re in.'}
+          {honesty === 'Missing' ? 'Missing — that did not finish.' : status === 'error' ? 'That link did not open.' : 'You’re in.'}
         </h1>
-        <p className="mt-4 text-[#b7c0b8] leading-relaxed" role={status === 'error' ? 'alert' : 'status'}>
-          {message}
-        </p>
+        {honesty ? (
+          <AuthHonestyLine honesty={honesty} message={message} />
+        ) : (
+          <p className="mt-4 text-[#b7c0b8] leading-relaxed" role={status === 'error' ? 'alert' : 'status'}>
+            {message}
+          </p>
+        )}
         {status === 'loading' ? (
           <div className="mx-auto mt-8 h-2 w-32 overflow-hidden rounded-full bg-[#26312c]">
             <div className="h-full w-2/3 animate-pulse rounded-full bg-[#7eb6ff]" />

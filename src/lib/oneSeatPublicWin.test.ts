@@ -61,8 +61,9 @@ describe('Grok-native One Seat public door', () => {
   it('does not redirect login, onboard, or the three checks off never86.ai', () => {
     expect(config).toMatch(/source: '\/communities'/);
     expect(config).toMatch(/destination: '\/portal'/);
-    expect(config).toContain("source: '/seat'");
-    expect(config).toContain("destination: '/onboard'");
+    expect(config).not.toContain("source: '/seat'");
+    expect(read('src/app/seat/page.tsx')).toMatch(/OneSeatPanels/);
+    expect(read('src/app/seat/page.tsx')).toMatch(/OperatorGoldLinks/);
     for (const path of ['/check/invoices', '/check/labor', '/check/menu', '/login', '/onboard']) {
       expect(config).not.toContain(`source: '${path}'`);
     }
@@ -100,6 +101,19 @@ describe('Grok-native One Seat public door', () => {
     expect(isGoldSampleInvoices(GOLD_PRIOR_INVOICE_CSV, GOLD_CURRENT_INVOICE_CSV)).toBe(true);
     expect(isGoldSampleInvoices(GOLD_CURRENT_INVOICE_CSV, GOLD_PRIOR_INVOICE_CSV)).toBe(true);
     expect(publicDoorHonesty({ row: mozzarella, disclosedSample: true })).toBe('Estimated');
+    const reshapedPrior = [
+      'Vendor,SKU,Description,Pack,Period,Unit Price,Qty',
+      'Sample Dairy,MZ-452,Whole Milk Mozzarella 20 LB case,20 lb,2026-09-01,48.00,1',
+      'Sample Dairy,FL-100,All Purpose Flour 50 LB,50 lb,2026-09-01,25.00,1',
+    ].join('\n');
+    const reshapedCurrent = [
+      'Vendor,SKU,Description,Pack,Period,Unit Price,Qty',
+      'Sample Dairy,MZ-452,Whole Milk Mozzarella 20 LB case,20 lb,2026-09-08,56.00,1',
+      'Sample Dairy,FL-100,All Purpose Flour 50 LB,50 lb,2026-09-08,25.00,1',
+    ].join('\n');
+    expect(isGoldSampleInvoices(reshapedPrior, reshapedCurrent)).toBe(true);
+    expect(attachPublicHonesty(compare.rows, isGoldSampleInvoices(reshapedPrior, reshapedCurrent)).every((row) => row.honesty === 'Estimated')).toBe(true);
+    expect(isGoldSampleInvoices('Vendor,SKU,Unit Price\nSysco,ABC,48.00', 'Vendor,SKU,Unit Price\nSysco,ABC,56.00')).toBe(false);
     const sampleRows = attachPublicHonesty(compare.rows, true);
     expect(sampleRows).toHaveLength(2);
     expect(sampleRows.every((row) => row.honesty === 'Estimated')).toBe(true);
@@ -136,14 +150,16 @@ describe('Grok-native One Seat public door', () => {
     expect(home).toContain(GOLD_SAMPLE_HONESTY);
     expect(home).toContain(GOLD_SAMPLE_HONESTY_NOTE);
 
+    expect(GOLD_SAMPLE_HONESTY_NOTE).toMatch(/Demo · Estimated/);
+    expect(GOLD_SAMPLE_HONESTY_NOTE).not.toMatch(/Verified/);
     const win = renderToStaticMarkup(createElement(InvoiceWinCard));
     const invoices = renderToStaticMarkup(createElement(CheckInvoices));
     for (const html of [win, invoices]) {
       expect(html).toContain(money(GOLD_MOZZARELLA.priorPrice));
       expect(html).toContain(money(GOLD_MOZZARELLA.currentPrice));
-      expect(html).toContain('Verified');
-      expect(html).toContain('Estimated');
+      expect(html).toContain('Demo · Estimated');
       expect(html).toContain('Missing');
+      expect(html).not.toMatch(/Verified/);
       expect(html).not.toMatch(/\bdesk\b/i);
       expect(html).not.toMatch(/chatgpt\.site/);
     }
@@ -167,11 +183,12 @@ describe('Grok-native One Seat public door', () => {
       expect(source).not.toMatch(/\bdesk\b/i);
       expect(source).not.toMatch(/chatgpt\.site/);
     }
-    for (const path of ['src/app/try/page.tsx', 'src/app/check/invoices/page.tsx']) {
-      const source = read(path);
-      expect(source).toMatch(/InvoiceWinCard/);
-      expect(source).not.toMatch(/\bdesk\b/i);
-      expect(source).not.toMatch(/chatgpt\.site/);
-    }
+    expect(read('src/app/try/page.tsx')).toMatch(/InvoiceWinCard/);
+    expect(read('src/app/try/page.tsx')).toMatch(/OperatorGoldLinks/);
+    expect(read('src/app/try/page.tsx')).not.toMatch(/\bdesk\b/i);
+    const invoices = read('src/app/check/invoices/page.tsx');
+    expect(invoices).toMatch(/InvoiceWinCard/);
+    expect(invoices).not.toMatch(/\bdesk\b/i);
+    expect(invoices).not.toMatch(/chatgpt\.site/);
   });
 });

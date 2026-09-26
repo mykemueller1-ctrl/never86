@@ -6,12 +6,14 @@ import {
   papersEnvChecklist,
   papersGoogleRedirect,
   papersIntakeCopy,
+  papersFileFirstWhenInboxOff,
   papersSeatHonesty,
 } from '@/lib/papersInbox';
 import {
   hydratePapersConnection,
   papersConnectionFor,
   papersDurableStore,
+  listDirectPapers,
   papersFoldersFor,
   papersInvoicesFor,
 } from '@/lib/papersInboxHttp';
@@ -27,11 +29,20 @@ export async function GET(req: NextRequest) {
     await hydratePapersConnection(operatorId);
     const connection = papersConnectionFor(operatorId);
     const invoices = papersInvoicesFor(operatorId);
+    const intake = await listDirectPapers(operatorId);
     const folders = papersFoldersFor(operatorId);
     const connected = Boolean(connection.gmail || connection.drive);
+    const fileFirst = papersFileFirstWhenInboxOff(connection);
+    const shownFolders = fileFirst.inboxOff
+      ? fileFirst.folders
+      : folders.map((folder) => (
+        folder.status === 'missing' ? { ...folder, honesty: 'Missing' as const } : folder
+      ));
     return NextResponse.json({
       success: true,
       intakeOrder: ['gmail', 'photo', 'chat'],
+      fileFirst: fileFirst.inboxOff,
+      lead: fileFirst.lead,
       googleFirst: true,
       ready: gate.ready,
       honesty: papersSeatHonesty({
@@ -46,7 +57,16 @@ export async function GET(req: NextRequest) {
       error: gate.error,
       durable: papersDurableStore(),
       connection,
-      folders,
+      folders: shownFolders,
+      intake: intake.map((paper) => ({
+        id: paper.id,
+        kind: paper.kind,
+        filename: paper.filename,
+        folder: paper.folder,
+        honesty: paper.honesty,
+        note: paper.note,
+        text: paper.text,
+      })),
       copy,
       outlook: outlookV2Plan(),
     });
