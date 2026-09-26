@@ -15,7 +15,7 @@ export default function OperatorLoginPage({ showHouseCode = false }: { showHouse
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
   const [seats, setSeats] = useState<SeatChoice[]>([]);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error' | 'pick'>('idle');
   const [message, setMessage] = useState('');
   const [resetOpen, setResetOpen] = useState(false);
 
@@ -40,10 +40,16 @@ export default function OperatorLoginPage({ showHouseCode = false }: { showHouse
         code?: string;
         seats?: SeatChoice[];
       };
-      if (data.code === 'pick_store' || data.code === 'unknown_store') {
+      if (data.code === 'pick_store') {
+        setSeats(Array.isArray(data.seats) ? data.seats : []);
+        setStatus('pick');
+        setMessage('Signed in. Which store?');
+        return;
+      }
+      if (data.code === 'unknown_store') {
         setSeats(Array.isArray(data.seats) ? data.seats : []);
         setStatus('error');
-        setMessage(data.error || 'Pick the store for this sign-in.');
+        setMessage(data.error || 'That store is not on this email.');
         return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
@@ -135,7 +141,14 @@ export default function OperatorLoginPage({ showHouseCode = false }: { showHouse
               ? (status === 'loading' ? 'Sending…' : status === 'sent' ? 'Link sent ✓' : 'Email me a set-password link →')
               : (status === 'loading' ? 'Signing in…' : 'Sign in →')}
           </button>
-          {message ? <p className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
+          {message ? (
+            <p
+              className={`text-sm text-center ${status === 'error' ? 'text-[#ff453a]' : status === 'pick' ? 'text-[#1d1d1f]' : 'text-[#248a3d]'}`}
+              role={status === 'error' ? 'alert' : 'status'}
+            >
+              {message}
+            </p>
+          ) : null}
           {seats.length > 1 ? (
             <div className="flex flex-wrap gap-2 justify-center">
               {seats.map((seat) => (
