@@ -223,6 +223,15 @@ async function liveAccessToken(operatorId: string): Promise<string | null> {
   return row.accessToken;
 }
 
+export function papersStoredConnection(operatorId: string): PapersStoredConnection | null {
+  return memory.connections.get(operatorId) ?? null;
+}
+
+export async function papersAccessToken(operatorId: string): Promise<string | null> {
+  await hydratePapersConnection(operatorId);
+  return liveAccessToken(operatorId);
+}
+
 export async function connectPapersFolders(operatorId: string): Promise<{
   folders: PapersBohFolder[];
   note: string;
@@ -260,7 +269,7 @@ export async function pullLastWeekPapers(input: {
       pulled: [],
       skipped: 0,
       honesty: 'Missing',
-      nextAction: 'Connect Gmail so Never86 can go get last-week papers. One photo if the inbox is empty.',
+      nextAction: 'Connect Google so Never86 can go get last-week papers. One photo if the inbox is empty.',
       invoices: [],
       compare: null,
       folders: emptyBohFolders(),
