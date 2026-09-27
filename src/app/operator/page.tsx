@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { SimpleOwnerDemo } from '@/components/FreeOperatorPhone';
 import OperatorStoreSwitcher from '@/components/OperatorStoreSwitcher';
 import { isCtapSeat1Email } from '@/lib/ctapSeat1';
 import { readOperatorSession } from '@/lib/readOperatorSession';
+import { OWNER_SEAT_LOGIN_HREF } from '@/lib/ownerSeatGate';
 import { deskSeatLabel } from '@/lib/seatIsolation';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await readOperatorSession();
@@ -25,13 +30,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function OperatorPhonePage() {
   const session = await readOperatorSession();
-  const ctapEmail = session ? isCtapSeat1Email(session.email) : false;
+  if (!session) redirect(OWNER_SEAT_LOGIN_HREF);
+  const ctapEmail = isCtapSeat1Email(session.email);
   const initialRestaurantName = ctapEmail ? deskSeatLabel('Community Tap') : null;
 
   return (
     <main className="owner-desk-page min-h-screen">
       <OperatorStoreSwitcher />
-      <SimpleOwnerDemo initialRestaurantName={initialRestaurantName} signedIn={Boolean(session)} />
+      <SimpleOwnerDemo
+        initialRestaurantName={initialRestaurantName}
+        signedIn
+        ctapOwner={ctapEmail}
+      />
     </main>
   );
 }

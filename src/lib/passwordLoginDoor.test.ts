@@ -124,7 +124,8 @@ describe('returning owners land in the desk, not the claim/login forms', () => {
   it('redirects a signed-in /login visit straight to the owner desk', () => {
     const page = read('src/app/login/page.tsx');
     expect(page).toContain('readOperatorSession');
-    expect(page).toMatch(/redirect\(OWNER_DESK_POST_AUTH_REDIRECT\)/);
+    expect(page).toMatch(/redirect\(returnTo \?\? OWNER_DESK_POST_AUTH_REDIRECT\)/);
+    expect(page).toContain('safeOwnerReturnTo');
     expect(page).toContain("from './LoginClient'");
   });
 

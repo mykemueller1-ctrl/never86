@@ -853,6 +853,38 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   justify-content: space-between;
   gap: 1rem;
 }
+.owner-desk-account {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+.owner-desk-signout {
+  appearance: none;
+  border: 1px solid #dce2eb;
+  background: #ffffff;
+  color: #172335;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.owner-desk-signout:hover {
+  border-color: #285be8;
+  color: #285be8;
+}
+.owner-desk-signout:focus-visible {
+  outline: 2px solid #285be8;
+  outline-offset: 3px;
+}
+.owner-desk-signout:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
 .owner-desk-store {
   font-family: var(--font-display), Inter, Arial, sans-serif;
   font-size: clamp(1.85rem, 4vw, 2.6rem);

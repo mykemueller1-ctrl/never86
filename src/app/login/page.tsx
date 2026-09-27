@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { readOperatorSession } from '@/lib/readOperatorSession';
 import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { safeOwnerReturnTo } from '@/lib/ownerSeatGate';
 import OperatorLoginPage from './LoginClient';
 
 export const dynamic = 'force-dynamic';
@@ -17,10 +18,17 @@ export const metadata: Metadata = {
 };
 
 // Returning owners with a valid session skip the login form and land on the owner seat.
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string | string[] }>;
+}) {
   const session = await readOperatorSession();
+  const params = await searchParams;
+  const rawReturn = Array.isArray(params.returnTo) ? params.returnTo[0] : params.returnTo;
+  const returnTo = safeOwnerReturnTo(rawReturn);
   if (session) {
-    redirect(OWNER_DESK_POST_AUTH_REDIRECT);
+    redirect(returnTo ?? OWNER_DESK_POST_AUTH_REDIRECT);
   }
-  return <OperatorLoginPage />;
+  return <OperatorLoginPage returnTo={returnTo} />;
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyOperatorSession, OPERATOR_COOKIE } from '@/lib/operatorSession';
 import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
+import { OWNER_SEAT_LOGIN_HREF, ownerSeatUnauthenticatedRedirect } from '@/lib/ownerSeatGate';
 
 export const config = {
   matcher: [
@@ -10,6 +11,8 @@ export const config = {
     '/tools/:path*',
     '/admin/:path*',
     '/dashboard/:path*',
+    '/operator',
+    '/operator/',
   ],
 };
 
@@ -23,6 +26,13 @@ async function sha256Hex(input: string): Promise<string> {
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  const ownerSeatLogin = ownerSeatUnauthenticatedRedirect(pathname);
+  if (ownerSeatLogin) {
+    const session = await verifyOperatorSession(req.cookies.get(OPERATOR_COOKIE)?.value, Date.now());
+    if (session) return NextResponse.next();
+    return NextResponse.redirect(new URL(OWNER_SEAT_LOGIN_HREF, req.url));
+  }
 
   if (pathname.startsWith('/reports/login')) {
     return NextResponse.next();
