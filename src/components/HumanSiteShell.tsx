@@ -26,16 +26,16 @@ export function HumanSiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-[#423e38] lg:flex" aria-label="Primary navigation">
-          <Link href="/#what-it-finds" className="human-nav-link">What it finds</Link>
-          <Link href="/#demo" className="human-nav-link">Demo</Link>
-          <Link href="/#one-to-three" className="human-nav-link">1–3 seats</Link>
+          <Link href="/#checks" className="human-nav-link">The checks</Link>
+          <Link href="/story" className="human-nav-link">Story</Link>
+          <Link href="/faq" className="human-nav-link">FAQ</Link>
           <Link href="/pricing" className="human-nav-link">Pricing</Link>
-          <Link href={ONE_SEAT_PATHS.try} className="human-nav-link">Try One Seat</Link>
-          <Link href={ONE_SEAT_PATHS.onboard} className="human-button human-button-primary text-sm">Claim free owner seat →</Link>
+          <Link href={ONE_SEAT_PATHS.onboard} className="human-nav-link">Claim free owner seat</Link>
+          <Link href={ONE_SEAT_PATHS.try} className="human-button human-button-primary text-sm">Try it free — no card</Link>
         </nav>
 
-        <Link href={ONE_SEAT_PATHS.onboard} className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
-          Claim free owner seat →
+        <Link href={ONE_SEAT_PATHS.try} className="human-button human-button-primary whitespace-nowrap text-xs lg:hidden">
+          Try it free
         </Link>
       </div>
     </header>
@@ -71,10 +71,13 @@ export function HumanSiteFooter() {
             </p>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-[#5b554d]">
-            Built from firsthand operating experience inside independent restaurants and a 28-location, private-equity-backed restaurant group. Every claim stays tied to the evidence in front of us.
+            Built by Myke Mueller while he runs a pizza bar in Fort Dodge, Iowa. Every public number is tagged, or it does not ship.
           </p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#4e4942]">
+          <Link href="/try" className="human-nav-link">Try it free</Link>
+          <Link href="/faq" className="human-nav-link">FAQ</Link>
+          <Link href="/story" className="human-nav-link">Story</Link>
           <Link href="/contact" className="human-nav-link">Request the free owner seat</Link>
           <Link href={ONE_SEAT_PATHS.onboard} className="human-nav-link">Claim the free owner seat</Link>
           <Link href="/product" className="human-nav-link">Product story</Link>
