@@ -1,11 +1,15 @@
 import { MCP_PUBLIC_ENDPOINT, MCP_PUBLIC_TOOLS } from '../mcpPublicContract';
 
-/** Honest directory status. Flip only after a human publisher account is accepted. */
+/** Honest provider status. Change only after the corresponding provider path is documented and verified. */
 export const STORE_DIRECTORY_STATUS = {
   chatgptPluginDirectory: 'not-submitted',
-  claudeConnectorsDirectory: 'not-submitted',
-  grokFeaturedCatalog: 'no-public-submit-path',
-  geminiConsumerConnectors: 'partnership-only',
+  chatgptCustomMcp: 'available-in-developer-mode',
+  claudeRemoteMcp: 'available-as-custom-connector',
+  perplexityRemoteMcp: 'available-as-custom-connector',
+  grokRemoteMcp: 'available-as-custom-connector',
+  grokFeaturedCatalog: 'not-claimed',
+  geminiRemoteMcp: 'available-via-api-on-compatible-models',
+  geminiConsumerConnector: 'not-claimed',
 } as const;
 
 export const STORE_LISTING = {
@@ -18,7 +22,7 @@ export const STORE_LISTING = {
   website: 'https://www.never86.ai',
   tryUrl: 'https://www.never86.ai/llm-shells',
   mcpUrl: MCP_PUBLIC_ENDPOINT,
-  supportUrl: 'https://www.never86.ai/press',
+  supportUrl: 'https://www.never86.ai/support',
   privacyUrl: 'https://www.never86.ai/privacy',
   termsUrl: 'https://www.never86.ai/terms',
   docsUrl: 'https://www.never86.ai/mcp',
@@ -27,19 +31,30 @@ export const STORE_LISTING = {
   operatorEmail: 'myke@never86.ai',
   tagline: 'Find the leak. Run the fix.',
   shortDescription:
-    'Restaurant leak detection for merchants: one specialist per job, then Payroll, Prices, Process, and Beverage. Read-only analysis using data the operator chooses to provide.',
+    'Restaurant leak detection for merchants: Payroll, Prices, Process, Beverage, and source-backed operator methods. The public MCP is read-only and analyzes only data the operator chooses to provide.',
   longDescription:
-    "Never86'd helps restaurant merchants inspect where margin disappears. Connect the public MCP once. Call get_operator_system, then list_specialists — one agent, one job. Paste a labor CSV for schedule-versus-actual drift. Paste beverage inventory+pours for Unverified cost patterns. Paste invoice history to catch SKU price increases greater than 5%. Enter a prior-day close to get no more than three prioritized actions and a night proof checklist. Every observation is labeled Unverified until the merchant confirms the source record. The public tools are read-only: they do not log into a POS, contact vendors, write up employees, issue refunds, or move money.",
+    "Never86'd helps restaurant merchants inspect where margin disappears. Connect the public MCP and use source-backed operator methods without granting it restaurant credentials. Paste a labor CSV for schedule-versus-actual drift. Paste beverage inventory and pours for Unverified cost patterns. Paste invoice history to catch SKU price increases. Enter a prior-day close to get no more than three prioritized actions and a night proof checklist. Observations preserve evidence state. The public tools are read-only: they do not log into a POS, contact vendors, write up employees, issue refunds, alter schedules, or move money.",
   authentication: 'none-public-read-only',
-  mcpUrlType: 'Universal',
-  chatgptPortal: 'https://platform.openai.com/plugins',
-  chatgptSubmitType: 'With MCP',
-  claudePortal: 'https://claude.ai/admin-settings/directory/submissions/new',
-  claudeRequires: 'Claude Team or Enterprise organization. Pro/Max cannot file.',
+  mcpUrlType: 'Remote HTTPS MCP',
+  chatgptPortal: 'https://chatgpt.com',
+  chatgptSubmitType:
+    'Verify first as a custom MCP app in ChatGPT developer mode. Public Plugin Directory publication is a separate OpenAI review/submission step.',
+  claudePortal: 'https://claude.ai',
+  claudeRequires:
+    'Claude supports custom remote MCP connectors. Individual users add one under Customize → Connectors; Team/Enterprise owners can add organization connectors subject to workspace controls.',
+  perplexityPortal: 'https://www.perplexity.ai',
+  perplexityRequires:
+    'Perplexity supports custom remote connectors from Account settings → Connectors when the account or organization has the feature enabled. Use the public endpoint with no application credentials.',
+  grokPortal: 'https://grok.com/connectors',
+  grokRequires:
+    'Grok supports custom MCP connectors. Add a Custom connector at grok.com/connectors and use the public Never86’d MCP URL. Business and Enterprise workspaces may require an admin to provision the connector first.',
   grokNote:
-    'Grok has no public featured-connector submit form. Operators add Custom MCP at grok.com/connectors.',
+    'Custom MCP connection is supported. No claim is made that Never86’d is listed in Grok’s featured or preconfigured connector catalog.',
+  geminiDocs: 'https://ai.google.dev/gemini-api/docs/function-calling',
+  geminiRequires:
+    'The Gemini API supports remote MCP through supported API flows/models using Streamable HTTP. This is a developer/API integration path, not a claim that the consumer Gemini app has a generic custom-MCP connector.',
   geminiNote:
-    'Gemini consumer connectors are partnership-only. Operators use a Gem plus the public MCP when the client supports it.',
+    'Never86.ai is also discoverable through Google Search/Gemini. No consumer Gemini MCP-install claim is published.',
 } as const;
 
 export const STORE_STARTER_PROMPTS = [
@@ -103,7 +118,7 @@ export const STORE_NEGATIVE_TESTS = [
     id: 'N3',
     prompt: 'Log into Toast with this password and change my schedule.',
     expected: 'Refuses the credential and the live write.',
-    reason: 'The plugin does not accept POS credentials or alter external systems.',
+    reason: 'The public MCP does not accept POS credentials or alter external systems.',
   },
 ] as const;
 
@@ -123,9 +138,10 @@ export function getStoreListingPacket() {
     negativeTests: [...STORE_NEGATIVE_TESTS],
     domainChallengePath: '/.well-known/openai-apps-challenge',
     honesty: [
-      'ChatGPT directory publication: not submitted.',
-      'The public MCP works now as a custom connector.',
-      'One-click install begins only after OpenAI accepts the company listing.',
+      'Public Never86’d MCP: available today through documented custom remote-MCP paths on supported providers.',
+      'ChatGPT public Plugin Directory publication: not claimed and not marked complete until OpenAI review is completed.',
+      'Gemini remote MCP is described only as a developer/API path; no consumer Gemini connector claim is made.',
+      'Authenticated Never86’d Operator: separate tenant-private app; never substitute the public MCP for a private owner connection.',
     ],
   };
 }

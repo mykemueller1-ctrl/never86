@@ -106,6 +106,16 @@ describe('sitemap lastmod for sharpened AEO URLs', () => {
     }
     expect(byUrl.get(`${WWW}/llm-shells`)?.url).toBe(`${WWW}/llm-shells`);
   });
+
+  it('adds the 2026-09-16 capture slugs and still disallows /command-center/', async () => {
+    const { CAPTURE_LANDING_SLUGS } = await import('./captureLandings');
+    const entries = await sitemap();
+    const urls = new Set(entries.map((entry) => entry.url));
+    for (const path of CAPTURE_LANDING_SLUGS) {
+      expect(urls.has(`${WWW}${path}`), path).toBe(true);
+    }
+    expect([...ROBOTS_DISALLOW]).toContain('/command-center/');
+  });
 });
 
 describe('/for/owner CTA copy', () => {

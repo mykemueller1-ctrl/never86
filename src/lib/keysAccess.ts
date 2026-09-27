@@ -61,7 +61,7 @@ export const XAI_API_KEY_NAME = 'XAI_API_KEY';
 export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   {
     name: XAI_API_KEY_NAME,
-    purpose: 'xAI Grok model API (OpenAI-compatible). Optional for command-center workers that only use public MCP.',
+    purpose: 'xAI Grok model API (OpenAI-compatible). Optional explain voice inside One Seat. Formulas still decide without it. Not required for public MCP.',
     surfaces: ['xai-console', 'vercel', 'local-env', 'cursor-factory'],
     kind: 'secret',
     required: false,
@@ -84,7 +84,7 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
     kind: 'public',
     required: false,
     placeholder: 'grok-4.6',
-    setup: 'Leave unset to use grok-4.6. YouTube desk and other Grok model callers share this default.',
+    setup: 'Leave unset to use grok-4.6. One Seat explain and other Grok model callers share this default.',
   },
   {
     name: 'NEVER86_ORCHESTRATOR_TOKEN',
@@ -224,21 +224,30 @@ export const KEYS_ACCESS_CATALOG: readonly KeySpec[] = [
   },
   {
     name: 'GOOGLE_CLIENT_ID',
-    purpose: 'Google one-seat claim and Gmail/Drive papers inbox. Fail-closed until present with secret + state.',
+    purpose: 'Google one-seat claim and Gmail/Drive papers inbox. Fail-closed until present with secret.',
     surfaces: ['vercel'],
     kind: 'public',
     required: false,
     placeholder: 'xxx.apps.googleusercontent.com',
-    setup: 'Google Cloud OAuth client → Vercel. Not live until Myke enables staff claim.',
+    setup: 'Google Cloud OAuth web client → Vercel Production + Preview. Authorized redirect: https://www.never86.ai/api/papers/google/callback',
   },
   {
     name: 'GOOGLE_CLIENT_SECRET',
-    purpose: 'Google one-seat claim secret.',
+    purpose: 'Google OAuth secret for papers inbox + one-seat claim. Do not invent.',
     surfaces: ['vercel'],
     kind: 'secret',
     required: false,
     placeholder: 'GOCSPX-xxx',
-    setup: 'Approved Vercel secret. Do not invent.',
+    setup: 'Approved Vercel secret. Same client as GOOGLE_CLIENT_ID. Myke Yes only.',
+  },
+  {
+    name: 'PAPERS_GOOGLE_REDIRECT',
+    purpose: 'OAuth redirect URI for operator Gmail + Drive papers. Defaults to production callback.',
+    surfaces: ['vercel'],
+    kind: 'public',
+    required: false,
+    placeholder: 'https://www.never86.ai/api/papers/google/callback',
+    setup: 'Must match Google Cloud Authorized redirect URIs exactly.',
   },
   {
     name: 'STAFF_SEAT_LOGIN_ENABLED',
@@ -312,7 +321,7 @@ export async function probeXaiModels(
   fetchFn: FetchLike = fetch,
 ): Promise<{ status: ProbeStatus; httpStatus?: number; modelCount?: number; detail?: string }> {
   const key = env[XAI_API_KEY_NAME]?.trim();
-  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. Grok Bot and public MCP do not need this key.' };
+  if (!key) return { status: 'not-configured', detail: 'XAI_API_KEY is absent. One Seat formulas still decide. Grok explain stays off. Public MCP does not need this key.' };
 
   const response = await fetchFn(`${xaiApiBase(env)}/models`, {
     method: 'GET',

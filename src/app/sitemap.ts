@@ -2,6 +2,12 @@ import type { MetadataRoute } from 'next';
 import { listPublishedAnswers } from '@/lib/answersDb';
 import { AGENT_SPECS } from '@/lib/agentSpecs';
 import { POS_SPECS } from '@/lib/posSpecs';
+import {
+  CAPTURE_LANDING_LASTMOD,
+  CAPTURE_LANDING_PATHS,
+  CAPTURE_SITEMAP_PRIORITY,
+  CAPTURE_SHIP_ORDER,
+} from '@/lib/captureLandings';
 import { AEO_PAGE_LASTMOD, ISSUE_122_3P_SLUGS, SITE_LASTMOD, WWW } from '@/lib/seoAeo';
 
 export const dynamic = 'force-dynamic';
@@ -45,8 +51,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/demo/catering-leak`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}/demo/shift-pulse`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}/demo/rate-card-audit`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE}/agents`,  lastModified: now, changeFrequency: 'weekly', priority: 0.97 },
-    { url: `${BASE}/trial`,   lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${BASE}/agents`, lastModified: now, changeFrequency: 'weekly', priority: 0.97 },
+    { url: `${BASE}/trial`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/play`, lastModified: now, changeFrequency: 'weekly', priority: 0.99 },
     { url: `${BASE}/product`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/operator`, lastModified: now, changeFrequency: 'weekly', priority: 0.96 },
@@ -55,7 +61,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/pricing`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/install`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/onboard`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${BASE}/operator`, lastModified: now, changeFrequency: 'weekly', priority: 0.96 },
+    { url: `${BASE}/contact`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/try`, lastModified: now, changeFrequency: 'weekly', priority: 0.99 },
+    { url: `${BASE}/seat`, lastModified: now, changeFrequency: 'weekly', priority: 0.99 },
+    { url: `${BASE}/chat`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/try/labor`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/try/recipes`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/try/watch`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}/check/invoices`, lastModified: now, changeFrequency: 'weekly', priority: 0.98 },
+    { url: `${BASE}/check/labor`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE}/check/menu`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    ...CAPTURE_SHIP_ORDER.map((key) => ({
+      url: `${BASE}${CAPTURE_LANDING_PATHS[key]}`,
+      lastModified: CAPTURE_LANDING_LASTMOD,
+      changeFrequency: 'weekly' as const,
+      priority: CAPTURE_SITEMAP_PRIORITY[key],
+    })),
     { url: `${BASE}/operators`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/answers`, lastModified: stamp('/answers'), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/delivery-marketplace-reconciliation`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
@@ -67,7 +88,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/terms`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/people`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/login`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE}/story`, lastModified: now, changeFrequency: 'monthly', priority: 0.92 },
     { url: `${BASE}/changelog`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}/case/walked-the-number-back`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },

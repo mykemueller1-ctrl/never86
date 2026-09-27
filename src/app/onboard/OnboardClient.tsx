@@ -2,6 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { AuthHonestyLine } from '@/components/AuthHonestyLine';
+import { PapersInboxConnect } from '@/components/PapersInboxConnect';
+import { PapersReadiness } from '@/components/PapersReadiness';
+import type { HonestyLabel } from '@/lib/oneSeatPublicWin';
 import { trackEvent } from '@/lib/track';
 
 type Status = 'idle' | 'loading' | 'sent' | 'error';
@@ -21,6 +25,7 @@ export default function OnboardPage() {
   const [storeName, setStoreName] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
+  const [honesty, setHonesty] = useState<HonestyLabel | null>(null);
 
   useEffect(() => { trackEvent('onboard_view'); }, []);
 
@@ -34,6 +39,7 @@ export default function OnboardPage() {
     }
     setStatus('loading');
     setMessage('');
+    setHonesty(null);
     trackEvent('onboard_submit', { meta: { path: 'email_store' } });
     try {
       const res = await fetch('/api/onboard/request', {
@@ -41,15 +47,33 @@ export default function OnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, restaurantName, storeName: restaurantName, sourcePage: '/onboard' }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send the link.');
+      const data = await res.json() as {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        code?: string;
+        honesty?: HonestyLabel;
+      };
+      if (!res.ok || !data.success) {
+        const missing = data.honesty === 'Missing'
+          || data.code === 'activation_email_unavailable'
+          || data.code === 'neon_unavailable';
+        setHonesty(missing ? 'Missing' : null);
+        const error = data.error || 'Could not send the link.';
+        setStatus('error');
+        setMessage(missing ? `${error} Honesty: Missing. The seat was not opened.` : error);
+        trackEvent('onboard_submit_error', { meta: { path: 'email_store', error } });
+        return;
+      }
+      setHonesty(null);
       setStatus('sent');
-      setMessage(data.message || 'Check your email for a set-password link.');
+      setMessage('Check your inbox for a link to set your password.');
       trackEvent('onboard_submit_success', { meta: { path: 'email_store' } });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : 'Could not send the link.';
+      setHonesty('Missing');
       setStatus('error');
-      setMessage(error);
+      setMessage(`${error} Honesty: Missing. The seat was not opened.`);
       trackEvent('onboard_submit_error', { meta: { path: 'email_store', error } });
     }
   }
@@ -80,7 +104,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Work email + store name. We email a set-password link once. After that, /login is email + password for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
+                Work email and restaurant name. You&apos;ll set your password from the link we email you. After that, sign in for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -95,34 +119,67 @@ export default function OnboardPage() {
 
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
-              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Email. Store. You&apos;re in.</h2>
-              <p className="compass-body mt-3 text-sm">No card. Set a password once from the email link. Extra stores stay on this same email — no plus-alias.</p>
+              <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Work email and restaurant name.</h2>
+              <p className="compass-body mt-3 text-sm">No card. These two fields open the free seat. Extra stores stay on this same email — no plus-alias.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@restaurant.com"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                  className={inputClass}
-                />
-                <input
-                  type="text"
-                  autoComplete="organization"
-                  placeholder="Store name"
-                  value={storeName}
-                  onChange={(event) => setStoreName(event.target.value)}
-                  required
-                  minLength={1}
-                  maxLength={120}
-                  className={inputClass}
-                />
+                <label className="block" htmlFor="onboard-email">
+                  <span className="mb-1.5 block text-[13px] font-semibold text-[#1d1d1f]">Work email</span>
+                  <input
+                    id="onboard-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@restaurant.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    className={inputClass}
+                  />
+                </label>
+                <label className="block" htmlFor="onboard-restaurant">
+                  <span className="mb-1.5 block text-[13px] font-semibold text-[#1d1d1f]">Restaurant name</span>
+                  <input
+                    id="onboard-restaurant"
+                    type="text"
+                    autoComplete="organization"
+                    placeholder="e.g. Community Tap"
+                    value={storeName}
+                    onChange={(event) => setStoreName(event.target.value)}
+                    required
+                    minLength={1}
+                    maxLength={120}
+                    className={inputClass}
+                  />
+                </label>
                 <button type="submit" disabled={status === 'loading' || status === 'sent'} className="btn-primary w-full disabled:opacity-50" style={{ background: '#0066ff' }}>
-                  {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your email ✓' : 'Open Never 86’d →'}
+                  {status === 'loading' ? 'Sending…' : status === 'sent' ? 'Check your inbox' : 'Open Never 86’d →'}
                 </button>
-                {message ? <p className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}>{message}</p> : null}
+                <AuthHonestyLine
+                  honesty={honesty}
+                  message={message}
+                  className={`text-center text-sm ${status === 'error' ? 'text-[#ff453a]' : 'text-[#248a3d]'}`}
+                />
               </form>
+              <p className="mt-4 text-sm leading-relaxed text-[#1d1d1f]">
+                You&apos;ll set your password from the link we email you.
+              </p>
+              <p className="mt-2 text-sm text-[#1d1d1f]">
+                Already have an account?{' '}
+                <Link href="/login" className="font-semibold text-[#0066ff] underline">
+                  Sign in
+                </Link>
+              </p>
+              {status === 'sent' ? (
+                <div className="mt-6">
+                  <p className="compass-body text-sm">
+                    Next: Connect Google. Gmail and Drive stay read-only, and papers land on one review screen. No homework form.
+                  </p>
+                  <PapersInboxConnect variant="claim" />
+                </div>
+              ) : (
+                <div className="mt-6">
+                  <PapersReadiness heading="Google papers" />
+                </div>
+              )}
               <p className="mt-4 text-[11px] leading-relaxed text-[#86868b]">
                 We use this email for account access and essential product help — thank-you, tips, education. No hard sales list. By continuing, you agree to our <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy policy</Link>.
               </p>

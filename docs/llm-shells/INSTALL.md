@@ -1,47 +1,53 @@
-# Never86'd four-LLM thin shells
+# Never86'd AI connector paths
 
-One provider-neutral skill pack. Four install wrappers. The public MCP backend owns the restaurant logic.
+One provider-neutral skill pack. Five provider guidance shells. The public MCP backend owns the restaurant logic.
 
 ## Status (honest)
 
 | Claim | State |
 |---|---|
-| Submitted to GPT Store / Claude directory / Gemini gallery / Grok featured connectors | **no — not submitted** |
-| Live-verified as installed inside ChatGPT, Claude, Gemini, or Grok | **no — unverified** |
-| Provider secrets or restaurant-tenant OAuth clients for these shells | **none claimed** |
-| READ-ONLY certified in repo | yes (not live-verified on a provider UI) |
-| DRAFT-ONLY certified in repo | yes (no live external writes) |
+| ChatGPT Plugin Directory publication | **not submitted** |
+| Claude marketplace / featured publication | **not claimed** |
+| Grok featured or preconfigured catalog listing | **not claimed** |
+| Consumer Gemini generic custom-MCP connector | **not claimed** |
+| Public remote-MCP paths documented | **ChatGPT, Claude, Perplexity, Grok; Gemini via compatible API/model flow** |
+| Live Never86'd connection tested in every provider/account/plan | **no — each account still needs verification** |
+| Provider secrets or restaurant-tenant OAuth clients for this public MCP | **none claimed** |
+| READ-ONLY certified in repo | **yes** |
+| DRAFT-ONLY certified in repo | **yes — no live external writes** |
 
-1-click search-and-install is a directory listing. Filing packet: `docs/llm-shells/STORE-LISTING.md` and `/store-listing`. Do not claim listed until Published.
+Directory publication is separate from custom remote-MCP availability. Do not claim a directory listing until the provider approves it.
 
 ## Shared source
 
 - Skill pack: `src/lib/llmShells/skillPack.ts` (`never86-operator-skill` v1.0.0)
-- Tool contracts: `src/lib/mcpPublicContract.ts` (same list the MCP route serves)
-- Thin Claude/Cursor skill file: `skills/never86/SKILL.md`
+- Tool contracts: `src/lib/mcpPublicContract.ts`
+- Thin skill file: `skills/never86/SKILL.md`
 - Machine-readable matrix: `GET /api/llm-shells`
-- Per-shell JSON: `GET /api/llm-shells/{chatgpt,claude,gemini,grok}`
+- Per-shell JSON: `GET /api/llm-shells/{chatgpt,claude,perplexity,grok,gemini}`
 - Human page: `/llm-shells`
-- Store listing packet: `/store-listing` (noindex)
+- Publisher packet: `/store-listing` (noindex)
 
 ## Public MCP
 
 `https://www.never86.ai/api/mcp`
 
-This is the existing public read-only Never86 MCP. It is not the private Grok→Cursor orchestrator (`/api/orchestrator/mcp`). Do not mix those.
+This is the public read-only Never86 MCP. It is not the authenticated tenant-private Never86'd Operator app and it is not the private orchestrator. Do not mix those surfaces.
 
-## Install (human still does this)
+## Provider paths
 
-1. **ChatGPT** — If the account has Connectors/MCP, add the URL above. Otherwise paste the shared skill instructions into a Custom GPT. Not listed in the GPT Store.
-2. **Claude** — Add a remote MCP server named `never86-operator-system` at the same URL. Optional: load `skills/never86/SKILL.md`. Not a marketplace listing.
-3. **Gemini** — Create a Gem with the shared instructions. Add remote MCP only if that client actually supports it. Do not re-declare restaurant math as Gemini functions. No Gem gallery ID is claimed.
-4. **Grok** — Grok Connectors → New Connector → Custom → paste the MCP URL. This repo does not claim the connector is already installed on grok.com.
+1. **ChatGPT** — Create a custom app from the remote MCP in ChatGPT Apps; enable Developer Mode when the plan/workspace requires it. Plugin Directory publication is a separate OpenAI review step.
+2. **Claude** — Customize → Connectors → Add custom connector → enter the remote MCP URL. Workspace controls can apply on Team/Enterprise.
+3. **Perplexity** — Account settings → Connectors → Custom connector → Remote → enter the public MCP URL. Use no application credentials for this public read-only connector.
+4. **Grok** — `grok.com/connectors` → New Connector → Custom → enter the public MCP URL. Business/Enterprise may require admin provisioning. No featured-catalog listing is claimed.
+5. **Gemini API** — Use a compatible Gemini API/model flow with remote MCP over Streamable HTTP. Configure the public endpoint with a server name that contains no hyphens. This is an API/developer path, not a consumer Gemini custom-connector claim.
 
-Every client should call `get_operator_system` first.
+Every compatible client should call `get_operator_system` first.
 
 ## Do not
 
 - Fork Action Shift, 3P math, vendor silence, or tenant rules into a provider prompt
-- Send mail, post, refund, pay, or write CRM from a shell
-- Put Community Tap private numbers, PINs, or staff names in these files
-- Claim Facebook, marketplace publication, or unverified credentials
+- Send mail, post, refund, pay, or write CRM from the public shell
+- Put restaurant-private numbers, PINs, credentials, or staff identifiers in these files
+- Claim marketplace/directory publication or provider credentials that have not been verified
+- Describe the public connector as the authenticated Never86'd Operator app

@@ -22,7 +22,7 @@ export async function GET() {
 
   const feed = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Never 86'd operator evidence desk</title>
+  <title>Never 86'd operator evidence seat</title>
   <id>https://www.never86.ai/answers</id>
   <link href="https://www.never86.ai/answers" />
   <link href="https://www.never86.ai/answers/feed.xml" rel="self" type="application/atom+xml" />

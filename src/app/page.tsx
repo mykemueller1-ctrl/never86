@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
-import HomePage from '@/components/HomePage';
+import HomePage from '@/components/OwnerHome';
 
 export const metadata: Metadata = {
-  title: "Claim the free owner seat | Never 86'd",
+  title: "One Seat — invoice, labor, and plate checks | Never86’d",
   description:
-    "Email-first free owner seat. Watch the recorded demo, then give your email. Payroll. Prices. Process. Not another dashboard.",
+    "One Seat is Action Shift for 1–5 unit independents. Try the two-invoice mozzarella sample, then claim the free owner seat on never86.ai. No ChatGPT onboarding.",
   alternates: { canonical: 'https://www.never86.ai/' },
   openGraph: {
-    title: "Find the leak. Run the fix. | Never 86'd",
+    title: "You run the restaurant. Let’s check the numbers. | Never86’d",
     description:
-      'Watch the recorded demo, then give your email to claim the free owner seat. Payroll. Prices. Process.',
+      'Bring one real restaurant problem and the evidence you already have. Never86’d helps find the leak, show the source, and work through the next move.',
     url: 'https://www.never86.ai/',
+    images: [{url:'https://www.never86.ai/media/never86-landscape-v24-poster.jpg',alt:'Never86 operator demo'}],
   },
 };
 

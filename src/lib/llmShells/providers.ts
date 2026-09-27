@@ -2,7 +2,7 @@ import { MCP_PUBLIC_ENDPOINT, MCP_PUBLIC_TOOL_NAMES } from '../mcpPublicContract
 import { certifyReadOnlyThenDraftOnly } from './certification';
 import { NEVER86_SKILL_PACK_ID, NEVER86_SKILL_PACK_VERSION, SHARED_SKILL_INSTRUCTIONS, getNever86SkillPack } from './skillPack';
 
-export const LLM_SHELL_PROVIDERS = ['chatgpt', 'claude', 'gemini', 'grok'] as const;
+export const LLM_SHELL_PROVIDERS = ['chatgpt', 'claude', 'perplexity', 'grok', 'gemini'] as const;
 export type LlmShellProvider = (typeof LLM_SHELL_PROVIDERS)[number];
 
 export type HonestInstallStatus = {
@@ -27,9 +27,10 @@ const HONEST_STATUS: HonestInstallStatus = {
 
 /** Durable claims only. Never encode merge/deploy/preview state that goes stale on a live build. */
 export const DURABLE_SHELL_CLAIMS = [
-  'Provider installation: unverified.',
+  'Provider-specific remote MCP paths are documented; each live Never86’d account connection still requires verification.',
   'Marketplace publication: not submitted.',
   'Credentials: none claimed.',
+  'Consumer Gemini custom-MCP install: not claimed.',
   'READ-ONLY and DRAFT-ONLY: certified in repo.',
 ] as const;
 
@@ -64,31 +65,31 @@ function sharedShell(provider: LlmShellProvider, label: string, install: {
 
 export function getChatgptShell() {
   return sharedShell('chatgpt', 'OpenAI ChatGPT', {
-    client: 'ChatGPT Settings → Connectors. Paid plan. Developer Mode if ChatGPT asks for it.',
-    docs: 'https://help.openai.com/en/articles/11487775-connectors-in-chatgpt',
+    client: 'ChatGPT custom app / remote MCP in developer mode when required by the plan or workspace.',
+    docs: 'https://help.openai.com/en/articles/12584461',
     openUrl: 'https://chatgpt.com',
     steps: [
-      'Open ChatGPT → Settings → Connectors (or Apps & Connectors). Enable Developer Mode if the screen asks.',
-      'Create a custom / remote MCP connector named Never86\'d Operator Intelligence.',
-      'Paste https://www.never86.ai/api/mcp. No restaurant login. Then send the first prompt on this page.',
+      'Open ChatGPT settings or workspace settings → Apps. Enable Developer Mode if the workspace requires it.',
+      'Create a custom app named Never86’d Operator Intelligence.',
+      'Enter https://www.never86.ai/api/mcp, scan the tools, and test the public read-only connector.',
     ],
     nativeConfig: {
       name: "Never86'd Operator Intelligence",
       mcpServers: [{ name: 'never86-operator-system', type: 'http', url: MCP_PUBLIC_ENDPOINT }],
-      gptStore: 'not-submitted',
+      pluginDirectory: 'not-submitted',
     },
   });
 }
 
 export function getClaudeShell() {
   return sharedShell('claude', 'Anthropic Claude', {
-    client: 'Claude.ai Customize → Connectors, or Claude Desktop custom connector.',
+    client: 'Claude.ai Customize → Connectors → custom remote connector.',
     docs: 'https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp',
-    openUrl: 'https://claude.ai/settings/connectors',
+    openUrl: 'https://claude.ai',
     steps: [
       'Open Claude → Customize → Connectors → Add custom connector.',
-      'Name it Never86\'d Operator Intelligence.',
-      'Paste https://www.never86.ai/api/mcp. Prefer HTTP/remote MCP. Then send the first prompt on this page.',
+      'Name it Never86’d Operator Intelligence.',
+      'Enter https://www.never86.ai/api/mcp, add the connector, and enable it in the conversation.',
     ],
     nativeConfig: {
       mcpServers: {
@@ -101,38 +102,57 @@ export function getClaudeShell() {
   });
 }
 
-export function getGeminiShell() {
-  return sharedShell('gemini', 'Google Gemini', {
-    client: 'Gemini Gem, or Gemini / AI Studio MCP connector when the account has it.',
-    docs: 'https://ai.google.dev/gemini-api/docs',
-    openUrl: 'https://gemini.google.com',
+export function getPerplexityShell() {
+  return sharedShell('perplexity', 'Perplexity', {
+    client: 'Perplexity Account settings → Connectors → Custom connector → Remote.',
+    docs: 'https://www.perplexity.ai/help-center/en/articles/13915507-adding-custom-remote-connectors',
+    openUrl: 'https://www.perplexity.ai',
     steps: [
-      'Open Gemini. Create a Gem named Never86\'d Operator Intelligence.',
-      'If the account shows Extensions / Connectors, add https://www.never86.ai/api/mcp. If not, paste the shared skill instructions into the Gem.',
-      'Do not rebuild restaurant math as Gemini functions. Then send the first prompt on this page.',
+      'Open Perplexity → Account settings → Connectors.',
+      'Choose Custom connector → Remote and name it Never86’d Operator Intelligence.',
+      'Enter https://www.never86.ai/api/mcp. Use no application credentials for the public read-only connector.',
     ],
     nativeConfig: {
-      gemName: "Never86'd Operator Intelligence",
-      mcpUrl: MCP_PUBLIC_ENDPOINT,
-      gemsGallery: 'not-submitted',
+      connectorName: "Never86'd Operator Intelligence",
+      endpoint: MCP_PUBLIC_ENDPOINT,
+      authentication: 'none-public-read-only',
     },
   });
 }
 
 export function getGrokShell() {
   return sharedShell('grok', 'xAI Grok', {
-    client: 'Grok Connectors → New → Custom.',
+    client: 'Grok Connectors → New Connector → Custom. Business / Enterprise may require admin provisioning.',
     docs: 'https://docs.x.ai/grok/connectors',
     openUrl: 'https://grok.com/connectors',
     steps: [
       'Open grok.com/connectors → New Connector → Custom.',
-      'Name it Never86\'d Operator Intelligence.',
-      'Paste https://www.never86.ai/api/mcp. Save. Then send the first prompt on this page.',
+      'Name it Never86’d Operator Intelligence.',
+      'Enter https://www.never86.ai/api/mcp and complete any connector confirmation. Business / Enterprise workspaces may require an admin first.',
     ],
     nativeConfig: {
       connectorName: "Never86'd Operator Intelligence",
       endpoint: MCP_PUBLIC_ENDPOINT,
-      grokDirectory: 'not-submitted',
+      grokCatalog: 'not-claimed',
+    },
+  });
+}
+
+export function getGeminiShell() {
+  return sharedShell('gemini', 'Google Gemini API', {
+    client: 'Gemini API remote MCP on compatible API/model flows. No consumer Gemini custom-connector claim.',
+    docs: 'https://ai.google.dev/gemini-api/docs/function-calling',
+    openUrl: 'https://aistudio.google.com',
+    steps: [
+      'Use a Gemini API flow/model that supports remote MCP over Streamable HTTP.',
+      'Configure an MCP server with URL https://www.never86.ai/api/mcp and a server name without hyphens, such as never86_operator_system.',
+      'Do not describe this as a generic consumer Gemini-app connector. It is a developer/API path.',
+    ],
+    nativeConfig: {
+      type: 'mcp_server',
+      name: 'never86_operator_system',
+      url: MCP_PUBLIC_ENDPOINT,
+      consumerGeminiConnector: 'not-claimed',
     },
   });
 }
@@ -140,8 +160,9 @@ export function getGrokShell() {
 const SHELL_BUILDERS = {
   chatgpt: getChatgptShell,
   claude: getClaudeShell,
-  gemini: getGeminiShell,
+  perplexity: getPerplexityShell,
   grok: getGrokShell,
+  gemini: getGeminiShell,
 } as const;
 
 export function getLlmShell(provider: LlmShellProvider) {
@@ -184,10 +205,10 @@ export function getInstallMatrix() {
       steps: shell.install.steps,
     })),
     honesty: [
-      'One skill pack. Four thin install shells. No forked restaurant logic.',
-      'Provider installation is unverified until a human adds the connector in each provider UI.',
-      'No GPT Store, Claude directory, Gemini gallery, or Grok featured-connector publication is claimed.',
-      'No provider secrets, operator OAuth clients, or unverified credentials are included.',
+      'One skill pack. Five provider guidance shells. No forked restaurant logic.',
+      'Documented connector/API paths do not prove that the Never86’d connector has been tested in every account or plan.',
+      'No ChatGPT Plugin Directory, Claude marketplace, Grok featured-catalog, or consumer Gemini connector publication is claimed.',
+      'No provider secrets, operator OAuth clients, or unverified credentials are included in the public MCP.',
       'READ-ONLY and DRAFT-ONLY are certified in repo. Live external writes: none.',
     ],
   };

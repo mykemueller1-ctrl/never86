@@ -2,10 +2,11 @@ import type { MetadataRoute } from 'next';
 import { ROBOTS_ALLOW, ROBOTS_DISALLOW, WWW } from '@/lib/seoAeo';
 
 export default function robots(): MetadataRoute.Robots {
-  // Allow public JSON first, then Disallow /api/. First-match crawlers honor order;
-  // Google still uses the longest path, so /api/answers wins over /api/.
+  // Public evidence, answers, and the MCP description are discoverable.
+  // Private operator/admin/upload routes remain blocked for every crawler.
   const allow = [...ROBOTS_ALLOW];
   const disallow = [...ROBOTS_DISALLOW];
+
   return {
     rules: [
       {
@@ -13,10 +14,23 @@ export default function robots(): MetadataRoute.Robots {
         allow,
         disallow,
       },
-      // Named AI crawlers can read the public evidence surface but not private
-      // operator, admin, command-center, or upload routes.
+      // Search / user-retrieval agents. Keep these explicit so Never86'd can
+      // be discovered and cited in ChatGPT, Claude, and Perplexity answers.
       {
-        userAgent: ['GPTBot', 'ClaudeBot', 'Google-Extended', 'PerplexityBot', 'OAI-SearchBot', 'Applebot-Extended'],
+        userAgent: [
+          'OAI-SearchBot',
+          'Claude-SearchBot',
+          'Claude-User',
+          'PerplexityBot',
+          'Perplexity-User',
+        ],
+        allow,
+        disallow,
+      },
+      // Existing public-content training/product posture is unchanged. These
+      // agents still receive only the same public surface and never private routes.
+      {
+        userAgent: ['GPTBot', 'ClaudeBot', 'Google-Extended', 'Applebot-Extended'],
         allow,
         disallow,
       },

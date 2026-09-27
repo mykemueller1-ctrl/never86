@@ -6,7 +6,7 @@ import OnboardPage from './OnboardClient';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Returning owners with a valid session skip Claim seat and land on the desk.
+// Returning owners with a valid session skip Claim seat and land on the owner seat.
 export default async function Onboard() {
   const session = await readOperatorSession();
   if (session) {

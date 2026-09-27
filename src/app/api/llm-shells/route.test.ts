@@ -10,7 +10,14 @@ describe('llm-shells machine-readable manifests', () => {
     const body = await response.json();
     expect(body.skillPack.providerNeutral).toBe(true);
     expect(body.status.marketplacePublication).toBe('not-submitted');
-    expect(body.shells).toHaveLength(4);
+    expect(body.shells).toHaveLength(5);
+    expect(body.shells.map((shell: { provider: string }) => shell.provider)).toEqual([
+      'chatgpt',
+      'claude',
+      'perplexity',
+      'grok',
+      'gemini',
+    ]);
   });
 
   it('returns each thin shell and 404s unknown providers', async () => {

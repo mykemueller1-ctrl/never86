@@ -6,17 +6,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-// Drain the admin.followup_queue. Called every 15 minutes via Vercel Cron.
-// Authenticated with CRON_SECRET (set on Vercel) — Vercel Cron sends an
-// "Authorization: Bearer {CRON_SECRET}" header on the scheduled call.
-//
-// For each pending follow-up whose scheduled_for <= NOW:
-//   1. Look up the lead
-//   2. Send the agent-aware operator-voice email
-//   3. Mark sent. On failure, mark failed but leave the row for inspection.
-//
-// At-most-once per row: we update status='sending' atomically before send,
-// so concurrent crons don't double-send.
+// Drain the optional admin.followup_queue. Called by Vercel Cron.
+// When the legacy ops database is not configured, this route is intentionally
+// a healthy no-op: current public lead intake sends its immediate emails directly.
+// If CRON_SECRET is configured, Vercel must send the matching Bearer token.
 
 type QueueRow = {
   id: number;
@@ -28,19 +21,22 @@ type QueueRow = {
 };
 
 export async function GET(req: NextRequest) {
-  // CRON_SECRET is OPTIONAL. If set: require Bearer auth. If unset: allow
-  // through. The route is safe to leave unauthenticated for this use case
-  // (worst attack = trigger a no-op against an empty queue; the atomic
-  // status='sending' claim prevents double-sends regardless). Set
-  // CRON_SECRET later if you want defense-in-depth.
   if (process.env.CRON_SECRET) {
     const auth = req.headers.get('authorization');
     if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
     }
   }
+
   if (!opsDbConfigured()) {
-    return NextResponse.json({ ok: false, error: 'ops db not configured' }, { status: 503 });
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      reason: 'optional ops follow-up queue is not configured',
+      processed: 0,
+      sent: 0,
+      failed: 0,
+    });
   }
 
   const sql = opsDb();
@@ -89,6 +85,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    skipped: false,
     processed: due.length,
     sent: results.filter((r) => r.sent).length,
     failed: results.filter((r) => !r.sent).length,

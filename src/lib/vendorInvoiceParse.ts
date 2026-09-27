@@ -13,6 +13,7 @@
  */
 
 import { findColumn, num, parseCsv } from './csv/core';
+import { extractPdfTokens } from './pdfTextTokens';
 import { extractNativePdfText } from './pdqEodParse';
 import { looksLikeVendorSilence } from './vendorSilenceParse';
 
@@ -30,6 +31,7 @@ export type VendorInvoiceLine = {
   vendor: string;
   sku: string;
   description: string;
+  pack: string | null;
   period: string;
   unitPrice: number | null;
   quantity: number | null;
@@ -58,7 +60,11 @@ const VENDOR_LABELS: Array<{ re: RegExp; label: string }> = [
 
 export function decodeInvoiceSource(bytes: Uint8Array, filename = ''): string {
   const pdf = filename.toLowerCase().endsWith('.pdf') || (bytes[0] === 0x25 && bytes[1] === 0x50);
-  if (pdf) return extractNativePdfText(bytes);
+  if (pdf) {
+    const tokens = extractPdfTokens(bytes);
+    if (tokens.length) return tokens.join('\n');
+    return extractNativePdfText(bytes);
+  }
   return Buffer.from(bytes).toString('utf8');
 }
 
@@ -123,6 +129,15 @@ function parseInvoiceNumber(text: string): string | null {
   return m?.[1] ?? null;
 }
 
+export function extractPack(raw: string): string | null {
+  const labeled = raw.match(/Pack(?:\/Size)?\s*[:#]?\s*([A-Za-z0-9./-]+(?:\s+(?:lb|cs|ea|gal|dz|case|each|cn)\b)?)/i);
+  if (labeled?.[1]) return labeled[1].trim();
+  const unit = raw.match(/\b(\d+(?:\.\d+)?\s*(?:lb|cs|ea|gal|dz|cn)\s*(?:case)?)\b/i)
+    ?? raw.match(/\b(20\s*lb\s*case|50\s*lb)\b/i)
+    ?? raw.match(/\b(CS|EA|LB|GAL|CN|DZ|CASE|EACH)\b/i);
+  return unit?.[1]?.trim() || null;
+}
+
 function moneyToken(raw: string | undefined | null): number | null {
   if (raw == null) return null;
   const cleaned = String(raw).replace(/[$,\s]/g, '');
@@ -140,6 +155,7 @@ function parseLabeledItemLine(line: string, vendor: string, period: string, sour
   const sku = line.match(/(?:SKU|Item(?:\s*Number)?|SUPC|Product(?:\s*Code|\s*Number)?)\s*[:#]?\s*([A-Za-z0-9._-]+)/i)?.[1];
   const price = moneyToken(line.match(/Unit\s*Price\s*[:#]?\s*\$?\s*([\d,]+\.\d{2})/i)?.[1]);
   if (!sku && price == null) return null;
+  const pack = extractPack(line);
   const labeledDesc = line.match(/Desc(?:ription)?\s*[:#]?\s*(.+?)(?:\s+Qty\b|\s+Pack\b|\s+Unit Price\b|$)/i)?.[1]?.trim();
   const between = sku
     ? line.replace(new RegExp(`^.*?${sku.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`, 'i'), '')
@@ -156,6 +172,7 @@ function parseLabeledItemLine(line: string, vendor: string, period: string, sour
       vendor,
       sku: sku || '',
       description,
+      pack,
       period,
       unitPrice: price,
       quantity,
@@ -169,6 +186,7 @@ function parseLabeledItemLine(line: string, vendor: string, period: string, sour
     vendor,
     sku,
     description,
+    pack,
     period,
     unitPrice: price,
     quantity,
@@ -197,11 +215,13 @@ function parseColumnarItemLine(line: string, vendor: string, period: string, sou
   const qtyMatch = rest.match(/\s(\d+(?:\.\d+)?)\s+(?:CS|EA|LB|GAL|CN|DZ|CASE|EACH)\b/i)
     ?? rest.match(/\s(\d+(?:\.\d+)?)\s+\$?[\d,]+\.\d{2}/);
   const quantity = qtyMatch && Number.isFinite(Number(qtyMatch[1])) ? Number(qtyMatch[1]) : null;
+  const pack = extractPack(trimmed);
   if (unitPrice == null || !period) {
     return {
       vendor,
       sku,
       description: desc,
+      pack,
       period,
       unitPrice,
       quantity,
@@ -215,6 +235,7 @@ function parseColumnarItemLine(line: string, vendor: string, period: string, sou
     vendor,
     sku,
     description: desc,
+    pack,
     period,
     unitPrice,
     quantity,
@@ -260,6 +281,7 @@ function parseNativeTextInvoice(text: string, filename: string): VendorInvoiceDo
         vendor: vendorName,
         sku: '',
         description: '',
+        pack: extractPack(line),
         period: period || '',
         unitPrice: null,
         quantity: null,
@@ -292,6 +314,7 @@ function parseCsvInvoice(text: string, filename: string): VendorInvoiceDocument 
   const iPeriod = findColumn(headers, ['Period', 'Month', 'InvoiceDate', 'Date', 'BusinessDate']);
   const iPrice = findColumn(headers, ['UnitPrice', 'Price', 'CasePrice', 'ItemPrice']);
   const iQty = findColumn(headers, ['Qty', 'Quantity', 'Cases', 'Units']);
+  const iPack = findColumn(headers, ['Pack', 'PackSize', 'Size', 'UOM']);
 
   if (iSku < 0 && iDesc < 0) return null;
   if (iPrice < 0) return null;
@@ -317,11 +340,13 @@ function parseCsvInvoice(text: string, filename: string): VendorInvoiceDocument 
     const qtyCell = iQty >= 0 ? num(row[iQty]) : NaN;
     const quantity = Number.isFinite(qtyCell) && qtyCell > 0 ? qtyCell : null;
     const raw = row.join(',');
+    const pack = (iPack >= 0 ? row[iPack] : '')?.trim() || extractPack(raw) || extractPack(description);
     const unreadable = !vendor || !sku || !period || unitPrice == null;
     lines.push({
       vendor,
       sku,
       description,
+      pack: pack || null,
       period,
       unitPrice,
       quantity,

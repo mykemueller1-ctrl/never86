@@ -3,14 +3,14 @@ import type { Metadata } from 'next';
 import ActivateClient from './ActivateClient';
 
 export const metadata: Metadata = {
-  title: "Open your operator | Never 86'd",
-  description: 'Use the secure email link to open your Never 86’d operator.',
+  title: "Set your password | Never 86'd",
+  description: 'Use the secure email link to set your Never 86’d password.',
   robots: { index: false, follow: false },
 };
 
 export default function ActivateRoute() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[#0c1210] text-[#e8ebe6] p-10">Loading…</main>}>
+    <Suspense fallback={<main className="min-h-screen bg-[#f4f5f7] p-10 text-[#475569]">Loading…</main>}>
       <ActivateClient />
     </Suspense>
   );

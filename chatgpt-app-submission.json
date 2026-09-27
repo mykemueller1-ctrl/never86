@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "$schema": "https://developers.openai.com/plugins/schemas/chatgpt-app-submission.v1.json",
   "schema_version": 1,
   "app_info": {
     "display_name": "Never86'd Operator",
@@ -9,11 +9,7 @@
   },
   "tools": {
     "get_operator_system": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns the public Never86 operator system pack only. No tenant data and no writes.",
         "open_world_justification": "Does not contact merchants, vendors, POS systems, or third-party portals.",
@@ -21,11 +17,7 @@
       }
     },
     "get_operator_logic": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns a public rulebook domain. No store-private memory and no writes.",
         "open_world_justification": "Does not fetch live merchant statements or log into marketplaces.",
@@ -33,11 +25,7 @@
       }
     },
     "get_3p_audit_logic": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns public marketplace 3P audit rules only.",
         "open_world_justification": "Does not open DoorDash, Uber Eats, or Grubhub merchant portals.",
@@ -45,11 +33,7 @@
       }
     },
     "list_answers": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Lists published public AEO answers. No private restaurant data.",
         "open_world_justification": "Does not scrape merchant portals or third-party admin pages.",
@@ -57,11 +41,7 @@
       }
     },
     "list_free_agents": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Lists the public free-agent catalog only.",
         "open_world_justification": "Does not run agents against live merchant accounts.",
@@ -69,11 +49,7 @@
       }
     },
     "list_agent_jobs": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns the one-agent-one-job governance registry.",
         "open_world_justification": "Does not spawn live workers or contact external systems.",
@@ -81,11 +57,7 @@
       }
     },
     "list_specialists": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Lists domain specialists and allowed tools for discovery.",
         "open_world_justification": "Does not invoke specialists against live merchant data by itself.",
@@ -93,11 +65,7 @@
       }
     },
     "analyze_labor": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Analyzes CSV text deliberately supplied by the merchant and does not change schedules, payroll, or employee records.",
         "open_world_justification": "Does not contact an employee, payroll provider, POS, or any other external system.",
@@ -105,11 +73,7 @@
       }
     },
     "analyze_beverage": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Analyzes merchant-supplied beverage CSV text and returns Unverified review leads without writing inventory.",
         "open_world_justification": "Does not contact distributors, change par levels, or open bar POS systems.",
@@ -117,11 +81,7 @@
       }
     },
     "convert_uom": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Converts verified package sizes and pour specs into portion units without writing inventory or inventing pack size.",
         "open_world_justification": "Does not contact distributors, scales, or POS systems.",
@@ -129,11 +89,7 @@
       }
     },
     "ask_pour_standards": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns interview questions for this unit's house pour sizes without writing memory or inventing ounces.",
         "open_world_justification": "Does not contact bars, POS systems, or distributors.",
@@ -141,11 +97,7 @@
       }
     },
     "declare_pour_standards": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Validates operator-answered pour lines and returns a Memory Curator proposal; it does not auto-approve memory.",
         "open_world_justification": "Does not message staff or alter POS buttons.",
@@ -153,11 +105,7 @@
       }
     },
     "ask_fountain_standards": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Returns interview questions for fountain BIB mix ratio and cup liquid fill without inventing 5+1 or ice displacement.",
         "open_world_justification": "Does not contact fountain valves, distributors, or POS.",
@@ -165,11 +113,7 @@
       }
     },
     "analyze_recipe_cost": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Calculates Unverified plate or drink cost, or food COGS, from merchant-supplied EP lines, house pours, and inventory dollars without writing recipes.",
         "open_world_justification": "Does not contact vendors or rewrite menu engineering systems.",
@@ -177,11 +121,7 @@
       }
     },
     "analyze_vendor_prices": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Reads merchant-supplied invoice or purchasing CSV text and returns a reproducible SKU price comparison without changing source records.",
         "open_world_justification": "Does not contact a vendor, issue a dispute, place an order, or publish information.",
@@ -189,11 +129,7 @@
       }
     },
     "build_action_shift": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
       "justifications": {
         "read_only_justification": "Calculates a short action plan from prior-day close values deliberately supplied by the merchant without writing business state.",
         "open_world_justification": "Does not message staff or vendors, alter a POS, issue refunds, or move money.",

@@ -53,7 +53,7 @@ The probe calls `GET /v1/models` only. It does not send a chat completion and do
 
 Chat completions, when a later job needs them, default to model **`grok-4.6`** at `https://api.x.ai/v1`. Override with public env `XAI_MODEL`. The only secret is `XAI_API_KEY`.
 
-Factory workers that only call public MCP do **not** need this key. Add it when a job must call the Grok model API from the app or a script.
+Factory workers that only call public MCP do **not** need this key. One Seat `/api/one-seat/explain` uses it as an optional explain voice. Formulas still decide without it. See `docs/GROK-ONE-SEAT.md`.
 
 ## Grok command hub and Cursor workers
 
@@ -76,6 +76,7 @@ See `.env.example`. Names used by the site:
 
 - `DATABASE_URL` · `OPS_DATABASE_URL` · `ANTHROPIC_API_KEY` · `RESEND_API_KEY` · `CRON_SECRET` · `ADMIN_API_SECRET` · `OWNER_EMAIL`
 - Staff claim (fail-closed until Myke enables): `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `STAFF_SEAT_LOGIN_ENABLED`
+- Operator papers Connect (same Google client): `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `PAPERS_GOOGLE_REDIRECT` — see `docs/PAPERS-GOOGLE.md`
 
 Do not set `STAFF_SEAT_LOGIN_ENABLED=true` from a factory job. Do not apply Neon from here.
 

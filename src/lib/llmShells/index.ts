@@ -6,6 +6,7 @@ export {
   LLM_SHELL_PROVIDERS,
   getChatgptShell,
   getClaudeShell,
+  getPerplexityShell,
   getGeminiShell,
   getGrokShell,
   getInstallMatrix,
