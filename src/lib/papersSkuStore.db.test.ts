@@ -21,6 +21,8 @@ import {
   forgetPapersSkuMemory,
   hydratePapersSku,
   PAPERS_REVIEW_PERSIST_ERROR,
+  papersContentHash,
+  papersSkuDocumentKey,
   papersSkuRowsForStore,
   PapersSkuPersistError,
   checkedQueryRows,
@@ -644,5 +646,134 @@ describe('papers sku database durability', () => {
     // One PGlite connection serialized these two transactions (overlap 1).
     // The survivor is one complete document. Two OS processes were not started.
     expect(maxOverlap).toBe(1);
+  }, 30_000);
+
+  it('reloads a cold store after pull and keeps a confirmed price beside the other documents', async () => {
+    resetPapersTokenStore();
+    const seat = 'seat:cold-pull';
+    const other = 'seat:cold-other';
+    const firstName = 'fixture-pfg-invoice.txt';
+    const firstText = [
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n');
+    const firstBytes = new TextEncoder().encode(firstText);
+    const firstKey = papersSkuDocumentKey(papersContentHash(firstBytes));
+    const thirdName = 'fixture-pfg-third-invoice.txt';
+    const thirdBytes = new TextEncoder().encode([
+      'Performance', 'Foodservice', 'Date:', '06/19/26', '06/19/26', '900003', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH300', '1', '1', 'EA', '3.000', '3.00',
+    ].join('\n'));
+    const thirdKey = papersSkuDocumentKey(papersContentHash(thirdBytes));
+
+    enqueuePapersScan(seat);
+    await drainPapersScan({
+      operatorId: seat,
+      listGmail: async () => [{ source: 'gmail', externalId: 'msg-cold-first', filename: firstName, bytes: firstBytes }],
+      listDrive: async () => [],
+    });
+    const review = papersScanSnapshot(seat).rows[0];
+    await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-12', lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    await replacePapersSkuDocument(seat, 'second-doc', sauce('05/29/26', '900002', 'TH900', '9.000', '9.00'));
+    await replacePapersSkuDocument(other, 'other-doc', sauce('06/05/26', '900001', 'TH100', '4.000', '4.00'));
+
+    forgetPapersSkuMemory(seat);
+    await replacePapersSkuDocument(seat, 'third-doc', sauce('06/19/26', '900003', 'TH300', '3.000', '3.00'));
+    expect(papersSkuRowsForStore(seat).map((row) => row.documentKey)).toEqual(['third-doc']);
+    await hydratePapersSku(seat);
+    expect(papersSkuRowsForStore(seat).map((row) => row.documentKey).sort()).toEqual([
+      firstKey,
+      'second-doc',
+      'third-doc',
+    ].sort());
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === firstKey)?.unitPrice.amount).toBe(2.25);
+    expect((await savedLines(seat)).map((row) => row.document_key).sort()).toEqual([
+      firstKey,
+      'second-doc',
+      'third-doc',
+    ].sort());
+
+    resetPapersSkuStore();
+    forgetPapersScanMemory();
+    setPapersSkuExecutorForTests(executorFor(database));
+    rememberPapersToken({ operatorId: seat, accessToken: 'tok', email: 'owner@example.com' });
+    const pulledThird = await pullLastWeekPapers({
+      operatorId: seat,
+      fetchGoogle: false,
+      listGmail: async () => [{ filename: thirdName, subject: 'PFG invoice', bytes: thirdBytes }],
+      listDrive: async () => [],
+    });
+    expect(papersSkuRowsForStore(seat).map((row) => row.documentKey).sort()).toEqual([
+      firstKey,
+      'second-doc',
+      'third-doc',
+      thirdKey,
+    ].sort());
+    expect(pulledThird.compare?.compare?.rows.map((row) => row.sku).sort()).toEqual(['TH100', 'TH300', 'TH900']);
+    expect(pulledThird.compare?.compare?.rows.find((row) => row.sku === 'TH100')).toEqual(expect.objectContaining({
+      currentPrice: 2.25,
+      currentPeriod: '2026-W24',
+    }));
+    expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.itemCode.value)).toEqual([]);
+    await hydratePapersSku(other);
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
+    expect(papersSkuRowsForStore(other).some((row) => row.storeId === seat)).toBe(false);
+
+    const again = await pullLastWeekPapers({
+      operatorId: seat,
+      fetchGoogle: false,
+      listGmail: async () => [{ filename: thirdName, subject: 'PFG invoice', bytes: thirdBytes }],
+      listDrive: async () => [],
+    });
+    expect(again.compare?.compare?.rows.find((row) => row.sku === 'TH300')?.currentPrice).toBe(3);
+    expect((await savedLines(seat)).filter((row) => row.document_key === thirdKey)).toHaveLength(1);
+
+    forgetPapersSkuMemory();
+    await replacePapersSkuDocument(seat, `gmail:${firstName}`, sauce('06/05/26', '900001', 'TH100', '1.250', '12.50'));
+    expect(papersSkuRowsForStore(seat).map((row) => row.unitPrice.amount)).toEqual([1.25]);
+    await hydratePapersSku(seat);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === firstKey)?.unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).some((row) => row.documentKey === `gmail:${firstName}` && row.unitPrice.amount === 1.25)).toBe(true);
+
+    const pulledSame = await pullLastWeekPapers({
+      operatorId: seat,
+      fetchGoogle: false,
+      listGmail: async () => [{ filename: firstName, subject: 'PFG invoice', bytes: firstBytes }],
+      listDrive: async () => [],
+    });
+    expect(papersSkuRowsForStore(seat).filter((row) => row.itemCode.value === 'TH100')).toEqual([
+      expect.objectContaining({ documentKey: firstKey, isoWeek: '2026-W24', unitPrice: expect.objectContaining({ amount: 2.25 }) }),
+    ]);
+    expect(papersSkuRowsForStore(seat).some((row) => row.documentKey === `gmail:${firstName}`)).toBe(false);
+    expect(pulledSame.compare?.compare?.rows.find((row) => row.sku === 'TH100')?.currentPrice).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'second-doc')?.isoWeek).toBe('2026-W22');
+    await hydratePapersScan(seat);
+    expect(papersScanSnapshot(seat).rows[0].confirmed).toBe(true);
+    expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+
+    forgetPapersSkuMemory(seat);
+    await Promise.all([
+      replacePapersSkuDocument(seat, 'race-left', sauce('06/05/26', '900004', 'TH400', '4.000', '4.00')),
+      replacePapersSkuDocument(seat, 'race-right', sauce('06/12/26', '900005', 'TH500', '5.000', '5.00')),
+    ]);
+    await hydratePapersSku(seat);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === firstKey)?.unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'race-left')?.unitPrice.amount).toBe(4);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'race-right')?.unitPrice.amount).toBe(5);
+
+    await reopenDatabase();
+    await hydratePapersSku(seat);
+    await hydratePapersSku(other);
+    await hydratePapersScan(seat);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === firstKey)?.unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'second-doc')?.unitPrice.amount).toBe(9);
+    expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.itemCode.value)).toEqual(['TH400']);
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
+    expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+    expect((await savedLines(seat)).some((row) => row.document_key === `gmail:${firstName}`)).toBe(false);
   }, 30_000);
 });

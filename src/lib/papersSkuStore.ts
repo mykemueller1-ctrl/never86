@@ -9,6 +9,8 @@
  * for that hash. Older `provider:filename` keys are removed in that same
  * database transaction.
  *
+ * A single-document write on an empty cache is partial. The next hydrate
+ * reloads every document for that store from the database.
  * One document is deleted and reinserted inside a single transaction.
  * A confirmed review edit writes that document and the review row in the
  * same transaction. Memory changes only after commit. Same-store saves in
@@ -120,6 +122,8 @@ function isPaperAlias(row: StoredSkuRow, canonical: string, hash: string, legacy
 const memory = new Map<string, StoredSkuRow[]>();
 const queues = new Map<string, Promise<unknown>>();
 const reviewedHashes = new Map<string, Set<string>>();
+/** A write that created the cache from an empty store. Hydrate must reload the database. */
+const partialStores = new Set<string>();
 let schemaReady: Promise<void> | null = null;
 let executorOverride: SkuExecutor | null = null;
 let neonCached: { url: string; executor: SkuExecutor } | null = null;
@@ -133,6 +137,7 @@ export function resetPapersSkuStore(): void {
   memory.clear();
   queues.clear();
   reviewedHashes.clear();
+  partialStores.clear();
   schemaReady = null;
 }
 
@@ -149,10 +154,23 @@ export function papersSkuDocumentKey(contentHash: string): string {
 export function forgetPapersSkuMemory(storeId?: string): void {
   if (!storeId) {
     memory.clear();
+    partialStores.clear();
     return;
   }
   const key = papersStoreKey(storeId);
-  if (key) memory.delete(key);
+  if (!key) return;
+  memory.delete(key);
+  partialStores.delete(key);
+}
+
+/**
+ * Publish lines for one document. A cache created from an empty store is
+ * partial: the database may still hold the other documents. Hydrate reloads
+ * those instead of treating this write as the whole store.
+ */
+function stageStore(storeId: string, rows: StoredSkuRow[]): void {
+  if (!memory.has(storeId)) partialStores.add(storeId);
+  memory.set(storeId, rows);
 }
 
 export function papersSkuRowsForStore(storeId: string, isoWeek?: string): StoredSkuRow[] {
@@ -216,8 +234,9 @@ export function replacePapersSkuDocument(
   const stored = storedFrom(key, documentKey, rows, ownerId);
   return enqueue(key, async () => {
     await persistDocument(key, documentKey, stored);
-    const kept = (memory.get(key) ?? []).filter((row) => row.documentKey !== documentKey);
-    memory.set(key, kept.concat(stored));
+    const prior = memory.has(key) ? (memory.get(key) ?? []) : [];
+    const kept = prior.filter((row) => row.documentKey !== documentKey);
+    stageStore(key, kept.concat(stored));
     return stored;
   });
 }
@@ -278,14 +297,15 @@ export function commitReviewedDocument(
     const hash = identity?.sourceHash?.trim().toLowerCase() ?? '';
     const legacy = identity?.legacyKeys ?? [];
     const dropSiblings = Boolean(identity?.replaceHashSiblings && isSha256(hash));
-    const kept = (memory.get(key) ?? []).filter((row) => {
+    const prior = memory.has(key) ? (memory.get(key) ?? []) : [];
+    const kept = prior.filter((row) => {
       if (row.documentKey === documentKey) return false;
       if (legacy.includes(row.documentKey)) return false;
       if (hash && row.sourceHash === hash) return false;
       if (dropSiblings && row.documentKey.endsWith(`:${hash}`)) return false;
       return true;
     });
-    memory.set(key, kept.concat(stored));
+    stageStore(key, kept.concat(stored));
     noteReviewedPaper(key, review.rowJson);
     return stored;
   });
@@ -323,7 +343,7 @@ export function replaceUnreviewedPaperDocument(
         if (row.documentKey.endsWith(`:${hash}`)) return false;
         return true;
       });
-      memory.set(key, kept.concat(stored));
+      stageStore(key, kept.concat(stored));
     }
     return 'replaced' as const;
   });
@@ -351,7 +371,7 @@ async function dropAliases(storeId: string, canonical: string, identity: PaperId
   const had = memory.has(storeId);
   await persistDocument(storeId, canonical, [], undefined, { ...identity, aliasesOnly: true });
   if (had) {
-    memory.set(storeId, (memory.get(storeId) ?? []).filter((row) => !isPaperAlias(row, canonical, hash, legacy)));
+    stageStore(storeId, (memory.get(storeId) ?? []).filter((row) => !isPaperAlias(row, canonical, hash, legacy)));
   }
 }
 
@@ -492,7 +512,7 @@ function readJson(value: unknown): unknown {
 
 export async function hydratePapersSku(storeId: string): Promise<void> {
   const key = papersStoreKey(storeId);
-  if (!key || memory.has(key)) return;
+  if (!key || (memory.has(key) && !partialStores.has(key))) return;
   const db = activeExecutor();
   if (!db) return;
   try {
@@ -505,6 +525,7 @@ export async function hydratePapersSku(storeId: string): Promise<void> {
       [key],
     );
     memory.set(key, found.map((row) => readStored(row.row_json)));
+    partialStores.delete(key);
   } catch (error) {
     if (error instanceof PapersSkuPersistError) throw error;
     throw new PapersSkuPersistError('SKU lines were not loaded. Compare was not updated.');
