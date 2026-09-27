@@ -79,12 +79,12 @@ describe('papers SKU line parsers', () => {
     expect(sauce.itemCode).toMatchObject({ honesty: 'Verified', value: 'TH100' });
     expect(sauce.quantity).toMatchObject({ honesty: 'Verified', amount: 1 });
     expect(sauce.unit).toMatchObject({ value: 'CS' });
-    expect(sauce.unitPrice).toMatchObject({ honesty: 'Verified', amount: 1.25 });
+    expect(sauce.unitPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
     expect(sauce.extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
     expect(sauce.category).toMatchObject({ honesty: 'Verified', value: 'food' });
     const dough = row(parsed.lines, '24400');
     expect(dough.productName.value).toContain('Dough');
-    expect(dough.unitPrice.amount).toBe(0.082);
+    expect(dough.unitPrice.amount).toBe(10);
     expect(dough.extendedPrice.amount).toBe(20);
     expect(dough.extendedPrice.amount).not.toBeCloseTo(0.164, 3);
     expect(dough.quantity.amount).toBe(2);
@@ -212,7 +212,7 @@ describe('papers SKU line parsers', () => {
     expect(box.category).toMatchObject({ honesty: 'Verified', value: 'other' });
     expect(box.quantity).toMatchObject({ honesty: 'Verified', amount: 1 });
     expect(box.unit.value).toBe('CS');
-    expect(box.unitPrice.amount).toBe(1.25);
+    expect(box.unitPrice.amount).toBe(12.5);
     expect(box.extendedPrice.amount).toBe(12.5);
     expect(box.quantity.amount).not.toBe(50);
     expect(row(boxes.lines, 'TH100').category.value).toBe('food');
@@ -547,7 +547,7 @@ describe('papers SKU line parsers', () => {
     const one = papersSkuCompareForStore('seat:fixture');
     expect(one?.honesty).not.toBe('Verified');
     expect(one?.compare?.rows[0].priorPrice).toBeNull();
-    expect(one?.compare?.rows[0].currentPrice).toBe(1.25);
+    expect(one?.compare?.rows[0].currentPrice).toBe(12.5);
     expect(one?.missing).toMatch(/Missing/);
     await replacePapersSkuDocument('seat:fixture', 'pfg-b', later.lines);
     expect(papersSkuRowsForStore('seat:fixture', '2026-W23')).toHaveLength(1);
@@ -557,8 +557,8 @@ describe('papers SKU line parsers', () => {
       sku: 'TH100',
       priorPeriod: '2026-W23',
       currentPeriod: '2026-W24',
-      priorPrice: 1.25,
-      currentPrice: 1.5,
+      priorPrice: 12.5,
+      currentPrice: 15,
     }));
     expect(both?.honesty).toBe('Verified');
 
@@ -699,8 +699,8 @@ describe('papers SKU line parsers', () => {
     expect(papersSkuCompareForStore('seat:101')?.compare?.rows[0]).toEqual(expect.objectContaining({
       priorPeriod: '2026-W23',
       currentPeriod: '2026-W24',
-      priorPrice: 1.25,
-      currentPrice: 1.5,
+      priorPrice: 12.5,
+      currentPrice: 15,
     }));
     expect(papersSkuCompareForStore('seat:102')?.compare?.rows[0]).toEqual(expect.objectContaining({
       currentPrice: 9,

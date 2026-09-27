@@ -71,7 +71,7 @@ export const BASE_WHAT_I_KNOW: readonly WhatIKnowCard[] = [
 ];
 
 export const PUBLIC_PREVIEW_COPY =
-  "Seat-scoped preview. Do not add private CTAP staff, PINs, or live dollars. Uploads and asks persist with source tags.";
+  'Uploads and asks stay on this account. They are tagged to the file you added. Do not paste private staff names.';
 
 export const OWNER_SEAT_EOD = {
   surface: 'owner-seat' as const,

@@ -12,7 +12,7 @@ export async function GET() {
     model: status.model,
     role: 'explain-only',
     product: 'One Seat / Action Shift — not a Grok-resale product',
-    error: status.ready ? null : 'XAI_API_KEY is absent. Formula cards still work. Grok explanation stays off.',
+    error: status.ready ? null : 'A written explanation is off on this seat. The formula result still stands.',
   });
 }
 

@@ -198,6 +198,7 @@ export function FreeOperatorPhone({
   const [winLine, setWinLine] = useState<string | null>(null);
   const [answer, setAnswer] = useState<SimpleOwnerAskAnswer | null>(null);
   const [localName, setLocalName] = useState<string | null>(null);
+  const [seatPapers, setSeatPapers] = useState<Array<{ id: string; filename: string; summary: string }>>([]);
   const [askFocused, setAskFocused] = useState(false);
   const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -218,6 +219,11 @@ export function FreeOperatorPhone({
     if (next.laborCards) setRoleCards(next.laborCards.map((row) => ({ ...row })));
     if (next.dailyCompare) setDailyCompare(next.dailyCompare.map((row) => ({ ...row })));
     if (next.lastWeekPrime) setLastWeekPrime(next.lastWeekPrime);
+    if (next.papers?.length) {
+      setSeatPapers(next.papers.map((row) => ({ id: row.id, filename: row.filename, summary: row.summary })));
+      setReceipt(receivedPapersLine(next.papers.map((row) => row.filename)));
+      setLocalName(next.papers[next.papers.length - 1]?.filename ?? null);
+    }
   }
 
   useEffect(() => {
@@ -578,6 +584,16 @@ export function FreeOperatorPhone({
               <p className="owner-desk-kicker">Papers</p>
               <h2 className="owner-desk-status-title">{papersStatus.title}</h2>
               <p className="owner-desk-poetry">{papersStatus.detail}</p>
+              {seatPapers.length ? (
+                <ul className="owner-seat-papers-folders">
+                  {seatPapers.map((paper) => (
+                    <li key={paper.id}>
+                      <span>{paper.filename}</span>
+                      <span>{paper.summary}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <p className="owner-desk-status-next">
                 <span>Next</span>
                 {papersStatus.next}

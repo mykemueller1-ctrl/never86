@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HonestyLegend } from '@/components/HonestyLegend';
+import { PublicPaperDrop } from '@/components/PublicPaperDrop';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_RECIPE, money, pctLabel } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
@@ -16,7 +17,7 @@ export default function CheckMenuPage() {
     <OneSeatPublicShell
       eyebrow="ONE SEAT · RECIPE COST"
       title="What does this plate cost now?"
-      lede="Bring a recipe and the purchase prices on the last invoices. Invoice ≠ COGS. No count → no food cost."
+      lede="Bring a recipe and the purchase prices on the last invoices. An invoice is not a counted food cost. No count means no food cost."
     >
       <article className={styles.card}>
         <p className={styles.eyebrow}>FICTIONAL SAMPLE</p>
@@ -32,7 +33,7 @@ export default function CheckMenuPage() {
         <HonestyLegend
           demo
           active="Estimated"
-          note="Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS."
+          note="Demo · Estimated. Fictional plate math. No count stays Missing. An invoice is not a counted food cost."
         />
         <div className={styles.next}>
           <small>YOUR NEXT MOVE</small>
@@ -40,6 +41,7 @@ export default function CheckMenuPage() {
         </div>
         <p className={styles.note}>{GOLD_RECIPE.claimBoundary}</p>
       </article>
+      <PublicPaperDrop label="Add a menu or invoice (PDF, CSV, TXT, JPG, or PNG)" />
       <div className={styles.actions}>
         <Link className={styles.primary} href={ONE_SEAT_PATHS.onboard}>Claim free owner seat</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.tryRecipes}>See the sample first</Link>

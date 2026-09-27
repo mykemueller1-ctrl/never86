@@ -93,7 +93,7 @@ export function PapersReadiness({ heading = 'Google papers' }: { heading?: strin
       <ul className={styles.list}>
         {folders.map((folder) => (
           <li key={folder.id || folder.name}>
-            {folder.name} — Missing
+            {folder.name} — {folder.status === 'received' ? 'Received' : (folder.honesty ?? 'Missing')}
           </li>
         ))}
       </ul>

@@ -8,6 +8,7 @@ import {
   papersIntakeCopy,
   papersFileFirstWhenInboxOff,
   papersSeatHonesty,
+  foldersWithReceived,
 } from '@/lib/papersInbox';
 import {
   hydratePapersConnection,
@@ -18,6 +19,7 @@ import {
   papersInvoicesFor,
 } from '@/lib/papersInboxHttp';
 import { withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
+import { getSimpleOwnerDemoService, isServiceError } from '@/lib/simpleOwnerDemo/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -33,11 +35,28 @@ export async function GET(req: NextRequest) {
     const folders = papersFoldersFor(operatorId);
     const connected = Boolean(connection.gmail || connection.drive);
     const fileFirst = papersFileFirstWhenInboxOff(connection);
+    let ownerPapers: Array<{ filename: string; evidenceKind: string }> = [];
+    try {
+      const service = getSimpleOwnerDemoService();
+      if (!isServiceError(service)) {
+        const readiness = await service.readiness(operatorId);
+        ownerPapers = readiness.papers ?? [];
+      }
+    } catch {
+      ownerPapers = [];
+    }
+    const landed = [
+      ...intake.map((paper) => ({ folder: paper.folder, filename: paper.filename })),
+      ...ownerPapers,
+    ];
     const shownFolders = fileFirst.inboxOff
-      ? fileFirst.folders
-      : folders.map((folder) => (
-        folder.status === 'missing' ? { ...folder, honesty: 'Missing' as const } : folder
-      ));
+      ? foldersWithReceived(fileFirst.folders, landed)
+      : foldersWithReceived(
+        folders.map((folder) => (
+          folder.status === 'missing' ? { ...folder, honesty: 'Missing' as const } : folder
+        )),
+        landed,
+      );
     return NextResponse.json({
       success: true,
       intakeOrder: ['gmail', 'photo', 'chat'],

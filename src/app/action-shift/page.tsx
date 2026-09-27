@@ -168,7 +168,7 @@ export default function ActionShiftDeskPage() {
             ))}
           </ul>
           <p className="mt-3 text-xs text-[#7a8a80]">
-            Community Tap holds seat 1. Open play is live for any operator on a sample shop (no private CTAP numbers). Claim your own free owner seat with email when you want a real login.{' '}
+            Open play is live for any operator on a sample shop. Private store numbers stay off this page. Claim your own free owner seat with email when you want a real login.{' '}
             <Link href="/play" className="text-[#c4a35a] underline-offset-4 hover:underline">
               Start playing →
             </Link>{' '}

@@ -778,19 +778,19 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   width: min(68rem, 100%);
   margin: 0 auto;
   min-height: 100dvh;
-  padding: 1.5rem 1.35rem 20rem;
+  padding: 1.5rem 1.35rem 2.5rem;
   background: transparent;
   color: var(--ink);
   font-family: var(--font-display), Inter, Arial, sans-serif;
 }
 .owner-desk.is-first-win {
-  padding-bottom: 20rem;
+  padding-bottom: 2.5rem;
 }
 @media (min-width: 880px) {
   .owner-desk,
   .owner-desk.is-first-win {
     width: min(72rem, 100%);
-    padding: 2.25rem 2.25rem 24rem;
+    padding: 2.25rem 2.25rem 3rem;
   }
 }
 .owner-desk-watermark {
@@ -1430,14 +1430,15 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   flex-shrink: 0;
 }
 .owner-seat-dock {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  z-index: 40;
-  transform: translateX(-50%);
-  width: min(68rem, 100%);
-  padding: 0.65rem 1.15rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, #fbfbf9 70%, rgba(251, 251, 249, 0));
+  position: static;
+  left: auto;
+  bottom: auto;
+  z-index: 1;
+  transform: none;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.65rem 0 calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  background: transparent;
 }
 .owner-desk-dock-card {
   border: 1px solid #dce2eb;
@@ -1453,7 +1454,7 @@ a.btn-secondary:hover, button.btn-secondary:hover {
   margin: 0;
 }
 .owner-seat-answer {
-  scroll-margin-bottom: 18rem;
+  scroll-margin-bottom: 1.5rem;
 }
 .papers-review {
   margin-top: 1rem;

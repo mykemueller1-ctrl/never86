@@ -43,7 +43,7 @@ export function OneSeatPublicShell({
         <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
         <Link href={ONE_SEAT_PATHS.login}>Sign in</Link>
         <Link href="/privacy">Privacy</Link>
-        <p>One Seat = Action Shift. Operators stay on never86.ai. Grok explains. Formulas decide.</p>
+        <p>One free owner seat. Operators stay on never86.ai. The formula decides the number.</p>
       </footer>
     </main>
   );

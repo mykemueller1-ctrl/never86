@@ -7,6 +7,7 @@
  * Never invent $ or %. Action Shift only.
  */
 
+import { laborFromFacts, weekSalesFromFacts, factsFromUploads } from '@/lib/ownerPaperFacts';
 import { toastMayAnswerSeat } from '@/lib/seatIsolation';
 import { collectToastFacts, usd } from '@/lib/toastParse';
 import type { SourceTag } from '@/lib/simpleOwnerDemo/types';
@@ -112,13 +113,14 @@ function familyRow(
   id: LastWeekPrimeFamilyId,
   amount: number | null,
   honesty: LastWeekHonesty,
+  paper = FAMILY_PAPER[id],
 ): LastWeekPrimeFamily {
   return {
     id,
     label: FAMILY_LABEL[id],
     honesty,
     amount,
-    paper: FAMILY_PAPER[id],
+    paper,
   };
 }
 
@@ -129,15 +131,26 @@ export function collectLastWeekPrime(
 ): LastWeekPrimeSnapshot {
   const nagToastOk = toastMayAnswerSeat(operatorId, restaurantName);
   const toast = nagToastOk ? collectToastFacts(uploads) : null;
-  const weekSales = toast?.salesWeek?.netSales ?? null;
-  const weekHonesty: LastWeekHonesty = weekSales != null ? 'Verified' : 'Missing';
-  const labor = toast?.labor?.laborCost ?? null;
+  const paperFacts = factsFromUploads(uploads);
+  const paperSales = weekSalesFromFacts(paperFacts);
+  const paperLabor = laborFromFacts(paperFacts);
+  const weekSales = toast?.salesWeek?.netSales ?? paperSales?.amount ?? null;
+  const weekHonesty: LastWeekHonesty = toast?.salesWeek?.netSales != null
+    ? 'Verified'
+    : (paperSales?.honesty ?? 'Missing');
+  const weekPaper = toast?.salesWeek?.netSales != null
+    ? FAMILY_PAPER['week-sales']
+    : (paperSales?.paper ?? FAMILY_PAPER['week-sales']);
+  const labor = toast?.labor?.laborCost ?? paperLabor?.amount ?? null;
   const laborHonesty: LastWeekHonesty = labor != null ? 'Verified' : 'Missing';
+  const laborPaper = toast?.labor?.laborCost != null
+    ? FAMILY_PAPER.labor
+    : (paperLabor?.paper ?? FAMILY_PAPER.labor);
   const labeled = cogsFromTags(uploads.flatMap((row) => row.sourceTags ?? []));
 
   const families: LastWeekPrimeFamily[] = [
-    familyRow('week-sales', weekSales, weekHonesty),
-    familyRow('labor', labor, laborHonesty),
+    familyRow('week-sales', weekSales, weekHonesty, weekPaper),
+    familyRow('labor', labor, laborHonesty, laborPaper),
     familyRow('food', labeled.food?.amount ?? null, labeled.food?.honesty ?? 'Missing'),
     familyRow('pop', labeled.pop?.amount ?? null, labeled.pop?.honesty ?? 'Missing'),
     familyRow('liquor', labeled.liquor?.amount ?? null, labeled.liquor?.honesty ?? 'Missing'),
@@ -172,7 +185,7 @@ export function collectLastWeekPrime(
       : `Estimated last-week prime ${primePct}% · band ${LAST_WEEK_PRIME_BAND_MIN}–${LAST_WEEK_PRIME_BAND_MAX}%`;
 
   const nextLoad = missingIds.length
-    ? `Load last-week COGS for: ${missingLabels}. Invoice ≠ COGS. No count → no food / pop / liquor / beer $.`
+    ? `Load last-week costs for: ${missingLabels}. An invoice is not a counted food cost. No count means food, pop, liquor, and beer stay Missing.`
     : 'Last-week COGS families are on this seat. Incomplete week stays Open if the dates do not match.';
 
   return {
@@ -214,7 +227,7 @@ export function answerLastWeekPrime(snapshot: LastWeekPrimeSnapshot): {
     snapshot.primePct != null && snapshot.weekSales != null && snapshot.cogsTotal != null
       ? `${snapshot.honesty} · math ${usd(snapshot.cogsTotal)} ÷ ${usd(snapshot.weekSales)} × 100 = ${snapshot.primePct}`
       : 'Prime % stays Missing until every family has a same-week dollar. No invented %.',
-    'Invoice ≠ COGS. No count → no food / pop / liquor / beer cost.',
+    'An invoice is not a counted food cost. No count means food, pop, liquor, and beer stay Missing.',
   ];
 
   return {

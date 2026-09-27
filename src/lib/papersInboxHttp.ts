@@ -427,7 +427,7 @@ export async function rememberDirectPaper(
   const existing = await listDirectPapers(operatorId);
   const paper: PapersDirectPaper = {
     ...draft,
-    honesty: draft.honesty === 'Verified' ? 'Estimated' : draft.honesty,
+    honesty: draft.honesty,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };

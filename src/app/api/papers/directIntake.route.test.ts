@@ -21,7 +21,7 @@ describe('POST /api/papers/upload, /photo, /chat', () => {
     const uploaded = await uploadPost(new NextRequest('http://localhost/api/papers/upload', { method: 'POST', body: totals }));
     const uploadBody = await uploaded.json();
     expect(uploaded.status).toBe(200);
-    expect(uploadBody.honesty).toBe('Estimated');
+    expect(uploadBody.honesty).toBe('Verified');
     expect(uploadBody.papers).toHaveLength(2);
     expect(uploadBody.papers.map((row: { text: string }) => row.text)).toEqual([
       'TOTAL DUE $19.00',
@@ -97,8 +97,8 @@ describe('POST /api/papers/upload, /photo, /chat', () => {
     expect(statusBody.intakeOrder).toEqual(['gmail', 'photo', 'chat']);
     expect(statusBody.honesty).toBe('Missing');
     expect(statusBody.intake.map((row: { kind: string; honesty: string }) => `${row.kind}:${row.honesty}`)).toEqual([
-      'upload:Estimated',
-      'upload:Estimated',
+      'upload:Verified',
+      'upload:Verified',
       'upload:Missing',
       'photo:Missing',
       'chat:Estimated',

@@ -107,12 +107,17 @@ export function PapersInboxConnect({
   const ready = Boolean(status.ready);
   const gmail = status.connection?.gmail === true;
   const drive = status.connection?.drive === true;
+  const folders = (status.folders ?? []).map((folder) => (
+    folder.status === 'received' || gmail
+      ? folder
+      : { ...folder, honesty: 'Missing' as const, status: 'missing' }
+  ));
+  const anyReceived = folders.some((folder) => folder.status === 'received');
   const honesty: PapersHonesty = gmail
     ? (status.honesty === 'Verified' || status.honesty === 'Estimated' ? status.honesty : 'Missing')
-    : 'Missing';
-  const folders = (status.folders ?? []).map((folder) => (
-    gmail ? folder : { ...folder, honesty: 'Missing' as const, status: 'missing' }
-  ));
+    : anyReceived
+      ? 'Estimated'
+      : 'Missing';
   const missingSecrets = status.missingSecrets ?? [];
 
   async function connectGoogle() {
@@ -190,7 +195,7 @@ export function PapersInboxConnect({
       ) : null}
       {!gmail && loaded ? (
         <p className="owner-seat-receipt" role="status">
-          Gmail is not connected. {drive ? 'Drive is connected.' : 'Drive is not connected.'} Drop a photo, a PDF, or use chat. Folders stay Missing.
+          Gmail is not connected. {drive ? 'Drive is connected.' : 'Drive is not connected.'} Drop a photo, a PDF, or use chat. {anyReceived ? 'Files already on this account show as received.' : 'Folders stay Missing until a file lands.'}
         </p>
       ) : null}
       <p className="owner-seat-papers-outlook">
@@ -211,7 +216,7 @@ export function PapersInboxConnect({
             >
               {busy && ready ? 'Opening Google…' : 'Connect Google'}
             </button>
-            <span className="owner-seat-honesty is-missing">Missing</span>
+            {anyReceived ? null : <span className="owner-seat-honesty is-missing">Missing</span>}
           </>
         ) : null}
         {gmail && ready ? (
@@ -225,8 +230,9 @@ export function PapersInboxConnect({
           {folders.map((folder) => (
             <li key={folder.id}>
               <span>{folder.name}</span>
-              <span className={`owner-seat-honesty is-${folder.honesty.toLowerCase()}`}>{folder.honesty}</span>
-              <span>{folder.status}</span>
+              <span className={`owner-seat-honesty is-${folder.status === 'received' ? 'estimated' : folder.honesty.toLowerCase()}`}>
+                {folder.status === 'received' ? 'Received' : folder.honesty}
+              </span>
             </li>
           ))}
         </ul>

@@ -14,6 +14,7 @@ import {
 } from '@/lib/vendorInvoiceParse';
 import { looksLikeInvoicePaper, type PapersHonesty } from '@/lib/papersInbox';
 import { parsePapersSkuLines, vendorDocumentsFromSkuRows, type PapersSkuRow } from '@/lib/papersSkuParse';
+import { extractPaperFacts } from '@/lib/ownerPaperFacts';
 import { papersSkuRowsForStore } from '@/lib/papersSkuStore';
 
 export type PapersSkuLine = {
@@ -62,11 +63,16 @@ export function invoiceDocumentToCompareText(doc: VendorInvoiceDocument): string
       csvCell(line.description),
       csvCell(line.pack ?? ''),
       csvCell(line.period),
-      line.unitPrice == null ? '' : line.unitPrice.toFixed(2),
+      line.unitPrice == null ? '' : comparePrice(line.unitPrice),
       line.quantity == null ? '' : String(line.quantity),
     ].join(','),
   );
   return [header, ...rows].join('\n');
+}
+
+function comparePrice(value: number): string {
+  const rounded = Math.round(value * 10000) / 10000;
+  return String(rounded);
 }
 
 function csvCell(value: string): string {
@@ -107,6 +113,11 @@ export function parseSeatInvoiceBytes(bytes: Uint8Array, filename: string): Pape
   } else if (readable) {
     honesty = 'Estimated';
     note = 'SKU lines parsed from the paper. Unit $ stay Estimated until two matching invoices compare.';
+    const headline = extractPaperFacts(filename, text).find((fact) => fact.kind === 'invoice' && fact.amount != null);
+    if (headline?.amount != null) {
+      const number = headline.invoiceNumber ? `#${headline.invoiceNumber}` : 'number Missing';
+      note = `${note} Invoice ${number} total $${headline.amount.toFixed(2)}.`;
+    }
   } else if (looksLikeVendorInvoice(text, filename) || looksLikeInvoicePaper(filename)) {
     note = 'Invoice file landed. SKU / pack / unit $ are Missing on unreadable lines — not $0.';
   }
