@@ -23,7 +23,7 @@ const PEOPLE = [
     place: 'Fort Dodge, Iowa',
     image: '/field/myke-kitchen.jpg',
     imageClass: 'object-cover object-bottom',
-    bio: "Myke built Never 86'd because the operating tools were not good enough. He still lives the restaurant week at Community Tap & Pizza, and brings firsthand experience from independent restaurants and a 28-location, private-equity-backed group.",
+    bio: "Myke built Never 86'd while he still runs Community Tap & Pizza in Fort Dodge, Iowa. He was tired of invoices, Z reports, and delivery fees, so he had AI agents write the back office and he approves every change.",
     line: 'The floor on Friday night. The books on Saturday morning.',
   },
   {
