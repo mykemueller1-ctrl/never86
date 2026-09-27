@@ -1,6 +1,6 @@
 # Codex → Grok Hub / Cursor Factory Handoff
 
-**Updated:** 2026-08-30 7:03 AM CT
+**Updated:** 2026-09-09 4:10 AM CT — HubSpot product CRM spec drafted; older Sentia+ notes kept as hygiene, not a cutover claim
 **Owner:** Grok Chat command hub
 **Purpose:** durable decisions and verified work state shared by Grok, Cursor, Grok Bots, and Codex; not a raw transcript
 
@@ -23,8 +23,8 @@
 - The product has one Never86 MCP/backend and evidence contract, with thin install packages for ChatGPT/OpenAI, Claude, Gemini, and Grok. Public read-only tools remain separate from private tenant tools; private tools require tenant OAuth, least privilege, audit receipts, and human approval for external side effects.
 - Claims such as built, tested, pushed, merged, and deployed require visible evidence. Never report one state as another.
 - Never86 Operator System MCP is connected at `https://www.never86.ai/api/mcp` and provides the operating logic.
-- Sentia+ at `https://your.sentia.plus/` is the CRM source of truth. Apollo is not used.
-- Sentia+ is currently operated through its signed-in browser app because this setup has no public Sentia MCP endpoint.
+- **2026-09-09 HubSpot product CRM spec drafted:** Kristin Aduna is CRM owner of record. Myke is founder/sales source, not overwrite authority. Canonical operator file: `docs/company/HUBSPOT_CRM_SPEC.md`. Rules: one person / one contact, one company / one record, no silent deletes, notes FACT → WHY → OWNER → NEXT ACTION. On the Line 515 stays off the product CRM. Command Center is a separate deal lane for 3–50 unit groups. Live HubSpot was **not** read from the factory worker. No CRM writes, merges, or deletes. Not merged / not live-verified.
+- Sentia+ at `https://your.sentia.plus/` remains named in older intake as a CRM surface and is still browser-operated (no public Sentia MCP). Apollo is not used. Same person in Sentia+ and HubSpot is hygiene ticket HYG-001 — not an auto-merge and not a claimed cutover.
 - **“Grok Bots” means the separate Grok Bot desktop workspaces with their own persistent Computer and Routines** (for example `LinkedIn as Myke`, `Facebook Never86'd + CTap`, `TikTok as Myke + Never86'd`, `X as Myke`, and the build/operations workspaces). It does not mean ordinary Grok Web automations or cards inside the command-hub chat.
 - At 8:35 PM CT on 28 Aug, Myke authorized workers to use connected apps, tools, Google Chrome, and desktop computer control whenever a real Never86 job needs them. Workers must tell Myke the exact click (MCP Connect, Agent Computer takeover, Beta egress) instead of stalling. This does **not** authorize random account creation, password/2FA entry by an agent, auto-send, Facebook work, Apollo, or Mac takeover from a cloud agent.
 - All of Myke's Grok Bots share one persistent managed Linux cloud computer, browser sessions, files, and logins. That computer is not Myke's local Google Chrome profile, and separate Bots are not separate security boundaries. Prefer Plugins/MCP; for a site without a connector, the Bot stops at authentication and Myke takes over Agent Computer to enter a password, passkey, 2FA code, or CAPTCHA once, then returns control. Never paste credentials into bot chat. A Cursor **cloud** agent cannot drive that computer or Myke's local Chrome.
