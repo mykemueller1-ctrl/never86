@@ -4,6 +4,7 @@ import path from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { pickAccessibleSeat, type AccessibleSeat } from './personAuth';
+import { pullLastWeekPapers, rememberPapersToken, resetPapersTokenStore } from './papersInboxHttp';
 import { papersSkuCompareForStore } from './papersInvoicePath';
 import {
   allowPapersRescan,
@@ -229,8 +230,10 @@ describe('papers sku database durability', () => {
     });
     expect(forced.deduped).toBe(1);
     expect(forced.kept).toBe(0);
-    const scanKey = papersScanSnapshot(seat).rows[0].dedupeKey;
-    expect((await savedLines(seat)).filter((row) => row.document_key === scanKey)).toHaveLength(1);
+    const scanRow = papersScanSnapshot(seat).rows[0];
+    expect(scanRow.skuDocumentKey).toBe(`paper:${scanRow.contentHash}`);
+    expect((await savedLines(seat)).filter((row) => row.document_key === scanRow.skuDocumentKey)).toHaveLength(1);
+    expect((await savedLines(seat)).some((row) => row.document_key === scanRow.dedupeKey)).toBe(false);
 
     hooks.inserts = 0;
     hooks.failInsertNumber = 1;
@@ -277,7 +280,7 @@ describe('papers sku database durability', () => {
     expect(edited?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
     expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.documentKey)).toEqual(['prior-doc']);
     expect(papersSkuRowsForStore(seat, '2026-W24')[0]).toEqual(expect.objectContaining({
-      documentKey: review.dedupeKey,
+      documentKey: review.skuDocumentKey,
     }));
     expect(papersSkuRowsForStore(seat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
     expect(papersSkuCompareForStore(seat)?.compare?.rows[0]).toEqual(expect.objectContaining({
@@ -377,9 +380,10 @@ describe('papers sku database durability', () => {
       confirm: true,
       fields: { lineItems: [{ index: 0, unitPrice: '8.00' }] },
     });
-    const pairKey = review.dedupeKey;
+    const pairKey = review.skuDocumentKey ?? '';
+    expect(pairKey.startsWith('paper:')).toBe(true);
     expect((await savedLines(seat)).filter((row) => row.document_key === pairKey)).toHaveLength(1);
-    expect((await savedReviews(seat)).filter((row) => row.dedupe_key === pairKey)).toHaveLength(1);
+    expect((await savedReviews(seat)).filter((row) => row.dedupe_key === review.dedupeKey)).toHaveLength(1);
     expect(papersSkuRowsForStore(seat, '2026-W24')).toEqual([]);
     expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.documentKey)).toEqual(['other-doc']);
 
@@ -457,5 +461,188 @@ describe('papers sku database durability', () => {
     expect(papersSkuRowsForStore(north, '2026-W24')).toEqual([]);
     expect(await savedLines(south)).toHaveLength(1);
     expect(await savedLines(north)).toHaveLength(1);
+  }, 30_000);
+
+  it('does not let a pull of the same paper duplicate or undo a confirmed correction', async () => {
+    const paper = [
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n');
+    const bytes = new TextEncoder().encode(paper);
+    const filename = 'fixture-pfg-invoice.txt';
+    const weekSeat = 'seat:cross-week';
+    const priceSeat = 'seat:cross-price';
+
+    async function scan(seat: string, externalId: string) {
+      enqueuePapersScan(seat);
+      return drainPapersScan({
+        operatorId: seat,
+        listGmail: async () => [{ source: 'gmail', externalId, filename, bytes }],
+        listDrive: async () => [],
+      });
+    }
+
+    async function pull(seat: string) {
+      rememberPapersToken({ operatorId: seat, accessToken: 'tok', email: 'owner@example.com' });
+      return pullLastWeekPapers({
+        operatorId: seat,
+        fetchGoogle: false,
+        listGmail: async () => [{ filename, subject: 'PFG invoice', bytes }],
+        listDrive: async () => [],
+      });
+    }
+
+    resetPapersTokenStore();
+    const scanned = await scan(weekSeat, 'msg-cross-week');
+    expect(scanned.kept).toBe(1);
+    expect(papersScanSnapshot(weekSeat).rows).toHaveLength(1);
+    const weekReview = papersScanSnapshot(weekSeat).rows[0];
+    const corrected = await applyPapersScanEdit(weekSeat, {
+      id: weekReview.id,
+      confirm: true,
+      fields: { dates: '2026-06-12', lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    expect(corrected?.isoWeek).toBe('2026-W24');
+    expect(corrected?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    await pull(weekSeat);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W24')).toHaveLength(1);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W23')).toEqual([]);
+    expect(new Set(papersSkuRowsForStore(weekSeat).map((row) => row.documentKey)).size).toBe(1);
+    expect(papersSkuCompareForStore(weekSeat)?.compare?.rows[0]).toEqual(expect.objectContaining({
+      sku: 'TH100',
+      currentPrice: 2.25,
+      priorPrice: null,
+    }));
+    expect(weekReview.skuDocumentKey).toBe(`paper:${weekReview.contentHash}`);
+    expect((await savedLines(weekSeat)).map((row) => row.document_key)).toEqual([weekReview.skuDocumentKey]);
+
+    await scan(priceSeat, 'msg-cross-price');
+    const priceReview = papersScanSnapshot(priceSeat).rows[0];
+    await applyPapersScanEdit(priceSeat, {
+      id: priceReview.id,
+      confirm: true,
+      fields: { lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    await pull(priceSeat);
+    expect(papersSkuRowsForStore(priceSeat)).toHaveLength(1);
+    expect(papersSkuRowsForStore(priceSeat)[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(priceSeat)[0].isoWeek).toBe('2026-W23');
+    expect(papersSkuCompareForStore(priceSeat)?.compare?.rows[0].currentPrice).toBe(2.25);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+
+    const confirmedLine = structuredClone(papersSkuRowsForStore(priceSeat)[0]);
+    confirmedLine.unitPrice = { ...confirmedLine.unitPrice, amount: 1.25, honesty: 'Verified' };
+    await replacePapersSkuDocument(priceSeat, `gmail:${filename}`, [confirmedLine]);
+    expect(papersSkuRowsForStore(priceSeat)).toHaveLength(2);
+    expect(papersSkuCompareForStore(priceSeat)?.compare?.rows).toEqual([
+      expect.objectContaining({ sku: 'TH100', currentPrice: 1.75, priorPrice: null }),
+    ]);
+    await applyPapersScanEdit(priceSeat, {
+      id: priceReview.id,
+      confirm: true,
+      fields: { lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    expect(papersSkuRowsForStore(priceSeat)).toHaveLength(1);
+    expect(papersSkuRowsForStore(priceSeat)[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuCompareForStore(priceSeat)?.compare?.rows[0].currentPrice).toBe(2.25);
+    expect((await savedLines(priceSeat)).some((row) => row.document_key === `gmail:${filename}`)).toBe(false);
+
+    allowPapersRescan(priceSeat);
+    enqueuePapersScan(priceSeat);
+    const drive = await drainPapersScan({
+      operatorId: priceSeat,
+      listGmail: async () => [],
+      listDrive: async () => [{ source: 'drive', externalId: 'drive-cross-price', filename, bytes }],
+    });
+    expect(drive.deduped).toBe(1);
+    expect(drive.kept).toBe(0);
+    expect(papersScanSnapshot(priceSeat).rows).toHaveLength(1);
+    expect(papersSkuRowsForStore(priceSeat)[0].unitPrice.amount).toBe(2.25);
+
+    const pullFirst = 'seat:pull-first';
+    await pull(pullFirst);
+    await pull(pullFirst);
+    expect(papersSkuRowsForStore(pullFirst)).toHaveLength(1);
+    expect(papersSkuRowsForStore(pullFirst)[0].documentKey.startsWith('paper:')).toBe(true);
+    await scan(pullFirst, 'msg-pull-first');
+    const openReview = papersScanSnapshot(pullFirst).rows[0];
+    expect(papersSkuRowsForStore(pullFirst)).toHaveLength(1);
+    await applyPapersScanEdit(pullFirst, {
+      id: openReview.id,
+      fields: { lineItems: [{ index: 0, unitPrice: '4.00' }] },
+    });
+    await pull(pullFirst);
+    expect(papersSkuRowsForStore(pullFirst)).toHaveLength(1);
+    expect(papersSkuRowsForStore(pullFirst)[0].unitPrice).toMatchObject({ honesty: 'Estimated', amount: 4 });
+    expect(papersScanSnapshot(pullFirst).rows[0].lineItems[0].unitPrice.amount).toBe(4);
+
+    forgetPapersSkuMemory();
+    forgetPapersScanMemory();
+    await reopenDatabase();
+    await hydratePapersScan(weekSeat);
+    await hydratePapersSku(weekSeat);
+    await hydratePapersSku(priceSeat);
+    expect(papersScanSnapshot(weekSeat).rows[0].confirmed).toBe(true);
+    expect(papersScanSnapshot(weekSeat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W23')).toEqual([]);
+    expect(papersSkuRowsForStore(priceSeat)[0].unitPrice.amount).toBe(2.25);
+    expect((await savedLines(weekSeat)).map((row) => row.document_key)).toHaveLength(1);
+    expect((await savedLines(priceSeat))).toHaveLength(1);
+
+    await pull(weekSeat);
+    await pull(priceSeat);
+    expect(papersSkuRowsForStore(weekSeat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(priceSeat)).toHaveLength(1);
+    expect(papersSkuRowsForStore(weekSeat).some((row) => row.storeId === priceSeat)).toBe(false);
+  }, 30_000);
+
+  it('keeps one complete document when two database transactions write the same key', async () => {
+    const seat = 'seat:db-race';
+    const documentKey = 'paper:racehashracehashracehashracehashracehashracehashraceha';
+    await replacePapersSkuDocument(seat, documentKey, sauce('06/05/26', '900001', 'TH100', '1.250', '12.50'));
+    let overlap = 0;
+    let maxOverlap = 0;
+
+    async function write(amount: number) {
+      const line = sauce('06/05/26', '900001', 'TH100', amount.toFixed(3), '12.50')[0];
+      const stored = {
+        ...line,
+        storeId: seat,
+        ownerId: null,
+        documentKey,
+        lineIndex: 0,
+        unitPrice: { ...line.unitPrice, amount, honesty: 'Estimated' as const },
+      };
+      await database.transaction(async (tx) => {
+        overlap += 1;
+        maxOverlap = Math.max(maxOverlap, overlap);
+        try {
+          await tx.query(
+            `delete from papers_sku_lines
+             where document_key = $1 and (store_id = $2 or operator_id = $2)`,
+            [documentKey, seat],
+          );
+          await tx.query(
+            `insert into papers_sku_lines (
+               operator_id, store_id, owner_id, document_key, line_index, iso_week, row_json, updated_at
+             ) values ($1, $2, $3, $4, $5, $6, $7::jsonb, now())`,
+            [seat, seat, null, documentKey, 0, stored.isoWeek, JSON.stringify(stored)],
+          );
+        } finally {
+          overlap -= 1;
+        }
+      });
+    }
+
+    const settled = await Promise.allSettled([write(4), write(5)]);
+    const lines = (await savedLines(seat)).filter((row) => row.document_key === documentKey);
+    expect(lines).toHaveLength(1);
+    expect([4, 5]).toContain(lines[0].row_json.unitPrice?.amount);
+    expect(settled.some((row) => row.status === 'fulfilled')).toBe(true);
+    // One PGlite connection serialized these two transactions (overlap 1).
+    // The survivor is one complete document. Two OS processes were not started.
+    expect(maxOverlap).toBe(1);
   }, 30_000);
 });

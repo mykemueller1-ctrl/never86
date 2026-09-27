@@ -28,6 +28,8 @@ export type PapersSkuRow = {
   category: PapersLabeledField;
   isoWeek: string | null;
   documentKey?: string;
+  /** Sha256 of the file bytes. The compare key is `paper:` plus this hash. */
+  sourceHash?: string | null;
 };
 
 const PHOTO_NOTE = 'Photo has no text layer. SKU lines Missing. OCR is a later step.';

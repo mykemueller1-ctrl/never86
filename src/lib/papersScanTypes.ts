@@ -67,6 +67,8 @@ export type PapersScanCandidate = {
 export type PapersScanRow = {
   id: string;
   dedupeKey: string;
+  /** Compare identity. Scan and pull share `paper:<contentHash>`. */
+  skuDocumentKey?: string;
   source: 'gmail' | 'drive';
   externalId: string;
   contentHash: string;
