@@ -45,11 +45,11 @@ export default function Home() {
               The invoice you haven’t checked. The shift that ran late. The note nobody followed up on. Bring it to Never 86&apos;d and work through the next move, with the source beside the answer.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/contact" className="human-button human-button-primary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/contact', label: 'Request the free owner seat' } })}>
-                Request the free owner seat →
+              <Link href={ONE_SEAT_PATHS.try} className="human-button human-button-primary" onClick={() => trackEvent('cta_try', { meta: { target: '/try', label: 'Try it free' } })}>
+                Try it free — no card
               </Link>
-              <Link href="/#demo" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/#demo', label: 'See how it works' } })}>
-                See how it works
+              <Link href="/contact" className="human-button human-button-secondary" onClick={() => trackEvent('home_hero_cta_click', { meta: { target: '/contact', label: 'Request the free owner seat' } })}>
+                Request the free owner seat →
               </Link>
             </div>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#514b43]">
@@ -180,16 +180,16 @@ export default function Home() {
           <p className="human-kicker">For independent restaurants</p>
           <h2 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#171717] md:text-7xl">
             Owner seat first.
-            <span className="block italic text-[#005de8]">Pay when you add seats.</span>
+            <span className="block italic text-[#005de8]">Extra seats when you need them.</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#514b43]">
-            This build is for independent operators running one to three locations. Seat 1 is the owner and stays free for one store. Seat 2 and seat 3 unlock when you bring in a GM or station lead. Multi-unit Command Center is a separate track.
+            This build is for independent operators. Seat 1 is the owner and stays free for one store. Extra seats are planned paid options. That price is not finalized.
           </p>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
               ['Seat 1', 'Owner', 'Free · one store · one login · morning action + night proof'],
-              ['Seat 2', 'Manager / GM', 'Paid expansion · one manager login · no staff-wide PINs'],
-              ['Seat 3', 'Kitchen / FOH / bar', 'Paid expansion · station templates owned by the manager seat'],
+              ['Seat 2', 'Manager / GM', 'Planned paid option · price not finalized · one manager login'],
+              ['Seat 3', 'Kitchen / FOH / bar', 'Planned paid option · price not finalized · owned by the manager seat'],
             ].map(([seat, role, copy]) => (
               <article key={seat} className="human-receipt-card">
                 <p className="font-mono text-xs font-bold text-[#005de8]">{seat}</p>
