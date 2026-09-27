@@ -10,6 +10,7 @@ import {
   OWNER_DESK_POST_AUTH_REDIRECT,
 } from '@/lib/ownerDeskAuth';
 import type { HonestyLabel } from '@/lib/oneSeatPublicWin';
+import { PortalHouseDisclosure } from '../portal/PortalHouseForm';
 
 const FONT_STACK =
   "var(--font-display), Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
@@ -20,7 +21,7 @@ const inputClass =
 
 type SeatChoice = { restaurantName: string };
 
-export default function OperatorLoginPage() {
+export default function OperatorLoginPage({ showHouseCode = false }: { showHouseCode?: boolean }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
@@ -220,6 +221,7 @@ export default function OperatorLoginPage() {
                   setResetOpen((open) => !open);
                   setStatus('idle');
                   setMessage('');
+                  setHonesty(null);
                 }}
                 className="text-[14px] font-medium hover:underline"
                 style={{ color: EMAIL_BRAND_BLUE }}
@@ -236,11 +238,15 @@ export default function OperatorLoginPage() {
             Create your account
           </Link>
         </p>
-        <p className="mt-2 text-center text-[14px] text-[#475569]">
-          <Link href="/portal" className="hover:underline" style={{ color: EMAIL_BRAND_BLUE }}>
-            Have a store house code?
-          </Link>
-        </p>
+        {showHouseCode ? (
+          <PortalHouseDisclosure />
+        ) : (
+          <p className="mt-2 text-center text-[14px] text-[#475569]">
+            <Link href="/portal" className="hover:underline" style={{ color: EMAIL_BRAND_BLUE }}>
+              Have a store house code?
+            </Link>
+          </p>
+        )}
         {/* Google papers connect after sign-in on the owner seat; a missing GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET stays Missing there. */}
         <p className="mt-2 text-center text-[13px] text-[#64748b]">
           After you sign in, connect Gmail + Drive in{' '}

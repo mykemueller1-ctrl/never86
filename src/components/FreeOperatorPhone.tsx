@@ -74,6 +74,70 @@ function weekdayLabel() {
   return new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
 }
 
+function nextPaperLabel(row: Day1MissingSpine): string {
+  switch (row.id) {
+    case 'schedules':
+      return 'add the weekly schedule';
+    case 'food':
+      return 'add the menu';
+    case 'pop':
+      return 'add the pop invoice';
+    case 'beer':
+      return 'add the beer ticket';
+    case 'liquor':
+      return 'add the liquor ticket';
+    default:
+      return `add ${row.label.toLowerCase()}`;
+  }
+}
+
+function lastWeekLead(snapshot: LastWeekPrimeSnapshot): { title: string; body: string } {
+  if (snapshot.honesty !== 'Missing') {
+    return {
+      title: snapshot.headline,
+      body: 'Same store. Same week. Missing stays Missing on any line without a paper.',
+    };
+  }
+  const missing = snapshot.families.filter((row) => row.honesty === 'Missing' || row.amount == null);
+  if (missing.length === 0 || missing.length === snapshot.families.length) {
+    return {
+      title: 'Last week is still open.',
+      body: 'Sales, labor, food, and drinks each need a paper from the same week. Missing stays Missing — not zero.',
+    };
+  }
+  return {
+    title: 'Last week is still open.',
+    body: `Still need ${missing.map((row) => row.label.toLowerCase()).join(', ')}. Missing stays Missing — not zero.`,
+  };
+}
+
+function papersStatusCopy(line: string): { title: string; detail: string; next: string } {
+  const landed = line.match(/Landed (\d+) papers? from Gmail \/ Drive/);
+  const parsed = line.match(/Parsed (\d+) SKU lines?/);
+  if (landed && parsed) {
+    const count = landed[1] ?? '0';
+    const lines = Number(parsed[1] ?? '0');
+    const paperWord = count === '1' ? 'paper' : 'papers';
+    const lineWord = lines === 1 ? 'line' : 'lines';
+    return {
+      title:
+        lines === 0
+          ? `${count} ${paperWord} landed. No item line read yet.`
+          : `${count} ${paperWord} landed. ${lines} item ${lineWord} read.`,
+      detail:
+        lines === 0
+          ? 'The files are on this seat. Nothing on them became a price, so those lines stay Missing.'
+          : 'Item lines are on this seat. A price stays Estimated until two matching invoices compare.',
+      next: 'Confirm they are the right store and the right week.',
+    };
+  }
+  return {
+    title: 'Papers on this seat',
+    detail: line,
+    next: 'Keep the same store and the same week. Missing stays Missing.',
+  };
+}
+
 function emptyEvidence(): PrimeCostEvidence[] {
   return OWNER_PRIME_COST_EVIDENCE.map((row) => ({
     ...row,
@@ -370,6 +434,10 @@ export function FreeOperatorPhone({
     }
   }
 
+  const lead = lastWeekLead(lastWeekPrime);
+  const nextSpine = DAY1_MISSING_SPINE.find((row) => day1MissingSpineState(row.id, filled) === 'missing');
+  const papersStatus = receipt ? papersStatusCopy(receipt) : null;
+
   return (
     <div className={`owner-desk ${filled.size === 0 ? 'is-first-win' : 'is-winning'}`}>
       <div className="owner-desk-watermark" aria-hidden>
@@ -378,6 +446,10 @@ export function FreeOperatorPhone({
       </div>
 
       <header className="owner-desk-top">
+        <div className="owner-desk-brand">
+          <span className="owner-desk-brand-mark" aria-hidden>86</span>
+          <span className="owner-desk-brand-word">Never86’d</span>
+        </div>
         <div className="owner-desk-hello">
           <div>
             <p className="owner-desk-store" title={deskSeatTitle(storeName || initialRestaurantName)}>
@@ -403,8 +475,8 @@ export function FreeOperatorPhone({
       </header>
 
       <div className="owner-desk-stage">
-        <aside className="owner-desk-missing-rail" aria-label="Missing honesty spine">
-          <p className="owner-desk-missing-kicker">Missing</p>
+        <aside className="owner-desk-missing-rail" aria-label="What is still missing">
+          <p className="owner-desk-missing-kicker">Still to bring</p>
           {DAY1_MISSING_SPINE.map((row) => {
             const copy = day1MissingSpineCopy(row.id, filled);
             const isMissing = day1MissingSpineState(row.id, filled) === 'missing';
@@ -415,57 +487,92 @@ export function FreeOperatorPhone({
                 className={`owner-desk-missing-row ${isMissing ? 'is-missing' : 'is-paper'}`}
                 onClick={() => onMissingSpine(row)}
               >
-                <span className="owner-desk-missing-label">{row.label}</span>
-                <span className="owner-desk-missing-state">{copy}</span>
+                <span className="owner-desk-check" aria-hidden />
+                <span className="owner-desk-missing-copy">
+                  <span className="owner-desk-missing-label">{row.label}</span>
+                  <span className="owner-desk-missing-state">{copy}</span>
+                </span>
+                <span className={`owner-seat-honesty ${isMissing ? 'is-missing' : ''}`}>
+                  {isMissing ? 'Missing' : 'On seat'}
+                </span>
               </button>
             );
           })}
+          {nextSpine ? (
+            <button type="button" className="owner-desk-rail-next" onClick={() => onMissingSpine(nextSpine)}>
+              Next: {nextPaperLabel(nextSpine)}
+            </button>
+          ) : (
+            <p className="owner-desk-missing-state">Those papers are on this seat.</p>
+          )}
         </aside>
 
         <div className="owner-desk-main">
       {view === 'home' ? (
         <section className="owner-desk-lom">
           <p className="owner-desk-kicker">Action Shift</p>
-          <h1 className="owner-desk-ask-title">
-            {lastWeekPrime.honesty === 'Missing' ? LAST_WEEK_PRIME_LOAD_ASK : lastWeekPrime.headline}
-          </h1>
+          <h1 className="owner-desk-ask-title">{lead.title}</h1>
           {winLine ? (
             <div className="owner-desk-win" role="status">
               <p className="owner-desk-win-mark">Ready</p>
               <p className="owner-desk-win-line">{winLine}</p>
             </div>
           ) : (
-            <p className="owner-desk-poetry">
-              {lastWeekPrime.nextLoad} Invoice ≠ COGS. Band {lastWeekPrime.bandMin}–{lastWeekPrime.bandMax}%. Missing stays Missing.
-            </p>
+            <p className="owner-desk-poetry">{lead.body}</p>
           )}
-          <article className="owner-desk-lastweek" aria-label="Last-week prime">
-            <p className="owner-desk-lastweek-kicker">{lastWeekPrime.honesty} · last-week prime</p>
-            <ul className="owner-desk-lastweek-list">
-              {lastWeekPrime.families.map((row) => (
-                <li key={row.id}>
-                  <button
-                    type="button"
-                    className={`owner-desk-lastweek-row is-${row.honesty.toLowerCase()}`}
-                    onClick={() => onLastWeekFamily(row.id)}
-                  >
-                    <span className="owner-desk-lastweek-label">{row.label}</span>
-                    <span className="owner-desk-lastweek-honesty">{row.honesty}</span>
-                    <span className="owner-desk-lastweek-amt">
-                      {row.amount == null ? 'Missing' : usd(row.amount)}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <article className="owner-desk-lastweek" aria-label="Last week">
+            <p className="owner-desk-lastweek-kicker">
+              <span className={`owner-seat-honesty is-${lastWeekPrime.honesty.toLowerCase()}`}>{lastWeekPrime.honesty}</span>
+            </p>
+            <table className="owner-desk-lastweek-table">
+              <thead>
+                <tr>
+                  <th scope="col">Line</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lastWeekPrime.families.map((row) => (
+                  <tr key={row.id} className={`is-${row.honesty.toLowerCase()}`}>
+                    <th scope="row">
+                      <button
+                        type="button"
+                        className="owner-desk-lastweek-row"
+                        onClick={() => onLastWeekFamily(row.id)}
+                      >
+                        {row.label}
+                      </button>
+                    </th>
+                    <td>
+                      <span className={`owner-seat-honesty is-${row.honesty.toLowerCase()}`}>{row.honesty}</span>
+                    </td>
+                    <td className="owner-desk-lastweek-amt">
+                      {row.amount == null ? <span aria-label="No dollar yet">—</span> : usd(row.amount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </article>
+          {papersStatus ? (
+            <article className="owner-desk-status owner-seat-receipt" role="status" aria-live="polite">
+              <p className="owner-desk-kicker">Papers</p>
+              <h2 className="owner-desk-status-title">{papersStatus.title}</h2>
+              <p className="owner-desk-poetry">{papersStatus.detail}</p>
+              <p className="owner-desk-status-next">
+                <span>Next</span>
+                {papersStatus.next}
+              </p>
+            </article>
+          ) : null}
           <button
             type="button"
             className="owner-desk-snap-hero"
             disabled={busy}
             onClick={() => void goAsk(LAST_WEEK_PRIME_LOAD_ASK)}
           >
-            {busy ? 'Loading…' : 'Load last-week COGS'}
+            {busy ? 'Loading…' : 'Check last week'}
           </button>
           <button
             type="button"
@@ -473,7 +580,7 @@ export function FreeOperatorPhone({
             disabled={busy}
             onClick={() => onMouth('file')}
           >
-            Add last-week files
+            Add last week&apos;s files
           </button>
           <PapersInboxConnect
             onPulled={(next) => {
@@ -561,11 +668,9 @@ export function FreeOperatorPhone({
 
       {view === 'labor' ? (
         <section className="mt-7">
-          <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            Labor cards · roles
-          </h1>
-          <p className="mt-2 text-sm text-white/80">
-            Paper-shop OCR. Daily compare to the clock. Punch ≠ schedule.
+          <h1 className="owner-desk-ask-title">Labor cards</h1>
+          <p className="owner-desk-poetry">
+            Compare the posted schedule to the clock. A missing punch stays Missing.
           </p>
 
           <div className="owner-v2-plates mt-5" aria-label="Labor folders">
@@ -589,8 +694,8 @@ export function FreeOperatorPhone({
           </div>
 
           <article className="owner-desk-card mt-5">
-            <h2 className="text-lg font-semibold text-[#f4f1ea]">Roles on the card</h2>
-            <p className="mt-1 text-sm text-[#8B949E]">
+            <h2 className="text-lg font-semibold text-[#172335]">Roles on the card</h2>
+            <p className="owner-desk-muted mt-1">
               Labor cards name seats, not people. FOH, Line, Dish, Run spawn from the week schedule.
             </p>
             <div className="owner-v2-roles mt-4">
@@ -617,8 +722,8 @@ export function FreeOperatorPhone({
           </article>
 
           <article className="owner-desk-card owner-desk-card-peach mt-4">
-            <h2 className="text-lg font-semibold text-[#f4f1ea]">Daily compare</h2>
-            <p className="mt-1 text-sm text-[#8B949E]">
+            <h2 className="text-lg font-semibold text-[#172335]">Daily compare</h2>
+            <p className="owner-desk-muted mt-1">
               Early leave, late leave, and labor drift vs the posted card. No invented overtime.
             </p>
             <ul className="mt-4 space-y-2">
@@ -629,9 +734,9 @@ export function FreeOperatorPhone({
                       {chip.state === 'READY' ? '✓' : '◷'}
                     </span>
                     <span className="text-left">
-                      <span className="block font-semibold text-[#f4f1ea]">{chip.label}</span>
-                      <span className="mt-1 block text-sm text-[#8B949E]">{chip.rule}</span>
-                      <span className="mt-1 block text-sm text-[#8B949E]">{chip.reason}</span>
+                      <span className="block font-semibold text-[#172335]">{chip.label}</span>
+                      <span className="owner-desk-muted mt-1 block">{chip.rule}</span>
+                      <span className="owner-desk-muted mt-1 block">{chip.reason}</span>
                     </span>
                   </div>
                 </li>
@@ -665,11 +770,11 @@ export function FreeOperatorPhone({
 
       {view === 'food' || view === 'bev' ? (
         <section className="mt-7">
-          <h1 className="font-serif text-[2.2rem] leading-[0.95] tracking-[-0.04em] text-white">
-            {view === 'food' ? 'Menu & invoice / truck' : 'Beverage margin'}
+          <h1 className="owner-desk-ask-title">
+            {view === 'food' ? 'Menu and truck papers' : 'Drinks'}
           </h1>
-          <p className="mt-2 text-sm text-white/80">
-            Same first-class folders as schedule and labor cards. Photo the paper. Invoice ≠ COGS.
+          <p className="owner-desk-poetry">
+            Photo the paper you already have. An invoice is not a counted cost. Missing stays Missing.
           </p>
           {view === 'food' ? (
             <div className="owner-v2-plates mt-5" aria-label="Food folders">
@@ -698,7 +803,7 @@ export function FreeOperatorPhone({
                 N86
               </span>
               <div>
-                <p className="text-sm leading-relaxed text-[#f4f1ea]">
+                <p className="text-sm leading-relaxed text-[#172335]">
                   {view === 'food'
                     ? 'Picture the menu and a truck ticket or invoice. Top plates first. Missing count stays Missing Evidence.'
                     : 'Ask for the count, invoice, or package change. Missing count stays Missing Evidence.'}
@@ -742,7 +847,7 @@ export function FreeOperatorPhone({
       </div>
 
       {localName ? (
-        <p className="mt-4 text-sm text-white/80">
+        <p className="owner-desk-muted mt-4">
           {localName} · stored on this seat · source-tagged
         </p>
       ) : null}
@@ -757,6 +862,8 @@ export function FreeOperatorPhone({
           void onRemoteFiles('file', event.dataTransfer.files);
         }}
       >
+      <div className="owner-desk-dock-card">
+      <p className="owner-desk-dock-label">Ask about this seat</p>
       <div className="owner-desk-mouth">
         <form
           onSubmit={(event) => {
@@ -767,11 +874,6 @@ export function FreeOperatorPhone({
           <label htmlFor="owner-desk-ask" className="sr-only">
             Ask what&apos;s happening
           </label>
-          {receipt ? (
-            <p className="owner-seat-receipt" role="status" aria-live="polite">
-              {receipt}
-            </p>
-          ) : null}
           <div className="owner-desk-ask-shell">
             <textarea
               id="owner-desk-ask"
@@ -812,9 +914,8 @@ export function FreeOperatorPhone({
       </div>
 
       <nav
-        className={`owner-desk-tray ${firstScreen ? 'is-quiet' : ''}`}
+        className="owner-desk-tray"
         aria-label="Seat sections"
-        hidden={firstScreen}
       >
         {OWNER_DESK_TRAY.map((item) => (
           <button
@@ -829,6 +930,7 @@ export function FreeOperatorPhone({
         ))}
       </nav>
 
+      </div>
       </div>
       <input
         ref={photoRef}
