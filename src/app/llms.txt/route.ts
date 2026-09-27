@@ -92,7 +92,9 @@ ${AGENT_SPECS.map((a) => `- [${a.name}](https://www.never86.ai/agents/${a.slug})
 - [Mychael “Myke” Mueller · operator and founder](https://www.never86.ai/story)
 - [Why Never86'd is operator-first](https://www.never86.ai/answers/why-never86d-is-operator-first)
 - [What Never86'd has and has not proven](https://www.never86.ai/answers/how-proven-is-never86d-marketplace-audit)
-- [The case · $8.3M → $1.81M, the walked-back number](https://www.never86.ai/case/walked-the-number-back)
+- [We do not invent dollars](https://www.never86.ai/case/walked-the-number-back)
+- [FAQ](https://www.never86.ai/faq)
+- [Try the sample, no card](https://www.never86.ai/try)
 - [Press kit](https://www.never86.ai/press)
 
 ## Public research
