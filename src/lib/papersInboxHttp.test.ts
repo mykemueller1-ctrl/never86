@@ -5,6 +5,7 @@ import { POST as startPost } from '../app/api/papers/google/start/route';
 import { GET as invoicesGet, POST as invoicesPost } from '../app/api/papers/invoices/route';
 import { POST as foldersPost } from '../app/api/papers/folders/route';
 import { POST as pullPost } from '../app/api/papers/pull/route';
+import { GET as scanGet, POST as scanPost } from '../app/api/papers/scan/route';
 
 function req(path: string, method = 'GET'): NextRequest {
   return new NextRequest(`http://localhost${path}`, { method });
@@ -44,12 +45,21 @@ describe('papers HTTP fail-closed', () => {
       expect(statusBody.envChecklist.filter((row) => row.required).every((row) => row.present === false)).toBe(true);
       expect(JSON.stringify(statusBody)).not.toMatch(/GOCSPX|secret-value/i);
 
+      const fixture = await scanGet(req('/api/papers/scan?fixture=1'));
+      const fixtureBody = await fixture.json() as { fixture: boolean; rows: Array<{ fixture: boolean; total: { amount: number | null } }> };
+      expect(fixture.status).toBe(200);
+      expect(fixtureBody.fixture).toBe(true);
+      expect(fixtureBody.rows.length).toBeGreaterThan(0);
+      expect(fixtureBody.rows.every((row) => row.fixture)).toBe(true);
+      expect(fixtureBody.rows.some((row) => row.total.amount === 999.99)).toBe(false);
+
       for (const res of [
         await startPost(req('/api/papers/google/start', 'POST')),
         await invoicesGet(req('/api/papers/invoices')),
         await invoicesPost(req('/api/papers/invoices', 'POST')),
         await foldersPost(req('/api/papers/folders', 'POST')),
         await pullPost(req('/api/papers/pull', 'POST')),
+        await scanPost(req('/api/papers/scan', 'POST')),
       ]) {
         const body = await res.json() as {
           success: boolean;

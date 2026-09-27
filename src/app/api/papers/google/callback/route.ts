@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePapersInboxEnablement, papersGoogleRedirect } from '@/lib/papersInbox';
 import { googleUserEmail } from '@/lib/papersGoogle';
 import { connectPapersFolders, pullLastWeekPapers, rememberPapersToken } from '@/lib/papersInboxHttp';
+import { schedulePapersScan } from '@/lib/papersScanJob';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest) {
     email,
     scopes: scopes.length ? scopes : undefined,
   });
+  schedulePapersScan(operatorId);
   await connectPapersFolders(operatorId).catch(() => undefined);
   await pullLastWeekPapers({ operatorId }).catch(() => undefined);
 

@@ -6,9 +6,11 @@ import {
   GOLD_CURRENT_INVOICE_CSV,
   GOLD_PRIOR_INVOICE_CSV,
   GOLD_SAMPLE_HONESTY_NOTE,
+  isGoldSampleInvoices,
   money,
   type HonestyLabel,
 } from '@/lib/oneSeatPublicWin';
+import { INVOICE_UPLOAD_ACCEPT } from '@/lib/invoiceFileIntake';
 import { oneSeatStyles as styles } from './OneSeatPublicShell';
 
 type CompareRow = {
@@ -46,6 +48,49 @@ export function InvoiceCompareClient() {
   const [explain, setExplain] = useState('');
   const [papersHonesty, setPapersHonesty] = useState<HonestyLabel | null>(null);
   const [papersNote, setPapersNote] = useState('');
+  const [priorName, setPriorName] = useState('prior.csv');
+  const [currentName, setCurrentName] = useState('current.csv');
+  const [priorFile, setPriorFile] = useState<{ honesty: HonestyLabel; note: string } | null>(null);
+  const [currentFile, setCurrentFile] = useState<{ honesty: HonestyLabel; note: string } | null>(null);
+
+  async function ingestFile(slot: 'prior' | 'current', file: File) {
+    setStatus('loading');
+    setMessage('');
+    try {
+      const body = new FormData();
+      body.set('file', file);
+      const persist = new FormData();
+      persist.set('file', file);
+      void fetch('/api/papers/upload', { method: 'POST', body: persist });
+      const res = await fetch('/api/one-seat/invoice-file', { method: 'POST', body });
+      const data = (await res.json()) as {
+        honesty?: HonestyLabel;
+        note?: string;
+        text?: string;
+        filename?: string;
+        error?: string;
+      };
+      const honesty: HonestyLabel = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
+      const note = data.note || data.error || 'Invoice text is Missing. No invented $.';
+      const landed = { honesty, note };
+      if (slot === 'prior') {
+        setPriorFile(landed);
+        setPriorName(data.filename || file.name || 'prior');
+        setPrior(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+      } else {
+        setCurrentFile(landed);
+        setCurrentName(data.filename || file.name || 'current');
+        setCurrent(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+      }
+      setStatus('idle');
+    } catch {
+      const landed = { honesty: 'Missing' as const, note: 'Missing — that file did not read. No invented $.' };
+      if (slot === 'prior') setPriorFile(landed);
+      else setCurrentFile(landed);
+      setStatus('error');
+      setMessage(landed.note);
+    }
+  }
 
   async function loadFromPapers() {
     setStatus('loading');
@@ -88,7 +133,8 @@ export function InvoiceCompareClient() {
         setCurrent(data.invoices[0].text);
         setPapersNote(data.invoices[0].note || 'Invoice landed. Second paper is Missing.');
       } else {
-        setPapersNote('Missing — no invoice PDFs matched on this seat. Connect Gmail + Drive, then pull.');
+        setPapersHonesty('Missing');
+        setPapersNote('Missing — Gmail is not connected. No invoice PDF matched. Drop a PDF above, or a photo in chat. No invented $.');
       }
       setStatus('idle');
     } catch {
@@ -112,8 +158,8 @@ export function InvoiceCompareClient() {
         body: JSON.stringify({
           store: 'Your store',
           documents: [
-            { text: prior, filename: 'prior.csv' },
-            { text: current, filename: 'current.csv' },
+            { text: prior, filename: priorName },
+            { text: current, filename: currentName },
           ],
         }),
       });
@@ -148,21 +194,46 @@ export function InvoiceCompareClient() {
   return (
     <div className={styles.card}>
       <p className={styles.eyebrow}>YOUR PAPERS · FORMULAS FIRST</p>
-      <h2>Paste two invoices from the same vendor.</h2>
+      <h2>Paste two invoices, or drop a PDF or CSV.</h2>
       <p className={styles.note}>
-        Native CSV or invoice PDF text. Same SKU and pack. Missing prior stays Missing — not $0.
-        Connect Gmail + Drive on the owner seat, then load the last two invoices. No homework form.
+        Native CSV, TXT, or invoice PDF text. HEIC photos stay Missing — no OCR, no invented $. Same SKU and pack. Missing prior stays Missing — not $0.
+        The boxes below start with a fictional demo. Gmail is not connected on this page.
         Grok can explain the card when <code>XAI_API_KEY</code> is set. It does not invent the dollars.
       </p>
+      {isGoldSampleInvoices(prior, current) ? (
+        <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
+      ) : null}
       {papersHonesty ? <HonestyLegend active={papersHonesty} note={papersNote} /> : null}
       <div className={styles.grid}>
         <label>
           Prior invoice
+          <input
+            className={styles.file}
+            type="file"
+            accept={INVOICE_UPLOAD_ACCEPT}
+            aria-label="Prior invoice file"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void ingestFile('prior', file);
+            }}
+          />
           <textarea className={styles.area} value={prior} onChange={(e) => setPrior(e.target.value)} />
+          {priorFile ? <HonestyLegend active={priorFile.honesty} note={priorFile.note} /> : null}
         </label>
         <label>
           Current invoice
+          <input
+            className={styles.file}
+            type="file"
+            accept={INVOICE_UPLOAD_ACCEPT}
+            aria-label="Current invoice file"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void ingestFile('current', file);
+            }}
+          />
           <textarea className={styles.area} value={current} onChange={(e) => setCurrent(e.target.value)} />
+          {currentFile ? <HonestyLegend active={currentFile.honesty} note={currentFile.note} /> : null}
         </label>
       </div>
       <div className={styles.actions}>
@@ -177,16 +248,22 @@ export function InvoiceCompareClient() {
       {actions ? (
         <div>
           <p>{actions.summary}</p>
-          {disclosedSample ? <HonestyLegend active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} /> : null}
-          {rows.map((row) => (
+          {disclosedSample ? <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} /> : null}
+          {rows.map((row) => {
+            const demoRow = disclosedSample || isGoldSampleInvoices(prior, current);
+            const honesty: HonestyLabel = demoRow ? 'Estimated' : row.honesty;
+            return (
             <div className={styles.next} key={`${row.vendor}-${row.sku}`}>
               <HonestyLegend
-                active={row.honesty}
+                demo={demoRow}
+                active={honesty}
                 note={
-                  row.honesty === 'Missing'
+                  demoRow
+                    ? 'Demo · Estimated. Fictional sample. Not a live store. Not recovered cash.'
+                    : honesty === 'Missing'
                     ? (row.missingEvidence || 'Prior invoice is Missing. That is not $0.')
-                    : row.honesty === 'Estimated'
-                      ? 'Estimated from partial or disclosed sample papers. Not invented dollars.'
+                    : honesty === 'Estimated'
+                      ? 'Estimated from the papers on this compare. Not invented dollars.'
                       : `${row.vendor} ${row.sku} is Verified from the two matching invoices. A price increase is not recovered cash.`
                 }
               />
@@ -198,7 +275,8 @@ export function InvoiceCompareClient() {
                 {row.flagged && row.dollarsObserved != null ? ` · +${money(row.dollarsObserved)}` : ''}
               </p>
             </div>
-          ))}
+            );
+          })}
           {actions.morningActions.map((action) => (
             <div className={styles.next} key={action.title}>
               <small>ONE NEXT MOVE</small>

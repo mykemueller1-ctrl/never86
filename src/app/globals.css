@@ -1423,6 +1423,92 @@ a.btn-secondary:hover, button.btn-secondary:hover {
 .owner-seat-answer {
   scroll-margin-bottom: 18rem;
 }
+.papers-review {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #e7ebf0;
+  scroll-margin-top: 1rem;
+}
+.papers-review-progress,
+.papers-review-fixture,
+.papers-review-source {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.82rem;
+  color: #526175;
+}
+.papers-review-fixture {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #dce2eb;
+  border-radius: 0.65rem;
+  color: #172335;
+}
+.papers-review-group h4 {
+  margin: 0.9rem 0 0.4rem;
+  font-size: 0.95rem;
+  color: #172335;
+}
+.papers-review-row {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #dce2eb;
+  border-radius: 0.8rem;
+  background: #ffffff;
+}
+.papers-review-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.7rem;
+  align-items: center;
+  color: #172335;
+}
+.papers-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.55rem;
+}
+.papers-review-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: #526175;
+}
+.papers-review-field-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  align-items: center;
+}
+.papers-review-field input {
+  width: 100%;
+  background: #ffffff;
+  color: #172335;
+  border: 1px solid #dae0e9;
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.5rem;
+}
+.papers-review-lines {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.papers-review-week {
+  margin: 0.2rem 0 0;
+  color: #526175;
+  font-size: 0.92rem;
+}
+.papers-review-lines li {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #e7ebf0;
+}
+.papers-review-row .owner-desk-primary {
+  margin-top: 0.7rem;
+}
 .owner-desk-mouth {
   position: relative;
   margin-top: 0;

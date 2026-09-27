@@ -102,7 +102,11 @@ export const PUBLIC_DOOR_VOICE = {
 
 export const GOLD_SAMPLE_HONESTY: HonestyLabel = 'Estimated';
 export const GOLD_SAMPLE_HONESTY_NOTE =
-  'This mozzarella sample is Estimated. Matching live papers become Verified. One invoice stays Missing — not $0.';
+  'Demo · Estimated. Fictional sample prices. Not a live store. Not recovered cash. One invoice stays Missing — not $0.';
+export const GOLD_LABOR_DEMO_NOTE =
+  'Demo · Estimated. Fictional sample hours and dollars. A missing punch stays Missing — not $0.';
+export const GOLD_RECIPE_DEMO_NOTE =
+  'Demo · Estimated. Fictional plate math. No count stays Missing. Invoice ≠ COGS.';
 
 export function honestyFromVendorRow(
   row: Pick<VendorDriftSkuRow, 'evidenceState' | 'priorPrice' | 'currentPrice'>,
@@ -124,10 +128,22 @@ export function publicDoorHonesty(input: {
   return fromPaper;
 }
 
+/** Prior is the $48 case. Current is the $56 case. Both prices on one file is not a side. */
+function goldSampleSide(text: string): 'prior' | 'current' | null {
+  if (!/Sample Dairy/i.test(text) || !/\bMZ-452\b/.test(text) || !/\bFL-100\b/.test(text)) return null;
+  const has48 = /(?:^|[^\d])48\.00(?:[^\d]|$)/.test(text);
+  const has56 = /(?:^|[^\d])56\.00(?:[^\d]|$)/.test(text);
+  if (has48 === has56) return null;
+  return has48 ? 'prior' : 'current';
+}
+
 export function isGoldSampleInvoices(prior: string, current: string): boolean {
   const texts = [prior.trim(), current.trim()].sort();
   const gold = [GOLD_PRIOR_INVOICE_CSV.trim(), GOLD_CURRENT_INVOICE_CSV.trim()].sort();
-  return texts[0] === gold[0] && texts[1] === gold[1];
+  if (texts[0] === gold[0] && texts[1] === gold[1]) return true;
+  const left = goldSampleSide(prior);
+  const right = goldSampleSide(current);
+  return (left === 'prior' && right === 'current') || (left === 'current' && right === 'prior');
 }
 
 export function attachPublicHonesty<T extends VendorDriftSkuRow>(

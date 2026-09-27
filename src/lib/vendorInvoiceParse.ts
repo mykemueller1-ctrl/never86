@@ -13,6 +13,7 @@
  */
 
 import { findColumn, num, parseCsv } from './csv/core';
+import { extractPdfTokens } from './pdfTextTokens';
 import { extractNativePdfText } from './pdqEodParse';
 import { looksLikeVendorSilence } from './vendorSilenceParse';
 
@@ -59,7 +60,11 @@ const VENDOR_LABELS: Array<{ re: RegExp; label: string }> = [
 
 export function decodeInvoiceSource(bytes: Uint8Array, filename = ''): string {
   const pdf = filename.toLowerCase().endsWith('.pdf') || (bytes[0] === 0x25 && bytes[1] === 0x50);
-  if (pdf) return extractNativePdfText(bytes);
+  if (pdf) {
+    const tokens = extractPdfTokens(bytes);
+    if (tokens.length) return tokens.join('\n');
+    return extractNativePdfText(bytes);
+  }
   return Buffer.from(bytes).toString('utf8');
 }
 

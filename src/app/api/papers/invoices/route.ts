@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { hydratePapersConnection, papersInvoicesFor, pullLastWeekPapers } from '@/lib/papersInboxHttp';
-import { papersInvoiceCompare } from '@/lib/papersInvoicePath';
+import { papersInvoiceCompare, papersSkuCompareForStore } from '@/lib/papersInvoicePath';
+import { hydratePapersSku, papersSkuFailureMessage } from '@/lib/papersSkuStore';
 import { withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
 export const runtime = 'nodejs';
@@ -14,8 +15,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ...papersFailClosedBody(), invoices: [], documents: [] }, { status: 503 });
     }
     await hydratePapersConnection(operatorId);
+    try {
+      await hydratePapersSku(operatorId);
+    } catch (error) {
+      const message = papersSkuFailureMessage(error);
+      if (message) {
+        return NextResponse.json({ success: false, honesty: 'Missing', error: message, invoices: [], documents: [] }, { status: 503 });
+      }
+      throw error;
+    }
     const invoices = papersInvoicesFor(operatorId);
-    const compare = invoices.length ? papersInvoiceCompare(invoices) : null;
+    const compare = papersSkuCompareForStore(operatorId) ?? (invoices.length ? papersInvoiceCompare(invoices) : null);
     return NextResponse.json({
       success: true,
       ready: gate.ready,
@@ -40,7 +50,14 @@ export async function POST(req: NextRequest) {
     const gate = evaluatePapersInboxEnablement();
     if (!gate.ready) return NextResponse.json(papersFailClosedBody(), { status: 503 });
     await hydratePapersConnection(operatorId);
-    const pulled = await pullLastWeekPapers({ operatorId });
+    let pulled;
+    try {
+      pulled = await pullLastWeekPapers({ operatorId });
+    } catch (error) {
+      const message = papersSkuFailureMessage(error);
+      if (message) return NextResponse.json({ success: false, honesty: 'Missing', error: message }, { status: 503 });
+      throw error;
+    }
     return NextResponse.json({
       success: true,
       honesty: pulled.honesty,

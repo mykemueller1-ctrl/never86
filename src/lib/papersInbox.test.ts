@@ -13,6 +13,7 @@ import {
   outlookV2Plan,
   papersEnvChecklist,
   papersFailClosedBody,
+  papersFileFirstWhenInboxOff,
   papersIntakeCopy,
   papersMissingSecretNames,
   papersSeatHonesty,
@@ -73,7 +74,7 @@ describe('papers inbox — Google first', () => {
 
     const empty = await pullLastWeekPapers({ operatorId: 'seat:1' });
     expect(empty.honesty).toBe('Missing');
-    expect(empty.nextAction).toMatch(/Connect Gmail/i);
+    expect(empty.nextAction).toMatch(/Connect Google/i);
     expect(empty.nextAction).not.toMatch(/desk/i);
 
     rememberPapersToken({ operatorId: 'seat:1', accessToken: 'tok', email: 'owner@example.com' });
@@ -98,6 +99,14 @@ describe('papers inbox — Google first', () => {
     expect(looksLikeInvoicePaper('Sysco-invoice.pdf')).toBe(true);
     expect(classifyPapersFolder('LaborBreakDown.csv')).toBe('labor');
     expect(papersSeatHonesty({ ready: false, connected: false })).toBe('Missing');
+    const off = papersFileFirstWhenInboxOff({ gmail: false, drive: false });
+    expect(off.inboxOff).toBe(true);
+    expect(off.honesty).toBe('Missing');
+    expect(off.lead).toEqual(['photo', 'pdf', 'chat']);
+    expect(off.folders.every((folder) => folder.honesty === 'Missing' && folder.status === 'missing')).toBe(true);
+    expect(off.note).toMatch(/not connected/);
+    expect(papersFileFirstWhenInboxOff({ gmail: true, drive: false }).inboxOff).toBe(false);
+    expect(papersFileFirstWhenInboxOff({ gmail: true, drive: false }).lead[0]).toBe('gmail');
   });
 
   it('keeps Outlook designed, not live, and never says desk to the operator', () => {
@@ -107,8 +116,16 @@ describe('papers inbox — Google first', () => {
     expect(outlook.status).toBe('designed');
     expect(`${copy.headline} ${copy.promise} ${copy.outlook}`).not.toMatch(/\bdesk\b/i);
     const phone = readFileSync(resolve('src/components/PapersInboxConnect.tsx'), 'utf8');
-    expect(phone).toMatch(/Connect Gmail/);
-    expect(phone).toMatch(/Connect Drive/);
+    expect(phone).toMatch(/Connect Google/);
+    expect(phone).not.toMatch(/Connect Drive/);
+    expect(phone).not.toMatch(/Connect Gmail/);
+    expect(phone).toMatch(/Drop a photo, a PDF, or use chat/);
+    expect(phone).toMatch(/status\.connection\?\.gmail === true/);
+    expect(phone.indexOf('href="/chat#photo"')).toBeGreaterThan(-1);
+    expect(phone.indexOf('href="/check/invoices"')).toBeGreaterThan(phone.indexOf('href="/chat#photo"'));
+    expect(phone.indexOf('Connect Google')).toBeGreaterThan(phone.indexOf('href="/check/invoices"'));
+    expect(readFileSync(resolve('src/lib/papersInboxHttp.ts'), 'utf8')).toMatch(/scopes\.includes\('gmail'\)/);
+    expect(phone).not.toMatch(/papers === 'connected'\) \{\n\s+setLine\('Gmail \+ Drive connected/);
     expect(phone).toMatch(/copy\.outlook/);
     expect(phone).toMatch(/Missing/);
     expect(phone).toMatch(/disabled=\{busy \|\| !ready\}/);
@@ -175,5 +192,6 @@ describe('papers inbox — Google first', () => {
     expect(status).toMatch(/papersEnvChecklist/);
     expect(status).toMatch(/requiredEnv/);
     expect(callback).toMatch(/pullLastWeekPapers/);
+    expect(callback).toMatch(/schedulePapersScan/);
   });
 });

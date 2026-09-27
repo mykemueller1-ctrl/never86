@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { PapersReviewScreen } from '@/components/PapersReviewScreen';
 import { papersIntakeCopy, type PapersHonesty } from '@/lib/papersInbox';
 
 type PapersStatus = {
@@ -11,6 +12,7 @@ type PapersStatus = {
   requiredEnv?: string[];
   connection?: { gmail: boolean; drive: boolean; email: string | null };
   folders?: Array<{ id: string; name: string; status: string; honesty: PapersHonesty }>;
+  intake?: Array<{ id: string; kind: string; filename: string; honesty: PapersHonesty; note: string }>;
   nextAction?: string;
 };
 
@@ -37,11 +39,13 @@ export function PapersInboxConnect({
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [line, setLine] = useState<string | null>(null);
+  const [fixture, setFixture] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const params = new URLSearchParams(window.location.search);
     const papers = params.get('papers');
+    setFixture(papers === 'fixture');
     void (async () => {
       try {
         const res = await fetch('/api/papers/status', { method: 'GET', signal: AbortSignal.timeout(8000) });
@@ -50,8 +54,8 @@ export function PapersInboxConnect({
         setStatus(body);
         if (!body.ready || papers === 'closed' || papers === 'token') {
           setLine(missingGoogleLine(body));
-        } else if (papers === 'connected' && (body.connection?.gmail || body.connection?.drive)) {
-          setLine('Gmail + Drive connected. Pulling last-week invoices…');
+        } else if (papers === 'connected' && body.connection?.gmail === true) {
+          setLine('This inbox is connected. Pulling last-week invoices…');
           setBusy(true);
           try {
             const pullRes = await fetch('/api/papers/pull', { method: 'POST', signal: AbortSignal.timeout(20000) });
@@ -66,7 +70,7 @@ export function PapersInboxConnect({
             if (!pullRes.ok) {
               setLine(missingGoogleLine(pullBody));
             } else {
-              setLine(pullBody.nextAction ?? 'Gmail + Drive connected. Last-week pull finished.');
+              setLine(pullBody.nextAction ?? 'This inbox is connected. Last-week pull finished.');
               if (pullBody.honesty) setStatus((prev) => ({ ...prev, honesty: pullBody.honesty }));
               if (pullBody.nextAction) onPulled?.(pullBody.nextAction);
             }
@@ -76,7 +80,7 @@ export function PapersInboxConnect({
             if (!cancelled) setBusy(false);
           }
         } else if (papers === 'connected') {
-          setLine('Gmail + Drive connected. Pull last-week invoices when you are ready.');
+          setLine('Missing — Gmail is not connected. Drop a photo, a PDF, or use chat. No invented papers.');
         }
       } catch {
         if (!cancelled) {
@@ -101,8 +105,14 @@ export function PapersInboxConnect({
   }, []);
 
   const ready = Boolean(status.ready);
-  const honesty: PapersHonesty = status.honesty ?? (ready ? 'Estimated' : 'Missing');
-  const connected = Boolean(status.connection?.gmail || status.connection?.drive);
+  const gmail = status.connection?.gmail === true;
+  const drive = status.connection?.drive === true;
+  const honesty: PapersHonesty = gmail
+    ? (status.honesty === 'Verified' || status.honesty === 'Estimated' ? status.honesty : 'Missing')
+    : 'Missing';
+  const folders = (status.folders ?? []).map((folder) => (
+    gmail ? folder : { ...folder, honesty: 'Missing' as const, status: 'missing' }
+  ));
   const missingSecrets = status.missingSecrets ?? [];
 
   async function connectGoogle() {
@@ -163,7 +173,7 @@ export function PapersInboxConnect({
       className={`owner-seat-papers ${variant === 'claim' ? 'is-claim' : ''}`}
       aria-label="Go get last-week papers"
     >
-      <p className="owner-desk-kicker">Papers</p>
+      <p className="owner-desk-kicker">Papers in</p>
       <p className={`owner-seat-honesty is-${honesty.toLowerCase()}`} role="status">
         {honesty}
       </p>
@@ -172,44 +182,47 @@ export function PapersInboxConnect({
       {!loaded ? (
         <p className="owner-seat-papers-outlook">Checking Google papers…</p>
       ) : !ready ? (
-        <div className="owner-desk-status" role="status">
-          <p className="owner-desk-kicker">Connect</p>
-          <h3 className="owner-desk-status-title">Gmail is not connected on this seat.</h3>
-          <p className="owner-desk-poetry">{missingGoogleLine(status)}</p>
-          <p className="owner-desk-status-next">
-            <span>Next</span>
-            Add a photo or a file. Missing stays Missing.
-          </p>
-        </div>
-      ) : connected && status.connection?.email ? (
-        <p className="owner-seat-papers-outlook">Connected as {status.connection.email}</p>
+        <p className="owner-seat-receipt" role="status">
+          {missingGoogleLine(status)}
+        </p>
+      ) : gmail && status.connection?.email ? (
+        <p className="owner-seat-papers-outlook">Gmail is connected as {status.connection.email}</p>
       ) : null}
+      {!gmail && loaded ? (
+        <p className="owner-seat-receipt" role="status">
+          Gmail is not connected. {drive ? 'Drive is connected.' : 'Drive is not connected.'} Drop a photo, a PDF, or use chat. Folders stay Missing.
+        </p>
+      ) : null}
+      <p className="owner-seat-papers-outlook">
+        Gmail and Drive stay read-only. The scan covers the last 90 days and skips files over 8MB.
+      </p>
       <div className="owner-seat-papers-actions">
-        <button
-          type="button"
-          className={connected ? 'owner-desk-secondary' : 'owner-desk-primary'}
-          disabled={busy || !ready}
-          onClick={() => void connectGoogle()}
-        >
-          {busy && ready ? 'Opening…' : 'Connect Gmail'}
-        </button>
-        <button
-          type="button"
-          className="owner-desk-secondary"
-          disabled={busy || !ready}
-          onClick={() => void connectGoogle()}
-        >
-          Connect Drive
-        </button>
-        {connected && ready ? (
-          <button type="button" className="owner-desk-primary" disabled={busy} onClick={() => void pullPapers()}>
+        {!gmail && loaded ? (
+          <>
+            <a className="owner-desk-primary" href="/chat#photo">Drop a photo</a>
+            <a className="owner-desk-primary" href="/check/invoices">Drop a PDF</a>
+            <a className="owner-desk-primary" href="/chat">Open chat intake</a>
+            <button
+              type="button"
+              id="connect-google"
+              className="owner-desk-primary"
+              disabled={busy || !ready}
+              onClick={() => void connectGoogle()}
+            >
+              {busy && ready ? 'Opening Google…' : 'Connect Google'}
+            </button>
+            <span className="owner-seat-honesty is-missing">Missing</span>
+          </>
+        ) : null}
+        {gmail && ready ? (
+          <button type="button" className="owner-desk-secondary" disabled={busy} onClick={() => void pullPapers()}>
             Pull last-week invoices
           </button>
         ) : null}
       </div>
-      {status.folders?.length ? (
+      {folders.length ? (
         <ul className="owner-seat-papers-folders">
-          {status.folders.map((folder) => (
+          {folders.map((folder) => (
             <li key={folder.id}>
               <span>{folder.name}</span>
               <span className={`owner-seat-honesty is-${folder.honesty.toLowerCase()}`}>{folder.honesty}</span>
@@ -219,16 +232,26 @@ export function PapersInboxConnect({
         </ul>
       ) : null}
       <p className="owner-seat-papers-outlook">{copy.outlook}</p>
-      {line && ready && !onPulled ? (
-        <div className="owner-desk-status" role="status" aria-live="polite">
-          <p className="owner-desk-kicker">Status</p>
-          <p className="owner-desk-poetry">{line}</p>
-          <p className="owner-desk-status-next">
-            <span>Next</span>
-            Confirm the store and the week. Missing stays Missing until a line is on the paper.
-          </p>
-        </div>
+      <p className="owner-seat-papers-outlook">
+        <a href="/chat">Chat maps what is still Missing</a>
+      </p>
+      {status.intake?.length ? (
+        <ul className="owner-seat-papers-folders">
+          {status.intake.map((paper) => (
+            <li key={paper.id}>
+              <span>{paper.kind}: {paper.filename}</span>
+              <span className={`owner-seat-honesty is-${paper.honesty.toLowerCase()}`}>{paper.honesty}</span>
+              <span>{paper.note}</span>
+            </li>
+          ))}
+        </ul>
       ) : null}
+      {line ? (
+        <p className="owner-seat-receipt" role="status" aria-live="polite">
+          {line}
+        </p>
+      ) : null}
+      <PapersReviewScreen active={gmail && ready} fixture={fixture} />
     </article>
   );
 }

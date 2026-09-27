@@ -43,6 +43,18 @@ There is no `PAPERS_ENABLED` flag. Missing client id or secret fail-closes Conne
 
 Readonly still auto-detects folders named Invoices, Z-EOD, Labor, Liquor-Beer (and common aliases). Create stays off without `drive.file`.
 
+## One-tap scan and review
+
+Connect is one button: **Connect Google**. It uses the same OAuth client and the same read scopes (`gmail.readonly`, `drive.readonly`, `drive.file` only to create the Never86 folders). The scan does not send, delete, label, or share anything in the operator's Google account.
+
+After the callback, a background job scans the last **90 days** of Gmail and Drive. Files over **8MB** are skipped and not downloaded. The same message id or file id plus the same content hash is stored once.
+
+Each kept paper lands on **one review screen** on the operator seat (`/operator#papers-review`). Categories: EOD/Z, vendor invoices, labor/timesheets, liquor and beer, DoorDash/Uber Eats/Grubhub statements, menu/recipe docs. Every number is **Verified** (labeled on the paper), **Estimated** (inferred, or marked low-confidence), or **Missing**. Unlabeled dollars are not filled in. The operator can edit a row; an edit stays Estimated. Confirm does not turn a Missing number into Verified.
+
+`GET /api/papers/scan?fixture=1` returns fake fixture rows for the review screen. Those rows are labeled FIXTURE and are not an operator inbox.
+
+`POST /api/papers/scan` stays fail-closed with `papers_google_closed` until `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` exist.
+
 ## Operator path
 
 1. `/onboard` email + store → Connect Gmail + Drive
