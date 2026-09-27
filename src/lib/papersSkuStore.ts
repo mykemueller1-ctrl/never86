@@ -41,6 +41,18 @@ export type SkuExecutor = {
   query<T = Record<string, unknown>>(text: string, values?: unknown[]): Promise<T[]>;
 };
 
+/**
+ * SQL drivers return plain row objects. Keep only those objects and expose
+ * them as the caller's row type. Arrays and other values are dropped.
+ */
+export function checkedQueryRows<T>(rows: readonly unknown[]): T[] {
+  const parsed: T[] = [];
+  for (const row of rows) {
+    if (typeof row === 'object' && row !== null && !Array.isArray(row)) parsed.push(row as T);
+  }
+  return parsed;
+}
+
 /** Seat id for the selected store. An email is a person, not a store. */
 export function papersStoreKey(storeId: string): string | null {
   const id = storeId.trim();
@@ -107,9 +119,9 @@ function neonSkuExecutor(url: string): SkuExecutor {
       if (!statements.length) return;
       await sql.transaction(statements.map((statement) => sql.query(statement.text, statement.values)));
     },
-    async query(text, values = []) {
+    async query<T>(text: string, values: unknown[] = []): Promise<T[]> {
       const rows = await sql.query(text, values);
-      return rows as Record<string, unknown>[];
+      return checkedQueryRows<T>(rows);
     },
   };
 }

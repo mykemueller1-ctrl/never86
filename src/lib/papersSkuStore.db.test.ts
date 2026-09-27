@@ -22,6 +22,7 @@ import {
   PAPERS_REVIEW_PERSIST_ERROR,
   papersSkuRowsForStore,
   PapersSkuPersistError,
+  checkedQueryRows,
   replacePapersSkuDocument,
   resetPapersSkuStore,
   setPapersSkuExecutorForTests,
@@ -83,9 +84,9 @@ function executorFor(db: PGlite): SkuExecutor {
         hooks.depth -= 1;
       }
     },
-    async query(text, values) {
+    async query<T>(text: string, values?: unknown[]): Promise<T[]> {
       const result = await db.query(text, values ?? []);
-      return result.rows;
+      return checkedQueryRows<T>(result.rows);
     },
   };
 }
