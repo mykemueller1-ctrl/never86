@@ -183,6 +183,22 @@ Hunters do not write HubSpot. Factory agents do not write HubSpot.
 | Deployed | no — docs do not need a product deploy |
 | Live-verified against HubSpot | **no** |
 | CRM records written | **no** |
+| GitHub `CI / verify` | **passed** on this PR |
+| Vercel `never86` preview | **passed** — that is the product project |
+| Vercel leftover projects | **not a code fail** — see below |
+
+### Leftover Vercel GitHub checks (2026-09-09 statuses)
+
+Three extra Vercel projects are still Git-linked to `mykemueller1-ctrl/never86` and posted **Account is blocked** on the first SHA of this PR. They are not this spec, and they are not the product preview.
+
+| GitHub check | What it is | Do not |
+|---|---|---|
+| `Vercel – never86` | Product preview. Already green. | Treat leftover checks as a product break |
+| `Vercel – never86-ctap-phone` | Leftover project. Same repo. | Unpause / spend / delete from a factory job |
+| `Vercel – never86-main` | Leftover project that still holds `never86.ai` / `www.never86.ai` | Change its production domains or unpause it from here |
+| `Vercel – never86-portal-gateway` | Leftover project. Same repo. | Treat it as the live site |
+
+Those three leftover projects later deployed **READY** on other branches (2026-09-27). The red X on this PR is the old blocked status on SHA `4341422`. A later push re-runs the checks. Myke still owns disconnecting leftover Git links. This factory job does not spend, unpause, or move production domains.
 
 ---
 

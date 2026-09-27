@@ -12,6 +12,7 @@
 - On the Line 515 stays off the product CRM. Command Center is a separate deal lane for 3–50 unit groups.
 - Live HubSpot was not read (no active connection). No contacts invented. No CRM writes, merges, or deletes.
 - Older intake still names Sentia+ as a CRM surface. That overlap is hygiene ticket HYG-001, not an auto-merge.
+- PR `#250` GitHub `verify` and Vercel `never86` are green. The three red checks are leftover Vercel projects (`never86-ctap-phone`, `never86-main`, `never86-portal-gateway`) that posted **Account is blocked** on SHA `4341422`. Not a docs/code defect. `never86-main` still holds `www.never86.ai` — do not unpause or move domains from a factory job.
 
 ## Files created/changed
 
