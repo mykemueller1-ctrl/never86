@@ -19,6 +19,8 @@ import {
   type LastWeekPrimeFamilyId,
   type LastWeekPrimeSnapshot,
 } from '@/lib/lastWeekPrimeCost';
+import { OwnerSeatSignOut } from '@/components/OwnerSeatSignOut';
+import { ownerSeatHeaderLabel, restaurantNameForOwnerSeat } from '@/lib/ownerSeatGate';
 import { deskSeatLabel, deskSeatTitle } from '@/lib/seatIsolation';
 import { PapersInboxConnect } from '@/components/PapersInboxConnect';
 import {
@@ -42,7 +44,6 @@ import {
   day1HookCoach,
   day1MissingSpineCopy,
   day1MissingSpineState,
-  day1StoreTitle,
   firstPhotoWinLine,
   type Day1FrontPick,
   type Day1FrontPickId,
@@ -166,9 +167,11 @@ function emptyDailyCompare(): DailyCompareChip[] {
 export function FreeOperatorPhone({
   initialRestaurantName = null,
   signedIn = false,
+  ctapOwner = false,
 }: {
   initialRestaurantName?: string | null;
   signedIn?: boolean;
+  ctapOwner?: boolean;
 }) {
   const [ask, setAsk] = useState('');
   const [view, setView] = useState<DeskView>('home');
@@ -181,11 +184,13 @@ export function FreeOperatorPhone({
   const [activeFolder, setActiveFolder] = useState<OperatorV2PlateId | null>(null);
   const [frontPath, setFrontPath] = useState<Day1FrontPickId | null>(null);
   const [paperPath, setPaperPath] = useState(false);
-  const [storeName, setStoreName] = useState(() => {
-    if (initialRestaurantName?.trim()) return deskSeatLabel(initialRestaurantName);
-    if (signedIn) return '';
-    return day1StoreTitle(null);
-  });
+  const [storeName, setStoreName] = useState(() =>
+    restaurantNameForOwnerSeat({
+      signedIn,
+      ctapOwner,
+      restaurantName: initialRestaurantName,
+    }) ?? '',
+  );
   const [listening, setListening] = useState(false);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -233,7 +238,11 @@ export function FreeOperatorPhone({
         const desk = await fetch('/api/desk', { method: 'GET' });
         const body = (await desk.json()) as { success?: boolean; restaurantName?: string | null };
         if (cancelled) return;
-        const named = body.restaurantName?.trim();
+        const named = restaurantNameForOwnerSeat({
+          signedIn,
+          ctapOwner,
+          restaurantName: body.restaurantName,
+        });
         if (desk.ok && body.success && named) setStoreName(deskSeatLabel(named));
       } catch {
         /* signed-in NAG never falls back to Community Tap */
@@ -242,7 +251,7 @@ export function FreeOperatorPhone({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [ctapOwner, signedIn]);
 
   async function goAsk(nextAsk: string, mouth: FreeOperatorMouth = 'type') {
     setBusy(true);
@@ -434,6 +443,12 @@ export function FreeOperatorPhone({
     }
   }
 
+  const headerName = ownerSeatHeaderLabel({
+    signedIn,
+    ctapOwner,
+    restaurantName: storeName || initialRestaurantName,
+  });
+  const headerTitle = headerName === 'Owner seat' ? 'Owner seat' : deskSeatTitle(headerName);
   const lead = lastWeekLead(lastWeekPrime);
   const nextSpine = DAY1_MISSING_SPINE.find((row) => day1MissingSpineState(row.id, filled) === 'missing');
   const papersStatus = receipt ? papersStatusCopy(receipt) : null;
@@ -452,25 +467,28 @@ export function FreeOperatorPhone({
         </div>
         <div className="owner-desk-hello">
           <div>
-            <p className="owner-desk-store" title={deskSeatTitle(storeName || initialRestaurantName)}>
-              {storeName.trim() ? deskSeatLabel(storeName) : signedIn ? 'Owner seat' : deskSeatLabel(null)}
+            <p className="owner-desk-store" title={headerTitle}>
+              {headerName}
             </p>
             <p className="owner-desk-hello-store">{firstScreen ? weekdayLabel() : greeting()}</p>
           </div>
-          {signedIn ? (
-            <button
-              type="button"
-              className="owner-desk-avatar"
-              aria-label="Jump to ask"
-              onClick={() => document.getElementById('owner-desk-ask')?.focus()}
-            >
-              1
-            </button>
-          ) : (
-            <Link href="/login" className="owner-desk-avatar" aria-label="Open owner seat">
-              1
-            </Link>
-          )}
+          <nav className="owner-desk-account" aria-label="Account">
+            {signedIn ? <OwnerSeatSignOut /> : null}
+            {signedIn ? (
+              <button
+                type="button"
+                className="owner-desk-avatar"
+                aria-label="Jump to ask"
+                onClick={() => document.getElementById('owner-desk-ask')?.focus()}
+              >
+                1
+              </button>
+            ) : (
+              <Link href="/login" className="owner-desk-avatar" aria-label="Open owner seat">
+                1
+              </Link>
+            )}
+          </nav>
         </div>
       </header>
 

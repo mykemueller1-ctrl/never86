@@ -76,7 +76,8 @@ describe('owner desk post-auth redirect', () => {
     expect(phone).toContain('DAY1_MISSING_SPINE');
     expect(phone).toContain('DAY1_HELP_ENERGY');
     expect(phone).toContain('DAY1_IDENTITY_LINE');
-    expect(phone).toContain('day1StoreTitle');
+    expect(phone).toContain('ownerSeatHeaderLabel');
+    expect(phone).toContain('OwnerSeatSignOut');
     expect(phone).not.toMatch(/How can we help you/);
     expect(phone).not.toMatch(/prime coach is finally here/);
     expect(phone).not.toMatch(/was you/);

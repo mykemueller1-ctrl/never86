@@ -21,7 +21,13 @@ const inputClass =
 
 type SeatChoice = { restaurantName: string };
 
-export default function OperatorLoginPage({ showHouseCode = false }: { showHouseCode?: boolean }) {
+export default function OperatorLoginPage({
+  showHouseCode = false,
+  returnTo = null,
+}: {
+  showHouseCode?: boolean;
+  returnTo?: string | null;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
@@ -79,7 +85,7 @@ export default function OperatorLoginPage({ showHouseCode = false }: { showHouse
         return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || 'Wrong email or password.');
-      window.location.assign(data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
+      window.location.assign(returnTo || data.redirect || OWNER_DESK_POST_AUTH_REDIRECT);
     } catch (err: unknown) {
       setHonesty(null);
       setStatus('error');
