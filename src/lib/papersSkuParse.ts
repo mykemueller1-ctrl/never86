@@ -60,6 +60,17 @@ export function isoWeekKeyFromDate(iso: string): string | null {
   return `${t.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
 }
 
+/** Operator-typed date. ISO or month/day/year. Unreadable text has no week. */
+export function calendarFromEditedDate(raw: string | null | undefined): { iso: string | null; isoWeek: string | null } {
+  const trimmed = (raw ?? '').trim();
+  if (!trimmed) return { iso: null, isoWeek: null };
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+    ? (isoWeekKeyFromDate(trimmed) ? trimmed : null)
+    : dateFromMdy(trimmed);
+  if (!iso) return { iso: null, isoWeek: null };
+  return { iso, isoWeek: isoWeekKeyFromDate(iso) };
+}
+
 export function parsePapersSkuLines(input: {
   filename?: string;
   text?: string;

@@ -1,6 +1,6 @@
 import { deflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
-import { allowPapersRescan, drainPapersScan, enqueuePapersScan, papersScanSnapshot, resetPapersScanStore } from './papersScanJob';
+import { allowPapersRescan, applyPapersScanEdit, drainPapersScan, enqueuePapersScan, papersScanSnapshot, resetPapersScanStore } from './papersScanJob';
 import { papersSkuCompareForStore } from './papersInvoicePath';
 import { extractPdfTokens } from './pdfTextTokens';
 import { isoWeekKeyFromDate, parsePapersSkuLines, type PapersSkuRow } from './papersSkuParse';
@@ -132,7 +132,7 @@ describe('papers SKU line parsers', () => {
     expect(charge.category.value).toBe('other');
   });
 
-  it('reads a short dry-goods invoice as food', () => {
+  it('keeps flour as food and a souffle lid as other', () => {
     const parsed = parsePapersSkuLines({
       filename: 'fixture-northern.txt',
       text: paper([
@@ -543,13 +543,13 @@ describe('papers SKU line parsers', () => {
     });
     expect(earlier.lines[0].isoWeek).toBe('2026-W23');
     expect(later.lines[0].isoWeek).toBe('2026-W24');
-    replacePapersSkuDocument('seat:fixture', 'pfg-a', earlier.lines);
+    await replacePapersSkuDocument('seat:fixture', 'pfg-a', earlier.lines);
     const one = papersSkuCompareForStore('seat:fixture');
     expect(one?.honesty).not.toBe('Verified');
     expect(one?.compare?.rows[0].priorPrice).toBeNull();
     expect(one?.compare?.rows[0].currentPrice).toBe(1.25);
     expect(one?.missing).toMatch(/Missing/);
-    replacePapersSkuDocument('seat:fixture', 'pfg-b', later.lines);
+    await replacePapersSkuDocument('seat:fixture', 'pfg-b', later.lines);
     expect(papersSkuRowsForStore('seat:fixture', '2026-W23')).toHaveLength(1);
     expect(papersSkuRowsForStore('seat:fixture', '2026-W24')).toHaveLength(1);
     const both = papersSkuCompareForStore('seat:fixture');
@@ -651,7 +651,7 @@ describe('papers SKU line parsers', () => {
     expect(papersSkuRowsForStore('seat:scan-sku', '2026-W24')).toEqual([]);
   });
 
-  it('isolates two stores of one owner from each other and from a second owner', () => {
+  it('isolates two stores of one owner from each other and from a second owner', async () => {
     resetPapersSkuStore();
     const ownerA = 'owner-a@example.com';
     const ownerB = 'owner-b@example.com';
@@ -678,12 +678,12 @@ describe('papers SKU line parsers', () => {
       ]),
     }).lines;
 
-    expect(replacePapersSkuDocument(ownerA, 'doc', sku('06/05/26', '900001', '1.250', '12.50'), ownerA)).toEqual([]);
-    replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
-    replacePapersSkuDocument('seat:101', 'doc-b', sku('06/12/26', '900002', '1.500', '15.00'), ownerA);
-    replacePapersSkuDocument('seat:102', 'doc-a', sku('06/05/26', '900001', '9.000', '9.00'), ownerA);
-    replacePapersSkuDocument('seat:201', 'doc-a', sku('06/05/26', '900001', '4.000', '4.00'), ownerB);
-    replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
+    await expect(replacePapersSkuDocument(ownerA, 'doc', sku('06/05/26', '900001', '1.250', '12.50'), ownerA)).resolves.toEqual([]);
+    await replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
+    await replacePapersSkuDocument('seat:101', 'doc-b', sku('06/12/26', '900002', '1.500', '15.00'), ownerA);
+    await replacePapersSkuDocument('seat:102', 'doc-a', sku('06/05/26', '900001', '9.000', '9.00'), ownerA);
+    await replacePapersSkuDocument('seat:201', 'doc-a', sku('06/05/26', '900001', '4.000', '4.00'), ownerB);
+    await replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
 
     expect(papersSkuRowsForStore(ownerA)).toEqual([]);
     expect(papersSkuRowsForStore('seat:101', '2026-W23')).toHaveLength(1);
@@ -711,5 +711,63 @@ describe('papers SKU line parsers', () => {
       priorPrice: null,
     }));
     expect(papersSkuCompareForStore(ownerA)).toBeNull();
+  });
+
+  it('copies a reviewed SKU, price, and date into the compare store and drops the old week', async () => {
+    resetPapersSkuStore();
+    resetPapersScanStore();
+    const seat = 'seat:edit-sku';
+    enqueuePapersScan(seat);
+    await drainPapersScan({
+      operatorId: seat,
+      listGmail: async () => [{
+        source: 'gmail',
+        externalId: 'msg-edit-sku',
+        filename: 'fixture-pfg.txt',
+        bytes: new TextEncoder().encode(paper([
+          'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+          '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+        ])),
+      }],
+      listDrive: async () => [],
+    });
+    const stayed = parsePapersSkuLines({
+      filename: 'fixture-pfg-stay.txt',
+      text: paper([
+        'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900009', 'DRY',
+        '1', 'CS', '6/#10Fixture', 'Sauce', 'TH900', '1', '1', 'EA', '1.250', '12.50',
+      ]),
+    });
+    await replacePapersSkuDocument(seat, 'stay-doc', stayed.lines);
+    const review = papersScanSnapshot(seat).rows[0];
+    const edited = await applyPapersScanEdit(seat, {
+      id: review.id,
+      fields: {
+        dates: '06/12/26',
+        lineItems: [{ index: 0, sku: 'TH200', quantity: '4', unitPrice: '2.50' }],
+      },
+    });
+    expect(edited?.isoWeek).toBe('2026-W24');
+    expect(edited?.dates.honesty).toBe('Estimated');
+    expect(edited?.lineItems[0].sku).toMatchObject({ honesty: 'Estimated', value: 'TH200' });
+    expect(edited?.lineItems[0].quantity).toMatchObject({ honesty: 'Estimated', amount: 4 });
+    expect(edited?.lineItems[0].unitPrice).toMatchObject({ honesty: 'Estimated', amount: 2.5 });
+    expect(edited?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    const moved = papersSkuRowsForStore(seat, '2026-W24');
+    expect(moved).toHaveLength(1);
+    expect(moved[0].itemCode.value).toBe('TH200');
+    expect(moved[0].unitPrice.amount).toBe(2.5);
+    expect(moved[0].extendedPrice.amount).toBe(12.5);
+    expect(papersSkuRowsForStore(seat, '2026-W23').map((line) => line.itemCode.value)).toEqual(['TH900']);
+    expect(papersSkuCompareForStore(seat)?.compare?.rows.map((line) => line.sku).sort()).toEqual(['TH200', 'TH900']);
+
+    const cleared = await applyPapersScanEdit(seat, {
+      id: review.id,
+      fields: { dates: 'not-a-date' },
+    });
+    expect(cleared?.isoWeek).toBeNull();
+    expect(papersSkuRowsForStore(seat, '2026-W24')).toEqual([]);
+    expect(papersSkuRowsForStore(seat).some((line) => line.documentKey === review.dedupeKey && line.isoWeek)).toBe(false);
+    expect(papersSkuRowsForStore(seat, '2026-W23')).toHaveLength(1);
   });
 });

@@ -313,7 +313,7 @@ export async function pullLastWeekPapers(input: {
       invoices.push(parsed);
       honesty = parsed.honesty;
       if (parsed.skuRows.length) {
-        replacePapersSkuDocument(input.operatorId, `${item.provider}:${item.filename}`, parsed.skuRows);
+        await replacePapersSkuDocument(input.operatorId, `${item.provider}:${item.filename}`, parsed.skuRows);
       }
     }
     pulled.push({

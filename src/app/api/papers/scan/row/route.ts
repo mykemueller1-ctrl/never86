@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyPapersScanEdit, type PapersScanEdit } from '@/lib/papersScanJob';
+import { papersSkuFailureMessage } from '@/lib/papersSkuStore';
 import { withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 
 export const runtime = 'nodejs';
@@ -11,7 +12,16 @@ export async function POST(req: NextRequest) {
     if (!body?.id) {
       return NextResponse.json({ success: false, honesty: 'Missing', error: 'Row id Missing.' }, { status: 400 });
     }
-    const row = await applyPapersScanEdit(operatorId, body);
+    let row;
+    try {
+      row = await applyPapersScanEdit(operatorId, body);
+    } catch (error) {
+      const message = papersSkuFailureMessage(error);
+      if (message) {
+        return NextResponse.json({ success: false, honesty: 'Missing', error: message }, { status: 503 });
+      }
+      throw error;
+    }
     if (!row) {
       return NextResponse.json({ success: false, honesty: 'Missing', error: 'Row Missing.' }, { status: 404 });
     }

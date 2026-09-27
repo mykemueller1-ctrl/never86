@@ -6,8 +6,12 @@
 import { createHash } from 'node:crypto';
 import { neon } from '@neondatabase/serverless';
 import { draftFromCandidateText, type PapersExtractDraft } from '@/lib/papersScanExtract';
-import { parsePapersSkuLines, skuRowToLineItem, type PapersSkuRow } from '@/lib/papersSkuParse';
-import { replacePapersSkuDocument } from '@/lib/papersSkuStore';
+import { calendarFromEditedDate, parsePapersSkuLines, skuRowToLineItem, type PapersSkuRow } from '@/lib/papersSkuParse';
+import {
+  papersSkuRowsForStore,
+  replacePapersSkuDocument,
+  type StoredSkuRow,
+} from '@/lib/papersSkuStore';
 import { listDriveScanCandidates, listGmailScanCandidates } from '@/lib/papersScanSources';
 import { paperTextFromBytes } from '@/lib/papersScanText';
 import {
@@ -289,29 +293,78 @@ export async function applyPapersScanEdit(operatorId: string, edit: PapersScanEd
   const rows = memory.rows.get(operatorId) ?? [];
   const row = rows.find((item) => item.id === edit.id);
   if (!row || row.fixture) return null;
+  const snapshot = structuredClone(row);
   const fields = edit.fields ?? {};
-  if (fields.vendorName != null) row.vendorName = editText(row.vendorName, fields.vendorName);
-  if (fields.invoiceNumber != null) row.invoiceNumber = editText(row.invoiceNumber, fields.invoiceNumber);
-  if (fields.dates != null) row.dates = editText(row.dates, fields.dates);
-  if (fields.total != null) row.total = editMoney(row.total, fields.total);
-  if (fields.deliveryGross != null) row.delivery.gross = editMoney(row.delivery.gross, fields.deliveryGross);
-  if (fields.deliveryFees != null) row.delivery.fees = editMoney(row.delivery.fees, fields.deliveryFees);
-  if (fields.deliveryNet != null) row.delivery.net = editMoney(row.delivery.net, fields.deliveryNet);
-  for (const shift of fields.shifts ?? []) {
-    const target = row.shifts[shift.index];
-    if (!target) continue;
-    target.hours = editHours(target.hours, shift.hours);
+  const datesEdited = fields.dates != null;
+  try {
+    if (fields.vendorName != null) row.vendorName = editText(row.vendorName, fields.vendorName);
+    if (fields.invoiceNumber != null) row.invoiceNumber = editText(row.invoiceNumber, fields.invoiceNumber);
+    if (fields.dates != null) row.dates = editText(row.dates, fields.dates);
+    if (fields.total != null) row.total = editMoney(row.total, fields.total);
+    if (fields.deliveryGross != null) row.delivery.gross = editMoney(row.delivery.gross, fields.deliveryGross);
+    if (fields.deliveryFees != null) row.delivery.fees = editMoney(row.delivery.fees, fields.deliveryFees);
+    if (fields.deliveryNet != null) row.delivery.net = editMoney(row.delivery.net, fields.deliveryNet);
+    for (const shift of fields.shifts ?? []) {
+      const target = row.shifts[shift.index];
+      if (!target) continue;
+      target.hours = editHours(target.hours, shift.hours);
+    }
+    for (const line of fields.lineItems ?? []) {
+      const target = row.lineItems[line.index];
+      if (!target) continue;
+      if (line.sku != null) target.sku = editText(target.sku, line.sku);
+      if (line.quantity != null) target.quantity = editHours(target.quantity, line.quantity);
+      if (line.unitPrice != null) target.unitPrice = editMoney(target.unitPrice, line.unitPrice);
+    }
+    if (edit.confirm) row.confirmed = true;
+    await syncReviewedSku(operatorId, row, datesEdited);
+  } catch (error) {
+    const index = rows.findIndex((item) => item.id === snapshot.id);
+    if (index >= 0) rows[index] = snapshot;
+    throw error;
   }
-  for (const line of fields.lineItems ?? []) {
-    const target = row.lineItems[line.index];
-    if (!target) continue;
-    if (line.sku != null) target.sku = editText(target.sku, line.sku);
-    if (line.quantity != null) target.quantity = editHours(target.quantity, line.quantity);
-    if (line.unitPrice != null) target.unitPrice = editMoney(target.unitPrice, line.unitPrice);
-  }
-  if (edit.confirm) row.confirmed = true;
   await persistRow(operatorId, row).catch(() => undefined);
   return row;
+}
+
+function skuRowsAfterReview(row: PapersScanRow, existing: StoredSkuRow[], datesEdited: boolean): PapersSkuRow[] {
+  const indexes = new Set<number>();
+  existing.forEach((line) => indexes.add(line.lineIndex));
+  row.lineItems.forEach((_, index) => indexes.add(index));
+  return [...indexes].sort((a, b) => a - b).map((lineIndex) => {
+    const prior = existing.find((line) => line.lineIndex === lineIndex);
+    const item = row.lineItems[lineIndex];
+    const moveWeek = datesEdited || !prior;
+    const calendar = moveWeek ? calendarFromEditedDate(row.dates.value) : null;
+    return {
+      productName: item?.description ?? prior?.productName ?? missingField(),
+      itemCode: item?.sku ?? prior?.itemCode ?? missingField(),
+      quantity: item?.quantity ?? prior?.quantity ?? missingField(),
+      unit: item?.unit ?? prior?.unit ?? missingField(),
+      unitPrice: item?.unitPrice ?? prior?.unitPrice ?? missingField(),
+      extendedPrice: item?.extendedPrice ?? prior?.extendedPrice ?? missingField(),
+      vendor: row.vendorName,
+      documentDate: moveWeek ? row.dates : (prior?.documentDate ?? row.dates),
+      documentNumber: row.invoiceNumber,
+      category: item?.category ?? prior?.category ?? missingField(),
+      isoWeek: moveWeek ? calendar?.isoWeek ?? null : (prior?.isoWeek ?? null),
+      documentKey: row.dedupeKey,
+    };
+  });
+}
+
+async function syncReviewedSku(operatorId: string, row: PapersScanRow, datesEdited: boolean): Promise<void> {
+  const existing = papersSkuRowsForStore(operatorId).filter((line) => line.documentKey === row.dedupeKey);
+  if (!existing.length && !row.lineItems.length) return;
+  const ownerId = existing.find((line) => line.ownerId)?.ownerId ?? null;
+  const stored = await replacePapersSkuDocument(
+    operatorId,
+    row.dedupeKey,
+    skuRowsAfterReview(row, existing, datesEdited),
+    ownerId,
+  );
+  const weeks = [...new Set(stored.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
+  row.isoWeek = weeks.length ? weeks.join(', ') : null;
 }
 
 async function ingest(
@@ -353,7 +406,15 @@ async function ingest(
     else if (sku.note.startsWith('Photo')) draft.note = sku.note;
     if (sku.lines.length) {
       // operatorId here is the selected store seat (`seat:<id>`), not the person email.
-      replacePapersSkuDocument(operatorId, dedupeKey, sku.lines.map((row) => ({ ...row, documentKey: dedupeKey })));
+      try {
+        await replacePapersSkuDocument(operatorId, dedupeKey, sku.lines.map((line) => ({ ...line, documentKey: dedupeKey })));
+      } catch (error) {
+        job.error = error instanceof Error && error.message
+          ? error.message
+          : 'SKU lines were not saved. Compare was not updated.';
+        job.skipped += 1;
+        continue;
+      }
     }
     const row: PapersScanRow = {
       ...draft,
