@@ -10,6 +10,8 @@ import {
   applyPapersScanEdit,
   drainPapersScan,
   enqueuePapersScan,
+  forgetPapersScanMemory,
+  hydratePapersScan,
   papersScanSnapshot,
   resetPapersScanStore,
 } from './papersScanJob';
@@ -17,6 +19,7 @@ import { parsePapersSkuLines } from './papersSkuParse';
 import {
   forgetPapersSkuMemory,
   hydratePapersSku,
+  PAPERS_REVIEW_PERSIST_ERROR,
   papersSkuRowsForStore,
   PapersSkuPersistError,
   replacePapersSkuDocument,
@@ -34,6 +37,8 @@ const hooks = {
   maxDepth: 0,
   inserts: 0,
   failInsertNumber: 0,
+  failReviewWrite: false,
+  reviewFailedAfterSku: false,
 };
 
 let database: PGlite;
@@ -57,8 +62,15 @@ function executorFor(db: PGlite): SkuExecutor {
       if (hooks.delayMs) await new Promise((resolve) => setTimeout(resolve, hooks.delayMs));
       try {
         await db.transaction(async (tx) => {
+          let preparedSku = false;
           for (const statement of statements) {
-            if (/^\s*insert/i.test(statement.text)) {
+            const insert = /^\s*insert/i.test(statement.text);
+            if (insert && /papers_sku_lines/i.test(statement.text)) preparedSku = true;
+            if (hooks.failReviewWrite && /papers_scan_rows/i.test(statement.text)) {
+              hooks.reviewFailedAfterSku = preparedSku;
+              throw new Error('forced review failure');
+            }
+            if (insert) {
               hooks.inserts += 1;
               if (hooks.failInsertNumber && hooks.inserts === hooks.failInsertNumber) {
                 throw new Error('forced insert failure');
@@ -76,6 +88,29 @@ function executorFor(db: PGlite): SkuExecutor {
       return result.rows;
     },
   };
+}
+
+type SavedReview = {
+  dedupe_key: string;
+  row_json: {
+    confirmed?: boolean;
+    isoWeek?: string | null;
+    lineItems?: Array<{
+      unitPrice?: { amount?: number; honesty?: string };
+      extendedPrice?: { amount?: number; honesty?: string };
+    }>;
+  };
+};
+
+async function savedReviews(storeId: string): Promise<SavedReview[]> {
+  const result = await database.query<SavedReview>(
+    `select dedupe_key, row_json from papers_scan_rows where operator_id = $1 order by dedupe_key`,
+    [storeId],
+  );
+  return result.rows.map((row) => ({
+    ...row,
+    row_json: typeof row.row_json === 'string' ? JSON.parse(row.row_json) as SavedReview['row_json'] : row.row_json,
+  }));
 }
 
 async function savedLines(storeId: string): Promise<SavedLine[]> {
@@ -121,6 +156,8 @@ describe('papers sku database durability', () => {
     hooks.maxDepth = 0;
     hooks.inserts = 0;
     hooks.failInsertNumber = 0;
+    hooks.failReviewWrite = false;
+    hooks.reviewFailedAfterSku = false;
     setPapersSkuExecutorForTests(executorFor(database));
   });
 
@@ -203,10 +240,11 @@ describe('papers sku database durability', () => {
       listGmail: async () => [{ source: 'gmail', externalId: 'msg-fail', filename: 'fixture-pfg.txt', bytes }],
       listDrive: async () => [],
     });
-    expect(failed.error).toBe('SKU lines were not saved. Compare was not updated.');
+    expect(failed.error).toBe(PAPERS_REVIEW_PERSIST_ERROR);
     expect(failed.kept).toBe(0);
     expect(papersScanSnapshot('seat:fail-scan').rows).toEqual([]);
     expect(await savedLines('seat:fail-scan')).toEqual([]);
+    expect(await savedReviews('seat:fail-scan')).toEqual([]);
   }, 30_000);
 
   it('stores a reviewed price and week, then reads them from a cold database', async () => {
@@ -266,11 +304,123 @@ describe('papers sku database durability', () => {
     expect(papersSkuRowsForStore(seat, '2026-W23')[0].documentKey).toBe('prior-doc');
 
     await reopenDatabase();
+    forgetPapersScanMemory(seat);
+    await hydratePapersScan(seat);
     await hydratePapersSku(seat);
+    expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+    expect(papersScanSnapshot(seat).rows[0].isoWeek).toBe('2026-W24');
     expect(papersSkuRowsForStore(seat, '2026-W24')[0].itemCode.value).toBe('TH100');
     expect(papersSkuRowsForStore(seat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
     expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.documentKey)).toEqual(['prior-doc']);
     expect((await savedLines(seat)).map((row) => row.iso_week).sort()).toEqual(['2026-W23', '2026-W24']);
+  }, 30_000);
+
+  it('keeps review and compare together when the review write fails, then retries', async () => {
+    const seat = 'seat:pair';
+    const bytes = new TextEncoder().encode([
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n'));
+    enqueuePapersScan(seat);
+    await drainPapersScan({
+      operatorId: seat,
+      listGmail: async () => [{ source: 'gmail', externalId: 'msg-pair', filename: 'fixture-pfg.txt', bytes }],
+      listDrive: async () => [],
+    });
+    await replacePapersSkuDocument(seat, 'other-doc', sauce('06/05/26', '900009', 'TH900', '1.250', '12.50'));
+    const review = papersScanSnapshot(seat).rows[0];
+    const agreed = await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-12', lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    expect(agreed?.confirmed).toBe(true);
+    expect(agreed?.lineItems[0].unitPrice).toMatchObject({ honesty: 'Estimated', amount: 2.25 });
+    expect(agreed?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+
+    hooks.failReviewWrite = true;
+    hooks.reviewFailedAfterSku = false;
+    await expect(applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-19', lineItems: [{ index: 0, unitPrice: '8.00' }] },
+    })).rejects.toThrow(PAPERS_REVIEW_PERSIST_ERROR);
+    expect(hooks.reviewFailedAfterSku).toBe(true);
+    expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+    expect(papersScanSnapshot(seat).rows[0].isoWeek).toBe('2026-W24');
+    expect(papersSkuRowsForStore(seat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat, '2026-W25')).toEqual([]);
+    expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.documentKey)).toEqual(['other-doc']);
+
+    forgetPapersScanMemory(seat);
+    forgetPapersSkuMemory(seat);
+    await hydratePapersScan(seat);
+    await hydratePapersSku(seat);
+    expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
+    expect(papersScanSnapshot(seat).rows[0].confirmed).toBe(true);
+    expect(papersSkuRowsForStore(seat, '2026-W24')[0].unitPrice.amount).toBe(2.25);
+    expect((await savedReviews(seat))[0].row_json.lineItems?.[0].unitPrice?.amount).toBe(2.25);
+    expect((await savedLines(seat)).find((row) => row.document_key === 'other-doc')?.row_json.itemCode?.value).toBe('TH900');
+
+    hooks.failReviewWrite = false;
+    const retried = await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-19', lineItems: [{ index: 0, unitPrice: '8.00' }] },
+    });
+    expect(retried?.lineItems[0].unitPrice.amount).toBe(8);
+    expect(retried?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(retried?.isoWeek).toBe('2026-W25');
+    await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { lineItems: [{ index: 0, unitPrice: '8.00' }] },
+    });
+    const pairKey = review.dedupeKey;
+    expect((await savedLines(seat)).filter((row) => row.document_key === pairKey)).toHaveLength(1);
+    expect((await savedReviews(seat)).filter((row) => row.dedupe_key === pairKey)).toHaveLength(1);
+    expect(papersSkuRowsForStore(seat, '2026-W24')).toEqual([]);
+    expect(papersSkuRowsForStore(seat, '2026-W23').map((row) => row.documentKey)).toEqual(['other-doc']);
+
+    hooks.delayMs = 40;
+    hooks.maxDepth = 0;
+    const [first, second] = await Promise.all([
+      applyPapersScanEdit(seat, {
+        id: review.id,
+        fields: { lineItems: [{ index: 0, unitPrice: '4.00' }] },
+      }).then((row) => {
+        const sku = papersSkuRowsForStore(seat).find((line) => line.documentKey === pairKey);
+        expect(row?.lineItems[0].unitPrice.amount).toBe(sku?.unitPrice.amount);
+        expect(row?.lineItems[0].unitPrice.amount).toBe(4);
+        return row;
+      }),
+      applyPapersScanEdit(seat, {
+        id: review.id,
+        fields: { lineItems: [{ index: 0, unitPrice: '5.00' }] },
+      }).then((row) => {
+        const sku = papersSkuRowsForStore(seat).find((line) => line.documentKey === pairKey);
+        expect(row?.lineItems[0].unitPrice.amount).toBe(sku?.unitPrice.amount);
+        expect(row?.lineItems[0].unitPrice.amount).toBe(5);
+        return row;
+      }),
+    ]);
+    expect(hooks.maxDepth).toBe(1);
+    expect(first?.lineItems[0].unitPrice.amount).toBe(4);
+    expect(second?.lineItems[0].unitPrice.amount).toBe(5);
+
+    await reopenDatabase();
+    forgetPapersScanMemory(seat);
+    await hydratePapersScan(seat);
+    await hydratePapersSku(seat);
+    const coldReview = papersScanSnapshot(seat).rows[0];
+    const coldSku = papersSkuRowsForStore(seat, '2026-W25')[0];
+    expect(coldReview.lineItems[0].unitPrice.amount).toBe(coldSku.unitPrice.amount);
+    expect(coldReview.lineItems[0].unitPrice.amount).toBe(5);
+    expect(coldReview.lineItems[0].unitPrice.honesty).toBe('Estimated');
+    expect(coldReview.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(coldSku.extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(papersSkuRowsForStore(seat, '2026-W23')[0].itemCode.value).toBe('TH900');
+    expect(papersSkuRowsForStore(seat).some((row) => row.storeId !== seat)).toBe(false);
   }, 30_000);
 
   it('follows the seat chosen by a location switch and keeps the other location', async () => {

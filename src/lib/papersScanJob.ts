@@ -8,8 +8,9 @@ import { neon } from '@neondatabase/serverless';
 import { draftFromCandidateText, type PapersExtractDraft } from '@/lib/papersScanExtract';
 import { calendarFromEditedDate, parsePapersSkuLines, skuRowToLineItem, type PapersSkuRow } from '@/lib/papersSkuParse';
 import {
+  commitReviewedDocument,
+  loadPapersReviewRows,
   papersSkuRowsForStore,
-  replacePapersSkuDocument,
   type StoredSkuRow,
 } from '@/lib/papersSkuStore';
 import { listDriveScanCandidates, listGmailScanCandidates } from '@/lib/papersScanSources';
@@ -38,13 +39,33 @@ type Store = {
 
 const memory: Store = { jobs: new Map(), rows: new Map() };
 const inflight = new Map<string, Promise<PapersScanJobState>>();
+const editQueue = new Map<string, Promise<unknown>>();
 let schemaReady: Promise<void> | null = null;
 
 export function resetPapersScanStore(): void {
   memory.jobs.clear();
   memory.rows.clear();
   inflight.clear();
+  editQueue.clear();
   schemaReady = null;
+}
+
+/** Drop the in-process review copy so the next read loads the database. */
+export function forgetPapersScanMemory(operatorId?: string): void {
+  if (!operatorId) {
+    memory.jobs.clear();
+    memory.rows.clear();
+    return;
+  }
+  memory.jobs.delete(operatorId);
+  memory.rows.delete(operatorId);
+}
+
+function enqueueScanEdit<T>(storeId: string, work: () => Promise<T>): Promise<T> {
+  const previous = editQueue.get(storeId) ?? Promise.resolve();
+  const run = previous.then(work, work);
+  editQueue.set(storeId, run.then(() => undefined, () => undefined));
+  return run;
 }
 
 export function papersContentHash(bytes: Uint8Array): string {
@@ -101,6 +122,8 @@ export function papersScanSnapshot(operatorId: string): { job: PapersScanJobStat
 
 export async function hydratePapersScan(operatorId: string): Promise<void> {
   if (memory.jobs.has(operatorId) || memory.rows.has(operatorId)) return;
+  const loaded = await loadPapersReviewRows(operatorId);
+  if (loaded) memory.rows.set(operatorId, loaded as PapersScanRow[]);
   const url = process.env.DATABASE_URL?.trim();
   if (!url) return;
   try {
@@ -117,14 +140,6 @@ export async function hydratePapersScan(operatorId: string): Promise<void> {
       if (job.status === 'running') job.status = 'queued';
       memory.jobs.set(operatorId, job);
     }
-    const stored = await sql`
-      select row_json from papers_scan_rows where operator_id = ${operatorId} order by updated_at asc limit 200
-    `;
-    const rows = stored.map((row) => {
-      const value = (row as { row_json: PapersScanRow | string }).row_json;
-      return typeof value === 'string' ? JSON.parse(value) as PapersScanRow : value;
-    });
-    if (rows.length) memory.rows.set(operatorId, rows);
   } catch {
     return;
   }
@@ -173,20 +188,6 @@ async function persistJob(operatorId: string): Promise<void> {
     values (${operatorId}, ${JSON.stringify(job)}::jsonb, now())
     on conflict (operator_id) do update set
       job_json = excluded.job_json,
-      updated_at = now()
-  `;
-}
-
-async function persistRow(operatorId: string, row: PapersScanRow): Promise<void> {
-  const url = process.env.DATABASE_URL?.trim();
-  if (!url) return;
-  await ensureScanSchema(url);
-  const sql = neon(url);
-  await sql`
-    insert into papers_scan_rows (operator_id, dedupe_key, row_json, updated_at)
-    values (${operatorId}, ${row.dedupeKey}, ${JSON.stringify(row)}::jsonb, now())
-    on conflict (operator_id, dedupe_key) do update set
-      row_json = excluded.row_json,
       updated_at = now()
   `;
 }
@@ -288,7 +289,11 @@ export type PapersScanEdit = {
   };
 };
 
-export async function applyPapersScanEdit(operatorId: string, edit: PapersScanEdit): Promise<PapersScanRow | null> {
+export function applyPapersScanEdit(operatorId: string, edit: PapersScanEdit): Promise<PapersScanRow | null> {
+  return enqueueScanEdit(operatorId, () => applyPapersScanEditNow(operatorId, edit));
+}
+
+async function applyPapersScanEditNow(operatorId: string, edit: PapersScanEdit): Promise<PapersScanRow | null> {
   await hydratePapersScan(operatorId);
   const rows = memory.rows.get(operatorId) ?? [];
   const row = rows.find((item) => item.id === edit.id);
@@ -323,8 +328,7 @@ export async function applyPapersScanEdit(operatorId: string, edit: PapersScanEd
     if (index >= 0) rows[index] = snapshot;
     throw error;
   }
-  await persistRow(operatorId, row).catch(() => undefined);
-  return row;
+  return structuredClone(row);
 }
 
 function skuRowsAfterReview(row: PapersScanRow, existing: StoredSkuRow[], datesEdited: boolean): PapersSkuRow[] {
@@ -355,16 +359,15 @@ function skuRowsAfterReview(row: PapersScanRow, existing: StoredSkuRow[], datesE
 
 async function syncReviewedSku(operatorId: string, row: PapersScanRow, datesEdited: boolean): Promise<void> {
   const existing = papersSkuRowsForStore(operatorId).filter((line) => line.documentKey === row.dedupeKey);
-  if (!existing.length && !row.lineItems.length) return;
+  const next = existing.length || row.lineItems.length
+    ? skuRowsAfterReview(row, existing, datesEdited)
+    : [];
+  if (next.length) {
+    const weeks = [...new Set(next.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
+    row.isoWeek = weeks.length ? weeks.join(', ') : null;
+  }
   const ownerId = existing.find((line) => line.ownerId)?.ownerId ?? null;
-  const stored = await replacePapersSkuDocument(
-    operatorId,
-    row.dedupeKey,
-    skuRowsAfterReview(row, existing, datesEdited),
-    ownerId,
-  );
-  const weeks = [...new Set(stored.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
-  row.isoWeek = weeks.length ? weeks.join(', ') : null;
+  await commitReviewedDocument(operatorId, row.dedupeKey, next, { dedupeKey: row.dedupeKey, rowJson: row }, ownerId);
 }
 
 async function ingest(
@@ -404,18 +407,6 @@ async function ingest(
     }
     if (sku.lines.length) applySkuLines(draft, sku.lines);
     else if (sku.note.startsWith('Photo')) draft.note = sku.note;
-    if (sku.lines.length) {
-      // operatorId here is the selected store seat (`seat:<id>`), not the person email.
-      try {
-        await replacePapersSkuDocument(operatorId, dedupeKey, sku.lines.map((line) => ({ ...line, documentKey: dedupeKey })));
-      } catch (error) {
-        job.error = error instanceof Error && error.message
-          ? error.message
-          : 'SKU lines were not saved. Compare was not updated.';
-        job.skipped += 1;
-        continue;
-      }
-    }
     const row: PapersScanRow = {
       ...draft,
       id: crypto.randomUUID(),
@@ -427,10 +418,28 @@ async function ingest(
       fixture: false,
       note: draft.note,
     };
+    try {
+      // operatorId here is the selected store seat (`seat:<id>`), not the person email.
+      if (sku.lines.length) {
+        await commitReviewedDocument(
+          operatorId,
+          dedupeKey,
+          sku.lines.map((line) => ({ ...line, documentKey: dedupeKey })),
+          { dedupeKey, rowJson: row },
+        );
+      } else {
+        await commitReviewedDocument(operatorId, dedupeKey, [], { dedupeKey, rowJson: row });
+      }
+    } catch (error) {
+      job.error = error instanceof Error && error.message
+        ? error.message
+        : 'Review and compare were not saved. The prior lines stay in place.';
+      job.skipped += 1;
+      continue;
+    }
     rows.push(row);
     seen.add(dedupeKey);
     job.kept += 1;
-    await persistRow(operatorId, row).catch(() => undefined);
     await persistJob(operatorId).catch(() => undefined);
   }
 }

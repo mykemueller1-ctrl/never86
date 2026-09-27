@@ -5,10 +5,13 @@
  * A missing week is Missing, not $0.
  *
  * One document is deleted and reinserted inside a single transaction.
- * Memory changes only after that transaction commits. Same-store saves in
+ * A confirmed review edit writes that document and the review row in the
+ * same transaction. Memory changes only after commit. Same-store saves in
  * this process wait their turn so two writes cannot report success on a
- * half-written map.
+ * half-written pair.
  */
+
+export const PAPERS_REVIEW_PERSIST_ERROR = 'Review and compare were not saved. The prior lines stay in place.';
 
 import { neon } from '@neondatabase/serverless';
 import type { PapersSkuRow } from '@/lib/papersSkuParse';
@@ -157,6 +160,15 @@ async function ensureSkuSchema(db: SkuExecutor): Promise<void> {
       `);
       await db.query(`alter table papers_sku_lines add column if not exists store_id text`);
       await db.query(`alter table papers_sku_lines add column if not exists owner_id text`);
+      await db.query(`
+        create table if not exists papers_scan_rows (
+          operator_id text not null,
+          dedupe_key text not null,
+          row_json jsonb not null,
+          updated_at timestamptz not null default now(),
+          primary key (operator_id, dedupe_key)
+        )
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;
@@ -165,7 +177,35 @@ async function ensureSkuSchema(db: SkuExecutor): Promise<void> {
   await schemaReady;
 }
 
-async function persistDocument(storeId: string, documentKey: string, stored: StoredSkuRow[]): Promise<void> {
+export function commitReviewedDocument(
+  storeId: string,
+  documentKey: string,
+  rows: PapersSkuRow[],
+  review: { dedupeKey: string; rowJson: unknown },
+  ownerId?: string | null,
+): Promise<StoredSkuRow[]> {
+  const key = papersStoreKey(storeId);
+  if (!key || !review.dedupeKey) return Promise.resolve([]);
+  const stored = storedFrom(key, documentKey, rows, ownerId);
+  const reviewJson = JSON.stringify(review.rowJson);
+  return enqueue(key, async () => {
+    await persistDocument(key, documentKey, stored, {
+      dedupeKey: review.dedupeKey,
+      rowJson: reviewJson,
+      failureMessage: PAPERS_REVIEW_PERSIST_ERROR,
+    });
+    const kept = (memory.get(key) ?? []).filter((row) => row.documentKey !== documentKey);
+    memory.set(key, kept.concat(stored));
+    return stored;
+  });
+}
+
+async function persistDocument(
+  storeId: string,
+  documentKey: string,
+  stored: StoredSkuRow[],
+  review?: { dedupeKey: string; rowJson: string; failureMessage: string },
+): Promise<void> {
   const db = activeExecutor();
   if (!db) return;
   const statements: SkuStatement[] = [
@@ -190,18 +230,54 @@ async function persistDocument(storeId: string, documentKey: string, stored: Sto
       ],
     })),
   ];
+  if (review) {
+    statements.push({
+      text: `insert into papers_scan_rows (operator_id, dedupe_key, row_json, updated_at)
+             values ($1, $2, $3::jsonb, now())
+             on conflict (operator_id, dedupe_key) do update set
+               row_json = excluded.row_json,
+               updated_at = now()`,
+      values: [storeId, review.dedupeKey, review.rowJson],
+    });
+  }
   try {
     await ensureSkuSchema(db);
     await db.transaction(statements);
   } catch (error) {
     if (error instanceof PapersSkuPersistError) throw error;
-    throw new PapersSkuPersistError();
+    throw new PapersSkuPersistError(review?.failureMessage || undefined);
   }
 }
 
 function readStored(value: unknown): StoredSkuRow {
   if (typeof value === 'string') return JSON.parse(value) as StoredSkuRow;
   return value as StoredSkuRow;
+}
+
+export async function loadPapersReviewRows(storeId: string): Promise<unknown[] | null> {
+  const key = papersStoreKey(storeId);
+  if (!key) return [];
+  const db = activeExecutor();
+  if (!db) return null;
+  try {
+    await ensureSkuSchema(db);
+    const found = await db.query<{ row_json: unknown }>(
+      `select row_json from papers_scan_rows
+       where operator_id = $1
+       order by updated_at asc
+       limit 200`,
+      [key],
+    );
+    return found.map((row) => readJson(row.row_json));
+  } catch (error) {
+    if (error instanceof PapersSkuPersistError) throw error;
+    throw new PapersSkuPersistError('Review rows were not loaded. Compare was not shown.');
+  }
+}
+
+function readJson(value: unknown): unknown {
+  if (typeof value === 'string') return JSON.parse(value) as unknown;
+  return value;
 }
 
 export async function hydratePapersSku(storeId: string): Promise<void> {
