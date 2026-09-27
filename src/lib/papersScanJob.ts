@@ -352,6 +352,7 @@ async function ingest(
     if (sku.lines.length) applySkuLines(draft, sku.lines);
     else if (sku.note.startsWith('Photo')) draft.note = sku.note;
     if (sku.lines.length) {
+      // operatorId here is the selected store seat (`seat:<id>`), not the person email.
       replacePapersSkuDocument(operatorId, dedupeKey, sku.lines.map((row) => ({ ...row, documentKey: dedupeKey })));
     }
     const row: PapersScanRow = {

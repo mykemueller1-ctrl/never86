@@ -41,6 +41,8 @@ const MONTHS: Record<string, number> = {
 };
 
 const SUPPLY_RE = /liner|glove|chemical|\btowel\b|\bsoap\b|\bmat\b|\bmop\b|apron|tissue|t-sack|canliner/i;
+/** Disposable packaging. A flour bag stays food. A printed pack size is not a unit conversion. */
+const PACKAGING_RE = /\blids?\b|souffle|pizza\s*box|box\s*pizza|\bcontainers?\b|\bnapkins?\b|\bstraws?\b|clamshell|\bcartons?\b|\bplacemats?\b/i;
 const LIQUOR_RE = /vodka|whiskey|whisky|tequila|\brum\b|\bgin\b|smir|liqueur|carbliss|bourbon|schnapps/i;
 const BEER_RE = /\bbeer\b|busch|\bbud\b|lager|\bale\b|\bipa\b|\bbbl\b|\bkeg\b|michelob|seltzer|\bultra\b/i;
 
@@ -269,7 +271,7 @@ function valueAfter(tokens: string[], label: string): string | null {
 function foodOrSupply(description: string, sectionFood: boolean): PapersLabeledField {
   if (LIQUOR_RE.test(description)) return categoryField('liquor');
   if (BEER_RE.test(description)) return categoryField('beer');
-  if (SUPPLY_RE.test(description)) return categoryField('other');
+  if (SUPPLY_RE.test(description) || PACKAGING_RE.test(description)) return categoryField('other');
   if (sectionFood) return categoryField('food');
   return missingField();
 }

@@ -25,6 +25,10 @@ describe('papers scan extractors', () => {
     expect(skuLayout?.vendorName).toMatchObject({ honesty: 'Verified', value: 'Performance Foodservice' });
     expect(skuLayout?.lineItems[0].extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
     expect(skuLayout?.lineItems[0].category.value).toBe('food');
+    expect(skuLayout?.lineItems[1].category.value).toBe('other');
+    expect(skuLayout?.lineItems[1].quantity.amount).toBe(1);
+    expect(skuLayout?.lineItems[1].unit.value).toBe('CS');
+    expect(skuLayout?.lineItems[1].extendedPrice.amount).toBe(4);
     expect(rows.every((row) => row.fixture && row.note.startsWith('FIXTURE'))).toBe(true);
     const amounts = rows.flatMap((row) => [
       row.total.amount,

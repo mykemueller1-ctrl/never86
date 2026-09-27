@@ -1,6 +1,6 @@
 import { deflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
-import { drainPapersScan, enqueuePapersScan, papersScanSnapshot, resetPapersScanStore } from './papersScanJob';
+import { allowPapersRescan, drainPapersScan, enqueuePapersScan, papersScanSnapshot, resetPapersScanStore } from './papersScanJob';
 import { papersSkuCompareForStore } from './papersInvoicePath';
 import { extractPdfTokens } from './pdfTextTokens';
 import { isoWeekKeyFromDate, parsePapersSkuLines, type PapersSkuRow } from './papersSkuParse';
@@ -87,6 +87,8 @@ describe('papers SKU line parsers', () => {
     expect(dough.unitPrice.amount).toBe(0.082);
     expect(dough.extendedPrice.amount).toBe(20);
     expect(dough.extendedPrice.amount).not.toBeCloseTo(0.164, 3);
+    expect(dough.quantity.amount).toBe(2);
+    expect(dough.unit.value).toBe('CS');
     expect(row(parsed.lines, 'TH200').category.value).toBe('other');
   });
 
@@ -159,11 +161,96 @@ describe('papers SKU line parsers', () => {
       ]),
     });
     expect(parsed.lines).toHaveLength(2);
-    expect(parsed.lines.every((line) => line.category.value === 'food' && line.category.honesty === 'Verified')).toBe(true);
+    expect(row(parsed.lines, 'Fixture Flour').category).toMatchObject({ honesty: 'Verified', value: 'food' });
+    expect(row(parsed.lines, 'Fixture Lid').category).toMatchObject({ honesty: 'Verified', value: 'other' });
     expect(parsed.lines[0].documentNumber.value).toBe('880002');
     expect(parsed.lines[0].documentDate.value).toBe('2026-06-01');
     expect(row(parsed.lines, 'Fixture Flour').itemCode.value).toBe('101');
+    expect(row(parsed.lines, 'Fixture Flour').category.value).toBe('food');
     expect(row(parsed.lines, 'Fixture Lid').extendedPrice.amount).toBe(12);
+    expect(row(parsed.lines, 'Fixture Lid').category.value).toBe('other');
+    expect(row(parsed.lines, 'Fixture Lid').quantity.amount).toBe(3);
+    expect(row(parsed.lines, 'Fixture Lid').unit.value).toBe('1/500');
+  });
+
+  it('keeps disposable boxes and lids as other without converting the printed pack', () => {
+    const boxes = parsePapersSkuLines({
+      filename: 'fixture-pfg-box.txt',
+      text: paper([
+        'Performance',
+        'Foodservice',
+        'Date:',
+        '06/05/26',
+        '06/05/26',
+        '900001',
+        'DRY',
+        '1',
+        'CS',
+        '1/50Fixture',
+        'Pizza Box',
+        'BX100',
+        '1',
+        '1',
+        'EA',
+        '1.250',
+        '**',
+        '12.50',
+        '1',
+        'CS',
+        '6/#10Fixture',
+        'Sauce',
+        'TH100',
+        '1',
+        '1',
+        'EA',
+        '2.000',
+        '8.00',
+      ]),
+    });
+    const box = row(boxes.lines, 'BX100');
+    expect(box.productName.value).toContain('Pizza Box');
+    expect(box.category).toMatchObject({ honesty: 'Verified', value: 'other' });
+    expect(box.quantity).toMatchObject({ honesty: 'Verified', amount: 1 });
+    expect(box.unit.value).toBe('CS');
+    expect(box.unitPrice.amount).toBe(1.25);
+    expect(box.extendedPrice.amount).toBe(12.5);
+    expect(box.quantity.amount).not.toBe(50);
+    expect(row(boxes.lines, 'TH100').category.value).toBe('food');
+
+    const lids = parsePapersSkuLines({
+      filename: 'fixture-northern-lid.txt',
+      text: paper([
+        'Northern Lights',
+        'Invoice Date:',
+        '06/01/2026',
+        'Invoice #:',
+        '880002',
+        'Item #',
+        'Extended',
+        '** DRY ITEMS **',
+        '201',
+        '000111222335',
+        'Fixture Souffle Cup',
+        '2500ct',
+        '1',
+        '9.00',
+        '9.00',
+        '101',
+        '000111222333',
+        'Fixture Flour Bag',
+        '50#',
+        '2',
+        '20.00',
+        '40.00',
+      ]),
+    });
+    const cup = row(lids.lines, '201');
+    expect(cup.category.value).toBe('other');
+    expect(cup.quantity.amount).toBe(1);
+    expect(cup.unit.value).toBe('2500ct');
+    expect(cup.extendedPrice.amount).toBe(9);
+    expect(row(lids.lines, '101').category.value).toBe('food');
+    expect(row(lids.lines, '101').quantity.amount).toBe(2);
   });
 
   it('keeps a credit line and does not invent a liquor category', () => {
@@ -510,5 +597,119 @@ describe('papers SKU line parsers', () => {
     expect(snap.rows[0].lineItems[0].extendedPrice.amount).toBe(12.5);
     expect(snap.rows[0].lineItems[0].category.value).toBe('food');
     expect(papersSkuRowsForStore('seat:scan-sku', '2026-W23')).toHaveLength(1);
+    expect(snap.job?.kept).toBe(1);
+    expect(snap.job?.deduped).toBe(0);
+
+    const repeat = await drainPapersScan({
+      operatorId: 'seat:scan-sku',
+      listGmail: async () => [{
+        source: 'gmail',
+        externalId: 'msg-sku',
+        filename: 'fixture-pfg.txt',
+        bytes: new TextEncoder().encode('ignored because the finished job does not scan again'),
+      }],
+      listDrive: async () => [],
+    });
+    expect(repeat.deduped).toBe(0);
+    expect(papersScanSnapshot('seat:scan-sku').rows).toHaveLength(1);
+    expect(papersSkuRowsForStore('seat:scan-sku', '2026-W23')).toHaveLength(1);
+
+    allowPapersRescan('seat:scan-sku');
+    enqueuePapersScan('seat:scan-sku');
+    const forced = await drainPapersScan({
+      operatorId: 'seat:scan-sku',
+      listGmail: async () => [{
+        source: 'gmail',
+        externalId: 'msg-sku',
+        filename: 'fixture-pfg.txt',
+        bytes: new TextEncoder().encode(paper([
+          'Performance',
+          'Foodservice',
+          'Date:',
+          '06/05/26',
+          '06/05/26',
+          '900001',
+          'DRY',
+          '1',
+          'CS',
+          '6/#10Fixture',
+          'Sauce',
+          'TH100',
+          '1',
+          '1',
+          'EA',
+          '1.250',
+          '12.50',
+        ])),
+      }],
+      listDrive: async () => [],
+    });
+    expect(forced.deduped).toBe(1);
+    expect(forced.kept).toBe(0);
+    expect(papersScanSnapshot('seat:scan-sku').rows).toHaveLength(1);
+    expect(papersSkuRowsForStore('seat:scan-sku', '2026-W23')).toHaveLength(1);
+    expect(papersSkuRowsForStore('seat:scan-sku', '2026-W24')).toEqual([]);
+  });
+
+  it('isolates two stores of one owner from each other and from a second owner', () => {
+    resetPapersSkuStore();
+    const ownerA = 'owner-a@example.com';
+    const ownerB = 'owner-b@example.com';
+    const sku = (date: string, invoice: string, price: string, extended: string) => parsePapersSkuLines({
+      filename: `fixture-${invoice}.txt`,
+      text: paper([
+        'Performance',
+        'Foodservice',
+        'Date:',
+        date,
+        date,
+        invoice,
+        'DRY',
+        '1',
+        'CS',
+        '6/#10Fixture',
+        'Sauce',
+        'TH100',
+        '1',
+        '1',
+        'EA',
+        price,
+        extended,
+      ]),
+    }).lines;
+
+    expect(replacePapersSkuDocument(ownerA, 'doc', sku('06/05/26', '900001', '1.250', '12.50'), ownerA)).toEqual([]);
+    replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
+    replacePapersSkuDocument('seat:101', 'doc-b', sku('06/12/26', '900002', '1.500', '15.00'), ownerA);
+    replacePapersSkuDocument('seat:102', 'doc-a', sku('06/05/26', '900001', '9.000', '9.00'), ownerA);
+    replacePapersSkuDocument('seat:201', 'doc-a', sku('06/05/26', '900001', '4.000', '4.00'), ownerB);
+    replacePapersSkuDocument('seat:101', 'doc-a', sku('06/05/26', '900001', '1.250', '12.50'), ownerA);
+
+    expect(papersSkuRowsForStore(ownerA)).toEqual([]);
+    expect(papersSkuRowsForStore('seat:101', '2026-W23')).toHaveLength(1);
+    expect(papersSkuRowsForStore('seat:101', '2026-W24')).toHaveLength(1);
+    expect(papersSkuRowsForStore('seat:101', '2026-W99')).toEqual([]);
+    expect(papersSkuRowsForStore('seat:101')).toHaveLength(2);
+    expect(papersSkuRowsForStore('seat:102', '2026-W23')[0].unitPrice.amount).toBe(9);
+    expect(papersSkuRowsForStore('seat:201', '2026-W23')[0].unitPrice.amount).toBe(4);
+    expect(papersSkuRowsForStore('seat:101').every((line) => line.storeId === 'seat:101' && line.ownerId === ownerA)).toBe(true);
+    expect(papersSkuRowsForStore('seat:102')[0].ownerId).toBe(ownerA);
+    expect(papersSkuRowsForStore('seat:201')[0].ownerId).toBe(ownerB);
+
+    expect(papersSkuCompareForStore('seat:101')?.compare?.rows[0]).toEqual(expect.objectContaining({
+      priorPeriod: '2026-W23',
+      currentPeriod: '2026-W24',
+      priorPrice: 1.25,
+      currentPrice: 1.5,
+    }));
+    expect(papersSkuCompareForStore('seat:102')?.compare?.rows[0]).toEqual(expect.objectContaining({
+      currentPrice: 9,
+      priorPrice: null,
+    }));
+    expect(papersSkuCompareForStore('seat:201')?.compare?.rows[0]).toEqual(expect.objectContaining({
+      currentPrice: 4,
+      priorPrice: null,
+    }));
+    expect(papersSkuCompareForStore(ownerA)).toBeNull();
   });
 });
