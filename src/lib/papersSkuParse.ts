@@ -680,7 +680,9 @@ function readShiftRow(tokens: string[], index: number): {
 }
 
 function isPersonName(token: string | undefined): boolean {
-  return Boolean(token && /^[A-Z][A-Za-z.'-]+, [A-Z]/.test(token));
+  // Printed headers are "Last, First" or "Last Last, First". Each word starts
+  // with a capital. A space in the surname is still one printed header.
+  return Boolean(token && /^[A-Z][A-Za-z.'-]+(?: [A-Z][A-Za-z.'-]+)*, [A-Z]/.test(token));
 }
 
 function isShiftDate(token: string | undefined): boolean {

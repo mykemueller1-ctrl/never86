@@ -422,6 +422,91 @@ describe('papers SKU line parsers', () => {
     expect(first.extendedPrice.amount).not.toBe(142.5);
   });
 
+  it('keeps a two-word printed surname on its own shifts', () => {
+    const parsed = parsePapersSkuLines({
+      filename: 'pdq-time-clock-fixture.txt',
+      text: paper([
+        'Time Clock',
+        'Emp Name',
+        'Bus Date',
+        'Overtime Pay',
+        'Cook, Fixture',
+        '5/11/2026',
+        '1001',
+        'Cook',
+        '15.00',
+        '4:00',
+        '12:00',
+        '8.00',
+        '8.00',
+        '120.00',
+        '0.00',
+        '0.00',
+        'Two Word, Person',
+        '5/12/2026',
+        '1002',
+        'Server',
+        '12.00',
+        '5:00',
+        '11:00',
+        '6.00',
+        '6.00',
+        '72.00',
+        '1.00',
+        '18.00',
+        '5/13/2026',
+        '1002',
+        'Cook',
+        '12.00',
+        '5:00',
+        '9:00',
+        '4.00',
+        '4.00',
+        '48.00',
+        '0.00',
+        '0.00',
+        'two word, person',
+        '5/14/2026',
+        '1001',
+        'Cook',
+        '15.00',
+        '4:00',
+        '8:00',
+        '4.00',
+        '4.00',
+        '60.00',
+        '0.00',
+        '0.00',
+        'Cook, Fixture',
+        '5/15/2026',
+        '1001',
+        'Cook',
+        '15.00',
+        '4:00',
+        '8:00',
+        '4.00',
+        '4.00',
+        '60.00',
+        '0.00',
+        '0.00',
+      ]),
+    });
+    expect(parsed.lines.map((line) => line.productName.value)).toEqual([
+      'Cook, Fixture · Cook',
+      'Two Word, Person · Server',
+      'Two Word, Person · Cook',
+      'Two Word, Person · Cook',
+      'Cook, Fixture · Cook',
+    ]);
+    expect(parsed.lines.some((line) => line.productName.value?.includes('two word'))).toBe(false);
+    const server = parsed.lines[1];
+    expect(server.productName.honesty).toBe('Verified');
+    expect(server.extendedPrice).toMatchObject({ honesty: 'Verified', amount: 72 });
+    expect(server.extendedPrice.amount).not.toBe(90);
+    expect(server.category).toMatchObject({ honesty: 'Verified', value: 'labor' });
+    expect(server.quantity).toMatchObject({ honesty: 'Verified', amount: 6 });
+  });
+
   it('pairs delivery statement labels with the amount on that line', () => {
     const parsed = parsePapersSkuLines({
       filename: 'fixture-doordash.txt',
