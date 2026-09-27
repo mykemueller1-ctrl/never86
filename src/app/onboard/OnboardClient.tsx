@@ -154,7 +154,7 @@ export default function OnboardPage() {
               {status === 'sent' ? (
                 <div className="mt-6">
                   <p className="compass-body text-sm">
-                    Next: Connect Gmail + Drive so agents can pull invoice PDFs. No homework form.
+                    Next: Connect Google. Gmail and Drive stay read-only, and papers land on one review screen. No homework form.
                   </p>
                   <PapersInboxConnect variant="claim" />
                 </div>

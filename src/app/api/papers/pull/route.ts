@@ -3,6 +3,7 @@ import { getSimpleOwnerDemoService, isServiceError } from '@/lib/simpleOwnerDemo
 import { jsonError, withSimpleOwnerTenant } from '@/lib/simpleOwnerDemo/http';
 import { evaluatePapersInboxEnablement, papersFailClosedBody } from '@/lib/papersInbox';
 import { pullLastWeekPapers } from '@/lib/papersInboxHttp';
+import { papersSkuFailureMessage } from '@/lib/papersSkuStore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,7 +17,14 @@ export async function POST(req: NextRequest) {
       return jsonError(service.status, service.error, service.code);
     }
 
-    const pulled = await pullLastWeekPapers({ operatorId });
+    let pulled;
+    try {
+      pulled = await pullLastWeekPapers({ operatorId });
+    } catch (error) {
+      const message = papersSkuFailureMessage(error);
+      if (message) return NextResponse.json({ success: false, honesty: 'Missing', error: message }, { status: 503 });
+      throw error;
+    }
     const landed: string[] = [];
     for (const invoice of pulled.invoices) {
       if (!invoice.filename.trim() || !invoice.text.trim()) continue;

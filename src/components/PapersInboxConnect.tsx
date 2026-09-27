@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { PapersReviewScreen } from '@/components/PapersReviewScreen';
 import { papersIntakeCopy, type PapersHonesty } from '@/lib/papersInbox';
 
 type PapersStatus = {
@@ -38,11 +39,13 @@ export function PapersInboxConnect({
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [line, setLine] = useState<string | null>(null);
+  const [fixture, setFixture] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const params = new URLSearchParams(window.location.search);
     const papers = params.get('papers');
+    setFixture(papers === 'fixture');
     void (async () => {
       try {
         const res = await fetch('/api/papers/status', { method: 'GET', signal: AbortSignal.timeout(8000) });
@@ -190,31 +193,27 @@ export function PapersInboxConnect({
           Gmail is not connected. {drive ? 'Drive is connected.' : 'Drive is not connected.'} Drop a photo, a PDF, or use chat. Folders stay Missing.
         </p>
       ) : null}
+      <p className="owner-seat-papers-outlook">
+        Gmail and Drive stay read-only. The scan covers the last 90 days and skips files over 8MB.
+      </p>
       <div className="owner-seat-papers-actions">
         {!gmail && loaded ? (
           <>
             <a className="owner-desk-primary" href="/chat#photo">Drop a photo</a>
             <a className="owner-desk-primary" href="/check/invoices">Drop a PDF</a>
             <a className="owner-desk-primary" href="/chat">Open chat intake</a>
+            <button
+              type="button"
+              id="connect-google"
+              className="owner-desk-primary"
+              disabled={busy || !ready}
+              onClick={() => void connectGoogle()}
+            >
+              {busy && ready ? 'Opening Google…' : 'Connect Google'}
+            </button>
+            <span className="owner-seat-honesty is-missing">Missing</span>
           </>
         ) : null}
-        <button
-          type="button"
-          className={gmail ? 'owner-desk-primary' : 'owner-desk-secondary'}
-          disabled={busy || !ready}
-          onClick={() => void connectGoogle()}
-        >
-          {busy && ready ? 'Opening…' : 'Connect Gmail'}
-        </button>
-        {!gmail ? <span className="owner-seat-honesty is-missing">Missing</span> : null}
-        <button
-          type="button"
-          className="owner-desk-secondary"
-          disabled={busy || !ready}
-          onClick={() => void connectGoogle()}
-        >
-          Connect Drive
-        </button>
         {gmail && ready ? (
           <button type="button" className="owner-desk-secondary" disabled={busy} onClick={() => void pullPapers()}>
             Pull last-week invoices
@@ -252,6 +251,7 @@ export function PapersInboxConnect({
           {line}
         </p>
       ) : null}
+      <PapersReviewScreen active={gmail && ready} fixture={fixture} />
     </article>
   );
 }
