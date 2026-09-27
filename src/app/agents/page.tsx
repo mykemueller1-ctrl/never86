@@ -114,7 +114,7 @@ export default function AgentsPage() {
             ))}
           </div>
           <p className="compass-body text-[14px] mt-8 max-w-3xl">
-            No competitor we could find shows their work like this — labeling every number, and telling you out loud when they got one wrong. We checked. <TrackedLink href="/case/walked-the-number-back" event="agents_case_link_click" meta={{ target: '/case/walked-the-number-back', label: 'Read the case · $1.81M walkback' }} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the case</TrackedLink> where we caught our own $8.3M number, walked it down to $1.81M in writing, and made labeling every figure the rule that came out of it.
+            Every number is labeled Verified, Estimated, or Missing. If we cannot re-pull it, we do not publish it as a result. <TrackedLink href="/case/walked-the-number-back" event="agents_case_link_click" meta={{ target: '/case/walked-the-number-back', label: 'Read the honesty rule' }} className="underline" style={{ textDecorationColor: '#0066ff' }}>Read the rule</TrackedLink>.
           </p>
         </div>
       </section>
@@ -126,10 +126,10 @@ export default function AgentsPage() {
             60 minutes. <em>Your real numbers.</em>
           </h2>
           <p className="compass-body text-lg mb-8">
-            Send a report from Toast, Square, Clover, or PDQ. Two checks run on your real numbers in 30 seconds. No card. No salesperson.
+            Try the sample first. No card. No POS connection is required. Bring papers you already have when you want the seat.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <TrackedLink href="/trial" event="agents_bottom_cta_click" meta={{ target: '/trial', label: 'Start the trial', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Start the trial →</TrackedLink>
+            <TrackedLink href="/try" event="agents_bottom_cta_click" meta={{ target: '/try', label: 'Try it free', variant: 'primary' }} className="btn-primary" style={{ background: '#0066ff' }}>Try it free — no card →</TrackedLink>
             <TrackedLink href="/pricing" event="agents_bottom_cta_click" meta={{ target: '/pricing', label: 'See pricing', variant: 'secondary' }} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>See pricing</TrackedLink>
           </div>
         </div>
