@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -27,6 +28,7 @@ import {
   PapersSkuPersistError,
   checkedQueryRows,
   replacePapersSkuDocument,
+  replaceUnreviewedPaperDocument,
   resetPapersSkuStore,
   setPapersSkuExecutorForTests,
   type SkuExecutor,
@@ -43,6 +45,8 @@ const hooks = {
   failInsertNumber: 0,
   failReviewWrite: false,
   reviewFailedAfterSku: false,
+  interleave: null as null | (() => Promise<void>),
+  interleaved: 0,
 };
 
 let database: PGlite;
@@ -64,13 +68,23 @@ function executorFor(db: PGlite): SkuExecutor {
       hooks.depth += 1;
       hooks.maxDepth = Math.max(hooks.maxDepth, hooks.depth);
       if (hooks.delayMs) await new Promise((resolve) => setTimeout(resolve, hooks.delayMs));
+      const guardedWrite = statements.some((statement) => /papers_sku_hash_locks/i.test(statement.text))
+        && statements.some((statement) => /insert into papers_sku_lines/i.test(statement.text))
+        && !statements.some((statement) => /insert into papers_scan_rows/i.test(statement.text));
+      if (guardedWrite && hooks.interleave) {
+        const run = hooks.interleave;
+        hooks.interleave = null;
+        hooks.interleaved += 1;
+        await run();
+      }
+      const results: unknown[][] = [];
       try {
         await db.transaction(async (tx) => {
           let preparedSku = false;
           for (const statement of statements) {
             const insert = /^\s*insert/i.test(statement.text);
             if (insert && /papers_sku_lines/i.test(statement.text)) preparedSku = true;
-            if (hooks.failReviewWrite && /papers_scan_rows/i.test(statement.text)) {
+            if (hooks.failReviewWrite && /insert into papers_scan_rows/i.test(statement.text)) {
               hooks.reviewFailedAfterSku = preparedSku;
               throw new Error('forced review failure');
             }
@@ -80,12 +94,14 @@ function executorFor(db: PGlite): SkuExecutor {
                 throw new Error('forced insert failure');
               }
             }
-            await tx.query(statement.text, statement.values);
+            const result = await tx.query(statement.text, statement.values);
+            results.push(checkedQueryRows(result.rows));
           }
         });
       } finally {
         hooks.depth -= 1;
       }
+      return results;
     },
     async query<T>(text: string, values?: unknown[]): Promise<T[]> {
       const result = await db.query(text, values ?? []);
@@ -162,6 +178,8 @@ describe('papers sku database durability', () => {
     hooks.failInsertNumber = 0;
     hooks.failReviewWrite = false;
     hooks.reviewFailedAfterSku = false;
+    hooks.interleave = null;
+    hooks.interleaved = 0;
     setPapersSkuExecutorForTests(executorFor(database));
   });
 
@@ -775,5 +793,190 @@ describe('papers sku database durability', () => {
     expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
     expect(papersScanSnapshot(seat).rows[0].lineItems[0].unitPrice.amount).toBe(2.25);
     expect((await savedLines(seat)).some((row) => row.document_key === `gmail:${firstName}`)).toBe(false);
+  }, 30_000);
+
+  it('keeps a confirmed review that sits past the first 200 review rows', async () => {
+    const seat = 'seat:page';
+    const other = 'seat:page-other';
+    const text = [
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n');
+    const bytes = new TextEncoder().encode(text);
+    const hash = papersContentHash(bytes);
+    const canonical = papersSkuDocumentKey(hash);
+    enqueuePapersScan(seat);
+    await drainPapersScan({
+      operatorId: seat,
+      listGmail: async () => [{ source: 'gmail', externalId: 'msg-page', filename: 'fixture-pfg-invoice.txt', bytes }],
+      listDrive: async () => [],
+    });
+    const review = papersScanSnapshot(seat).rows[0];
+    await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-12', lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    await replacePapersSkuDocument(seat, 'other-doc', sauce('05/29/26', '900002', 'TH900', '9.000', '9.00'));
+    await replacePapersSkuDocument(other, 'other-seat-doc', sauce('06/05/26', '900001', 'TH100', '4.000', '4.00'));
+    const alias = sauce('06/05/26', '900001', 'TH100', '1.250', '12.50')[0];
+    await database.query(
+      `insert into papers_sku_lines (
+         operator_id, store_id, owner_id, document_key, line_index, iso_week, row_json
+       ) values ($1, $1, null, $2, 0, $3, $4::jsonb)`,
+      [seat, 'gmail:fixture-pfg-invoice.txt', alias.isoWeek, JSON.stringify({
+        ...alias,
+        storeId: seat,
+        ownerId: null,
+        documentKey: 'gmail:fixture-pfg-invoice.txt',
+        lineIndex: 0,
+        sourceHash: hash,
+      })],
+    );
+    for (let index = 0; index < 200; index += 1) {
+      const filler = createHash('sha256').update(`filler-review-${index}`).digest('hex');
+      await database.query(
+        `insert into papers_scan_rows (operator_id, dedupe_key, row_json, updated_at)
+         values ($1, $2, $3::jsonb, '2020-01-01T00:00:00Z')`,
+        [seat, `gmail:filler-${index}:${filler}`, JSON.stringify({
+          contentHash: filler,
+          skuDocumentKey: `paper:${filler}`,
+          confirmed: true,
+        })],
+      );
+    }
+    await database.query(
+      `update papers_scan_rows set updated_at = '2026-12-01T00:00:00Z'
+       where operator_id = $1 and dedupe_key = $2`,
+      [seat, review.dedupeKey],
+    );
+    const page = await database.query<{ hash: string | null }>(
+      `select row_json->>'contentHash' as hash
+       from papers_scan_rows
+       where operator_id = $1
+       order by updated_at asc
+       limit 200`,
+      [seat],
+    );
+    expect(page.rows.some((row) => row.hash === hash)).toBe(false);
+    expect(page.rows).toHaveLength(200);
+
+    resetPapersSkuStore();
+    forgetPapersScanMemory();
+    setPapersSkuExecutorForTests(executorFor(database));
+    const outcome = await replaceUnreviewedPaperDocument(
+      seat,
+      hash,
+      sauce('06/05/26', '900001', 'TH100', '1.250', '12.50'),
+      ['gmail:fixture-pfg-invoice.txt'],
+    );
+    expect(outcome).toBe('kept');
+    const confirmed = papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical);
+    expect(confirmed?.unitPrice).toMatchObject({ honesty: 'Estimated', amount: 2.25 });
+    expect(confirmed?.extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(confirmed?.itemCode.value).toBe('TH100');
+    expect(confirmed?.isoWeek).toBe('2026-W24');
+    expect(papersSkuRowsForStore(seat).some((row) => row.documentKey === 'gmail:fixture-pfg-invoice.txt')).toBe(false);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')).toMatchObject({
+      isoWeek: '2026-W22',
+      unitPrice: expect.objectContaining({ amount: 9 }),
+    });
+    expect(papersSkuRowsForStore(other)).toEqual([]);
+    await hydratePapersSku(other);
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
+    expect((await savedReviews(seat)).find((row) => row.dedupe_key === review.dedupeKey)?.row_json.lineItems?.[0].unitPrice?.amount).toBe(2.25);
+    expect((await savedReviews(seat)).find((row) => row.dedupe_key === review.dedupeKey)?.row_json.isoWeek).toBe('2026-W24');
+    expect((await savedLines(seat)).some((row) => row.document_key === 'gmail:fixture-pfg-invoice.txt')).toBe(false);
+
+    await reopenDatabase();
+    await hydratePapersSku(seat);
+    await hydratePapersSku(other);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical)?.unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical)?.isoWeek).toBe('2026-W24');
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')?.unitPrice.amount).toBe(9);
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
+    const coldReview = (await savedReviews(seat)).find((row) => row.dedupe_key === review.dedupeKey);
+    expect(coldReview?.row_json.lineItems?.[0].unitPrice?.amount).toBe(2.25);
+    expect(coldReview?.row_json.isoWeek).toBe('2026-W24');
+  }, 30_000);
+
+  it('rechecks the review inside the raw write after that review commits', async () => {
+    const seat = 'seat:interleave';
+    const other = 'seat:interleave-other';
+    const bytes = new TextEncoder().encode([
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n'));
+    const hash = papersContentHash(bytes);
+    const canonical = papersSkuDocumentKey(hash);
+    const confirmedLine = sauce('06/12/26', '900001', 'TH100', '2.250', '12.50')[0];
+    confirmedLine.unitPrice = { ...confirmedLine.unitPrice, amount: 2.25, honesty: 'Estimated' };
+    confirmedLine.isoWeek = '2026-W24';
+    confirmedLine.documentDate = { ...confirmedLine.documentDate, value: '2026-06-12' };
+    const stored = {
+      ...confirmedLine,
+      storeId: seat,
+      ownerId: null,
+      documentKey: canonical,
+      lineIndex: 0,
+      sourceHash: hash,
+    };
+    await replacePapersSkuDocument(seat, 'other-doc', sauce('05/29/26', '900002', 'TH900', '9.000', '9.00'));
+    await replacePapersSkuDocument(other, 'other-seat-doc', sauce('06/05/26', '900001', 'TH100', '4.000', '4.00'));
+    resetPapersSkuStore();
+    setPapersSkuExecutorForTests(executorFor(database));
+    hooks.interleave = async () => {
+      await database.query(
+        `insert into papers_sku_lines (
+           operator_id, store_id, owner_id, document_key, line_index, iso_week, row_json
+         ) values ($1, $1, null, $2, 0, $3, $4::jsonb)`,
+        [seat, canonical, '2026-W24', JSON.stringify(stored)],
+      );
+      await database.query(
+        `insert into papers_scan_rows (operator_id, dedupe_key, row_json)
+         values ($1, $2, $3::jsonb)`,
+        [seat, `gmail:msg-interleave:${hash}`, JSON.stringify({
+          contentHash: hash,
+          skuDocumentKey: canonical,
+          confirmed: true,
+          isoWeek: '2026-W24',
+          dedupeKey: `gmail:msg-interleave:${hash}`,
+          lineItems: [{
+            unitPrice: { amount: 2.25, honesty: 'Estimated' },
+            extendedPrice: { amount: 12.5, honesty: 'Verified' },
+            sku: { value: 'TH100', honesty: 'Verified' },
+          }],
+        })],
+      );
+    };
+    const outcome = await replaceUnreviewedPaperDocument(
+      seat,
+      hash,
+      sauce('06/05/26', '900001', 'TH100', '1.250', '12.50'),
+      ['gmail:fixture-pfg-invoice.txt'],
+    );
+    expect(hooks.interleaved).toBe(1);
+    expect(outcome).toBe('kept');
+    const confirmed = papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical);
+    expect(confirmed?.unitPrice).toMatchObject({ honesty: 'Estimated', amount: 2.25 });
+    expect(confirmed?.extendedPrice).toMatchObject({ honesty: 'Verified', amount: 12.5 });
+    expect(confirmed?.isoWeek).toBe('2026-W24');
+    expect(confirmed?.itemCode.value).toBe('TH100');
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')?.unitPrice.amount).toBe(9);
+    expect(papersSkuRowsForStore(seat).some((row) => row.isoWeek === '2026-W23' && row.itemCode.value === 'TH100')).toBe(false);
+    await hydratePapersSku(other);
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
+    const savedReview = (await savedReviews(seat))[0];
+    expect(savedReview.row_json.lineItems?.[0].unitPrice).toMatchObject({ amount: 2.25, honesty: 'Estimated' });
+    expect(savedReview.row_json.isoWeek).toBe('2026-W24');
+    expect((await savedLines(seat)).find((row) => row.document_key === canonical)?.iso_week).toBe('2026-W24');
+    expect((await savedLines(seat)).find((row) => row.document_key === canonical)?.row_json.unitPrice?.amount).toBe(2.25);
+
+    await reopenDatabase();
+    await hydratePapersSku(seat);
+    await hydratePapersSku(other);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical)?.unitPrice.amount).toBe(2.25);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')?.isoWeek).toBe('2026-W22');
+    expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
   }, 30_000);
 });

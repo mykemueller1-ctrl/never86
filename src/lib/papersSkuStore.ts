@@ -6,18 +6,22 @@
  *
  * Scan and pull share one compare key: `paper:` plus the sha256 of the file.
  * A later unreviewed import does not replace lines once a review row exists
- * for that hash. Older `provider:filename` keys are removed in that same
- * database transaction.
+ * for that hash. The check is an exact store-id + hash lookup inside the
+ * write transaction, not a page of review rows. That transaction locks the
+ * store+hash row first, then skips the replace when the review is there.
+ * Older `provider:filename` keys are removed in that same transaction.
  *
  * A single-document write on an empty cache is partial. The next hydrate
  * reloads every document for that store from the database.
  * One document is deleted and reinserted inside a single transaction.
  * A confirmed review edit writes that document and the review row in the
- * same transaction. Memory changes only after commit. Same-store saves in
- * this process wait their turn so two writes cannot report success on a
- * half-written pair. On one database connection, two transactions for the
- * same document were serialized. The survivor was one complete document.
- * Two OS processes were not run.
+ * same transaction, after the same store+hash lock. Memory changes only
+ * after commit. Same-store saves in this process wait their turn so two
+ * writes cannot report success on a half-written pair. On one database
+ * connection, two transactions for the same document were serialized.
+ * The survivor was one complete document. Two OS processes were not run.
+ * The lock is what keeps a raw import from landing between a review check
+ * and the write.
  */
 
 export const PAPERS_REVIEW_PERSIST_ERROR = 'Review and compare were not saved. The prior lines stay in place.';
@@ -47,7 +51,8 @@ export function papersSkuFailureMessage(error: unknown): string | null {
 export type SkuStatement = { text: string; values: unknown[] };
 
 export type SkuExecutor = {
-  transaction(statements: SkuStatement[]): Promise<void>;
+  /** One database transaction. Each entry is that statement's rows. */
+  transaction(statements: SkuStatement[]): Promise<unknown[][]>;
   query<T = Record<string, unknown>>(text: string, values?: unknown[]): Promise<T[]>;
 };
 
@@ -77,10 +82,27 @@ type PaperIdentity = {
   replaceHashSiblings?: boolean;
   /** Remove alias keys and leave the canonical document in place. */
   aliasesOnly?: boolean;
+  /**
+   * Raw import. Lock the store+hash, then insert lines only when this
+   * transaction still sees no review for that hash.
+   */
+  guardReviewedHash?: boolean;
 };
 
 function isSha256(hash: string): boolean {
   return /^[a-f0-9]{64}$/.test(hash);
+}
+
+/** Exact review match for one store and one file hash. Not a page of reviews. */
+function reviewHashPredicate(storeParam: string, hashParam: string): string {
+  return `exists (
+    select 1 from papers_scan_rows
+    where operator_id = ${storeParam}
+      and (
+        lower(coalesce(row_json->>'contentHash', '')) = ${hashParam}
+        or coalesce(row_json->>'skuDocumentKey', '') = 'paper:' || ${hashParam}
+      )
+  )`;
 }
 
 function contentHashFromReview(value: unknown): string | null {
@@ -202,8 +224,9 @@ function neonSkuExecutor(url: string): SkuExecutor {
   const sql = neon(url);
   return {
     async transaction(statements) {
-      if (!statements.length) return;
-      await sql.transaction(statements.map((statement) => sql.query(statement.text, statement.values)));
+      if (!statements.length) return [];
+      const results = await sql.transaction(statements.map((statement) => sql.query(statement.text, statement.values)));
+      return results.map((rows) => checkedQueryRows(rows));
     },
     async query<T>(text: string, values: unknown[] = []): Promise<T[]> {
       const rows = await sql.query(text, values);
@@ -268,6 +291,13 @@ async function ensureSkuSchema(db: SkuExecutor): Promise<void> {
           primary key (operator_id, dedupe_key)
         )
       `);
+      await db.query(`
+        create table if not exists papers_sku_hash_locks (
+          operator_id text not null,
+          content_hash text not null,
+          primary key (operator_id, content_hash)
+        )
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;
@@ -328,14 +358,22 @@ export function replaceUnreviewedPaperDocument(
   const canonical = papersSkuDocumentKey(hash);
   const tagged = rows.map((row) => ({ ...row, documentKey: canonical, sourceHash: hash }));
   return enqueue(key, async () => {
-    const identity: PaperIdentity = { sourceHash: hash, legacyKeys, replaceHashSiblings: true };
-    if (await reviewExistsForContentHash(key, hash)) {
-      await dropAliases(key, canonical, { ...identity, replaceHashSiblings: false, aliasesOnly: true });
-      return 'kept' as const;
-    }
+    const identity: PaperIdentity = {
+      sourceHash: hash,
+      legacyKeys,
+      replaceHashSiblings: true,
+      guardReviewedHash: true,
+    };
     const stored = storedFrom(key, canonical, tagged, ownerId);
     const had = memory.has(key);
-    await persistDocument(key, canonical, stored, undefined, identity);
+    const outcome = await persistDocument(key, canonical, stored, undefined, identity);
+    if (outcome === 'kept') {
+      memory.delete(key);
+      partialStores.delete(key);
+      noteReviewedPaper(key, { contentHash: hash });
+      await hydratePapersSku(key);
+      return 'kept' as const;
+    }
     if (had) {
       const kept = (memory.get(key) ?? []).filter((row) => {
         if (row.documentKey === canonical) return false;
@@ -384,24 +422,49 @@ export async function reviewExistsForContentHash(storeId: string, contentHash: s
   if (!db) return false;
   try {
     await ensureSkuSchema(db);
-    const found = await db.query<{ row_json: unknown }>(
-      `select row_json from papers_scan_rows
+    const found = await db.query<{ found: number }>(
+      `select 1 as found from papers_scan_rows
        where operator_id = $1
-       limit 200`,
-      [key],
+         and (
+           lower(coalesce(row_json->>'contentHash', '')) = $2
+           or coalesce(row_json->>'skuDocumentKey', '') = 'paper:' || $2
+         )
+       limit 1`,
+      [key, hash],
     );
-    let exists = false;
-    for (const row of found) {
-      const seen = contentHashFromReview(readJson(row.row_json));
-      if (!seen) continue;
-      noteReviewedPaper(key, { contentHash: seen });
-      if (seen === hash) exists = true;
-    }
-    return exists;
+    if (!found.length) return false;
+    noteReviewedPaper(key, { contentHash: hash });
+    return true;
   } catch (error) {
     if (error instanceof PapersSkuPersistError) throw error;
     throw new PapersSkuPersistError(PAPERS_REVIEW_PERSIST_ERROR);
   }
+}
+
+function hashLockStatements(storeId: string, hash: string): SkuStatement[] {
+  if (!isSha256(hash)) return [];
+  return [
+    {
+      text: `insert into papers_sku_hash_locks (operator_id, content_hash)
+             values ($1, $2)
+             on conflict (operator_id, content_hash) do nothing`,
+      values: [storeId, hash],
+    },
+    {
+      text: `select content_hash from papers_sku_hash_locks
+             where operator_id = $1 and content_hash = $2
+             for update`,
+      values: [storeId, hash],
+    },
+  ];
+}
+
+function reviewedFlag(results: unknown[][]): boolean {
+  const last = results[results.length - 1];
+  const row = last?.[0];
+  if (!row || typeof row !== 'object') return false;
+  const value = (row as { reviewed?: unknown }).reviewed;
+  return value === true || value === 't' || value === 'true';
 }
 
 async function persistDocument(
@@ -410,12 +473,13 @@ async function persistDocument(
   stored: StoredSkuRow[],
   review?: { dedupeKey: string; rowJson: string; failureMessage: string },
   identity?: PaperIdentity,
-): Promise<void> {
+): Promise<'kept' | 'replaced'> {
   const db = activeExecutor();
-  if (!db) return;
+  if (!db) return 'replaced';
   const hash = identity?.sourceHash?.trim().toLowerCase() ?? '';
   const siblings = identity?.replaceHashSiblings && isSha256(hash) ? 'yes' : 'no';
-  const statements: SkuStatement[] = [];
+  const guard = Boolean(identity?.guardReviewedHash) && isSha256(hash);
+  const statements: SkuStatement[] = hashLockStatements(storeId, hash);
   if (identity?.aliasesOnly) {
     statements.push({
       text: `delete from papers_sku_lines
@@ -433,13 +497,16 @@ async function persistDocument(
                  document_key = $1
                  or ($3 <> '' and row_json->>'sourceHash' = $3)
                  or ($4 = 'yes' and $3 <> '' and document_key like '%:' || $3)
-               )`,
-      values: [documentKey, storeId, hash, siblings],
+               )
+               and ($5 = 'no' or not ${reviewHashPredicate('$2', '$3')})`,
+      values: [documentKey, storeId, hash, siblings, guard ? 'yes' : 'no'],
     });
     statements.push(...stored.map((row) => ({
       text: `insert into papers_sku_lines (
                operator_id, store_id, owner_id, document_key, line_index, iso_week, row_json, updated_at
-             ) values ($1, $2, $3, $4, $5, $6, $7::jsonb, now())`,
+             )
+             select $1, $2, $3, $4, $5, $6, $7::jsonb, now()
+             where $8 = 'no' or not ${reviewHashPredicate('$2', '$9')}`,
       values: [
         storeId,
         storeId,
@@ -448,6 +515,8 @@ async function persistDocument(
         row.lineIndex,
         row.isoWeek,
         JSON.stringify(row),
+        guard ? 'yes' : 'no',
+        hash,
       ],
     })));
     if (review) {
@@ -470,9 +539,16 @@ async function persistDocument(
       values: [legacy, storeId],
     });
   }
+  if (guard) {
+    statements.push({
+      text: `select ${reviewHashPredicate('$1', '$2')} as reviewed`,
+      values: [storeId, hash],
+    });
+  }
   try {
     await ensureSkuSchema(db);
-    await db.transaction(statements);
+    const results = await db.transaction(statements);
+    return guard && reviewedFlag(results) ? 'kept' : 'replaced';
   } catch (error) {
     if (error instanceof PapersSkuPersistError) throw error;
     throw new PapersSkuPersistError(review?.failureMessage || undefined);
