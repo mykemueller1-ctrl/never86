@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
-export const alt = "Never 86'd — Month-end is too late. Built by restaurant operators.";
+export const runtime = 'nodejs';
+export const alt = "Never 86'd — Find the leak. Keep the receipt.";
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -70,11 +70,11 @@ export default async function OG() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: 83, lineHeight: 0.92, letterSpacing: '-0.055em' }}>
-              Month-end is
+            <div style={{ fontSize: 78, lineHeight: 0.92, letterSpacing: '-0.055em' }}>
+              Find the leak.
             </div>
-            <div style={{ marginTop: 10, color: '#005de8', fontSize: 96, fontStyle: 'italic', lineHeight: 0.9, letterSpacing: '-0.055em' }}>
-              too late.
+            <div style={{ marginTop: 10, color: '#005de8', fontSize: 72, fontStyle: 'italic', lineHeight: 0.9, letterSpacing: '-0.055em' }}>
+              Keep the receipt.
             </div>
             <div
               style={{
@@ -86,7 +86,7 @@ export default async function OG() {
                 color: '#514b43',
               }}
             >
-              One DoorDash statement. The documented cost, the payout bridge, and the missing proof—plain English, source attached.
+              Independent restaurant back office. Try a sample free. No card. First owner seat is free.
             </div>
           </div>
 
