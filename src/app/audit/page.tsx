@@ -9,11 +9,11 @@ import { trackEvent } from '@/lib/track';
 import { TOP_THREE_P_GUIDES } from '@/lib/threePDiscovery';
 
 const BREAKDOWN = [
-  ['Commission', '$787.55'],
-  ['Merchant fees', '$39.92'],
-  ['Promotions + marketing', '$887.80'],
-  ['Error charges', '$49.02'],
-  ['Observed marketplace cost', '$1,764.29'],
+  ['Commission', 'The line on the statement'],
+  ['Merchant fees', 'Separate from commission'],
+  ['Promotions + marketing', 'Who funded them'],
+  ['Error charges', 'Shown, not assumed'],
+  ['Observed marketplace cost', 'The lines added up'],
 ];
 
 const OUTPUTS = [
@@ -117,7 +117,7 @@ export default function AuditCampaignPage() {
               See the statement math before you share a file. If you want the deeper review, send one redacted statement and get a source-stamped operator receipt.
             </p>
             <p className="compass-body mt-5 max-w-2xl text-base">
-              Built from firsthand operating experience inside a 28-location, private-equity-backed restaurant group—because the tools were not good enough for the operator questions that mattered.
+              Built by a working restaurant operator in Fort Dodge, Iowa. The tools he was paying for did not answer the questions he had after close.
             </p>
             <div className="mt-8 flex flex-wrap gap-2">
               {['No portal password', 'No integration', 'No invented savings'].map((item) => <span key={item} className="compass-pill">{item}</span>)}
@@ -170,8 +170,8 @@ export default function AuditCampaignPage() {
         <p className="compass-eyebrow">— One real restaurant statement</p>
         <div className="mt-6 grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
           <div>
-            <h2 className="compass-display text-4xl md:text-6xl">Commission was $787.55. <em>Observed cost was $1,764.29.</em></h2>
-            <p className="compass-body mt-5 max-w-xl text-lg">Verified example from Community Tap &amp; Pizza&apos;s January 2026 DoorDash statement. Eligible food sales were $8,207.63. The observed marketplace cost was 21.5%.</p>
+            <h2 className="compass-display text-4xl md:text-6xl">Commission is one line. <em>Cost is the stack.</em></h2>
+            <p className="compass-body mt-5 max-w-xl text-lg">Type your own statement totals in the snapshot above. We do not publish another restaurant&apos;s DoorDash dollars on this page. A fee you can see is not money recovered.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {BREAKDOWN.map(([label, value], index) => (
@@ -192,23 +192,23 @@ export default function AuditCampaignPage() {
             <div className="compass-card p-6 md:p-8"><h2 className="font-serif text-3xl text-[#1d1d1f]">We have not proven scale yet.</h2><p className="compass-body mt-4">DoorDash is the strongest current pilot. Uber Eats, Grubhub, and ezCater are early access. Repeat paid use, deterministic cross-platform coverage, and enterprise reliability still have to be earned.</p></div>
           </div>
           <div className="compass-card mt-4 p-6 md:p-8">
-            <p className="compass-card-label" style={{ color: '#0066ff' }}>Sanitized 12-period method proof</p>
+            <p className="compass-card-label" style={{ color: '#0066ff' }}>What a statement can show</p>
             <div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-4">
-              <div><strong className="block text-3xl text-[#1d1d1f]">$103.6K</strong><span className="text-sm text-[#86868b]">eligible food sales</span></div>
-              <div><strong className="block text-3xl text-[#1d1d1f]">8.7%</strong><span className="text-sm text-[#86868b]">commission</span></div>
-              <div><strong className="block text-3xl text-[#1d1d1f]">17.0%</strong><span className="text-sm text-[#86868b]">restaurant-funded ads and promotions</span></div>
-              <div><strong className="block text-3xl text-[#0066ff]">27.2%</strong><span className="text-sm text-[#86868b]">observed marketplace cost</span></div>
+              <div><strong className="block text-2xl text-[#1d1d1f]">Sales</strong><span className="text-sm text-[#86868b]">eligible food sales you type</span></div>
+              <div><strong className="block text-2xl text-[#1d1d1f]">Commission</strong><span className="text-sm text-[#86868b]">one line, not the whole cost</span></div>
+              <div><strong className="block text-2xl text-[#1d1d1f]">Ads</strong><span className="text-sm text-[#86868b]">restaurant-funded, kept separate</span></div>
+              <div><strong className="block text-2xl text-[#0066ff]">Observed cost</strong><span className="text-sm text-[#86868b]">the lines added together</span></div>
             </div>
-            <p className="compass-body mt-5 text-sm">All 12 finalized statements reconciled. This proves the cost-composition method on one anonymized store. It does not prove a contract violation, recoverable cash, guaranteed savings, or a market-wide benchmark.</p>
+            <p className="compass-body mt-5 text-sm">This shows the method. It does not prove a contract violation, recoverable cash, guaranteed savings, or a market-wide benchmark. We do not publish a store total here.</p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <div><p className="compass-eyebrow">— The trust test</p><h2 className="compass-display mt-5 text-4xl md:text-6xl">Our audit found $0 missing. <em>Good.</em></h2><p className="compass-body mt-5 max-w-2xl text-lg">DoorDash reported a $7,646.86 net total. Never86&apos;d independently calculated $7,646.86. The payout math reconciled to the penny. A tool that always “finds money” is not an audit.</p></div>
+          <div><p className="compass-eyebrow">— The trust test</p><h2 className="compass-display mt-5 text-4xl md:text-6xl">A clean match is <em>allowed.</em></h2><p className="compass-body mt-5 max-w-2xl text-lg">If the statement total and the lines you typed agree, we say they agree. A tool that always “finds money” is not an audit. We do not print a private payout on this page.</p></div>
           <div className="compass-card p-6 md:p-8">
-            {[['DoorDash reported', '$7,646.86'], ["Never86'd calculated", '$7,646.86'], ['Unexplained variance', '$0.00']].map(([label, value], index) => (
+            {[['Statement reported', 'Your total'], ["Never86'd calculated", 'The same lines'], ['Unexplained variance', 'Only if they differ']].map(([label, value], index) => (
               <div key={label} className={`flex items-center justify-between gap-4 py-4 ${index < 2 ? 'border-b border-[#e8e8ed]' : ''}`}><span className={index === 2 ? 'font-semibold text-[#0066ff]' : 'text-[#6e6e73]'}>{label}</span><strong className={`text-2xl ${index === 2 ? 'text-[#0066ff]' : 'text-[#1d1d1f]'}`}>{value}</strong></div>
             ))}
           </div>
@@ -232,7 +232,7 @@ export default function AuditCampaignPage() {
               <h2 className="compass-display mt-5 text-4xl md:text-6xl">Check the method before you send a file.</h2>
               <p className="compass-body mt-5 text-lg">Use the same statement, payout, contract, and bank rules Never86&apos;d applies. Every guide states what the evidence can prove and where it stops.</p>
             </div>
-            <Link href="/delivery-marketplace-reconciliation" className="btn-primary" style={{ background: '#0066ff' }}>Open all 52 guides →</Link>
+            <Link href="/delivery-marketplace-reconciliation" className="btn-primary" style={{ background: '#0066ff' }}>Open the guides →</Link>
           </div>
           <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {TOP_THREE_P_GUIDES.map((guide) => (
@@ -245,10 +245,13 @@ export default function AuditCampaignPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
-        <p className="compass-eyebrow">— 100 restaurant operators wanted</p>
+        <p className="compass-eyebrow">— Start with one statement</p>
         <h2 className="compass-display mt-5 text-5xl md:text-7xl">Where did your delivery money go?</h2>
-        <p className="compass-body mx-auto mt-6 max-w-2xl text-xl">Bring one redacted statement. We&apos;ll show the math. You decide what happens next.</p>
-        <a href="#claim" onClick={() => trackEvent('audit_campaign_bottom_cta', { meta: attribution })} className="btn-primary mt-9" style={{ background: '#0066ff' }}>Get my free audit →</a>
+        <p className="compass-body mx-auto mt-6 max-w-2xl text-xl">Bring one redacted statement. We&apos;ll show the math. You decide what happens next. Or try the sample first. No card.</p>
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <a href="/try" onClick={() => trackEvent('cta_try', { meta: { ...attribution, href: '/try' } })} className="btn-primary" style={{ background: '#0066ff' }}>Try it free — no card</a>
+          <a href="#claim" onClick={() => trackEvent('audit_campaign_bottom_cta', { meta: attribution })} className="btn-secondary" style={{ background: 'transparent', borderColor: '#d2d2d7', color: '#1d1d1f' }}>Get my free audit</a>
+        </div>
         <p className="compass-eyebrow-dim mt-8">Bring the file · show the math · keep the receipt</p>
       </section>
 

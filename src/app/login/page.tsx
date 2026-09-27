@@ -10,6 +10,8 @@ export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
   title: "Sign in | Never86'd",
+  description: "Sign in to the owner seat on never86.ai. No card.",
+  alternates: { canonical: 'https://www.never86.ai/login' },
   robots: {
     index: false,
     follow: false,

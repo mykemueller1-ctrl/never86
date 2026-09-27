@@ -1,11 +1,20 @@
 import type { Metadata } from 'next';
+import { OnboardStartBeacon } from '@/components/OnboardStartBeacon';
+import { publicPageMetadata } from '@/lib/seoAeo';
 
 export const metadata: Metadata = {
-  title: "Onboard your restaurant | Never 86'd",
-  description: "Tell Never86'd which restaurant system and operator problem should be addressed first.",
-  alternates: { canonical: 'https://www.never86.ai/onboard' },
+  ...publicPageMetadata({
+    path: '/onboard',
+    title: "Claim the free owner seat | Never 86'd",
+    description: "One restaurant. One owner seat. Free to start. No card. Bring the papers you already have.",
+  }),
 };
 
 export default function OnboardLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <OnboardStartBeacon />
+      {children}
+    </>
+  );
 }

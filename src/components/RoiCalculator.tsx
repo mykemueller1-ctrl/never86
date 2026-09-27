@@ -7,9 +7,8 @@ import { trackEvent } from '@/lib/track';
 
 const POINTS = [1, 2, 3, 4] as const;
 
-// Homepage ROI calculator: an operator enters monthly sales and sees what a
-// few points of food-cost recovery is worth — turning $199/mo into a rounding
-// error. Pure math lives in @/lib/roi (tested); this is just the UI.
+// Optional what-if on sales the operator types. Arithmetic only.
+// Not recovered cash. The first owner seat is free. Pure math lives in @/lib/roi.
 export default function RoiCalculator() {
   const [sales, setSales] = useState(60000);
   const [points, setPoints] = useState(2);
@@ -45,7 +44,7 @@ export default function RoiCalculator() {
             className="w-full mt-4 accent-[#0066ff]"
           />
 
-          <p className="compass-card-label mt-6" style={{ color: '#86868b' }}>— Food-cost points recovered</p>
+          <p className="compass-card-label mt-6" style={{ color: '#86868b' }}>— If food cost moved by</p>
           <div className="mt-3 flex gap-2">
             {POINTS.map((p) => (
               <button
@@ -65,7 +64,7 @@ export default function RoiCalculator() {
             ))}
           </div>
           <p className="compass-body text-[13px] mt-4" style={{ color: '#6e6e73' }}>
-            Most kitchens have 2–4 points hiding in voids, vendor drift, tips, and waste.
+            Arithmetic on the sales you typed. Not money recovered.
           </p>
         </div>
 
@@ -79,13 +78,10 @@ export default function RoiCalculator() {
             {usd(monthly)}/mo · {points} point{points === 1 ? '' : 's'} of food cost
           </p>
           <p className="compass-body text-[14px] mt-5">
-            Pulse is <span className="text-ink-800 font-semibold">$199/mo</span>
-            {monthly >= 199
-              ? <> — this pace pays for it <span className="text-ink-800 font-semibold">{Math.round(monthly / 199)}× over</span> every month.</>
-              : <>. Even a fraction of a point covers it.</>}
+            The first owner seat is free. No card to start. This difference is not recovered cash.
           </p>
           <Link
-            href="/trial"
+            href="/try"
             onClick={() => trackEvent('home_roi_cta_click', { meta: { sales, points, annual } })}
             className="btn-primary mt-6 inline-block"
             style={{ background: '#0066ff' }}

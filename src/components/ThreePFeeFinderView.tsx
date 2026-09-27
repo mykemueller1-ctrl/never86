@@ -43,10 +43,10 @@ function SampleBanner() {
     <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8 flex items-center justify-between gap-4">
       <div>
         <p className="text-ink-800 text-sm font-semibold mb-1">Sample data — this isn&apos;t a real restaurant.</p>
-        <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Connect your POS to run this on your own stores.</p>
+        <p className="text-ink-600 text-sm">Made-up numbers for a 5-unit demo. Not recovered cash. No POS connection is required.</p>
       </div>
-      <Link href="/operators#talk" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-ink-800 font-semibold rounded-full px-4 py-2 text-sm">
-        Connect your data
+      <Link href="/try" className="shrink-0 bg-ink-800 hover:bg-ink-900 text-white font-semibold rounded-full px-4 py-2 text-sm">
+        Try it free
       </Link>
     </div>
   );
@@ -58,18 +58,18 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
       {sample ? <SampleBanner /> : null}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Kpi label="3P revenue / yr" value={usd(d.networkTpRevenueYr)} level="verified" sub="annualized from Toast" />
+        <Kpi label="3P revenue / yr" value={usd(d.networkTpRevenueYr)} level={sample ? 'estimated' : 'verified'} sub={sample ? 'fictional sample' : 'from the export you provide'} />
         <Kpi label="Est. fees / yr" value={`${usd(d.networkFees20)}–${usd(d.networkFees25)}`} level="estimated" sub="20–25% assumed take" />
-        <Kpi label="First-party % of digital" value={d.networkFirstPartyPct != null ? `${d.networkFirstPartyPct}%` : '—'} level="verified" sub={`target ${d.firstPartyTarget}%`} />
-        <Kpi label="Stores below target" value={String(d.storesBelowTarget)} level="verified" sub={`under ${d.firstPartyTarget}% first-party`} />
+        <Kpi label="First-party % of digital" value={d.networkFirstPartyPct != null ? `${d.networkFirstPartyPct}%` : '—'} level={sample ? 'estimated' : 'verified'} sub={sample ? 'fictional sample' : `target ${d.firstPartyTarget}%`} />
+        <Kpi label="Stores below target" value={String(d.storesBelowTarget)} level={sample ? 'estimated' : 'verified'} sub={`under ${d.firstPartyTarget}% first-party`} />
       </div>
 
       <div className="bg-ink-100 border border-ink-200 rounded-xl p-4 mb-8">
-        <p className="text-ink-800 text-sm font-semibold mb-1">The fee is an estimate — the revenue isn&apos;t.</p>
+        <p className="text-ink-800 text-sm font-semibold mb-1">{sample ? 'Sample numbers. The fee is an assumption.' : 'The fee is an estimate until the statement is in.'}</p>
         <p className="text-ink-600 text-sm">
-          We see your third-party revenue from Toast (Verified). The fee is that revenue times an assumed
-          20–25% marketplace take. Your real take rate is on your DoorDash and Uber Eats statements — plug it
-          in and these turn exact. First-party % is the lever: the more digital you own, the less of this bill you pay.
+          {sample
+            ? 'This demo is a made-up 5-unit group. It is not a live restaurant and not recovered cash. Your real take rate lives on the statement you already have.'
+            : 'The fee here is revenue times an assumed 20–25% marketplace take. Your real take rate is on the DoorDash or Uber Eats statement you provide. No portal login.'}
         </p>
       </div>
 
@@ -128,8 +128,8 @@ export function ThreePFeeFinderBody({ data: d, sample }: { data: ThreePFees; sam
             <p className="text-warning-500 text-[10px] uppercase tracking-[0.22em] font-mono">The lever · {d.renegotiationLever.precedentLabel}</p>
             <SourceTag level="estimated" />
           </div>
-          <p className="text-3xl md:text-4xl font-bold font-mono tabular-nums text-ink-800 mb-1">{usd(d.renegotiationLever.annualSavingsEstimate)}<span className="text-ink-500 text-base font-normal"> / year</span></p>
-          <p className="text-ink-600 text-sm mb-3">{usd(d.renegotiationLever.fourWeekSavingsEstimate)} / 4 weeks at this volume</p>
+          <p className="text-3xl md:text-4xl font-bold font-mono tabular-nums text-ink-800 mb-1">{sample ? 'Sample only' : usd(d.renegotiationLever.annualSavingsEstimate)}{sample ? null : <span className="text-ink-500 text-base font-normal"> / year</span>}</p>
+          <p className="text-ink-600 text-sm mb-3">{sample ? 'Not recovered cash.' : `${usd(d.renegotiationLever.fourWeekSavingsEstimate)} / 4 weeks at this volume`}</p>
           <p className="text-ink-600 text-sm leading-relaxed">{d.renegotiationLever.basis}</p>
         </div>
       ) : null}

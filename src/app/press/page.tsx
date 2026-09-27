@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 };
 
 const RECEIPTS = [
-  { v: '$1,043,797.69', l: 'The canary' },
-  { v: '$15.72M',       l: 'The network' },
-  { v: '$8.3M → $1.81M',l: 'The correction' },
+  { v: 'Free', l: 'First owner seat' },
+  { v: 'No card', l: 'To start' },
+  { v: 'Missing ≠ $0', l: 'The rule' },
 ];
 
 const FACTS = [

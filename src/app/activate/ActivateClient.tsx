@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AuthHonestyLine } from '@/components/AuthHonestyLine';
+import { trackPublic } from '@/lib/publicAnalytics';
 import {
   ACTIVATE_FAILURE_LOGOUT_PATH,
   decideActivateClientOutcome,
@@ -140,6 +141,7 @@ export default function ActivateClient() {
       }
       setStatus('done');
       setMessage('Password saved. Opening your operator…');
+      trackPublic('signup_complete', { path: '/activate' });
       goToDesk();
     } catch (err: unknown) {
       setPasswordStatus('error');

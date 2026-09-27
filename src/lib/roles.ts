@@ -36,7 +36,7 @@ export const ROLES: Record<string, RoleSpec> = {
       'Every consultant pitches "you\'re leaving $X on the table" — and none of them can defend $X.',
     ],
     reliefs: [
-      'Network reconciled-to-the-cent. $15.72M across 545,677 orders for our 16-unit design partner.',
+      'Every figure tagged Verified, Estimated, or Unverified. We do not publish a customer total we cannot re-pull.',
       'One screen per role on your team — they see what they need, you see the rollup.',
       'Every figure tagged Verified / Estimated / Unverified. When we\'re wrong we walk the number back in public.',
       'Per-store, per-channel, per-employee leaks with names attached — coachable, not punitive.',
@@ -47,7 +47,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: 'Catering Leak', line: 'Per-store catering economics + invoice-vs-POS reconciliation gap.', href: '/demo/catering-leak' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
+      { slug: 'why-never86d-is-operator-first', t: 'Why we do not publish a number we cannot re-pull' },
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
       { slug: 'catering-economics-multi-unit', t: 'How catering economics break for multi-unit operators' },
     ],
@@ -64,26 +64,26 @@ export const ROLES: Record<string, RoleSpec> = {
     headline: { l1: 'Books that close', gradient: 'to the penny.', l3: 'Without the month-end death march.' },
     intro: 'Every dollar your restaurants move, read and reconciled across the chain. Every figure tagged Verified, Estimated, or Unverified — so you walk into the board meeting knowing which numbers to defend and which to flag.',
     pains: [
-      'The POS export says $72M. The dining-options export says $53M. The sales-category export says $15.7M. Which one\'s right?',
+      'Three exports of the same week can disagree. We do not pick a sales total we cannot re-pull from the papers.',
       'You spend three days a month reconciling 3P payouts against the deposit ledger.',
       'Your food-cost % drifts 4 points week-over-week and nobody can explain it.',
       'Banking covenants want trailing-twelve net. Each store reports it differently.',
     ],
     reliefs: [
-      'Sales counted once, not twice — the double-counting rule that caught our own $8.3M number and walked it back to $1.81M.',
-      'Per-partner 3P take rate (DD 10% / UE 18% / GH 18% confirmed for our design partner) vs blended-effective.',
+      'Sales counted once. A doubled rollup stays flagged. It is not published as a result.',
+      'Per-partner statement math versus the rate on the paper you provide. No invented savings.',
       'Source-tag discipline on every figure that hits a board doc.',
       'When the model is wrong we publish the correction. No vendor in this industry does that.',
     ],
     freeAgents: [
-      { name: '3P Fee Finder', line: 'Per-partner contract vs blended-effective, store by store. Plus the $585K UE+GH renegotiation lever.', href: '/demo/3p-fee-finder' },
+      { name: '3P Fee Finder', line: 'A labeled sample of contract vs blended rate. Not a recovered-cash result.', href: '/demo/3p-fee-finder' },
       { name: 'Catering Leak', line: 'Catering net vs invoiced — the off-prem reconciliation gap.', href: '/demo/catering-leak' },
       { name: 'Tip Variance', line: 'Week-over-week tip movement. The leading indicator the P&L misses.', href: '/demo/tip-variance' },
     ],
     answers: [
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
       { slug: 'renegotiate-ue-gh-to-dd', t: 'How to renegotiate Uber Eats and GrubHub to the DoorDash rate' },
-      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
+      { slug: 'why-never86d-is-operator-first', t: 'Why we do not publish a number we cannot re-pull' },
     ],
     bookCtaLine: '15 minutes. Bring last month\'s 3P payout statements. We\'ll show the contract-vs-effective gap live.',
   },
@@ -99,7 +99,7 @@ export const ROLES: Record<string, RoleSpec> = {
     intro: 'Labor leak before payroll posts. Void patterns that flag a coaching conversation, not a verdict. Per-store scorecards your DMs actually open. The ops view a COO actually wants to see at 6:30am.',
     pains: [
       'Labor % drifts 3 points and you have to wait for the EOD report to know which store.',
-      'A "$50K overtime month" lands as a single P&L line — no idea which employee, which shift, which week.',
+      'An overtime month can land as a single P&L line — no idea which shift.',
       'Your DMs run nine stores each and you have no way to know whose stores are slipping until the quarterly review.',
       'When you ask "is this store\'s void rate normal?" the answer is "compared to what?"',
     ],
@@ -140,7 +140,7 @@ export const ROLES: Record<string, RoleSpec> = {
     reliefs: [
       'We sit outside the stack. We don\'t replace any system. We reconcile across them and surface the gaps.',
       'Source-tag discipline — every figure shipped tagged Verified, Estimated, or Unverified, with the system it came from named in the logic-toggle view.',
-      'Toast IQ pipeline live today; Square/Clover/Aloha/Lightspeed next; universal CSV/Excel/PDF as the floor.',
+      'No POS connection is required. Drop the CSV, Excel, or PDF you already have.',
       'You can audit every number we surface — and when we\'re wrong we publish the correction.',
     ],
     freeAgents: [
@@ -149,7 +149,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: 'Labor Leak', line: 'Schedule system + POS reconciled against actual clocked hours.', href: '/demo/labor-leak' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
+      { slug: 'why-never86d-is-operator-first', t: 'Why we do not publish a number we cannot re-pull' },
       { slug: 'people-native-ai-restaurants', t: 'What does "people-native AI" mean for restaurants' },
       { slug: 'labor-screen-managers-want', t: 'Why the labor screen managers actually want looks different' },
     ],
@@ -184,7 +184,7 @@ export const ROLES: Record<string, RoleSpec> = {
     ],
     answers: [
       { slug: 'doordash-blended-rate-dashpass', t: 'Why your DoorDash 10% blends to 11.2%' },
-      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
+      { slug: 'why-never86d-is-operator-first', t: 'Why we do not publish a number we cannot re-pull' },
       { slug: 'labor-screen-managers-want', t: 'Why the labor screen managers actually want looks different' },
     ],
     bookCtaLine: '15 minutes. Bring your last month\'s Toast export. I\'ll run our reconciliation on it during the call.',
@@ -270,7 +270,7 @@ export const ROLES: Record<string, RoleSpec> = {
       'Your CDC says food cost is "fine." Your invoices say otherwise. Reconciliation is on you.',
       'Beverage mix drifts and you can\'t tell if it\'s the bartender, the menu, or the inventory count.',
       'Prep waste is invisible until end-of-week — by then the line cook\'s habit is set.',
-      'You signed off on a $40K week and the books say $32K. Where did $8K go?',
+      'You signed off on a week and the books disagree. The gap needs a paper, not a guess.',
     ],
     reliefs: [
       'Food cost by category vs your menu mix — daily, not weekly.',
@@ -284,7 +284,7 @@ export const ROLES: Record<string, RoleSpec> = {
       { name: '3P Fee Finder', line: 'What DD/UE/GH actually keep — so menu pricing on 3P is honest.', href: '/demo/3p-fee-finder' },
     ],
     answers: [
-      { slug: 'walked-the-number-back', t: 'How we caught our own $8.3M number and walked it back to $1.81M' },
+      { slug: 'why-never86d-is-operator-first', t: 'Why we do not publish a number we cannot re-pull' },
       { slug: 'catering-economics-multi-unit', t: 'How catering economics break for multi-unit operators' },
       { slug: 'people-native-ai-restaurants', t: 'What does "people-native AI" mean for restaurants' },
     ],

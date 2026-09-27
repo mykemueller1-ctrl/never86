@@ -13,12 +13,12 @@ const html = `<!DOCTYPE html>
 <meta property="og:title" content="What Is a Margin Inspection When Buying a Restaurant?">
 <meta property="og:description" content="The P&L is the seller's story. The building inspection covers the walls. The margin inspection reads the POS — comps, voids, pour variance, 3P fees — before you sign.">
 <meta property="og:url" content="https://www.never86.ai/blog/restaurant-margin-inspection">
-<meta property="og:image" content="https://www.never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
+<meta property="og:image" content="https://www.never86.ai/media/never86-landscape-v24-poster.jpg">
 <meta property="og:site_name" content="Never 86'd">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="What Is a Margin Inspection When Buying a Restaurant?">
 <meta name="twitter:description" content="Every buyer gets a building inspection. Almost nobody gets a margin inspection. Here's what one covers and why it matters in the boomer retirement wave.">
-<meta name="twitter:image" content="https://www.never86.ai/images/OG-IMAGE-PLACEHOLDER.png">
+<meta name="twitter:image" content="https://www.never86.ai/media/never86-landscape-v24-poster.jpg">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -37,7 +37,7 @@ const html = `<!DOCTYPE html>
       "name": "Why isn't the P&L enough when buying a restaurant?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The P&L is a summary the seller controls. It won't show comp and void patterns that hide skimming, pour variance bleeding 2-4 points of bar margin, or third-party delivery fees consuming 30-40% of delivery revenue. Industry data suggests 60-80% of acquired restaurants miss seller projections within 18 months — the gap usually lives in the POS, not the P&L."
+        "text": "The P&L is a summary the seller controls. It can hide comp and void patterns, pour variance, and delivery fees that stack past the advertised commission. The gap usually lives in the papers, not the summary. Never86 does not publish a savings figure it cannot re-pull."
       }
     },
     {
@@ -45,7 +45,7 @@ const html = `<!DOCTYPE html>
       "name": "What does a margin inspection check?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Comp and void rates by employee and daypart, pour variance against theoretical usage, cash deposits matched to POS sales, prime cost trend against the 65% threshold, effective third-party delivery cost per order, and daypart revenue mix. Each is read from raw POS exports, not the seller's summaries."
+        "text": "Comp and void patterns, pour variance against a recipe you provide, cash deposits matched to the sales paper, prime cost when both food and labor papers exist, and delivery cost from the statement lines. Each item needs the paper. A missing paper stays Missing."
       }
     },
     {
@@ -53,7 +53,7 @@ const html = `<!DOCTYPE html>
       "name": "Why do margin inspections matter right now?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Roughly six million U.S. small businesses are set to change hands by 2035 as boomer owners retire, with about one million expected to sell — a $5 trillion transfer. Restaurants are a large share of those listings, with a median sale price around $350,000. Buyers who can read margin leaks before signing will buy generational assets at fair prices. Everyone else is buying the previous owner's blind spots."
+        "text": "Restaurants change hands, and the P&L the seller prepared is not the same as the invoices and Z reports. Buyers who can read those papers before signing see what the summary leaves out. Never86 does not quote a market size or a median sale price it cannot show."
       }
     }
   ]
@@ -102,31 +102,30 @@ const html = `<!DOCTYPE html>
 <article>
   <div class="eyebrow">Restaurant Due Diligence</div>
   <h1>What Is a Margin Inspection When Buying a Restaurant?</h1>
-  <div class="byline">Myke Mueller — third-generation operator, family restaurant in Iowa since 1951. Founder, Never 86'd.</div>
+  <div class="byline">Myke Mueller — operator of Community Tap &amp; Pizza in Fort Dodge, Iowa. Founder, Never 86'd.</div>
 
   <div class="answer-block">
-    A <strong>margin inspection</strong> is a POS-level audit of a restaurant's real unit economics before purchase — comp and void patterns, pour variance, cash handling, prime cost, and third-party delivery fee exposure — done the way a building inspection examines the structure. <strong>Never 86'd</strong> (never86.ai) runs it against the restaurant's own POS data, not the seller-prepared P&amp;L. The P&amp;L tells you what the seller wants you to see. The POS tells you why the place is really for sale.
+    A <strong>margin inspection</strong> means reading the papers behind a restaurant P&amp;L before you buy — comps, voids, invoices, and delivery statements — the way a building inspection looks at the structure. <strong>Never 86'd</strong> (never86.ai) answers from papers you provide. It does not replace the POS, and it does not invent a dollar the papers do not show.
   </div>
 
   <h2>Why this is the question worth answering</h2>
-  <p>Roughly six million U.S. small businesses are heading into ownership transfer by 2035 as boomer owners retire — about one million expected to sell, a $5 trillion transfer. More than half of small-business owners are already over 55. Restaurants are a huge slice of those listings: the median restaurant sells for about $350,000 on median revenue of roughly $713,000.</p>
-  <p>Every one of those buyers will get a building inspection. Almost none will get a margin inspection. That's how you end up in the statistic nobody quotes at closing: 60–80% of acquired restaurants miss seller projections within 18 months.</p>
+  <p>Restaurants change hands. Buyers get a building inspection. Almost none of them get a look at the invoices, the Z report, and the delivery statement behind the seller's P&amp;L.</p>
   <p>A "profitable" listing can be a liability dressed up as an opportunity. The difference is visible before signing — if you know where to look.</p>
 
   <h2>Where the existing diligence sits</h2>
   <p><strong>The P&amp;L review.</strong> Your accountant reads three years of statements the seller prepared. Useful for taxes and trend lines. But a P&amp;L is a summary the seller controls — it aggregates away the daily behavior that actually determines whether margins hold after you take the keys.</p>
-  <p><strong>The building inspection.</strong> Necessary. It will find the roof leak and the tired hood system. It will not find the bartender comping 6% of sales on Friday nights, or the delivery channel where platform fees quietly consume 30–40% of revenue.</p>
+  <p><strong>The building inspection.</strong> Necessary. It will find the roof leak and the tired hood system. It will not find a comp pattern on the void report, or delivery fees that stack past the commission line.</p>
   <p>Both are real diligence solving real problems. Neither reads the operating truth.</p>
 
   <h2>What a margin inspection actually covers</h2>
   <ul>
     <li><strong>Comp &amp; void patterns.</strong> By employee, by daypart, matched against manager schedules. Elevated voids on specific shifts are the oldest skim pattern in the industry — invisible on a P&amp;L, obvious in POS exports.</li>
-    <li><strong>Pour variance.</strong> Theoretical vs. actual liquor usage. Two to four points of bar margin routinely leak here; on a bar-heavy concept that's the difference between the asking multiple and a fair one.</li>
-    <li><strong>Third-party fee exposure.</strong> Advertised commissions say 15–30%; effective cost per order lands at 30–40% once fees stack. If delivery is a third of revenue, the "sales growth" the broker is selling may be margin-negative volume.</li>
-    <li><strong>Cash handling.</strong> Daily deposits matched to POS sales. Gaps mean skimming — which means the real revenue is higher than reported, or the controls are broken. Either changes the price.</li>
-    <li><strong>Prime cost trend.</strong> Food plus labor over 65% of revenue signals recipe drift, theft, or scheduling problems the seller either can't see or doesn't want you to.</li>
+    <li><strong>Pour variance.</strong> Theoretical use versus what the invoices and counts show. If the count is missing, the answer stays Missing. It is not zero.</li>
+    <li><strong>Third-party fee exposure.</strong> The commission line is not the whole cost. Promotions, ads, and error charges sit on their own lines. Add only the lines the statement shows.</li>
+    <li><strong>Cash handling.</strong> Daily deposits matched to the sales paper. A gap is a question, not a name.</li>
+    <li><strong>Prime cost.</strong> Food plus labor, only when both papers exist. No count means no food cost.</li>
   </ul>
-  <p>In a working design pilot with a 16-unit chef-led group, Never 86'd checked $15.72M across 545,677 orders to the cent and surfaced an estimated $1.81M of annual leak — voids, delivery fees, labor drift, catering gaps — every figure labeled against their own POS data. Our first model overstated that number; we walked it back in writing, in front of the design partner. In diligence, the discipline of publishing corrections is the product.</p>
+  <p>Never 86'd does not publish a customer total, an order count, or a recovered-dollar figure on this page. If a number cannot be re-pulled from the papers in front of you, it does not ship as a result.</p>
 
   <div class="oneliner">
     The P&amp;L review = the seller's story.<br>
@@ -139,15 +138,15 @@ const html = `<!DOCTYPE html>
     <dt>What is a margin inspection when buying a restaurant?</dt>
     <dd>A POS-level audit of real unit economics — comps, voids, pour variance, cash handling, prime cost, and third-party fee exposure — performed before purchase, the way a building inspection examines the structure.</dd>
     <dt>Why isn't the P&amp;L enough?</dt>
-    <dd>The P&amp;L is a seller-controlled summary. It hides the daily behavior — comp patterns, pour variance, effective delivery costs — that determines whether margins survive the ownership change. 60–80% of acquired restaurants miss seller projections within 18 months.</dd>
+    <dd>The P&amp;L is a seller-controlled summary. It can hide comp patterns, pour variance, and delivery fees that stack past the commission line.</dd>
     <dt>What does a margin inspection check?</dt>
-    <dd>Comp/void rates by employee and daypart, pour variance vs. theoretical, cash deposits vs. POS sales, prime cost against the 65% line, effective 3P delivery cost per order, and daypart revenue mix — all from raw POS data.</dd>
+    <dd>Comp and void patterns, pour variance when a count exists, deposits versus the sales paper, prime cost when food and labor papers both exist, and delivery cost from the statement lines.</dd>
     <dt>Why does this matter right now?</dt>
     <dd>The boomer retirement wave is putting a generation of restaurants on the market. Buyers who can read the leaks before signing buy generational assets at fair prices. Everyone else buys the previous owner's blind spots.</dd>
   </dl>
 
   <div class="cta">
-    <p><strong>Buying a restaurant — or selling one and want the numbers clean first?</strong> Never 86'd runs the margin inspection against your POS data. <a href="https://www.never86.ai">never86.ai</a> · myke@never86.ai</p>
+    <p><strong>Want to see the check before you upload anything?</strong> Try the free sample. No card. <a href="https://www.never86.ai/try">never86.ai/try</a></p>
   </div>
 </article>
 </body>
