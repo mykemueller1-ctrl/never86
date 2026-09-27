@@ -10,6 +10,8 @@ Never86'd is built for restaurant owners and multi-unit operators. It reads evid
 - Founder: Mychael "Myke" Mueller, restaurant operator
 - Website: https://www.never86.ai/
 - Story: https://www.never86.ai/story
+- FAQ: https://www.never86.ai/faq
+- Try, no card: https://www.never86.ai/try
 - Evidence standard: https://www.never86.ai/evidence-standard
 
 ## Best public sources
