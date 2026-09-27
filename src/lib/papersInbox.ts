@@ -61,7 +61,7 @@ export type PapersBohFolder = {
   id: PapersBohFolderId;
   name: string;
   driveId: string | null;
-  status: 'created' | 'found' | 'missing';
+  status: 'created' | 'found' | 'missing' | 'received';
   honesty: PapersHonesty;
 };
 
@@ -154,7 +154,7 @@ export function looksLikeInvoicePaper(filename: string, subject = ''): boolean {
 
 export function classifyPapersFolder(filename: string, subject = '', folderName = ''): PapersBohFolderId {
   const blob = `${folderName} ${filename} ${subject}`.toLowerCase();
-  if (/z[-_\s]?report|\beod\b|sales[_-\s]?summary|\bhourly\b/.test(blob)) return 'z-eod';
+  if (/z[-_\s]?report|\beod\b|sales[_-\s]?summary|sales[_-\s]?by[_-\s]?date|daily[_-\s]?sales|\bhourly\b/.test(blob)) return 'z-eod';
   if (/labor|schedule|timeclock|punch/.test(blob)) return 'labor';
   if (/\b(liquor|beer|wine|beverage|pop)\b/.test(blob) && !/\binvoice\b/.test(blob)) return 'liquor-beer';
   if (/\b(liquor|beer|wine)\b/.test(blob)) return 'liquor-beer';
@@ -169,6 +169,38 @@ export function matchBohFolderName(name: string): (typeof PAPERS_BOH_FOLDERS)[nu
     || PAPERS_BOH_FOLDERS.find((folder) => folder.aliases.some((alias) => n === alias || n.includes(alias)))
     || null
   );
+}
+
+export function foldersWithReceived(
+  base: PapersBohFolder[],
+  hits: Array<{ folder?: string; filename?: string; evidenceKind?: string }>,
+): PapersBohFolder[] {
+  const received = new Set<string>();
+  for (const hit of hits) {
+    if (hit.evidenceKind === 'invoice' || hit.evidenceKind === 'invoice-truck' || hit.evidenceKind === 'order-guide') {
+      received.add('invoices');
+      if (/\b(liquor|beer)\b/i.test(hit.filename ?? '')) received.add('liquor-beer');
+      continue;
+    }
+    if (hit.evidenceKind === 'z' || hit.evidenceKind === 'hourly' || hit.evidenceKind === 'void') {
+      received.add('z-eod');
+      continue;
+    }
+    if (hit.evidenceKind === 'timeclock' || hit.evidenceKind === 'schedule' || hit.evidenceKind === 'labor-cards') {
+      received.add('labor');
+      continue;
+    }
+    if (hit.folder === 'invoices' || hit.folder === 'z-eod' || hit.folder === 'labor' || hit.folder === 'liquor-beer') {
+      received.add(hit.folder);
+      continue;
+    }
+    if (hit.filename) received.add(classifyPapersFolder(hit.filename, '', hit.folder ?? ''));
+  }
+  return base.map((folder) => (
+    received.has(folder.id)
+      ? { ...folder, status: 'received', honesty: 'Estimated' as const }
+      : folder
+  ));
 }
 
 export function emptyBohFolders(): PapersBohFolder[] {

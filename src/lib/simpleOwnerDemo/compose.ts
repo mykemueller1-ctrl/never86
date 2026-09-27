@@ -52,7 +52,14 @@ import {
   routeWeekSalesQuestion,
 } from '@/lib/lastWeekPrimeCost';
 import { OPERATOR_PERSIST_FACT } from '@/lib/ownerDeskPapers';
-import { answerVendorSpineQuestion } from '@/lib/ctapVendorSpine';
+import { answerVendorSpineQuestion, matchVendorSpine } from '@/lib/ctapVendorSpine';
+import {
+  answerFromPaperFacts,
+  factsFromTags,
+  isPlainPaperQuestion,
+  missingPaperAnswer,
+  summaryForFacts,
+} from '@/lib/ownerPaperFacts';
 import type { SimpleOwnerAskAnswer, SimpleOwnerReadiness, SimpleOwnerUploadRecord, SourceTag } from './types';
 
 const EMPTY_EVIDENCE: readonly PrimeCostEvidence[] = OWNER_PRIME_COST_EVIDENCE.map((row) => ({
@@ -100,6 +107,13 @@ export function readinessFromUploads(
     uploadCount: uploads.length,
     askCount,
     sourceTags,
+    papers: uploads.map((row) => ({
+      id: row.id,
+      filename: row.filename,
+      evidenceKind: row.evidenceKind,
+      createdAt: row.createdAt,
+      summary: summaryForFacts(factsFromTags(row.sourceTags)) || row.filename,
+    })),
     lastWeekPrime: collectLastWeekPrime(
       operatorId,
       uploads,
@@ -204,6 +218,30 @@ export function composeAskAnswer(input: {
     };
   }
 
+  // Community Tap later-wave vendors stay Missing on that seat. A new account
+  // still reads the total off its own uploaded paper.
+  const ctapVendorHook = onCtapSeat1 ? matchVendorSpine(input.question) : null;
+  const paperAnswer = ctapVendorHook ? null : answerFromPaperFacts(input.question, input.uploads);
+  if (paperAnswer) {
+    const sourceTags: SourceTag[] = [
+      ...paperAnswer.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+      { tag: paperAnswer.verifiedClose ? 'verified' : 'unverified', source: 'simple-owner-ask:paper-fact' },
+    ];
+    return {
+      slug: paperAnswer.slug,
+      headline: paperAnswer.headline,
+      facts: [...paperAnswer.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: paperAnswer.coachTomorrow,
+      needs: paperAnswer.needs,
+      tags: sourceTags.filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)).map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: paperAnswer.sampleDollars,
+      verifiedClose: paperAnswer.verifiedClose,
+    };
+  }
+
   const toastFacts = nagToastOk ? collectToastFacts(input.uploads) : null;
   const toastKind = toastFacts ? routeToastDeskQuestion(input.question) : null;
   const toastAnswer =
@@ -236,7 +274,8 @@ export function composeAskAnswer(input: {
   const takePdqMorning = Boolean(pdqKind) && (pdqFacts.hasPdq || clearlyPdq || onCtapSeat1)
     && (!clearlyHyvee || clearlyPdq);
   const pdqAnswer = takePdqMorning ? answerPdqDeskQuestion(input.question, pdqFacts, input.now ?? new Date()) : null;
-  if (pdqAnswer) {
+  const plainPaper = isPlainPaperQuestion(input.question);
+  if (pdqAnswer && (pdqAnswer.verifiedClose || !plainPaper)) {
     const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
     const sourceTags: SourceTag[] = [
       ...pdqAnswer.sourceTags,
@@ -289,7 +328,27 @@ export function composeAskAnswer(input: {
     };
   }
 
-  const vendorSpine = answerVendorSpineQuestion(input.question);
+  if (plainPaper && !onCtapSeat1) {
+    const missing = missingPaperAnswer();
+    const sourceTags: SourceTag[] = [
+      ...missing.sourceTags,
+      ...input.uploads.flatMap((row) => row.sourceTags).filter((tag) => !isHiddenParseTag(tag, onCtapSeat1)),
+    ];
+    return {
+      slug: missing.slug,
+      headline: missing.headline,
+      facts: [...missing.facts, persistFactFor(input.readiness.operatorId)],
+      coachTomorrow: missing.coachTomorrow,
+      needs: missing.needs,
+      tags: sourceTags.map((tag) => `${tag.tag}:${tag.source}`),
+      sourceTags,
+      inventedClose: false,
+      sampleDollars: missing.sampleDollars,
+      verifiedClose: false,
+    };
+  }
+
+  const vendorSpine = onCtapSeat1 ? answerVendorSpineQuestion(input.question) : null;
   if (vendorSpine) {
     const lock = onCtapSeat1 ? contaminantLockTag(input.uploads) : null;
     const sourceTags: SourceTag[] = [
@@ -347,7 +406,7 @@ export function composeAskAnswer(input: {
 
   const laborFact = laborAsk
     ? 'Labor cards name roles (FOH, Line, Dish, Run). Daily compare to the clock flags early leave, late leave, and labor drift. Punch ≠ schedule. No invented overtime.'
-    : 'This seat answers FOH, BOH, schedule, vendor, or merchant. It does not invent a close.';
+    : 'This seat can talk about the floor, the kitchen, the schedule, a vendor, or card sales. It does not invent a close.';
 
   if (looksLikeDay1BartenderAsk(input.question) && /bartender|drawer/.test(qLower)) {
     return {
@@ -406,7 +465,9 @@ export function composeAskAnswer(input: {
   }
 
   const persistFact = persistFactFor();
-  const vendorFact = looksLikeDay1VendorAsk(input.question) ? vendorBabysitLine({ question: input.question }) : null;
+  const vendorFact = onCtapSeat1 && looksLikeDay1VendorAsk(input.question)
+    ? vendorBabysitLine({ question: input.question })
+    : null;
 
   const facts = [
     evidenceFact,

@@ -71,7 +71,7 @@ export const OPERATOR_V2_PLATES: readonly OperatorV2Plate[] = [
     folder: 'Invoice / truck',
     ask: 'Truck ticket or invoice — snap it when you want that paper off the plate.',
     tray: 'food',
-    missingUntil: 'A truck ticket, liquor invoice, or handwritten short lands. Invoice ≠ COGS.',
+    missingUntil: 'A truck ticket, liquor invoice, or handwritten short lands. An invoice is not a counted food cost.',
     ocrInput: true,
     firstClass: true,
     deferred: false,

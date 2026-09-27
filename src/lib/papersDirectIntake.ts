@@ -8,6 +8,7 @@ import { classifyPapersFolder, type PapersHonesty } from '@/lib/papersInbox';
 import { chatIntakeMap, chatReplyForLine, readChatIntakeLine } from '@/lib/papersChatIntake';
 import { literalTypedDollars, peelLiteralTotals } from '@/lib/papersIntakeHelpers';
 import { matchStagedVendorPaper } from '@/lib/stagedVendorFixtures';
+import { extractPaperFacts } from '@/lib/ownerPaperFacts';
 import { decodeInvoiceSource } from '@/lib/vendorInvoiceParse';
 
 export const PAPERS_DIRECT_KINDS = ['upload', 'photo', 'chat'] as const;
@@ -55,6 +56,41 @@ function draftFromNativeText(kind: 'upload' | 'photo', bytes: Uint8Array, filena
   } catch {
     raw = '';
   }
+  const facts = extractPaperFacts(name, raw);
+  const sales = facts.filter((fact) => fact.kind === 'sales' && fact.amount != null);
+  if (sales.length) {
+    return {
+      kind,
+      filename: name,
+      folder: 'z-eod',
+      honesty: 'Verified',
+      note: 'Verified from the sales rows on this file. Not a closed week by itself. No invented $.',
+      text: sales.map((fact) => `${fact.date ?? ''} ${fact.amount?.toFixed(2) ?? ''}`.trim()).join('\n'),
+    };
+  }
+  const zed = facts.find((fact) => fact.kind === 'z' && fact.amount != null);
+  if (zed?.amount != null) {
+    return {
+      kind,
+      filename: name,
+      folder: 'z-eod',
+      honesty: 'Verified',
+      note: `Verified grand total $${zed.amount.toFixed(2)} from this file. Not recovered cash. We will not guess a dollar.`,
+      text: `Grand Total ${zed.amount.toFixed(2)}`,
+    };
+  }
+  const labor = facts.find((fact) => fact.kind === 'labor' && fact.amount != null);
+  if (labor?.amount != null) {
+    const pct = labor.laborPct != null ? ` (${labor.laborPct}%)` : '';
+    return {
+      kind,
+      filename: name,
+      folder: 'labor',
+      honesty: 'Verified',
+      note: `Verified labor $${labor.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${pct} from this time clock. Hours are not a second labor dollar.`,
+      text: `Total Labor ${labor.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    };
+  }
   const totals = peelLiteralTotals(raw);
   const folder = classifyPapersFolder(name);
   if (totals.length > 0) {
@@ -62,8 +98,8 @@ function draftFromNativeText(kind: 'upload' | 'photo', bytes: Uint8Array, filena
       kind,
       filename: name,
       folder,
-      honesty: 'Estimated',
-      note: 'Estimated from a literal TOTAL/DUE line on this file. Not Verified. Not recovered cash. No invented $.',
+      honesty: 'Verified',
+      note: 'Verified from a printed total on this file. Not recovered cash. No invented $.',
       text: totals.join('\n'),
     };
   }

@@ -129,19 +129,29 @@ export function compareVendorInvoiceDocuments(
     const priorPrice = priorPrices?.length ? average(priorPrices) : null;
 
     if (skuPeriods.length < 2 || currentPrice == null || priorPrice == null || priorPrice <= 0) {
+      const onCurrent = currentPeriod ? bucket.periods.get(currentPeriod) : undefined;
+      const onPrior = priorPeriod ? bucket.periods.get(priorPeriod) : undefined;
+      const hasCurrent = Boolean(onCurrent?.length);
+      const hasPrior = Boolean(onPrior?.length);
+      let missingEvidence = `Prior period unit price for ${bucket.vendor} ${bucket.sku} is Missing Evidence, not $0.`;
+      if (priorPeriod && currentPeriod && hasPrior && !hasCurrent) {
+        missingEvidence = `The newer invoice is missing ${bucket.sku}. The older invoice has it. Missing Evidence, not $0.`;
+      } else if (priorPeriod && currentPeriod && hasCurrent && !hasPrior) {
+        missingEvidence = `The older invoice is missing ${bucket.sku}. The newer invoice has it. Missing Evidence, not $0.`;
+      }
       rows.push({
         vendor: bucket.vendor,
         sku: bucket.sku,
         description: bucket.description,
-        currentPeriod: skuCurrent,
-        priorPeriod: skuPrior,
-        currentPrice,
-        priorPrice,
+        currentPeriod: hasCurrent ? currentPeriod : skuCurrent,
+        priorPeriod: hasPrior ? priorPeriod : skuPrior,
+        currentPrice: hasCurrent && onCurrent ? average(onCurrent) : currentPrice,
+        priorPrice: hasPrior && onPrior ? average(onPrior) : priorPrice,
         driftPct: null,
         dollarsObserved: null,
         flagged: false,
         evidenceState: 'missing-evidence',
-        missingEvidence: `Prior period unit price for ${bucket.vendor} ${bucket.sku} is Missing Evidence, not $0.`,
+        missingEvidence,
       });
       continue;
     }

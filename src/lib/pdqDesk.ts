@@ -148,7 +148,7 @@ function missingZ(
       ...thinEodMissingFacts({ askedDate, hasVoids }),
       ...extra,
     ],
-    coachTomorrow: 'Forward the pdqreports@pdqpos.com ZReport_Summary for the same store and business date.',
+    coachTomorrow: 'Add the Z report for the same store and business date.',
     needs: 'PDQ ZReport_Summary (native PDF) for the asked business date.',
     sourceTags: [{ tag: 'unverified', source: 'pdq-desk:z-summary:missing' }],
     verifiedClose: false,
@@ -194,7 +194,7 @@ function answerPdqDeskQuestionUnwrapped(
         facts: [
           'Hourly sales stay Missing. No peak hour invented.',
         ],
-        coachTomorrow: 'Land Hourly_Sales_Report from the same pdqreports morning pack.',
+        coachTomorrow: 'Add the hourly sales report for the same business date.',
         needs: 'PDQ Hourly_Sales_Report for the asked business date.',
         sourceTags: [{ tag: 'unverified', source: 'pdq-desk:hourly:missing' }],
         verifiedClose: false,

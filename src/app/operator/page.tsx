@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: 'https://www.never86.ai/operator' },
     openGraph: {
       title: "Owner seat — 1–3 unit Action Shift | Never 86'd",
-      description: 'Not a dashboard. Need or Ready from stored files. No invented close. No private CTAP data.',
+      description: 'Not a dashboard. Need or Ready from stored files. No invented close. No private staff data.',
       url: 'https://www.never86.ai/operator',
     },
   };
