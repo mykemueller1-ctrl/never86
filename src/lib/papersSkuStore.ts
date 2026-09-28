@@ -19,9 +19,9 @@
  * after commit. Same-store saves in this process wait their turn so two
  * writes cannot report success on a half-written pair. On one database
  * connection, two transactions for the same document were serialized.
- * The survivor was one complete document. Two OS processes were not run.
- * The lock is what keeps a raw import from landing between a review check
- * and the write.
+ * The survivor was one complete document. Two OS processes, on one disposable
+ * Postgres, share that lock: the raw import waits, then sees the committed
+ * review and does not replace it.
  */
 
 export const PAPERS_REVIEW_PERSIST_ERROR = 'Review and compare were not saved. The prior lines stay in place.';

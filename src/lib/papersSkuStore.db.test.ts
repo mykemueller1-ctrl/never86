@@ -662,7 +662,7 @@ describe('papers sku database durability', () => {
     expect([4, 5]).toContain(lines[0].row_json.unitPrice?.amount);
     expect(settled.some((row) => row.status === 'fulfilled')).toBe(true);
     // One PGlite connection serialized these two transactions (overlap 1).
-    // The survivor is one complete document. Two OS processes were not started.
+    // The survivor is one complete document. Two OS processes are the Postgres test.
     expect(maxOverlap).toBe(1);
   }, 30_000);
 
