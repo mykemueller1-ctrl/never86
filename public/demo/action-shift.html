@@ -106,7 +106,7 @@
               </div>
             </div>
           </div>
-          <p class="fine">Prep book on this page. No staff names, phone numbers, door code, or wifi password. Not a food-cost %. Punch ≠ schedule.</p>
+          <p class="fine">Prep book and the posted weeks are on this page. No phone numbers, door code, or wifi password. Not a food-cost %. Punch ≠ schedule.</p>
         </div>
       </main>
     </div>
@@ -120,13 +120,13 @@
 
       const STARTERS = {
         home: null,
-        menu: "Game day card is the price. The prep book is separate. Yield stays Missing. Not a food-cost %. The September daily grid is a photo — glare cells are not typed.",
-        schedules: "The week is on the paper grid. Names stay off this page. We do not copy hours off a photo. No invented hours. Punch ≠ schedule.",
+        menu: "Game day card is the price. September nightly specials are the footer on that board. A lunch cell under glare is not given a date. Not a food-cost %.",
+        schedules: "Two face-up grids are typed: Sept 20–26, and the partial sheet for Sept 27–Oct 3. Sideways weeks are not guessed. Letters are copied as written. Punch ≠ schedule.",
         recipes: "Prep book from the binder. Handwritten lines are the current card. Marked-out lines are not copied. Not a food-cost %.",
         kitchen: "Portion card and the label rule. Two marked-out lines on the weight sheet are not copied. Call-out rule is here. No names.",
         dining: "Pizza-side duties and the close list. Marked-out lines are not copied. Mop waits on the bartender or manager on duty. No drawer totals.",
         driver: "Delivery fee by stop, from the posted sheet. Ask a manager if the stop is not on the list. No guest address, no phone list, no door code.",
-        notes: "Meal rule and the day-off rule. Schedule changes need the owner or the manager. No names on this page.",
+        notes: "Meal rule and the day-off rule. Schedule changes need the owner or the manager. The phone list is not on this page.",
         cards: "Labor cards spawn from the schedule. Drop the week first if it’s empty. Each card is a seat: posted in, posted out. Late drift only if the punch exists. Punch ≠ schedule. We don’t invent stay-late hours.",
         report: "Labor report spawns from the same schedule. How many people in each seat is how this shop actually runs — tribal knowledge, not a textbook. Late / stay-late stays Missing until punches land.",
         foh: "Front of house on the schedule. Posted in / posted out. Punch Missing — we will not say they stayed late.",
@@ -205,7 +205,26 @@
             "Add queso $1.99",
             "Domestic beer bucket (6) $18.00",
             "Apple cider mimosa $5 on the September board",
-          ], "Football season. Daily specials that were glare on the September photo are not typed.");
+          ], "Football season.") +
+            sheet("September nightly specials", [
+              "Monday: small 3-topping pizza + garlic cheese bread $15.99",
+              "Tuesday: large 3-topping pizza + garlic cheese bread $15.99",
+              "Wednesday: large 3-topping pizza $20.99",
+              "Thursday: any medium pizza $18.99",
+              "Friday: any medium pizza $16.99",
+              "Saturday: large 3-topping pizza $15.99",
+              "Sunday: see the game day card",
+              "Monday, Sept 7: open. No specials.",
+            ], "Apple cider mimosa is $5. Lunch cells under glare are not assigned a date.") +
+            sheet("Lunch lines on the September board", [
+              "Spaghetti and meatballs $11.99",
+              "Smash burgers $11.99",
+              "Large 1-topping pizza $11.99",
+              "Half meatball sub $10.99",
+              "Boneless burger and a side $13.99",
+              "Any medium pizza $15.99",
+              "Large 3-topping pizza $20.99",
+            ], "These repeat on the board. A date that was glare is not filled in.");
         }
         if (id === "recipes") {
           return [
@@ -391,6 +410,37 @@
             "No Otho, Coalville, or Riverside Trail unless a manager approves it and more than one driver is on",
           ], "The fee goes on the order. One week to learn it. After that, a missed fee is between the person who rang it and the driver, or it comes out of the paycheck. Ask a manager before you send the order.");
         }
+        if (id === "schedules") {
+          const week = (title, rows) => sheet(title, rows, "Order is Sun through Sat. A dash is a blank cell. C, RO, and Drive are copied as written.");
+          return week("Sept 20–26", [
+            "Moe: — — 10-5 — 10-5 5-C 5-C",
+            "Che: 4-C — 10-5 10-5P 4-3 5-C 5-C",
+            "Tom: 0-5 8-9 — 6:30 6:30 6:30 7:30",
+            "Ryan: 10-3 5-C — — 5-0 11-7 4-10",
+            "Steve: 3-C 4-C 5-C 4-C 9-5 10 5-C",
+            "Aundrik: 5-9 — 5-9 — 5-9 — 5-10",
+            "Aundrey: 11-0 — — — 5-10 — 11-7",
+            "Max: 11-7 — — 5-9 — 5-10 5-11:30",
+            "Dustin: 5-0 5-0 — — 5-0 5-11:30 5-11:30",
+            "Gavin: RO — RO RO 10-4 9-4 —",
+            "Matt: — — RO RO Drive — —",
+            "Nacho: 7:30 — 6:30 — 4-C 5-0 4-11",
+            "Josue: Drive Drive Drive Drive RO RO Drive",
+            "Dekotah: 4-8:30 5-8:30 — 5-8:30 5-8:30 4-8:30 —",
+            "Kyler: — — 5-0 5-0 — — —",
+            "Thomas: 4-10 5-0 — 10-3 5-0 9-5 9-4",
+            "Connor: 5-0 — 5-0 5-0 — — 5-0",
+            "Skylar: — — 5-0 5-0 — 5-0 5-0",
+            "Mychael: RO — — — — — —",
+          ]) + week("Sept 27–Oct 3, rows on that sheet", [
+            "Kim: 4-0 — — — — 5-0 4-0",
+            "Nate: 5-C — — 5-C 5-C 5-C 5-C",
+            "Matt: — 9-4 4-4 4-4 9-4 — —",
+            "Josue: 10-5 4-C 5-C — — 10-5 10-7",
+            "Nacho: — — — — — 4-0 —",
+            "Hunter: 10-5 4-C 4-0 4-0 4-0 4-0 —",
+          ]);
+        }
         if (id === "notes") {
           return [
             sheet("Employee meal", [
@@ -404,7 +454,7 @@
             sheet("Schedule", [
               "Schedule changes need the owner or the manager. Effective now",
               "A day-off request is not a guarantee. First come",
-              "The paper grids stay on paper. Names are not on this page",
+              "The face-up weeks are on Schedules. The phone list is not on this page",
             ]),
           ].join("");
         }
@@ -498,6 +548,7 @@
       function openRoom(id) {
         room = id;
         const t = threadOf(id);
+        if (id === "schedules") known.schedule = true;
         if (!t.length && STARTERS[id]) {
           add(id, "as", STARTERS[id], bookExtra(id) + extraFor(id));
         }
@@ -535,7 +586,7 @@
         }
         if (kind === "schedules") {
           known.schedule = true;
-          return "The paper week stays on paper. Names stay off this page. We do not copy hours off a photo. Posted in / posted out still needs a grid we can read without names. Punches are Missing. No invented hours. No invented overtime.";
+          return "Face-up weeks are on the schedule. Sideways photos are not guessed. Letters stay as written. Punches are Missing. No invented hours. No invented overtime.";
         }
         if (kind === "recipes") {
           return "Kept on the prep book. Handwritten lines stay the current card. Not a food-cost %.";

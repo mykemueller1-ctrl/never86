@@ -4,7 +4,7 @@
 **Date:** 2026-09-04  
 **Name lock:** The LLM plug-and-play desk for the **1-to-1 through 1-to-5 unit owner is Action Shift.** Command is the same loop when the group is bigger. Do not sell that owner a “Command Center.”  
 **Quality bar:** same as the 1P–3P / Audit path — honest labels, no vapor, no invented dollars.  
-**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book holds the prep binder, portion card, pizza-side and close lists, and the delivery-fee sheet. Staff names, phone numbers, the door code, and the wifi password stay off this page. `/demo/command.html` redirects here.
+**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book holds the prep binder, portion card, pizza-side and close lists, and the delivery-fee sheet. Schedules holds the two face-up weeks. Phone numbers, the door code, and the wifi password stay off this page. `/demo/command.html` redirects here.
 
 ---
 
@@ -108,7 +108,7 @@ Voice: short. Concrete. Not a robot. Not Myke. See `docs/TWO_TRACKS.md`.
 | **Kitchen notes** | Weight spec, label / date / rotate, call-out rule. | Two marked-out portion lines are not copied. **No names.** |
 | **Dining-room checklist** | Pizza-side duties and the close list. Mop waits on the bartender or manager on duty. | Marked-out lines are not copied. No drawer totals. |
 | **Driver notes** | Delivery fee by stop. | No guest address. **No phone list. No door code. No wifi password.** |
-| **Employee notes** | Meal rule. Schedule changes need the owner or the manager. Day off is not a guarantee. | Paper grids stay on paper. **No names.** |
+| **Employee notes** | Meal rule. Schedule changes need the owner or the manager. Day off is not a guarantee. | Phone list stays off this page. |
 | **Late / stay-late drift** | Clock vs posted out. | **Missing until punches.** Do not invent overtime or “they stayed late.” |
 | **Order guides / Invoices** | Later. | Invoice unlocks SKU drift. Invoice ≠ COGS. |
 
@@ -180,7 +180,7 @@ Live probes (2026-09-03, this run):
 - Wired Thanx / Marqii / Looker / EONR (scaffolds in `agents/`, not Command UI).
 - `never86-command-center-v2` and `taco-bamba-command-center` as GitHub repos (see §6).
 
-**Now on this branch (static):** `public/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book is the binder: recipes, portion weights, dining-room lists, delivery fees, meal rule. Handwritten lines are the current card. Marked-out lines are not copied. Names, phone numbers, door code, and wifi password are not on the page. Paper schedules stay on paper. Not a food-cost %. Not wired to ops DB. `public/demo/command.html` redirects here.
+**Now on this branch (static):** `public/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book is the binder: recipes, portion weights, dining-room lists, delivery fees, meal rule. Handwritten lines are the current card. Marked-out lines are not copied. Schedules has the two face-up weeks. Sideways weeks are not guessed. Phone numbers, door code, and wifi password are not on the page. Not a food-cost %. Not wired to ops DB. `public/demo/command.html` redirects here.
 
 ---
 
