@@ -4,7 +4,7 @@
 **Date:** 2026-09-04  
 **Name lock:** The LLM plug-and-play desk for the **1-to-1 through 1-to-5 unit owner is Action Shift.** Command is the same loop when the group is bigger. Do not sell that owner a “Command Center.”  
 **Quality bar:** same as the 1P–3P / Audit path — honest labels, no vapor, no invented dollars.  
-**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules (labor cards + report spawn from the schedule). Floor books spawn after that: recipes from the menu; kitchen notes, dining-room checklist, driver notes, and the employee note from the schedule. `/demo/command.html` redirects here.
+**Try-it on this branch:** `/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book holds the prep binder, portion card, pizza-side and close lists, and the delivery-fee sheet. Staff names, phone numbers, the door code, and the wifi password stay off this page. `/demo/command.html` redirects here.
 
 ---
 
@@ -104,11 +104,11 @@ Voice: short. Concrete. Not a robot. Not Myke. See `docs/TWO_TRACKS.md`.
 | **Schedules** | The week they already posted. In and out per seat. | We **do not** auto-write schedules today. No invented hours. |
 | **Labor cards** (spawned) | Each row on that schedule: station, posted in, posted out. FOH / BOH / Delivery / Dish live here. | Posted times Verified when on the schedule. **Punch ≠ schedule.** |
 | **Labor report** (spawned) | Headcount by station — tribal knowledge of *this* shop’s workflow. | Count of posted seats. Not a national norm. |
-| **Recipes** (spawned from Menu) | What’s in the plate. Sample: smash burger — bun, patty, cheese. | Price stays on the menu. Yield **Missing**. **Not a food-cost %.** |
-| **Kitchen notes** (spawned from Back of house) | Line open / mid / close: station set, temps, 86 board, fire times, labels. | Sample only. No count invented. |
-| **Dining-room checklist** (spawned from Front of house) | Server open, shift, close: sidework, specials, allergy ask, reset. | No drawer totals. No staff names. |
-| **Driver notes** (spawned from Delivery) | Bag check, hot and cold split, receipt back. | No guest address. |
-| **Employee notes** (spawned once the schedule is in) | One line the shift can read. | Not a write-up. Not a personnel file. **No names.** |
+| **Recipes** | Prep book from the binder: sauces, rubs, queso, mac, ranch, taco base, pizza sauce. | Handwritten line is the current card. Marked-out lines are not copied. **Not a food-cost %.** |
+| **Kitchen notes** | Weight spec, label / date / rotate, call-out rule. | Two marked-out portion lines are not copied. **No names.** |
+| **Dining-room checklist** | Pizza-side duties and the close list. Mop waits on the bartender or manager on duty. | Marked-out lines are not copied. No drawer totals. |
+| **Driver notes** | Delivery fee by stop. | No guest address. **No phone list. No door code. No wifi password.** |
+| **Employee notes** | Meal rule. Schedule changes need the owner or the manager. Day off is not a guarantee. | Paper grids stay on paper. **No names.** |
 | **Late / stay-late drift** | Clock vs posted out. | **Missing until punches.** Do not invent overtime or “they stayed late.” |
 | **Order guides / Invoices** | Later. | Invoice unlocks SKU drift. Invoice ≠ COGS. |
 
@@ -180,7 +180,7 @@ Live probes (2026-09-03, this run):
 - Wired Thanx / Marqii / Looker / EONR (scaffolds in `agents/`, not Command UI).
 - `never86-command-center-v2` and `taco-bamba-command-center` as GitHub repos (see §6).
 
-**Now on this branch (static, sample only):** `public/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Labor cards / report spawn from the schedule. Floor books spawn after: recipes from the menu; kitchen notes, dining-room checklist, and driver notes from the station card; employee note once the schedule is in. Sample shop. No names, no guest address, no food-cost %. Not wired to ops DB. Not Bamba. `public/demo/command.html` redirects here.
+**Now on this branch (static):** `public/demo/action-shift.html` — one chat, one prompt. Left: Menu, Schedules. Floor book is the binder: recipes, portion weights, dining-room lists, delivery fees, meal rule. Handwritten lines are the current card. Marked-out lines are not copied. Names, phone numbers, door code, and wifi password are not on the page. Paper schedules stay on paper. Not a food-cost %. Not wired to ops DB. `public/demo/command.html` redirects here.
 
 ---
 
