@@ -15,6 +15,7 @@
 import { findColumn, num, parseCsv } from './csv/core';
 import { extractPdfTokens } from './pdfTextTokens';
 import { extractNativePdfText } from './pdqEodParse';
+import { readPrintedInvoiceNumber } from './ownerPaperFacts';
 import { looksLikeVendorSilence } from './vendorSilenceParse';
 
 export type EvidenceState =
@@ -125,8 +126,7 @@ function parseInvoiceDateFromBody(text: string, filename = ''): string | null {
 }
 
 function parseInvoiceNumber(text: string): string | null {
-  const m = text.match(/Invoice\s*(?:Number|#|No\.?)\s*[:#]?\s*([A-Za-z0-9][A-Za-z0-9._-]{2,})/i);
-  return m?.[1] ?? null;
+  return readPrintedInvoiceNumber(text);
 }
 
 export function extractPack(raw: string): string | null {

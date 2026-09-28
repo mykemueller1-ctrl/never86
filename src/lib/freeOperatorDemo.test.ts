@@ -180,8 +180,8 @@ describe('free operator demo pack', () => {
     expect(OWNER_SEAT_EOD.notThisDemo).toBe(true);
     expect(OWNER_SEAT_EOD.copy).toMatch(/close\+\{seat\}@inbound\.never86\.ai/);
     expect(OWNER_SEAT_EOD.copy).toMatch(/not this public preview/i);
-    expect(PUBLIC_PREVIEW_COPY).toMatch(/source tags/i);
-    expect(PUBLIC_PREVIEW_COPY).toMatch(/private CTAP/i);
+    expect(PUBLIC_PREVIEW_COPY).toMatch(/this account/i);
+    expect(PUBLIC_PREVIEW_COPY).not.toMatch(/CTAP/i);
   });
 
   it('keeps CTap staff names, pars, and live Z dollars out of public demo copy', () => {

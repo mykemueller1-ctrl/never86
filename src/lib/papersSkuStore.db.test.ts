@@ -198,7 +198,7 @@ describe('papers sku database durability', () => {
       replacePapersSkuDocument('seat:right', 'doc', sauce('06/05/26', '900001', 'TH100', '9.000', '9.00')),
     ]);
     expect(hooks.maxDepth).toBe(2);
-    expect((await savedLines('seat:left'))[0].row_json.unitPrice?.amount).toBe(1.25);
+    expect((await savedLines('seat:left'))[0].row_json.unitPrice?.amount).toBe(12.5);
     expect((await savedLines('seat:right'))[0].row_json.unitPrice?.amount).toBe(9);
   }, 30_000);
 
@@ -307,7 +307,7 @@ describe('papers sku database durability', () => {
       sku: 'TH100',
       priorPeriod: '2026-W23',
       currentPeriod: '2026-W24',
-      priorPrice: 1,
+      priorPrice: 10,
       currentPrice: 2.25,
     }));
 
@@ -467,10 +467,10 @@ describe('papers sku database durability', () => {
     await replacePapersSkuDocument(south, 'week', sauce('06/12/26', '900002', 'TH100', '9.000', '9.00'), email);
     let active = south;
     expect(papersSkuRowsForStore(active, '2026-W24')[0].unitPrice.amount).toBe(9);
-    expect(papersSkuRowsForStore(north, '2026-W23')[0].unitPrice.amount).toBe(1.25);
+    expect(papersSkuRowsForStore(north, '2026-W23')[0].unitPrice.amount).toBe(12.5);
     expect(papersSkuRowsForStore(email)).toEqual([]);
     active = north;
-    expect(papersSkuCompareForStore(active)?.compare?.rows[0].currentPrice).toBe(1.25);
+    expect(papersSkuCompareForStore(active)?.compare?.rows[0].currentPrice).toBe(12.5);
     expect(papersSkuCompareForStore(south)?.compare?.rows[0].currentPrice).toBe(9);
 
     await reopenDatabase();

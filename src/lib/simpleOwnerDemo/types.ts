@@ -59,6 +59,14 @@ export type SimpleOwnerAskRecord = {
   createdAt: string;
 };
 
+export type OwnerSeatPaper = {
+  id: string;
+  filename: string;
+  evidenceKind: EvidenceKind;
+  createdAt: string;
+  summary: string;
+};
+
 export type SimpleOwnerReadiness = {
   operatorId: string;
   evidence: PrimeCostEvidence[];
@@ -69,6 +77,7 @@ export type SimpleOwnerReadiness = {
   uploadCount: number;
   askCount: number;
   sourceTags: SourceTag[];
+  papers: OwnerSeatPaper[];
   lastWeekPrime: LastWeekPrimeSnapshot;
 };
 

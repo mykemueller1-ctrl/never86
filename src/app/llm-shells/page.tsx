@@ -20,10 +20,10 @@ const STARTERS = [
 const PROVIDERS = [
   {
     name: 'Grok',
-    status: 'Preferred explain path · remote MCP + optional XAI_API_KEY',
+    status: 'Preferred explain path · remote MCP. Grok explains after the formula.',
     steps: [
       'The free owner seat is on never86.ai. Do not onboard operators on ChatGPT.',
-      'Optional: set XAI_API_KEY so One Seat can ask Grok to explain a formula card.',
+      'Grok can explain a formula card after the formula runs. It does not invent the dollars.',
       'Or open grok.com/connectors → New Connector → Custom and enter the public MCP URL.',
     ],
     href: 'https://docs.x.ai/grok/connectors',
@@ -96,7 +96,7 @@ export default function LlmShellsPage() {
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
           The public operator door is One Seat on never86.ai. Operators claim the free owner seat here, not on ChatGPT.
-          Grok can explain a card after the formula runs when <code>XAI_API_KEY</code> is set. This is not a Grok-resale product.
+          Grok can explain a card after the formula runs. It does not invent the dollars. This is not a Grok-resale product.
           The public MCP still reads only the numbers or CSV you deliberately send. It cannot log into a POS or move money.
         </p>
 

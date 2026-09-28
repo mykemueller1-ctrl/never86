@@ -70,17 +70,17 @@ export function InvoiceCompareClient() {
         filename?: string;
         error?: string;
       };
-      const honesty: HonestyLabel = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
+      const honesty: HonestyLabel = data.honesty === 'Verified' || data.honesty === 'Estimated' ? data.honesty : 'Missing';
       const note = data.note || data.error || 'Invoice text is Missing. No invented $.';
       const landed = { honesty, note };
       if (slot === 'prior') {
         setPriorFile(landed);
         setPriorName(data.filename || file.name || 'prior');
-        setPrior(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+        setPrior(honesty !== 'Missing' && data.text?.trim() ? data.text : '');
       } else {
         setCurrentFile(landed);
         setCurrentName(data.filename || file.name || 'current');
-        setCurrent(honesty === 'Estimated' && data.text?.trim() ? data.text : '');
+        setCurrent(honesty !== 'Missing' && data.text?.trim() ? data.text : '');
       }
       setStatus('idle');
     } catch {
@@ -196,9 +196,9 @@ export function InvoiceCompareClient() {
       <p className={styles.eyebrow}>YOUR PAPERS · FORMULAS FIRST</p>
       <h2>Paste two invoices, or drop a PDF or CSV.</h2>
       <p className={styles.note}>
-        Native CSV, TXT, or invoice PDF text. HEIC photos stay Missing — no OCR, no invented $. Same SKU and pack. Missing prior stays Missing — not $0.
+        Native CSV, TXT, or invoice PDF text. You can drop more than one file, including JPG and PNG. Photos stay Missing until the text can be read. We will not guess a dollar. Same SKU and pack. The case price on the invoice is what we compare. A missing prior price stays missing. It is not $0.
+        Files dropped here without signing in are saved on the server for this browser. Sign in to keep them on your owner account.
         The boxes below start with a fictional demo. Gmail is not connected on this page.
-        Grok can explain the card when <code>XAI_API_KEY</code> is set. It does not invent the dollars.
       </p>
       {isGoldSampleInvoices(prior, current) ? (
         <HonestyLegend demo active="Estimated" note={GOLD_SAMPLE_HONESTY_NOTE} />
@@ -211,10 +211,12 @@ export function InvoiceCompareClient() {
             className={styles.file}
             type="file"
             accept={INVOICE_UPLOAD_ACCEPT}
+            multiple
             aria-label="Prior invoice file"
             onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void ingestFile('prior', file);
+              const files = Array.from(event.target.files ?? []);
+              if (files[0]) void ingestFile('prior', files[0]);
+              if (files[1]) void ingestFile('current', files[1]);
             }}
           />
           <textarea className={styles.area} value={prior} onChange={(e) => setPrior(e.target.value)} />
@@ -226,6 +228,7 @@ export function InvoiceCompareClient() {
             className={styles.file}
             type="file"
             accept={INVOICE_UPLOAD_ACCEPT}
+            multiple
             aria-label="Current invoice file"
             onChange={(event) => {
               const file = event.target.files?.[0];
@@ -271,7 +274,7 @@ export function InvoiceCompareClient() {
                 {row.sku} · {row.description || row.vendor}
                 {row.priorPrice != null && row.currentPrice != null
                   ? ` · ${money(row.priorPrice)} → ${money(row.currentPrice)}`
-                  : ' · no invented $'}
+                  : ' · price missing'}
                 {row.flagged && row.dollarsObserved != null ? ` · +${money(row.dollarsObserved)}` : ''}
               </p>
             </div>

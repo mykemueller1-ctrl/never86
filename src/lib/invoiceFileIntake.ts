@@ -10,7 +10,7 @@ import type { HonestyLabel } from './oneSeatPublicWin';
 export const MAX_INVOICE_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 export const INVOICE_UPLOAD_ACCEPT =
-  '.pdf,.csv,.txt,.heic,.heif,application/pdf,text/csv,text/plain,image/heic,image/heif';
+  '.pdf,.csv,.txt,.heic,.heif,.jpg,.jpeg,.png,application/pdf,text/csv,text/plain,image/heic,image/heif,image/jpeg,image/png';
 
 const HEIF_BRANDS = new Set(['heic', 'heix', 'hevc', 'heif', 'mif1', 'msf1']);
 
@@ -68,16 +68,19 @@ export function readPublicInvoiceUpload(
       honesty: 'Missing',
       filename: safeName,
       text: '',
-      note: 'HEIC photo landed. Native invoice text is Missing — no OCR on this seat. Paste the lines or drop a PDF or CSV. No invented $.',
+      note: 'HEIC photo landed. The text on it cannot be read here. Paste the lines or drop a PDF or CSV. We will not guess a dollar.',
     };
   }
   if (!allowedText(safeName, contentType, bytes)) {
+    const photo = /\.(jpe?g|png|gif|webp)$/i.test(safeName) || contentType.toLowerCase().startsWith('image/');
     return {
       success: true,
       honesty: 'Missing',
       filename: safeName,
       text: '',
-      note: 'This file has no native invoice text on this seat. Drop a PDF, CSV, or TXT. HEIC stays Missing. No invented $.',
+      note: photo
+        ? 'JPG or PNG landed. The text on the photo cannot be read on this page, so the total stays Missing.'
+        : 'This file has no invoice text we can read. Drop a PDF, CSV, or TXT. A photo stays Missing until the text can be read.',
     };
   }
   const parsed = parseSeatInvoiceBytes(bytes, safeName);

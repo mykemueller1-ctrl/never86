@@ -8,7 +8,7 @@ import {
   CAPTURE_SITEMAP_PRIORITY,
   CAPTURE_SHIP_ORDER,
 } from '@/lib/captureLandings';
-import { AEO_PAGE_LASTMOD, ISSUE_122_3P_SLUGS, SITE_LASTMOD, WWW } from '@/lib/seoAeo';
+import { AEO_PAGE_LASTMOD, ISSUE_122_3P_SLUGS, PUBLIC_FUNNEL_LASTMOD, SITE_LASTMOD, WWW } from '@/lib/seoAeo';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -88,7 +88,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/terms`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/people`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/story`, lastModified: now, changeFrequency: 'monthly', priority: 0.92 },
+    { url: `${BASE}/story`, lastModified: PUBLIC_FUNNEL_LASTMOD, changeFrequency: 'monthly', priority: 0.92 },
+    { url: `${BASE}/faq`, lastModified: PUBLIC_FUNNEL_LASTMOD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${BASE}/changelog`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}/case/walked-the-number-back`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
   ];

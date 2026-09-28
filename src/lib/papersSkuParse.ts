@@ -13,6 +13,7 @@ import {
   type PapersLabeledField,
   type PapersLineItem,
 } from '@/lib/papersScanTypes';
+import { readPrintedInvoiceNumber } from '@/lib/ownerPaperFacts';
 import type { VendorInvoiceDocument, VendorInvoiceLine } from '@/lib/vendorInvoiceParse';
 
 export type PapersSkuRow = {
@@ -186,6 +187,7 @@ function dispatchSkuTokens(tokens: string[], filename: string): PapersSkuRow[] {
     ?? parseNorthern(tokens, filename)
     ?? parseVestis(tokens, filename)
     ?? parsePfg(tokens, filename)
+    ?? parseSimpleInvoice(tokens, filename)
     ?? [];
 }
 
@@ -339,6 +341,18 @@ function isPfgProduct(tokens: string[], index: number): boolean {
     && /\//.test(tokens[index + 2] || '');
 }
 
+const PFG_HEADER_WORDS = new Set([
+  'DRY', 'FROZEN', 'GOODS', 'RESTAURANT', 'SUPPLY', 'SCOTT', 'SELIM',
+  'INVOICE', 'PAGE', 'CUSTOMER', 'DATE', 'TOTAL', 'TAX',
+]);
+
+function isSkuToken(token: string): boolean {
+  return /^[A-Z]{0,4}\d{2,}[A-Z0-9-]*$/.test(token)
+    && !token.includes('/')
+    && !token.includes('"')
+    && !/^CATG/i.test(token);
+}
+
 function isPfgPrice(tokens: string[], index: number): boolean {
   return /^\d+$/.test(tokens[index] || '')
     && /^\d+$/.test(tokens[index + 1] || '')
@@ -371,7 +385,7 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
   let i = 0;
   while (i < tokens.length) {
     if (tokens[i] === 'DRY' || tokens[i] === 'DRYGOODS' || tokens[i] === 'FROZEN') sectionFood = true;
-    if (rows.length && /^[A-Z]{2,12}$/.test(tokens[i] || '') && !['DRY', 'FROZEN', 'GOODS'].includes(tokens[i])) {
+    if (rows.length && /^[A-Z]{2,12}$/.test(tokens[i] || '') && !PFG_HEADER_WORDS.has(tokens[i])) {
       const soon = [1, 2, 3].some((step) => isPfgProduct(tokens, i + step));
       if (soon) {
         const previous = rows[rows.length - 1];
@@ -399,9 +413,14 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
     let itemCode: string | null = null;
     while (i < tokens.length && !isPfgPrice(tokens, i) && !isPfgProduct(tokens, i)) {
       const token = tokens[i];
-      if (!itemCode && /^[A-Z]{0,4}\d{2,}[A-Z0-9-]*$/.test(token) && !token.includes('/') && !token.includes('"')) {
+      if (/^CATG/i.test(token)) {
+        i += 1;
+        if (desc.length > 24) break;
+        continue;
+      }
+      if (isSkuToken(token)) {
         itemCode = token;
-      } else {
+      } else if (!PFG_HEADER_WORDS.has(token)) {
         desc.push(token);
       }
       i += 1;
@@ -410,16 +429,22 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
     let unitPrice: number | null = null;
     let extended: number | null = null;
     if (isPfgPrice(tokens, i)) {
-      unitPrice = looseDecimal(tokens[i + 3]);
       i += 4;
       if (tokens[i] === '**') i += 1;
-      const inline = isDecimalToken(tokens[i]) ? tokens[i] : null;
-      if (inline) i += 1;
-      if (isMoneyToken(tokens[i])) {
-        extended = looseDecimal(tokens[i]);
+      const follow: string[] = [];
+      while (follow.length < 2 && isDecimalToken(tokens[i]) && !isPfgProduct(tokens, i)) {
+        follow.push(tokens[i]);
         i += 1;
-      } else if (inline && isMoneyToken(inline)) {
-        extended = looseDecimal(inline);
+      }
+      if (follow.length >= 2) {
+        unitPrice = looseDecimal(follow[0]);
+        extended = looseDecimal(follow[1]);
+      } else if (follow.length === 1) {
+        extended = looseDecimal(follow[0]);
+        const qty = qtyToken(quantityRaw);
+        unitPrice = extended != null && qty != null && qty > 0
+          ? Math.round((extended / qty) * 10000) / 10000
+          : extended;
       }
     }
     const productName = [pack, ...desc].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
@@ -436,6 +461,44 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
     }));
   }
   return rows.length ? rows : null;
+}
+
+function parseSimpleInvoice(tokens: string[], filename: string): PapersSkuRow[] | null {
+  const blob = tokens.join('\n');
+  const hay = `${filename}\n${blob}`;
+  if (!/central iowa|\binvoice\b/i.test(hay)) return null;
+  if (tokens.some((_, index) => isPfgProduct(tokens, index))) return null;
+  if (tokens.includes('BILL QTY') || tokens.includes('Item #') || tokens.includes('Extended')) return null;
+  const invoice = readPrintedInvoiceNumber(blob);
+  const totalMatch = blob.match(
+    /(?:invoice\s*total|amount\s*due|total\s*due|balance\s*due)\s*[:\-]?\s*\$?\s*([\d,]+\.\d{2})/i,
+  );
+  const total = totalMatch ? looseDecimal(totalMatch[1].includes('.') ? totalMatch[1] : `${totalMatch[1]}.00`) : null;
+  if (!invoice || total == null) return null;
+  const lineMatch = blob.match(/(?:^|\n)\s*([A-Za-z][A-Za-z ]{2,40})\s*\n\s*([\d,]+\.\d{2})\s*(?:\n|$)/);
+  const item = lineMatch?.[1]?.trim() || 'line';
+  const lineAmount = lineMatch ? looseDecimal(lineMatch[2]) : total;
+  const date = dateFromMdy(blob);
+  const dated = metaDate(date);
+  const vendor = /central iowa/i.test(hay)
+    ? 'Central Iowa'
+    : (/vestis/i.test(hay) ? 'Vestis' : 'Vendor');
+  const header: Header = {
+    vendor: verifiedText(vendor),
+    documentDate: dated.field,
+    documentNumber: verifiedText(invoice),
+    isoWeek: dated.isoWeek,
+  };
+  return [makeRow(header, {
+    productName: item,
+    itemCode: invoice,
+    quantity: 1,
+    quantityRaw: '1',
+    unit: 'EA',
+    unitPrice: lineAmount,
+    extended: lineAmount,
+    category: categoryField('other'),
+  })];
 }
 
 function parseVestis(tokens: string[], filename: string): PapersSkuRow[] | null {

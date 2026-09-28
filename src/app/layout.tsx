@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono, Newsreader } from 'next/font/google';
 import './globals.css';
 import { LogicToggle } from '@/components/LogicToggle';
 import { DiscoveryReferralTracker } from '@/components/DiscoveryReferralTracker';
+import { SiteAnalytics } from '@/components/SiteAnalytics';
+import { SHARE_IMAGE } from '@/lib/seoAeo';
 
 const display = Inter({
   subsets: ['latin'],
@@ -28,9 +30,12 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.never86.ai'),
-  title: "Never86'd — Restaurant operating intelligence",
+  title: {
+    default: "Never86'd — Find the leak. Keep the receipt.",
+    template: "%s",
+  },
   description:
-    "Evidence-first restaurant operating intelligence for delivery-marketplace fees, payout reconciliation, margin exceptions, and inside-the-four-walls execution. Built by Myke Mueller and a team with real restaurant, product, and hospitality-technology experience.",
+    "Back office for independent restaurants. Drop invoices and Z reports. The owner seat answers from your papers. Try a sample free. No card. First owner seat is free.",
   applicationName: "Never86'd",
   keywords: [
     'restaurant operating intelligence',
@@ -45,16 +50,18 @@ export const metadata: Metadata = {
   creator: 'Mychael “Myke” Mueller',
   publisher: "Never86'd",
   openGraph: {
-    title: "Never86'd — Restaurant operating intelligence",
-    description: 'Find the margin leak, attach the source, route the action, and verify what changed.',
+    title: "Never86'd — Find the leak. Keep the receipt.",
+    description: 'Drop invoices and Z reports. The owner seat answers from your papers. First seat is free. No card.',
     url: 'https://www.never86.ai',
     siteName: "Never 86'd",
     type: 'website',
+    images: [{ url: SHARE_IMAGE, width: 1200, height: 630, alt: "Never 86'd operator demo" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Never86'd — Restaurant operating intelligence",
-    description: 'Evidence-first intelligence for restaurant owners and multi-unit operators.',
+    title: "Never86'd — Find the leak. Keep the receipt.",
+    description: 'Independent restaurant back office. Try it free. No card. First owner seat is free.',
+    images: [SHARE_IMAGE],
   },
   icons: { icon: '/favicon.ico' },
 };
@@ -74,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       { '@type': 'Person', name: 'Rik Reinhardt', jobTitle: 'Cofounder and hospitality systems' },
     ],
     slogan: 'The restaurant and its problems come first.',
-    description: 'Independent, evidence-first restaurant operating intelligence built by active restaurant operator Myke Mueller. Never86d explains what restaurant-held evidence supports, what is missing, who acts next, and whether the result changed.',
+    description: "Back office for independent restaurants, built by Myke Mueller while he runs Community Tap & Pizza in Fort Dodge, Iowa. An owner drops in invoices and Z reports. The seat answers from those papers and tags every figure Verified, Estimated, or Missing.",
     sameAs: ['https://www.linkedin.com/company/never-86-d'],
     knowsAbout: [
       'restaurant operations',
@@ -99,20 +106,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
   const applicationJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
+    '@type': 'SoftwareApplication',
     '@id': 'https://www.never86.ai/#application',
     name: "Never86'd",
     url: 'https://www.never86.ai/',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     provider: { '@id': 'https://www.never86.ai/#organization' },
-    audience: { '@type': 'Audience', audienceType: 'Restaurant owners and multi-unit restaurant operators' },
+    audience: { '@type': 'Audience', audienceType: 'Independent restaurant owners' },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: 'First owner seat is free. No card to start. Extra seats are not priced yet.',
+    },
     featureList: [
-      'Delivery-marketplace statement audit',
-      'Payout and bank reconciliation',
-      'Restaurant margin exception detection',
-      'Role-routed operating actions',
-      'Verified, Estimated, and Unverified source labels',
+      'Invoice and Z-report owner seat',
+      'Verified, Estimated, and Missing labels',
+      'DoorDash statement math from totals you type',
+      'Free sample with no account',
     ],
   };
   return (
@@ -129,6 +141,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <DiscoveryReferralTracker />
         <LogicToggle />
+        <SiteAnalytics />
       </body>
     </html>
   );

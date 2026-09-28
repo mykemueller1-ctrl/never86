@@ -17,6 +17,11 @@ import {
   reportSourceTagsForSeat,
 } from '@/lib/reportAdapters';
 import { isCtapSeat, restaurantNameHintFromOperatorId } from '@/lib/seatIsolation';
+import {
+  evidenceKindForPaperFacts,
+  extractPaperFacts,
+  paperFactTags,
+} from '@/lib/ownerPaperFacts';
 import { buildObjectKey, classifyUpload } from './classify';
 import { composeAskAnswer, readinessFromUploads } from './compose';
 import type {
@@ -30,6 +35,38 @@ import type {
   SourceTag,
 } from './types';
 import { SIMPLE_OWNER_MAX_BYTES } from './types';
+
+const PAPER_FACT_PREFIX = 'paper-fact:v1:';
+
+async function hydratePaperFactUploads(
+  uploads: SimpleOwnerUploadRecord[],
+  objects: SimpleOwnerObjectStore,
+): Promise<SimpleOwnerUploadRecord[]> {
+  if (!objects.get) return uploads;
+  return Promise.all(
+    uploads.map(async (upload) => {
+      if (upload.sourceTags.some((tag) => tag.source.startsWith(PAPER_FACT_PREFIX))) return upload;
+      if (detectReport(upload.filename, upload.contentType)) return upload;
+      const blob = await objects.get?.({ operatorId: upload.operatorId, objectKey: upload.objectKey });
+      if (!blob) return upload;
+      let text = '';
+      try {
+        text = decodeInvoiceSource(blob.bytes, upload.filename);
+      } catch {
+        return upload;
+      }
+      const facts = extractPaperFacts(upload.filename, text);
+      const tags = paperFactTags(upload.filename, text);
+      const evidenceKind = evidenceKindForPaperFacts(facts, upload.filename, upload.evidenceKind);
+      if (!tags.length && evidenceKind === upload.evidenceKind) return upload;
+      return {
+        ...upload,
+        evidenceKind,
+        sourceTags: [...upload.sourceTags, ...tags],
+      };
+    }),
+  );
+}
 
 async function hydrateToastUploads(
   uploads: SimpleOwnerUploadRecord[],
@@ -145,7 +182,11 @@ export function createSimpleOwnerDemoService(deps: {
       deps.repo.countAsks(operatorId),
     ]);
     const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
-    return readinessFromUploads(operatorId, uploads, askCount, seatName);
+    const hydrated = await hydratePaperFactUploads(
+      await hydrateToastUploads(uploads, deps.objects, seatName),
+      deps.objects,
+    );
+    return readinessFromUploads(operatorId, hydrated, askCount, seatName);
   }
 
   return {
@@ -170,6 +211,14 @@ export function createSimpleOwnerDemoService(deps: {
 
       const createdAt = now();
       const classified = classifyUpload(filename, contentType, folder);
+      let decoded = '';
+      try {
+        decoded = decodeInvoiceSource(bytes, filename);
+      } catch {
+        decoded = '';
+      }
+      const facts = detectReport(filename, contentType) ? [] : extractPaperFacts(filename, decoded);
+      const evidenceKind = evidenceKindForPaperFacts(facts, filename, classified.kind);
       const existing = await deps.repo.listUploads(operatorId);
       const identityTags = invoiceIdentityTags(filename, contentType, bytes, existing);
       const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
@@ -188,8 +237,8 @@ export function createSimpleOwnerDemoService(deps: {
         filename: filename.trim(),
         contentType: contentType || 'application/octet-stream',
         byteLength: bytes.byteLength,
-        evidenceKind: classified.kind,
-        sourceTags: [...classified.sourceTags, ...identityTags, ...toastTags],
+        evidenceKind,
+        sourceTags: [...classified.sourceTags, ...paperFactTags(filename, decoded), ...identityTags, ...toastTags],
         objectKey: stored.objectKey,
         storageBackend: stored.storageBackend,
         createdAt: createdAt.toISOString(),
@@ -218,10 +267,13 @@ export function createSimpleOwnerDemoService(deps: {
       }
 
       const seatName = restaurantName ?? restaurantNameHintFromOperatorId(operatorId);
-      const uploads = await hydrateToastUploads(
-        await deps.repo.listUploads(operatorId),
+      const uploads = await hydratePaperFactUploads(
+        await hydrateToastUploads(
+          await deps.repo.listUploads(operatorId),
+          deps.objects,
+          seatName,
+        ),
         deps.objects,
-        seatName,
       );
       const readiness = readinessFromUploads(operatorId, uploads, 0, seatName);
       const answer = composeAskAnswer({

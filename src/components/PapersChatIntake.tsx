@@ -18,7 +18,7 @@ import {
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 type ThreadLine = { id: string; text: string };
-type ChatReceipt = { honesty: 'Estimated' | 'Missing'; note: string };
+type ChatReceipt = { honesty: 'Verified' | 'Estimated' | 'Missing'; note: string };
 
 function SlotActions({
   id,
@@ -53,28 +53,28 @@ function FileDrops({
   return (
     <div className={styles.grid} id="photo" style={{ scrollMarginTop: 24 }}>
       <label>
-        Photo (HEIC stays Missing — no OCR)
+        Photo, JPG, or PNG (no readable text stays Missing)
         <input
           className={styles.file}
           type="file"
           accept={INVOICE_UPLOAD_ACCEPT}
+          multiple
           disabled={busy}
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) onFile('photo', file);
+            for (const file of Array.from(event.target.files ?? [])) onFile('photo', file);
           }}
         />
       </label>
       <label>
-        Invoice PDF, CSV, or TXT
+        Invoice PDF, CSV, TXT, JPG, or PNG
         <input
           className={styles.file}
           type="file"
           accept={INVOICE_UPLOAD_ACCEPT}
+          multiple
           disabled={busy}
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) onFile('invoices', file);
+            for (const file of Array.from(event.target.files ?? [])) onFile('invoices', file);
           }}
         />
       </label>
@@ -160,7 +160,7 @@ export function PapersChatIntake() {
           body: JSON.stringify({ text }),
         });
         const data = (await res.json()) as { note?: string; honesty?: string };
-        const honesty = data.honesty === 'Estimated' ? 'Estimated' : 'Missing';
+        const honesty = data.honesty === 'Verified' || data.honesty === 'Estimated' ? data.honesty : 'Missing';
         setReceipt({
           honesty,
           note: data.note || (honesty === 'Estimated'
@@ -181,9 +181,12 @@ export function PapersChatIntake() {
       body.set('file', file);
       const path = slot === 'photo' ? '/api/papers/photo' : '/api/papers/upload';
       const res = await fetch(path, { method: 'POST', body });
-      const data = (await res.json()) as { honesty?: HonestyLabel; note?: string; text?: string };
-      const parsed = data.honesty === 'Estimated' && Boolean(data.text?.trim());
-      const next = { ...marks, [slot]: parsed ? 'parsed' as const : 'named' as const };
+      const data = (await res.json()) as { honesty?: HonestyLabel; note?: string; text?: string; folder?: string };
+      const parsed = (data.honesty === 'Verified' || data.honesty === 'Estimated') && Boolean(data.text?.trim());
+      const landed = data.folder === 'z-eod' || data.folder === 'labor' || data.folder === 'invoices' || data.folder === 'photo'
+        ? data.folder
+        : slot;
+      const next = { ...marks, [landed]: parsed ? 'parsed' as const : 'named' as const };
       setMarks(next);
       push(data.note || 'File landed. Text is Missing. No invented $.');
     } catch {
@@ -199,7 +202,7 @@ export function PapersChatIntake() {
       <h2>What is still Missing</h2>
       <p className={styles.note}>
         {fileFirst
-          ? 'Gmail is not connected. Drive is not connected. A photo, a PDF, or this chat is the paper. A named paper stays Missing. No invented $.'
+          ? 'Gmail is not connected. Drive is not connected. A photo, a PDF, or this chat is the paper. A named paper stays Missing. A printed total on a file can be Verified. Files dropped here without signing in are saved on the server for this browser. Sign in to keep them on your owner account. No invented $.'
           : 'Naming a paper does not make it Verified. A parsed file is Estimated. Each folder stays Missing until a file lands. No invented $.'}
       </p>
       {fileFirst ? <FileDrops busy={busy} onFile={onFile} /> : null}

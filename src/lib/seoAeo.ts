@@ -1,4 +1,40 @@
+import type { Metadata } from 'next';
+
 export const WWW = 'https://www.never86.ai';
+
+/** Static share image. File-based opengraph-image.tsx also paints a card. */
+export const SHARE_IMAGE = `${WWW}/media/never86-landscape-v24-poster.jpg`;
+
+/** Pages rewritten for the honest public funnel. */
+export const PUBLIC_FUNNEL_LASTMOD = new Date('2026-09-27T13:00:00Z');
+
+export function publicPageMetadata(input: {
+  title: string;
+  description: string;
+  path: string;
+}): Metadata {
+  const url = input.path === '/' ? `${WWW}/` : `${WWW}${input.path}`;
+  const image = { url: SHARE_IMAGE, width: 1200, height: 630, alt: "Never 86'd — find the leak, keep the receipt" };
+  return {
+    title: input.title,
+    description: input.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: input.title,
+      description: input.description,
+      url,
+      siteName: "Never 86'd",
+      type: 'website',
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: input.title,
+      description: input.description,
+      images: [SHARE_IMAGE],
+    },
+  };
+}
 
 /** Content date for surfaces sharpened for GitHub issue #122 (GSC indexed 2026-08-21). */
 export const AEO_PAGE_LASTMOD = new Date('2026-08-26T17:00:00Z');

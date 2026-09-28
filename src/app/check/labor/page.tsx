@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HonestyLegend } from '@/components/HonestyLegend';
+import { PublicPaperDrop } from '@/components/PublicPaperDrop';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_LABOR } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
@@ -40,6 +41,7 @@ export default function CheckLaborPage() {
         </div>
         <p className={styles.note}>{GOLD_LABOR.claimBoundary}</p>
       </article>
+      <PublicPaperDrop label="Add a schedule or time clock (PDF, CSV, TXT, JPG, or PNG)" />
       <div className={styles.actions}>
         <Link className={styles.primary} href={ONE_SEAT_PATHS.onboard}>Claim free owner seat</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.operator}>Open the owner seat</Link>

@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
+import { FunnelLink } from '@/components/FunnelLink';
+import { publicPageMetadata } from '@/lib/seoAeo';
 import { HonestyLegend } from '@/components/HonestyLegend';
 import { InvoiceCompareClient } from '@/components/InvoiceCompareClient';
 import { InvoiceWinCard } from '@/components/InvoiceWinCard';
@@ -11,12 +12,12 @@ import { PapersReadiness } from '@/components/PapersReadiness';
 import { GOLD_MOZZARELLA, GOLD_SAMPLE_HONESTY_NOTE, ONE_SEAT_EQUALS, ONE_SEAT_ICP } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
-export const metadata: Metadata = {
-  title: 'Try the operator walk | Never86’d One Seat',
+export const metadata = publicPageMetadata({
+  path: '/try',
+  title: "Try it free — no card | Never86'd",
   description:
-    'What’s missing, invoices, labor, menu, and Ask. Fictional sample dollars. Gmail stays Missing until a pull lands.',
-  alternates: { canonical: 'https://www.never86.ai/try' },
-};
+    "A public sample with fictional dollars. No account. No card. Then claim the free owner seat or sign in.",
+});
 
 export default function TryPage() {
   return (
@@ -55,7 +56,8 @@ export default function TryPage() {
         ask={<PapersChatIntake />}
       />
       <div className={styles.actions}>
-        <Link className={styles.primary} href={ONE_SEAT_PATHS.onboard}>Claim free owner seat</Link>
+        <FunnelLink className={styles.primary} href={ONE_SEAT_PATHS.onboard} event="onboard_start">Claim free owner seat</FunnelLink>
+        <Link className={styles.secondary} href={ONE_SEAT_PATHS.login}>Sign in</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.chat}>Open the Missing map</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.seat}>Open the seat</Link>
         <Link className={styles.secondary} href={ONE_SEAT_PATHS.checkLabor}>Check labor papers</Link>
