@@ -2,6 +2,7 @@
  * SKU / line rows read off restaurant papers.
  * Every number is Verified only when that field is on the paper.
  * Missing stays Missing. Extended price is never qty × price.
+ * Unit price is never extension ÷ qty.
  * Photos with no text layer stay empty. This file does not OCR.
  */
 
@@ -429,6 +430,10 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
     let unitPrice: number | null = null;
     let extended: number | null = null;
     if (isPfgPrice(tokens, i)) {
+      // The decimal in this slot is the printed price per OZ/LB/EA.
+      // Two amounts after it are the printed case price and the printed extension.
+      // One amount is the extension alone. Do not divide that extension by quantity.
+      const perMeasure = looseDecimal(tokens[i + 3]);
       i += 4;
       if (tokens[i] === '**') i += 1;
       const follow: string[] = [];
@@ -441,10 +446,7 @@ function parsePfg(tokens: string[], filename: string): PapersSkuRow[] | null {
         extended = looseDecimal(follow[1]);
       } else if (follow.length === 1) {
         extended = looseDecimal(follow[0]);
-        const qty = qtyToken(quantityRaw);
-        unitPrice = extended != null && qty != null && qty > 0
-          ? Math.round((extended / qty) * 10000) / 10000
-          : extended;
+        unitPrice = perMeasure;
       }
     }
     const productName = [pack, ...desc].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
