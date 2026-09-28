@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Action Shift — owner seat · Never 86'd</title>
-    <meta name="description" content="One chat. One prompt. Menu and Schedules. Labor comes off the schedule. Sample shop only." />
+    <meta name="description" content="One chat. One prompt. Menu and Schedules. Floor books spawn from those. Sample shop only." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -48,6 +48,11 @@
       .card { border: 1px solid var(--line); background: #f7f3e8; border-radius: 12px; padding: 10px; text-align: left; cursor: pointer; font: inherit; }
       .card b { display: block; font-size: 14px; }
       .card span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+      .sheet { margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: #fffdf8; padding: 10px 12px; }
+      .sheet h3 { margin: 0 0 6px; font-size: 15px; }
+      .sheet ul { margin: 0; padding-left: 18px; }
+      .sheet li { margin: 2px 0; }
+      .sheet p { margin: 8px 0 0; }
       .dock { padding: 8px 16px 18px; }
       .box { max-width: 680px; margin: 0 auto; background: #fffdf8; border: 1px solid var(--line); border-radius: 22px; padding: 10px 12px 8px; }
       .box.hot { border-color: var(--go); }
@@ -75,6 +80,14 @@
           <button class="nav dim" type="button" data-room="cards">Labor cards</button>
           <button class="nav dim" type="button" data-room="report">Labor report</button>
         </div>
+        <p class="sec">Floor book</p>
+        <div class="roles">
+          <button class="nav" type="button" data-room="recipes">Recipes<small>Prep book. Not a food cost.</small></button>
+          <button class="nav" type="button" data-room="kitchen">Kitchen notes<small>Portions. Label, date, rotate.</small></button>
+          <button class="nav" type="button" data-room="dining">Dining room<small>Pizza side and close.</small></button>
+          <button class="nav" type="button" data-room="driver">Driver notes<small>Delivery fee by stop.</small></button>
+          <button class="nav" type="button" data-room="notes">Employee notes<small>Meal rule. No names.</small></button>
+        </div>
         <p class="sec">Later</p>
         <button class="nav dim" type="button" data-room="guides">Order guides</button>
         <button class="nav dim" type="button" data-room="invoices">Invoices</button>
@@ -93,7 +106,7 @@
               </div>
             </div>
           </div>
-          <p class="fine">Sample shop — not yours, not Bamba. We don’t invent food cost, labor $, or late hours. Invoice ≠ COGS. Punch ≠ schedule.</p>
+          <p class="fine">Prep book on this page. No staff names, phone numbers, door code, or wifi password. Not a food-cost %. Punch ≠ schedule.</p>
         </div>
       </main>
     </div>
@@ -107,8 +120,13 @@
 
       const STARTERS = {
         home: null,
-        menu: "What’s on the menu and what do you charge? Plate + price. Recipe and order guide come later — that’s how SKU drift stays honest when beef goes up.",
-        schedules: "Schedules are the thing you already write. Labor lives on that grid — who you posted, when they were supposed to walk in, when they were supposed to walk out. Drop the week. Then we spawn labor cards and a labor report. We do not write the week yet. No invented hours.",
+        menu: "Game day card is the price. The prep book is separate. Yield stays Missing. Not a food-cost %. The September daily grid is a photo — glare cells are not typed.",
+        schedules: "The week is on the paper grid. Names stay off this page. We do not copy hours off a photo. No invented hours. Punch ≠ schedule.",
+        recipes: "Prep book from the binder. Handwritten lines are the current card. Marked-out lines are not copied. Not a food-cost %.",
+        kitchen: "Portion card and the label rule. Two marked-out lines on the weight sheet are not copied. Call-out rule is here. No names.",
+        dining: "Pizza-side duties and the close list. Marked-out lines are not copied. Mop waits on the bartender or manager on duty. No drawer totals.",
+        driver: "Delivery fee by stop, from the posted sheet. Ask a manager if the stop is not on the list. No guest address, no phone list, no door code.",
+        notes: "Meal rule and the day-off rule. Schedule changes need the owner or the manager. No names on this page.",
         cards: "Labor cards spawn from the schedule. Drop the week first if it’s empty. Each card is a seat: posted in, posted out. Late drift only if the punch exists. Punch ≠ schedule. We don’t invent stay-late hours.",
         report: "Labor report spawns from the same schedule. How many people in each seat is how this shop actually runs — tribal knowledge, not a textbook. Late / stay-late stays Missing until punches land.",
         foh: "Front of house on the schedule. Posted in / posted out. Punch Missing — we will not say they stayed late.",
@@ -121,8 +139,13 @@
 
       const PLACE = {
         home: "Drop last night’s close, or pick Menu / Schedules.",
-        menu: "Burger $14. Cheese, bun, smash patty…",
+        menu: "Game day smash, quesadilla, wings…",
         schedules: "Mon–Sun, who you already posted, in and out…",
+        recipes: "Bun, smash patty, cheese… yield stays Missing.",
+        kitchen: "86 board, temps, fire times…",
+        dining: "Sidework, specials, allergy ask…",
+        driver: "Bag check, hot and cold…",
+        notes: "One line the shift needs…",
         cards: "A station from the schedule…",
         report: "How many on the floor, the line, dish…",
         foh: "Floor posted…",
@@ -135,7 +158,13 @@
 
       let room = "home";
       const threads = { home: [] };
-      const known = { close: false, menu: false, schedule: false, punches: false };
+      const known = { close: false, menu: true, schedule: false, punches: false };
+
+      function sheet(title, lines, method) {
+        const items = lines.map((line) => `<li>${line}</li>`).join("");
+        const how = method ? `<p>${method}</p>` : "";
+        return `<section class="sheet"><h3>${title}</h3><ul>${items}</ul>${how}</section>`;
+      }
 
       function threadOf(id) {
         if (!threads[id]) threads[id] = [];
@@ -162,21 +191,264 @@
         </div>`;
       }
 
+      function bookCard(id, title, span) {
+        return `<div class="cards"><button class="card" type="button" data-room="${id}"><b>${title}</b><span>${span}</span></button></div>`;
+      }
+
+      function bookExtra(id) {
+        if (id === "menu") {
+          return sheet("Game day card", [
+            "Game Day Smash $10.99 with a side",
+            "Quesadilla $12.99",
+            "Loaded nachos $12.99",
+            "Smoked bone-in wings (6) $9.99",
+            "Add queso $1.99",
+            "Domestic beer bucket (6) $18.00",
+            "Apple cider mimosa $5 on the September board",
+          ], "Football season. Daily specials that were glare on the September photo are not typed.");
+        }
+        if (id === "recipes") {
+          return [
+            sheet("Iowa sauce", [
+              "12 cups brown sugar — handwritten: 3 lbs",
+              "3 gallons ketchup",
+              "3 tbsp ground mustard",
+              "3 tbsp cayenne pepper",
+              "4 1/2 cups apple cider vinegar",
+              "4 1/2 cups molasses — handwritten on this line: 1 gal",
+              "4 1/2 cups Worcestershire",
+              "3/4 cup garlic powder",
+              "3/4 cup onion powder",
+              "6 tbsp black pepper",
+              "6 tbsp paprika",
+              "Handwritten: 7 1/2 cups honey — 1 half gal",
+            ], "Handwritten: mix in a 5 gallon bucket with a mixer."),
+            sheet("Georgia peach", [
+              "8 — 13 oz jars peach preserves",
+              "6 quarts Iowa sauce",
+            ], "Combine in an 8 quart cambro and mix well."),
+            sheet("KC fire / spicy BBQ", [
+              "6 quarts Iowa sauce",
+              "1/2 cup sriracha",
+              "1/2 cup red pepper flakes",
+            ], "Combine in an 8 quart cambro and mix well."),
+            sheet("Honey BBQ", [
+              "1 gallon Iowa BBQ sauce",
+              "3 cups honey",
+              "3 cups sugar",
+            ], "Combine in an 8 quart cambro and mix well."),
+            sheet("Taco base", [
+              "Bring 2 quarts water to a boil and add 1 bag refried beans",
+              "In an 8 quart cambro add 2 quarts taco sauce and 2 quarts pizza sauce",
+              "Add the refried beans and stir very well",
+            ], "Label, date, rotate."),
+            sheet("Ranch", [
+              "2 gallons mayo",
+              "4 1/2 gallons buttermilk",
+              "6 scoops ranch mix",
+            ], "In a 5 gallon bucket add all ingredients and mix well."),
+            sheet("Queso", [
+              "2 — 5 lb bricks white processed cheese",
+              "3/4 gallon milk",
+              "1 can Rotel, drained",
+            ], "Double boiler. Add milk. Cut the cheese into chunks. Medium heat. Stir often so it does not burn. When it is smooth, add the Rotel and stir through. Pour into an 8 quart cambro. Label, date, rotate."),
+            sheet("Mac cheese", [
+              "2 — 5 lb bricks yellow processed cheese",
+              "1 gallon milk",
+            ], "Double boiler. Add 1 gallon milk. Cut the cheese into chunks. Medium heat so it does not burn. Stir until melted and smooth. Pour into an 8 quart cambro. Label, date, rotate."),
+            sheet("Pizza sauce", [
+              "4 cans pizza sauce",
+              "Water: printed #10 can is crossed out. Handwritten: 1 3/4 can",
+              "1 1/2 small Pepsi cups pizza seasoning",
+              "1 cup parmesan cheese",
+            ], "Empty the sauce into a 5 gallon bucket. Rinse each can with the water. Add seasoning and parmesan. Mix very well. Label, date, rotate."),
+            sheet("Pizza seasoning", [
+              "2 — 6.5 oz containers Italian seasoning",
+              "3/4 bag parmesan cheese",
+              "2 cups garlic powder",
+              "1/4 cup celery salt",
+              "8 tbsp black pepper",
+              "2 cups oregano",
+            ]),
+            sheet("Brisket rub", [
+              "6 cups kosher salt",
+              "6 cups black pepper",
+              "4 cups chili powder",
+              "1 cup cayenne",
+              "2 cups onion powder",
+              "1 cup garlic powder",
+            ]),
+            sheet("Rib rub", [
+              "4 cups chili powder",
+              "1 1/2 cups onion powder",
+              "1 1/2 cups garlic powder",
+              "2 cups black pepper",
+              "1/2 cup cumin",
+              "1/2 cup ground mustard",
+              "5 cups kosher salt",
+            ]),
+            sheet("Pork rub", [
+              "8 cups brown sugar",
+              "6 cups chili powder",
+              "1 cup onion powder",
+              "1 1/2 cups garlic powder",
+              "2 cups black pepper",
+              "1/2 cup celery seed",
+              "1/2 cup ground mustard",
+              "8 cups kosher salt",
+            ]),
+            sheet("Chicken rub", [
+              "4 cups chili powder",
+              "3 cups smoked paprika",
+              "3 cups kosher salt",
+              "2 cups onion powder",
+              "3 cups black pepper",
+              "2 cups oregano",
+            ]),
+            sheet("Wing marinade", [
+              "4 cups cider vinegar",
+              "1 cup Worcestershire sauce",
+              "1 cup salt",
+              "1 tablespoon cayenne",
+              "1 tablespoon mustard powder",
+              "1/2 cup smoked paprika",
+              "2 tablespoons onion powder",
+              "1 tablespoon garlic powder",
+            ], "Mix until smooth. Rub on wings. Covers 1 case of wings."),
+          ].join("");
+        }
+        if (id === "kitchen") {
+          return [
+            sheet("Weight spec", [
+              "Cheese balls 7 oz",
+              "Gizzards 8 oz",
+              "Green beans 7 oz",
+              "Mushrooms 7 oz",
+              "All fries 7 oz",
+              "Mexi chicken 4 oz",
+              "Ham 2.5 oz",
+              "Turkey 2.5 oz",
+              "Corned beef 4 oz",
+              "Roast beef 5 oz",
+              "Boneless wings 4 oz",
+              "Mac noodles 5 oz",
+            ], "Two lines on the card are marked out. They are not copied."),
+            sheet("Line rule", [
+              "Label, date, rotate the cambro",
+              "Queso and mac stay on medium and get stirred so they do not burn",
+            ]),
+            sheet("Call-out", [
+              "A missed shift with no call is a write-up and can be termination",
+              "Talk to management before coming back",
+              "No exceptions. Use a phone and call the restaurant if you cannot make the shift",
+            ]),
+          ].join("");
+        }
+        if (id === "dining") {
+          return [
+            sheet("Pizza side duties", [
+              "Fill all BBQ sauce caddies",
+              "Wipe down BBQ sauce caddies and clean lids",
+              "Marry all ketchups and mustards",
+              "Fill all parmesan. Sunday: make an old parm",
+              "Fill red pepper flake shakers",
+              "Fill salt and pepper shakers",
+              "Fill napkin holders",
+              "Fill small and large to-go boxes",
+              "Parmesan, ketchup, mustard, and BBQ caddies go in the walk-in",
+              "Saturday night: take apart the pop machine, run it through the dishwasher, soak the pop tabs",
+              "Wipe down the pop machine",
+              "Dishes back to the kitchen. Wipe the bus tub before you sweep under it",
+              "Fill ice to the top and push it all the way back",
+              "Fill straws, kids cups and lids, and Pepsi cups above the pop machine",
+              "Roll all silverware. Do not leave clean silverware out",
+              "Wipe every table with sanitizer",
+              "Turn off all TVs",
+            ], "Lines that are marked out on the card are not copied."),
+            sheet("Close, before the mop", [
+              "Wipe off the special board",
+              "Deck is cleared off",
+              "Sweep the dining room and the pool room",
+              "Windex the double doors and the games in the pool room",
+              "Drop any money owed and do checkout",
+              "This list is done up to this point",
+              "All customers are gone",
+              "Bartender or manager on duty checks the list before anyone mops",
+            ]),
+          ].join("");
+        }
+        if (id === "driver") {
+          return sheet("Delivery fee", [
+            "Kock $7",
+            "Deerwood $3",
+            "Airport / Apple Orchard $3",
+            "CJ Bio $7",
+            "Cargill $7",
+            "Valaro $7",
+            "Quality Inn $1",
+            "Fairgrounds / Old 169 $3",
+            "Past highway 169: $1. If you are not sure, ask a manager",
+            "No Otho, Coalville, or Riverside Trail unless a manager approves it and more than one driver is on",
+          ], "The fee goes on the order. One week to learn it. After that, a missed fee is between the person who rang it and the driver, or it comes out of the paycheck. Ask a manager before you send the order.");
+        }
+        if (id === "notes") {
+          return [
+            sheet("Employee meal", [
+              "50% off one meal a day, up to 30 minutes before the shift or after the shift ends",
+              "No eating on the clock during 11:00 a.m.–2:00 p.m. or 5:00 p.m.–8:00 p.m.",
+              "Do not ring or cook your own food. The kitchen manager on duty rings it, discounts it, and cashes it out",
+              "Late-night meals are up to management. Some orders are to-go",
+              "The discount is for the employee working that day. Not for family or friends",
+              "Skipping the rule can be a write-up",
+            ]),
+            sheet("Schedule", [
+              "Schedule changes need the owner or the manager. Effective now",
+              "A day-off request is not a guarantee. First come",
+              "The paper grids stay on paper. Names are not on this page",
+            ]),
+          ].join("");
+        }
+        return "";
+      }
+
       function extraFor(id) {
-        if (id === "schedules") return spawnAgents();
+        if (id === "schedules") {
+          const note = known.schedule
+            ? bookCard("notes", "Employee notes", "One line the shift can read. No names.")
+            : "";
+          return spawnAgents() + note;
+        }
         if (id === "cards") return known.schedule ? positionCards() : "";
+        if (id === "menu" && known.menu) {
+          return bookCard("recipes", "Recipes", "What’s in the plate. Yield Missing. Not a food cost.");
+        }
+        if (id === "foh") return bookCard("dining", "Dining room", "Server open, shift, close. No drawer totals.");
+        if (id === "boh") return bookCard("kitchen", "Kitchen notes", "86 board, temps, labels. No count.");
+        if (id === "delivery") return bookCard("driver", "Driver notes", "Bag check. No guest address.");
         return "";
       }
 
       function followsFor() {
+        if (room === "recipes") return [["menu", "Menu"], ["schedules", "Schedules"]];
+        if (room === "kitchen") return [["boh", "Back of house"], ["notes", "Employee notes"]];
+        if (room === "dining") return [["foh", "Front of house"], ["notes", "Employee notes"]];
+        if (room === "driver") return [["delivery", "Delivery"], ["notes", "Employee notes"]];
+        if (room === "notes") return [["cards", "Labor cards"], ["home", "Last night’s close"]];
+        if (room === "foh") return [["dining", "Dining room"], ["cards", "Labor cards"]];
+        if (room === "boh") return [["kitchen", "Kitchen notes"], ["cards", "Labor cards"]];
+        if (room === "delivery") return [["driver", "Driver notes"], ["cards", "Labor cards"]];
         if (room === "schedules" || known.schedule) {
           if (room === "schedules") return [["cards", "Labor cards"], ["report", "Labor report"]];
         }
         if (room === "cards") return [["report", "Labor report"], ["foh", "Front of house"]];
         if (room === "report") return [["cards", "Labor cards"], ["home", "Last night’s close"]];
         if (known.close && !known.schedule) return [["schedules", "Drop the schedule"], ["menu", "What’s on the menu?"]];
-        if (known.menu && !known.close) return [["home", "Drop last night’s close"], ["schedules", "Schedules"]];
-        if (room === "menu") return [["schedules", "Schedules"], ["home", "Last night’s close"]];
+        if (known.menu && !known.close && room !== "menu") return [["home", "Drop last night’s close"], ["schedules", "Schedules"]];
+        if (room === "menu") {
+          return known.menu
+            ? [["recipes", "Recipes"], ["schedules", "Schedules"]]
+            : [["schedules", "Schedules"], ["home", "Last night’s close"]];
+        }
         return [["menu", "Menu"], ["schedules", "Schedules"]];
       }
 
@@ -227,7 +499,7 @@
         room = id;
         const t = threadOf(id);
         if (!t.length && STARTERS[id]) {
-          add(id, "as", STARTERS[id], extraFor(id));
+          add(id, "as", STARTERS[id], bookExtra(id) + extraFor(id));
         }
         render();
         document.getElementById("prompt").focus();
@@ -235,6 +507,11 @@
 
       function look(text) {
         const v = text.toLowerCase();
+        if (/employee note|shift note/.test(v)) return "notes";
+        if (/kitchen note|86 board/.test(v)) return "kitchen";
+        if (/dining room|waitress|sidework|server checklist/.test(v)) return "dining";
+        if (/\bdrivers?\b|driver note|hot and cold/.test(v)) return "driver";
+        if (/\brecipe\b|\byield\b/.test(v)) return "recipes";
         if (/invoice|sysco|us foods/.test(v)) return "invoices";
         if (/order guide|par/.test(v)) return "guides";
         if (/punch|clock|timecard|stayed late/.test(v)) return known.schedule ? "report" : "schedules";
@@ -254,11 +531,26 @@
         }
         if (kind === "menu") {
           known.menu = true;
-          return "Got a plate and a price. That’s the menu. What’s in it matters later when beef goes up — switch the house or raise the burger. Order guide and invoice after this. We didn’t invent a save.";
+          return "Got a plate and a price. That’s the menu. Recipe card is the plate — yield Missing, not a food-cost %. Order guide and invoice after this. We didn’t invent a save.";
         }
         if (kind === "schedules") {
           known.schedule = true;
-          return "Schedule’s in. Sample week: 3 on the floor, 2 on the line, 1 dish, 1 run. That’s how this shop works — headcount by seat, not a textbook. Posted in / posted out is on the cards. Late drift needs the punch. Punches are Missing. We do not auto-write the week. No invented hours. No invented overtime.";
+          return "The paper week stays on paper. Names stay off this page. We do not copy hours off a photo. Posted in / posted out still needs a grid we can read without names. Punches are Missing. No invented hours. No invented overtime.";
+        }
+        if (kind === "recipes") {
+          return "Kept on the prep book. Handwritten lines stay the current card. Not a food-cost %.";
+        }
+        if (kind === "kitchen") {
+          return "Kept on the line notes. Portions stay what the card says. Marked-out lines stay off. No names.";
+        }
+        if (kind === "dining") {
+          return "Kept on the floor list. Mop still waits on the bartender or manager on duty. No drawer totals.";
+        }
+        if (kind === "driver") {
+          return "Kept on the driver sheet. Fee by stop. If the stop is not on the list, ask a manager. No phone list. No door code.";
+        }
+        if (kind === "notes") {
+          return "Kept as an employee note. Meal rule and day-off rule stay. No names.";
         }
         if (kind === "cards") {
           return "Labor cards spawned from the schedule. Each seat: posted in, posted out. Stay-late only if a punch says they stayed. Punch ≠ schedule. No labor $.";
@@ -266,7 +558,7 @@
         if (kind === "report") {
           return known.punches
             ? "Punches would sit next to posted in / out. We still don’t invent a save."
-            : "Labor report: sample headcount 3 floor / 2 line / 1 dish / 1 run. That’s the workflow. Late / stay-late is Missing — no punches. We will not say someone stayed late to make a story.";
+            : "Labor report waits on a posted grid we can read without names. Late / stay-late is Missing — no punches. We will not say someone stayed late to make a story.";
         }
         if (POSITIONS[kind]) {
           return `${POSITIONS[kind].title}: ${POSITIONS[kind].posted} That’s the owner’s post, not the clock. Drift waits on a punch. No invented late.`;
