@@ -12,11 +12,10 @@ type Seat = {
   name: string;
 };
 
-// Free plan = one owner seat for the 1–3 unit ICP.
-// Community Tap is seat 1 (first assigned store). Open play is for any operator.
+// Free plan = one owner seat, one restaurant, one login.
 // Seats 2–3 are paid expansion. Multi-unit Command Center is a separate build.
 const SEATS: Seat[] = [
-  { n: 1, role: 'Owner-operator', status: 'free', name: 'Community Tap · first store · assigned' },
+  { n: 1, role: 'Owner-operator', status: 'free', name: 'Your restaurant · one store · free' },
   { n: 2, role: 'Manager / GM', status: 'invite', name: 'Paid seat · one manager login' },
   { n: 3, role: 'Kitchen / FOH / driver stations', status: 'invite', name: 'Paid seat · templates under manager' },
 ];
@@ -95,7 +94,7 @@ export default function ActionShiftDeskPage() {
           Never 86&apos;d
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#a8b5ac]">
-          Yesterday&apos;s numbers → one next action → night proof. Seat 1 is free. Community Tap is the first assigned store. Any operator can open play now — no password.
+          Yesterday&apos;s numbers → one next action → night proof. Seat 1 is free for one restaurant and one login. A second location stays closed until it is paid.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
@@ -145,7 +144,7 @@ export default function ActionShiftDeskPage() {
             LLM / MCP
           </Link>
           <Link href="/action-shift/lab" className="underline-offset-4 hover:underline">
-            CTap lab templates
+            Lab templates
           </Link>
         </nav>
 

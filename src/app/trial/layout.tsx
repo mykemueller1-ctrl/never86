@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Live trial · 60 minutes · Never 86'd",
-  description: 'Drop a Toast / Square / Clover / PDQ export. Void Hunter and Leak Detector run on your real data in 30 seconds. 60-minute trial, no card.',
+  title: "Free owner seat | Never 86'd",
+  description: 'The first owner seat is free for one restaurant and one login. Claim it at /onboard. This page also runs a timed CSV check.',
   openGraph: {
-    title: "Never 86'd · 60-minute live trial",
-    description: 'One hour. Your real numbers. Drop a CSV, see the leak, no human in the loop.',
+    title: "Never 86'd · free owner seat",
+    description: 'One restaurant. One login. Claim the free owner seat, or run a timed CSV check on this page.',
     url: 'https://www.never86.ai/trial',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Never 86'd · 60-minute live trial",
-    description: 'Drop a CSV, see the leak. No card. No human in the loop.',
+    title: "Never 86'd · free owner seat",
+    description: 'One restaurant. One login. Claim the free owner seat.',
   },
   alternates: { canonical: 'https://www.never86.ai/trial' },
 };

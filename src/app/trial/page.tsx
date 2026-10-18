@@ -419,9 +419,9 @@ export default function TrialPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· live trial</span>
+                Never 86&apos;d <span className="italic text-ink-600">· free owner seat</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">60 free minutes · real numbers from your restaurant</p>
+              <p className="compass-eyebrow-dim mt-2">One restaurant · one login · claim the seat</p>
             </span>
           </Link>
           {phase === 'active' && (
@@ -437,14 +437,18 @@ export default function TrialPage() {
 
       {phase === 'start' && (
         <section className="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-16 text-center">
-          <p className="compass-eyebrow mb-6">— Free trial · 60 minutes</p>
+          <p className="compass-eyebrow mb-6">— Free owner seat · one restaurant</p>
           <h1 className="compass-display text-5xl md:text-7xl mb-6">
-            One hour. <em>Your real numbers.</em>
+            One seat. <em>Your restaurant.</em>
           </h1>
           <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Two checks ready. Send a sales report and see what&apos;s really happening on your floor. No card. No salesperson.
+            The first owner seat is free. One restaurant. One login. A second location stays closed until it is paid.
           </p>
-          <button onClick={startTrial} disabled={starting} className="btn-primary text-base disabled:opacity-50" style={{ background: '#0066ff' }}>
+          <Link href="/onboard" className="btn-primary text-base" style={{ background: '#0066ff' }}>
+            Claim the free owner seat →
+          </Link>
+          <p className="compass-body text-sm mt-8 mb-4">Or run a timed CSV check on this page. No card.</p>
+          <button onClick={startTrial} disabled={starting} className="btn-secondary text-base disabled:opacity-50">
             {starting ? 'Starting…' : 'Start the hour →'}
           </button>
           {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}

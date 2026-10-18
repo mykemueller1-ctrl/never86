@@ -120,7 +120,7 @@ export default function OnboardPage() {
             <div className="compass-card lg:sticky lg:top-8">
               <p className="compass-card-label" style={{ color: '#0066ff' }}>Free owner seat</p>
               <h2 className="mt-3 font-serif text-3xl text-[#1d1d1f]">Work email and restaurant name.</h2>
-              <p className="compass-body mt-3 text-sm">No card. These two fields open the free seat. Extra stores stay on this same email — no plus-alias.</p>
+              <p className="compass-body mt-3 text-sm">No card. These two fields open the free seat. One restaurant and one login. A second location stays closed until it is paid.</p>
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <label className="block" htmlFor="onboard-email">
                   <span className="mb-1.5 block text-[13px] font-semibold text-[#1d1d1f]">Work email</span>
@@ -141,7 +141,7 @@ export default function OnboardPage() {
                     id="onboard-restaurant"
                     type="text"
                     autoComplete="organization"
-                    placeholder="e.g. Community Tap"
+                    placeholder="Your restaurant name"
                     value={storeName}
                     onChange={(event) => setStoreName(event.target.value)}
                     required
