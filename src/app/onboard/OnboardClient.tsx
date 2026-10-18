@@ -104,7 +104,7 @@ export default function OnboardPage() {
                 Claim the <em>owner seat.</em>
               </h1>
               <p className="compass-body max-w-2xl text-lg md:text-xl leading-relaxed">
-                Work email and restaurant name. You&apos;ll set your password from the link we email you. After that, sign in for every store on this email. First-class folders: schedule, labor cards, menu, invoice / truck.
+                Work email and restaurant name. You&apos;ll set your password from the link we email you. After that, sign in to that one restaurant. First-class folders: schedule, labor cards, menu, invoice / truck.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
