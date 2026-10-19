@@ -23,8 +23,9 @@ describe('operator seat thicken', () => {
     expect(page).toMatch(/InvoiceCompareClient/);
   });
 
-  it('walks sample papers, drift, labor, menu, and Google on /try', () => {
-    const page = read('src/app/try/page.tsx');
+  it('walks sample papers, drift, labor, menu, and Google on the preserved try page', () => {
+    const page = read('src/app/legacy/try/page.tsx');
+    expect(read('src/app/try/page.tsx')).toMatch(/ActionShiftMorning/);
     expect(page).toMatch(/InvoiceWinCard/);
     expect(page).toMatch(/InvoiceCompareClient/);
     expect(page).toMatch(/PapersReadiness/);

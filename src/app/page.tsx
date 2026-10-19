@@ -1,16 +1,16 @@
-import HomePage from '@/components/OwnerHome';
+import { ActionShiftMorning } from '@/components/ActionShiftMorning';
 import { publicPageMetadata } from '@/lib/seoAeo';
 
 export const metadata = {
   ...publicPageMetadata({
     path: '/',
-    title: "Find the leak. Keep the receipt. | Never86'd",
+    title: "Action Shift — One Seat, one move every morning | Never86'd",
     description:
-      "One Seat for independent restaurants. Drop invoices and Z reports. Try a free sample with no card, then claim the free owner seat.",
+      'One Seat. One free restaurant. A sample morning: mozzarella $48 to $56, $0.20 more a pizza, 385 sold, $77 a week. Open the app.',
   }),
   alternates: { canonical: 'https://www.never86.ai/' },
 };
 
 export default function RootPage() {
-  return <HomePage />;
+  return <ActionShiftMorning page="home" />;
 }

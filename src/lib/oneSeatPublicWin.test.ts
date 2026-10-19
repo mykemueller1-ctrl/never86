@@ -183,9 +183,10 @@ describe('Grok-native One Seat public door', () => {
       expect(source).not.toMatch(/\bdesk\b/i);
       expect(source).not.toMatch(/chatgpt\.site/);
     }
-    expect(read('src/app/try/page.tsx')).toMatch(/InvoiceWinCard/);
-    expect(read('src/app/try/page.tsx')).toMatch(/OperatorGoldLinks/);
-    expect(read('src/app/try/page.tsx')).not.toMatch(/\bdesk\b/i);
+    expect(read('src/app/legacy/try/page.tsx')).toMatch(/InvoiceWinCard/);
+    expect(read('src/app/legacy/try/page.tsx')).toMatch(/OperatorGoldLinks/);
+    expect(read('src/app/legacy/try/page.tsx')).not.toMatch(/\bdesk\b/i);
+    expect(read('src/app/try/page.tsx')).toMatch(/ActionShiftMorning/);
     const invoices = read('src/app/check/invoices/page.tsx');
     expect(invoices).toMatch(/InvoiceWinCard/);
     expect(invoices).not.toMatch(/\bdesk\b/i);
