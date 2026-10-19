@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { ActionShiftDoor } from '@/components/ActionShiftDoor';
 import { trackEvent } from '@/lib/track';
 
 type VoidResult = {
@@ -411,6 +412,23 @@ export default function TrialPage() {
     ? Math.max(0, voidResult.networkVoids - voidResult.medianStoreVoidRate * voidResult.networkNet) * 3
     : 0;
 
+  if (phase === 'start') {
+    return (
+      <ActionShiftDoor
+        extra={(
+          <>
+            <p className="as-start-note">
+              <button type="button" className="as-quiet" onClick={startTrial} disabled={starting}>
+                {starting ? 'Starting…' : 'Or run a timed CSV check on this page'}
+              </button>
+            </p>
+            {errMsg ? <p className="as-error">{errMsg}</p> : null}
+          </>
+        )}
+      />
+    );
+  }
+
   return (
     <main className="compass min-h-screen">
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
@@ -434,34 +452,6 @@ export default function TrialPage() {
           )}
         </div>
       </div>
-
-      {phase === 'start' && (
-        <section className="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-16 text-center">
-          <p className="compass-eyebrow mb-6">— Free owner seat · one restaurant</p>
-          <h1 className="compass-display text-5xl md:text-7xl mb-6">
-            One seat. <em>Your restaurant.</em>
-          </h1>
-          <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            The first owner seat is free. One restaurant. One login. A second location stays closed until it is paid.
-          </p>
-          <Link href="/onboard" className="btn-primary text-base" style={{ background: '#0066ff' }}>
-            Claim the free owner seat →
-          </Link>
-          <p className="compass-body text-sm mt-8 mb-4">Or run a timed CSV check on this page. No card.</p>
-          <button onClick={startTrial} disabled={starting} className="btn-secondary text-base disabled:opacity-50">
-            {starting ? 'Starting…' : 'Start the hour →'}
-          </button>
-          {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
-          <p className="compass-eyebrow-dim mt-6">— Works now with Toast, Square, Clover, and PDQ exports · direct connections to Toast, Lightspeed, and Aloha on the way</p>
-          <p className="mt-4 text-sm text-[#86868b]">
-            Prefer the phone?{' '}
-            <Link href="/operator" className="text-[#0066ff] underline-offset-4 hover:underline">
-              Ask first — talk, type, photo, or file
-            </Link>
-            . Files stay on that phone. Sample answers stay fictional.
-          </p>
-        </section>
-      )}
 
       {phase === 'active' && (
         <>
