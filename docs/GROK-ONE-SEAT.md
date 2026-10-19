@@ -18,6 +18,8 @@
 
 ChatGPT Sites V28 (`action-shift-one-seat-v2.never86-d-9722.chatgpt.site`) is archived. Do not send `/check/*`, `/login`, or `/onboard` there.
 
+`app.never86.app` is an **alias**, not a second product. Proxy + `vercel.json` 308 it to `www.never86.ai` once DNS points at Vercel. See `docs/ONE-DOOR.md`.
+
 ## Honesty on the cold win
 
 | Label | When |
@@ -50,7 +52,7 @@ npm run keys:probe
 
 ## LIVE 403 — `x-vercel-mitigated: deny`
 
-This repo has **no** `middleware.ts` and **no** Vercel WAF `mitigate` block in `vercel.json` or `next.config.js`. A datacenter `GET https://www.never86.ai` that returns HTTP 403 with `x-vercel-mitigated: deny` is **platform Attack Challenge / system mitigation**, not an in-app deny.
+This repo uses `src/proxy.ts` (not `middleware.ts`) for owner-seat auth and one-door host aliases. There is **no** Vercel WAF `mitigate` block in `vercel.json` or `next.config.js`. A datacenter `GET https://www.never86.ai` that returns HTTP 403 with `x-vercel-mitigated: deny` is **platform Attack Challenge / system mitigation**, not an in-app deny.
 
 This Cursor Vercel connection only sees team `myke-muellers-projects` project `compass`. It cannot toggle the never86.ai firewall from here. DNS is Namecheap → Vercel, so the live project lives on the Vercel team that owns that domain.
 
@@ -66,6 +68,6 @@ Do not add an in-repo deny rule to “fix” this. That would hide the platform 
 
 ## Deploy
 
-This branch targets **`main`** (LIVE SHA lineage `5cd84548…`). Default git branch `recovery-apr12` is the thin email-only launch and is **not** what currently serves the One Seat door.
+This branch targets **`main`**. Default git branch may still say `recovery-apr12` until Myke flips it in GitHub Settings — that tip is the thin email-only launch and is **not** the One Seat door. Agents must branch from `main` (`docs/ONE-DOOR.md`).
 
 **Do not merge or promote Production without Myke deploy Yes.**

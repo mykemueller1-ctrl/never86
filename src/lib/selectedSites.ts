@@ -1,9 +1,15 @@
 /**
  * Public One Seat door on never86.ai.
- * ChatGPT Sites V28 is archived. Operators do not onboard there.
+ * ChatGPT Sites V28 and app.never86.app are aliases / archive — not onboard doors.
  */
 
-export const ONE_SEAT_ORIGIN = 'https://www.never86.ai';
+import {
+  ONE_DOOR_ALIAS_HOSTS,
+  ONE_DOOR_CANONICAL_ORIGIN,
+  isOneDoorAliasHost,
+} from './oneDoor';
+
+export const ONE_SEAT_ORIGIN = ONE_DOOR_CANONICAL_ORIGIN;
 
 export const ONE_SEAT_PATHS = {
   home: '/',
@@ -23,14 +29,17 @@ export const ONE_SEAT_PATHS = {
   trial: '/trial',
 } as const;
 
-/** Archived ChatGPT Sites host. The gold seat path is the operator reference. */
+/** Archived ChatGPT Sites host. Operators do not onboard there. */
 export const CHATGPT_SITES_ARCHIVE_URL =
   'https://action-shift-one-seat-v2.never86-d-9722.chatgpt.site';
 
+/** @deprecated Use NEVER86_SEAT_URL — ChatGPT gold is archive-only. */
 export const CHATGPT_ONE_SEAT_GOLD_URL =
   'https://action-shift-one-seat-v2.never86-d-9722.chatgpt.site/seat';
 
-export const NEVER86_TRY_URL = 'https://www.never86.ai/try';
+export const NEVER86_TRY_URL = `${ONE_SEAT_ORIGIN}/try`;
+export const NEVER86_SEAT_URL = `${ONE_SEAT_ORIGIN}/seat`;
+export const NEVER86_ONBOARD_URL = `${ONE_SEAT_ORIGIN}/onboard`;
 
 /** Native origin. Kept so older imports resolve on never86.ai, not chatgpt.site. */
 export const SELECTED_SITES_BASE_URL = ONE_SEAT_ORIGIN;
@@ -43,6 +52,8 @@ export const SELECTED_SITES_CHECK_URLS = {
   menu: ONE_SEAT_PATHS.checkMenu,
 } as const;
 
+export { ONE_DOOR_ALIAS_HOSTS, isOneDoorAliasHost };
+
 export function isChatgptSitesHost(url: string): boolean {
-  return /never86-d-9722\.chatgpt\.site/i.test(url);
+  return /never86-d-9722\.chatgpt\.site/i.test(url) || /(?:^|\.)never86\.app(?::|$|\/)/i.test(url);
 }

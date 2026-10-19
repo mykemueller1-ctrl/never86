@@ -3,5 +3,25 @@
     { "path": "/api/briefing", "schedule": "0 11 * * *" },
     { "path": "/api/cron/send-followups", "schedule": "0 14 * * *" }
   ],
-  "ignoreCommand": "case \"$VERCEL_PROJECT_NAME\" in never86-ctap-phone|never86-portal-gateway) exit 0;; *) exit 1;; esac"
+  "ignoreCommand": "case \"$VERCEL_PROJECT_NAME\" in never86-ctap-phone|never86-portal-gateway) exit 0;; *) exit 1;; esac",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "app.never86.app" }],
+      "destination": "https://www.never86.ai/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.never86.app" }],
+      "destination": "https://www.never86.ai/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "never86.app" }],
+      "destination": "https://www.never86.ai/:path*",
+      "permanent": true
+    }
+  ]
 }

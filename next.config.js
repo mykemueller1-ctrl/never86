@@ -20,7 +20,9 @@ const nextConfig = {
     return [
       // Preserve the local Community house-code path.
       { source: '/communities', destination: '/portal', permanent: false },
-      // /seat is the public One Seat page. The old bookmark stays on never86.ai.
+      // Legacy email-launch seat bookmark → claim path on the one door.
+      { source: '/trial', destination: '/onboard', permanent: false },
+      { source: '/trial/:path*', destination: '/onboard', permanent: false },
     ];
   },
   async rewrites() {

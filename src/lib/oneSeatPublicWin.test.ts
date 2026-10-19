@@ -47,6 +47,7 @@ describe('Grok-native One Seat public door', () => {
 
   it('keeps the ChatGPT Sites host archived and off the public core win', () => {
     expect(isChatgptSitesHost(CHATGPT_SITES_ARCHIVE_URL)).toBe(true);
+    expect(isChatgptSitesHost('https://app.never86.app/seat')).toBe(true);
     expect(SELECTED_SITES_BASE_URL).toBe(ONE_SEAT_ORIGIN);
     expect(SELECTED_SITES_CONTACT_URL).toBe('/contact');
     expect(SELECTED_SITES_CHECK_URLS.invoices).toBe('/check/invoices');
@@ -54,6 +55,7 @@ describe('Grok-native One Seat public door', () => {
     expect(config).toMatch(/allowedDevOrigins/);
     expect(config).not.toContain(CHATGPT_SITES_ARCHIVE_URL);
     expect(home).not.toMatch(/chatgpt\.site/);
+    expect(home).not.toMatch(/app\.never86\.app/);
     expect(read('src/components/HumanSiteShell.tsx')).not.toMatch(/chatgpt\.site/);
     expect(read('src/components/HomePage.tsx')).not.toMatch(/chatgpt\.site/);
   });

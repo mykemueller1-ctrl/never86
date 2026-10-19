@@ -3,18 +3,27 @@ import type { NextRequest } from 'next/server';
 import { verifyOperatorSession, OPERATOR_COOKIE } from '@/lib/operatorSession';
 import { OWNER_DESK_POST_AUTH_REDIRECT } from '@/lib/ownerDeskAuth';
 import { OWNER_SEAT_LOGIN_HREF, ownerSeatUnauthenticatedRedirect } from '@/lib/ownerSeatGate';
+import { canonicalOneDoorUrl, isOneDoorAliasHost } from '@/lib/oneDoor';
+
+const GATED_PREFIXES = [
+  '/reports',
+  '/command-center',
+  '/tools',
+  '/admin',
+  '/dashboard',
+  '/operator',
+] as const;
 
 export const config = {
-  matcher: [
-    '/reports/:path*',
-    '/command-center/:path*',
-    '/tools/:path*',
-    '/admin/:path*',
-    '/dashboard/:path*',
-    '/operator',
-    '/operator/',
-  ],
+  // Alias hosts need every path. Gated auth still only runs on GATED_PREFIXES.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 };
+
+function isGatedPath(pathname: string): boolean {
+  return GATED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -25,7 +34,16 @@ async function sha256Hex(input: string): Promise<string> {
 }
 
 export async function proxy(req: NextRequest) {
+  const host = req.headers.get('host');
+  if (isOneDoorAliasHost(host)) {
+    const { pathname, search } = req.nextUrl;
+    return NextResponse.redirect(canonicalOneDoorUrl(pathname, search), 308);
+  }
+
   const { pathname } = req.nextUrl;
+  if (!isGatedPath(pathname)) {
+    return NextResponse.next();
+  }
 
   const ownerSeatLogin = ownerSeatUnauthenticatedRedirect(pathname);
   if (ownerSeatLogin) {
