@@ -9,7 +9,8 @@
  * for that hash. The check is an exact store-id + hash lookup inside the
  * write transaction, not a page of review rows. That transaction locks the
  * store+hash row first, then skips the replace when the review is there.
- * Older `provider:filename` keys are removed in that same transaction.
+ * Older `provider:filename` keys, and any other key for that same file hash,
+ * are removed in that same transaction. A kept review stays on `paper:<hash>`.
  *
  * A single-document write on an empty cache is partial. The next hydrate
  * reloads every document for that store from the database.
@@ -138,7 +139,8 @@ function noteReviewedPaper(storeId: string, rowJson: unknown): void {
 function isPaperAlias(row: StoredSkuRow, canonical: string, hash: string, legacyKeys: readonly string[]): boolean {
   if (row.documentKey === canonical) return false;
   if (legacyKeys.includes(row.documentKey)) return true;
-  return Boolean(hash) && row.sourceHash === hash;
+  if (!hash) return false;
+  return row.sourceHash === hash || row.documentKey.endsWith(`:${hash}`);
 }
 
 const memory = new Map<string, StoredSkuRow[]>();
@@ -486,20 +488,29 @@ async function persistDocument(
              where (store_id = $2 or operator_id = $2)
                and document_key <> $1
                and $3 <> ''
-               and row_json->>'sourceHash' = $3`,
+               and (
+                 row_json->>'sourceHash' = $3
+                 or document_key like '%:' || $3
+               )`,
       values: [documentKey, storeId, hash],
     });
   } else {
     statements.push({
       text: `delete from papers_sku_lines
              where (store_id = $2 or operator_id = $2)
+               and document_key <> $1
                and (
-                 document_key = $1
-                 or ($3 <> '' and row_json->>'sourceHash' = $3)
+                 ($3 <> '' and row_json->>'sourceHash' = $3)
                  or ($4 = 'yes' and $3 <> '' and document_key like '%:' || $3)
-               )
-               and ($5 = 'no' or not ${reviewHashPredicate('$2', '$3')})`,
-      values: [documentKey, storeId, hash, siblings, guard ? 'yes' : 'no'],
+               )`,
+      values: [documentKey, storeId, hash, siblings],
+    });
+    statements.push({
+      text: `delete from papers_sku_lines
+             where (store_id = $2 or operator_id = $2)
+               and document_key = $1
+               and ($3 = 'no' or not ${reviewHashPredicate('$2', '$4')})`,
+      values: [documentKey, storeId, guard ? 'yes' : 'no', hash],
     });
     statements.push(...stored.map((row) => ({
       text: `insert into papers_sku_lines (

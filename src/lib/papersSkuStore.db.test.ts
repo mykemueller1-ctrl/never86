@@ -979,4 +979,61 @@ describe('papers sku database durability', () => {
     expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')?.isoWeek).toBe('2026-W22');
     expect(papersSkuRowsForStore(other)[0].unitPrice.amount).toBe(4);
   }, 30_000);
+
+  it('drops a same-hash copy under another key when the confirmed review stays', async () => {
+    const seat = 'seat:alias-copy';
+    const text = [
+      'Performance', 'Foodservice', 'Date:', '06/05/26', '06/05/26', '900001', 'DRY',
+      '1', 'CS', '6/#10Fixture', 'Sauce', 'TH100', '1', '1', 'EA', '1.250', '12.50',
+    ].join('\n');
+    const bytes = new TextEncoder().encode(text);
+    const hash = papersContentHash(bytes);
+    const canonical = papersSkuDocumentKey(hash);
+    enqueuePapersScan(seat);
+    await drainPapersScan({
+      operatorId: seat,
+      listGmail: async () => [{ source: 'gmail', externalId: 'msg-alias', filename: 'fixture-pfg-invoice.txt', bytes }],
+      listDrive: async () => [],
+    });
+    const review = papersScanSnapshot(seat).rows[0];
+    await applyPapersScanEdit(seat, {
+      id: review.id,
+      confirm: true,
+      fields: { dates: '2026-06-12', lineItems: [{ index: 0, unitPrice: '2.25' }] },
+    });
+    await replacePapersSkuDocument(seat, 'other-doc', sauce('05/29/26', '900002', 'TH900', '9.000', '9.00'));
+    const alias = sauce('06/05/26', '900001', 'TH100', '99.000', '99.00')[0];
+    await database.query(
+      `insert into papers_sku_lines (
+         operator_id, store_id, owner_id, document_key, line_index, iso_week, row_json
+       ) values ($1, $1, null, $2, 0, $3, $4::jsonb)`,
+      [seat, 'drive:same-invoice.pdf', alias.isoWeek, JSON.stringify({
+        ...alias,
+        storeId: seat,
+        ownerId: null,
+        documentKey: 'drive:same-invoice.pdf',
+        lineIndex: 0,
+        sourceHash: hash,
+      })],
+    );
+
+    resetPapersSkuStore();
+    setPapersSkuExecutorForTests(executorFor(database));
+    const outcome = await replaceUnreviewedPaperDocument(
+      seat,
+      hash,
+      sauce('06/05/26', '900001', 'TH100', '1.250', '12.50'),
+      ['gmail:fixture-pfg-invoice.txt'],
+    );
+    expect(outcome).toBe('kept');
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === canonical)?.unitPrice).toMatchObject({
+      honesty: 'Estimated',
+      amount: 2.25,
+    });
+    expect(papersSkuRowsForStore(seat).some((row) => row.documentKey === 'drive:same-invoice.pdf')).toBe(false);
+    expect(papersSkuRowsForStore(seat).some((row) => row.unitPrice.amount === 99)).toBe(false);
+    expect(papersSkuRowsForStore(seat).find((row) => row.documentKey === 'other-doc')?.unitPrice.amount).toBe(9);
+    expect((await savedLines(seat)).some((row) => row.document_key === 'drive:same-invoice.pdf')).toBe(false);
+    expect((await savedLines(seat)).find((row) => row.document_key === canonical)?.row_json.unitPrice?.amount).toBe(2.25);
+  }, 30_000);
 });
