@@ -37,6 +37,10 @@ describe('public Action Shift morning page', () => {
     expect(html).toContain('Sales');
     expect(html).toContain('Morning');
     expect(html).toContain('Labor');
+    expect(html).toContain('Owner desk');
+    expect(html).toContain('Example data');
+    expect(html).toContain('One owner');
+    expect(html).toContain('myke@never86.app');
     expect(html).toContain('href="https://app.never86.app"');
     expect(html).toContain('href="/legacy"');
     expect(html).toContain('href="/legacy/try"');
@@ -58,10 +62,10 @@ describe('public Action Shift morning page', () => {
   it('stays a one-seat sample, with no store data and no retired name', () => {
     const html = renderToStaticMarkup(createElement(ActionShiftMorning, { page: 'try' }));
     expect(html).toContain('Four steps. Then one move.');
+    expect(html).toContain('Owner desk');
     expect(html).not.toMatch(/Pulse/);
     expect(html).not.toMatch(/Command Center/);
     expect(html).not.toMatch(/Community Tap/);
-    expect(html).not.toMatch(/\bdesk\b/i);
     expect(html).not.toMatch(/Fort Dodge/);
     expect(html).not.toMatch(/\bAlex\b/);
     expect(html).not.toMatch(/\$105|33\.35|42\.32|8\.97|\$80|\$31|\$40|16\.7/);

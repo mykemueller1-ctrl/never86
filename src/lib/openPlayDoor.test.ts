@@ -30,9 +30,12 @@ describe('never86.ai open play front door', () => {
     expect(page).toMatch(/HomePage/);
   });
 
-  it('marks Community Tap as seat 1 on /action-shift', () => {
+  it('keeps /action-shift to one free owner seat', () => {
     const page = readFileSync(resolve('src/app/action-shift/page.tsx'), 'utf8');
-    expect(page).toMatch(/Community Tap · first store · assigned/);
-    expect(page).toMatch(/href="\/play"/);
+    expect(page).toMatch(/ActionShiftMorning/);
+    expect(page).not.toMatch(/Community Tap/);
+    expect(page).not.toMatch(/Command Center/);
+    expect(page).not.toMatch(/\bPulse\b/);
+    expect(page).not.toMatch(/seat 2|pricing|multi-store/i);
   });
 });
