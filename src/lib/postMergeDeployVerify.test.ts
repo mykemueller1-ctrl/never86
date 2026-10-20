@@ -11,11 +11,14 @@ function read(path: string): string {
 describe('post-merge deploy-verify locks', () => {
   it('keeps the stranger funnel email-first on never86.ai One Seat', () => {
     const liveHome = read('src/app/page.tsx');
+    const legacyHome = read('src/app/legacy/page.tsx');
     const ownerHome = read('src/components/OwnerHome.tsx');
     const home = read('src/components/HomePage.tsx');
     const shell = read('src/components/HumanSiteShell.tsx');
     const config = read('next.config.js');
-    expect(liveHome).toContain("from '@/components/OwnerHome'");
+    expect(liveHome).toContain('ActionShiftMorning');
+    expect(read('src/components/ActionShiftMorning.tsx')).toContain('https://app.never86.app');
+    expect(legacyHome).toContain("from '@/components/OwnerHome'");
     expect(ownerHome).toContain('Claim free owner seat');
     expect(ownerHome).toContain('ONE_SEAT_PATHS.checkInvoices');
     expect(ownerHome).not.toMatch(/\bdesk\b/i);
