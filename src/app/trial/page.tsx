@@ -1097,8 +1097,7 @@ export default function TrialPage() {
         </section>
       )}
 
-      {phase !== 'start' && (
-        <section className="border-t border-[#e8e8ed] py-16 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 px-6">
           <div className="max-w-xl mx-auto">
             <p className="compass-eyebrow mb-4 text-center">— Save your read · wire it to live data</p>
             {leadSaved ? (
@@ -1119,7 +1118,6 @@ export default function TrialPage() {
             )}
           </div>
         </section>
-      )}
 
       <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
