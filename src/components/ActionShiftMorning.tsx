@@ -8,6 +8,20 @@
  */
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
+import {
+  ArrowUp,
+  BarChart3,
+  BookOpen,
+  CircleAlert,
+  Clock,
+  FolderOpen,
+  LayoutDashboard,
+  ListChecks,
+  MessageSquare,
+  Receipt,
+  UtensilsCrossed,
+  type LucideIcon,
+} from 'lucide-react';
 import styles from './action-shift-morning.module.css';
 
 export const ACTION_SHIFT_APP_URL = 'https://app.never86.app';
@@ -30,16 +44,16 @@ export const ACTION_SHIFT_CASE_DELTA =
 const MOVE = 'Call your cheese rep, or change the pizza price.';
 
 const NAV = [
-  { id: 'desk', label: 'Owner desk' },
-  { id: 'ask', label: 'Ask' },
-  { id: 'sales', label: 'Sales reports' },
-  { id: 'labor', label: 'Labor' },
-  { id: 'invoices', label: 'Invoices' },
-  { id: 'recipes', label: 'Recipe cards' },
-  { id: 'knowledge', label: 'Restaurant knowledge' },
-  { id: 'actions', label: 'My actions', keep: true },
-  { id: 'missing', label: "What's missing" },
-  { id: 'files', label: 'All files' },
+  { id: 'desk', label: 'Owner desk', icon: LayoutDashboard },
+  { id: 'ask', label: 'Ask', icon: MessageSquare },
+  { id: 'sales', label: 'Sales reports', icon: BarChart3 },
+  { id: 'labor', label: 'Labor', icon: Clock },
+  { id: 'invoices', label: 'Invoices', icon: Receipt },
+  { id: 'recipes', label: 'Recipe cards', icon: UtensilsCrossed },
+  { id: 'knowledge', label: 'Restaurant knowledge', icon: BookOpen },
+  { id: 'actions', label: 'My actions', icon: ListChecks, keep: true },
+  { id: 'missing', label: "What's missing", icon: CircleAlert },
+  { id: 'files', label: 'All files', icon: FolderOpen },
 ] as const;
 
 type SectionId = (typeof NAV)[number]['id'];
@@ -69,14 +83,19 @@ function answerFor(question: string) {
   return "I don't have that yet.";
 }
 
-function Chip({ label, note }: { label: 'Sample' | 'Missing'; note?: string }) {
-  const tone = label === 'Sample' ? styles.chipSample : styles.chipMissing;
+function Tag({ label, note }: { label: 'Sample' | 'Missing' | 'Done'; note?: string }) {
+  const tone =
+    label === 'Sample' ? styles.tagSample : label === 'Done' ? styles.tagDone : styles.tagMissing;
   return (
-    <span className={`${styles.chip} ${tone}`}>
+    <span className={`${styles.tag} ${tone}`}>
       {label}
       {note ? <small>{note}</small> : null}
     </span>
   );
+}
+
+function RailIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return <Icon size={16} strokeWidth={1.5} aria-hidden="true" />;
 }
 
 const MISSING = [
@@ -85,6 +104,23 @@ const MISSING = [
   'No menu price in this example.',
   'No close for last night. The week stays open.',
 ];
+
+function MissingTable() {
+  return (
+    <table className={styles.sheet}>
+      <tbody>
+        {MISSING.map((line) => (
+          <tr key={line}>
+            <th scope="row">
+              <Tag label="Missing" />
+            </th>
+            <td>{line}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
 export function ActionShiftMorning({ page = 'home' }: Props) {
   const sample = ACTION_SHIFT_SAMPLE;
@@ -100,6 +136,8 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
   }
 
   const showCheese = category === 'All' || category === 'Food';
+  const outcome =
+    actionState === 'open' ? 'Awaiting outcome' : actionState === 'done' ? 'Done' : 'Not doing';
 
   return (
     <div className={styles.seat} data-section={section}>
@@ -116,7 +154,8 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               aria-current={section === item.id ? 'page' : undefined}
               onClick={() => setSection(item.id)}
             >
-              {item.label}
+              <RailIcon icon={item.icon} />
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
@@ -147,35 +186,71 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           <p className={styles.stepLabel}>Morning · {sample.label}</p>
           {page === 'try' ? <h1>Here&apos;s a sample morning.</h1> : <h2>One thing to get ahead of</h2>}
           <p className={styles.move}>{MOVE}</p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Item</th>
+                <td>{sample.item}</td>
+              </tr>
+              <tr>
+                <th scope="row">Was</th>
+                <td><Unit value={sample.priorCase} /></td>
+              </tr>
+              <tr>
+                <th scope="row">Now</th>
+                <td><Unit value={sample.currentCase} /></td>
+              </tr>
+              <tr>
+                <th scope="row">A case</th>
+                <td><Unit value={ACTION_SHIFT_CASE_DELTA} /></td>
+              </tr>
+              <tr>
+                <th scope="row">A pizza</th>
+                <td><Unit value={sample.perPizza} cents /></td>
+              </tr>
+              <tr>
+                <th scope="row">Sold</th>
+                <td>{sample.sold}</td>
+              </tr>
+              <tr>
+                <th scope="row">This week</th>
+                <td><Unit value={sample.week} /></td>
+              </tr>
+              <tr>
+                <th scope="row">Yield</th>
+                <td>40 pizzas a case (sample)</td>
+              </tr>
+            </tbody>
+          </table>
           <p className={styles.why}>
             {sample.item} went from <Unit value={sample.priorCase} /> to <Unit value={sample.currentCase} /> a case.
             {' '}40 pizzas a case (sample). That is <Unit value={ACTION_SHIFT_CASE_DELTA} /> a case,{' '}
             <Unit value={sample.perPizza} cents /> a pizza. You sold {sample.sold}. That is <Unit value={sample.week} /> this week.
           </p>
           <p className={styles.money}>
-            <strong><Unit value={sample.week} /></strong>
-            <Chip label="Sample" note="Example data" />
+            <Tag label="Sample" note="Example data" />
           </p>
           <p className={styles.note}>Week stays open. This example has the cheese invoice and no nightly close.</p>
           <div className={styles.mobileMissing}>
             <h2>What&apos;s missing</h2>
-            <ul>
-              {MISSING.map((line) => (
-                <li key={line}>
-                  <Chip label="Missing" />
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
+            <MissingTable />
           </div>
         </article>
 
         <article data-panel="ask">
           <h2>Ask</h2>
-          <div className={styles.thread}>
-            <p className={styles.bubble}>What changed on the cheese?</p>
-            <p className={styles.answer}>{answer}</p>
-          </div>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Question</th>
+                <td>What changed on the cheese?</td>
+              </tr>
+              <tr>
+                <th scope="row">Answer</th>
+                <td>{answer}</td>
+              </tr>
+            </tbody>
+          </table>
           <form className={styles.composer} onSubmit={onAsk}>
             <label className={styles.sr} htmlFor="ask-box">
               Ask about this example
@@ -187,7 +262,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               placeholder="Ask about this example"
             />
             <button type="submit" className={styles.send} aria-label="Send">
-              ↑
+              <ArrowUp size={16} strokeWidth={1.5} aria-hidden="true" />
             </button>
           </form>
         </article>
@@ -197,9 +272,20 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           <p>
             {sample.sold} pizzas sold in this example. There is no close report here, so a sales total stays Missing.
           </p>
-          <p className={styles.money}>
-            <Chip label="Missing" note="No close in this example" />
-          </p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Pizzas sold</th>
+                <td>{sample.sold}</td>
+              </tr>
+              <tr>
+                <th scope="row">Sales total</th>
+                <td>
+                  <Tag label="Missing" note="No close in this example" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <p>No close file is in this example.</p>
         </article>
 
@@ -211,10 +297,17 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             On your seat, this compares the schedule with who clocked in. This sample
             does not show a labor amount. The one move stays the cheese.
           </p>
-          <p className={styles.money}>
-            <Chip label="Missing" />
-            <span>No time clock in this example.</span>
-          </p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Hours</th>
+                <td>
+                  <Tag label="Missing" />
+                  <span>No time clock in this example.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </article>
 
         <article id="invoices" data-panel="invoices">
@@ -236,19 +329,24 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               <p className={styles.stepLabel}>Invoices · {sample.label}</p>
               <h3>Same cheese. Higher price.</h3>
               <p>The same mozzarella case costs more than last time.</p>
-              <div className={styles.prices}>
-                <div>
-                  <small>Was</small>
-                  <b><Unit value={sample.priorCase} /></b>
-                </div>
-                <span aria-hidden="true">→</span>
-                <div>
-                  <small>Now</small>
-                  <b><Unit value={sample.currentCase} /></b>
-                </div>
-              </div>
+              <table className={styles.sheet}>
+                <tbody>
+                  <tr>
+                    <th scope="row">Item</th>
+                    <td>{sample.item}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Was</th>
+                    <td><Unit value={sample.priorCase} /></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Now</th>
+                    <td><Unit value={sample.currentCase} /></td>
+                  </tr>
+                </tbody>
+              </table>
               <p className={styles.money}>
-                <Chip label="Sample" note="Example data" />
+                <Tag label="Sample" note="Example data" />
               </p>
             </>
           ) : (
@@ -264,38 +362,63 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             The higher case price adds <Unit value={sample.perPizza} cents /> to each pizza.
             40 pizzas a case (sample).
           </p>
-          <p className={styles.money}>
-            <strong><Unit value={sample.perPizza} cents /></strong>
-            <Chip label="Sample" note="Example data" />
-          </p>
-          <p className={styles.money}>
-            <Chip label="Missing" />
-            <span>No menu price in this example, so plate cost stays Missing.</span>
-          </p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">A pizza</th>
+                <td><Unit value={sample.perPizza} cents /></td>
+              </tr>
+              <tr>
+                <th scope="row">Plate cost</th>
+                <td>
+                  <Tag label="Missing" />
+                  <span>No menu price in this example, so plate cost stays Missing.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </article>
 
         <article data-panel="knowledge">
           <h2>Restaurant knowledge</h2>
-          <ul>
-            <li>
-              One owner. One restaurant. The first seat is free.
-              <span className={styles.source}>Source: example</span>
-            </li>
-            <li>
-              A price change is something to check. The cash is still in the same drawer.
-              <span className={styles.source}>Source: example</span>
-            </li>
-          </ul>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Seat</th>
+                <td>
+                  One owner. One restaurant. The first seat is free.
+                  <span className={styles.source}>Source: example</span>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Price</th>
+                <td>
+                  A price change is something to check. The cash is still in the same drawer.
+                  <span className={styles.source}>Source: example</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </article>
 
         <article id="actions" data-panel="actions">
           <h2>My actions</h2>
-          <p>{MOVE}</p>
-          <p>
-            Owner: Owner · {actionState === 'open' ? 'Awaiting outcome' : actionState === 'done' ? 'Done' : 'Not doing'}
-          </p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Move</th>
+                <td>{MOVE}</td>
+              </tr>
+              <tr>
+                <th scope="row">Owner</th>
+                <td>
+                  Owner: Owner · {actionState === 'done' ? <Tag label="Done" /> : outcome}
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <p className={styles.money}>
-            <Chip label="Sample" note="Example data" />
+            <Tag label="Sample" note="Example data" />
           </p>
           <div className={styles.actions}>
             <button type="button" onClick={() => setActionState('done')}>
@@ -309,24 +432,22 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
 
         <article data-panel="missing">
           <h2>What&apos;s missing</h2>
-          <ul className={styles.missingList}>
-            {MISSING.map((line) => (
-              <li key={line}>
-                <Chip label="Missing" />
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
+          <MissingTable />
         </article>
 
         <article data-panel="files">
           <h2>All files</h2>
-          <ul>
-            <li>
-              Invoices · sample-invoice.pdf
-              <Chip label="Sample" note="Example data" />
-            </li>
-          </ul>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">File</th>
+                <td>
+                  Invoices · sample-invoice.pdf
+                  <Tag label="Sample" note="Example data" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <p>No other files are in this example.</p>
         </article>
 

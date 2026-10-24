@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -85,5 +86,11 @@ describe('public Action Shift morning page', () => {
     expect(html).not.toMatch(/\bAlex\b/);
     expect(html).not.toMatch(/\$105|33\.35|42\.32|8\.97|\$80|\$31|\$40|16\.7/);
     expect(html).not.toMatch(/multi-store|seat 2|pricing/i);
+  });
+
+  it('keeps a restrained back-office palette', () => {
+    const css = readFileSync(new URL('../components/action-shift-morning.module.css', import.meta.url), 'utf8');
+    expect(css).toContain('tabular-nums');
+    expect(css).not.toMatch(/#f3f0ea|#f6e7c1|#3b2a12|#e7e4fb|#f3e4e1|#8a4b2f|999px|Iowan/);
   });
 });
