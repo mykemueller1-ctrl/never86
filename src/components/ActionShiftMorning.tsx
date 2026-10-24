@@ -2,23 +2,23 @@
 
 /**
  * Public Action Shift door on never86.ai.
- * Looks like the one-owner CTAP seat: one rail, one pane.
- * Sample chain only: mozzarella $48 to $56, $0.20 per pizza, 385 sold, $77 a week.
- * Previous homepage: /legacy. Previous /try: /legacy/try.
+ * One owner, one seat. Sample chain only:
+ * mozzarella $48 to $56, $8 a case, 40 pizzas a case (sample), $0.20 a pizza, 385 sold, $77 a week.
+ * /legacy and /legacy/try stay routed. This page does not link them.
  */
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import styles from './action-shift-morning.module.css';
 
 export const ACTION_SHIFT_APP_URL = 'https://app.never86.app';
-export const ACTION_SHIFT_CONTACT = 'myke@never86.app';
 
-/** /try sample values. $8 is $56 − $48. $77 is 385 × $0.20. */
+/** /try sample values. $8 is $56 − $48. $0.20 is $8 / 40 pizzas a case (sample). $77 is 385 × $0.20. */
 export const ACTION_SHIFT_SAMPLE = {
   label: 'Sample',
   item: 'Mozzarella',
   priorCase: 48,
   currentCase: 56,
+  pizzasPerCase: 40,
   perPizza: 0.2,
   sold: 385,
   week: 77,
@@ -37,7 +37,7 @@ const NAV = [
   { id: 'invoices', label: 'Invoices' },
   { id: 'recipes', label: 'Recipe cards' },
   { id: 'knowledge', label: 'Restaurant knowledge' },
-  { id: 'actions', label: 'My actions' },
+  { id: 'actions', label: 'My actions', keep: true },
   { id: 'missing', label: "What's missing" },
   { id: 'files', label: 'All files' },
 ] as const;
@@ -48,9 +48,14 @@ type Props = {
   page?: 'home' | 'try';
 };
 
+function Unit({ value, cents = false }: { value: number; cents?: boolean }) {
+  const shown = cents ? value.toFixed(2) : String(value);
+  return <span className={styles.unit}>{`$${shown}`}</span>;
+}
+
 function sampleAnswer() {
   const sample = ACTION_SHIFT_SAMPLE;
-  return `${sample.item} went from $${sample.priorCase} to $${sample.currentCase} a case. That is $${sample.perPizza.toFixed(2)} more on each pizza. You sold ${sample.sold}. That is $${sample.week} more this week. Example data.`;
+  return `${sample.item} went from $${sample.priorCase} to $${sample.currentCase} a case. 40 pizzas a case (sample). That is $${ACTION_SHIFT_CASE_DELTA} a case, $${sample.perPizza.toFixed(2)} a pizza. You sold ${sample.sold}. That is $${sample.week} this week. Example data.`;
 }
 
 function answerFor(question: string) {
@@ -74,6 +79,13 @@ function Chip({ label, note }: { label: 'Sample' | 'Missing'; note?: string }) {
   );
 }
 
+const MISSING = [
+  'No time clock in this example.',
+  'No wage on file.',
+  'No menu price in this example.',
+  'No close for last night. The week stays open.',
+];
+
 export function ActionShiftMorning({ page = 'home' }: Props) {
   const sample = ACTION_SHIFT_SAMPLE;
   const [section, setSection] = useState<SectionId>('desk');
@@ -90,10 +102,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
   const showCheese = category === 'All' || category === 'Food';
 
   return (
-    <div className={styles.seat}>
-      <a className={styles.skip} href="#morning">
-        Skip to the morning card
-      </a>
+    <div className={styles.seat} data-section={section}>
       <aside>
         <p className={styles.brand}>Action Shift</p>
         <p className={styles.place}>Example seat</p>
@@ -103,6 +112,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             <button
               key={item.id}
               type="button"
+              data-keep={'keep' in item && item.keep ? '' : undefined}
               aria-current={section === item.id ? 'page' : undefined}
               onClick={() => setSection(item.id)}
             >
@@ -110,40 +120,57 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             </button>
           ))}
         </nav>
-        <p className={styles.contact}>
-          <a href={`mailto:${ACTION_SHIFT_CONTACT}`}>{ACTION_SHIFT_CONTACT}</a>
-        </p>
       </aside>
       <main>
+        {page === 'home' ? (
+          <header className={styles.hero}>
+            <h1>Find the leak. Assign the fix. Keep the receipt.</h1>
+            <p className={styles.lede}>
+              Last night&apos;s close, turned into one move. One owner. One receipt.
+            </p>
+            <div className={styles.heroActions}>
+              <Link className={styles.primary} href="/onboard">
+                Start my free seat
+              </Link>
+              <a className={styles.secondary} href="#morning">
+                See a sample morning
+              </a>
+            </div>
+          </header>
+        ) : null}
+
         <p className={styles.banner} role="status">
           Example data
         </p>
-        <p className={styles.kicker}>Money, leaks, owner actions</p>
 
-        <article id="morning" hidden={section !== 'desk'}>
+        <article id="morning" data-panel="desk">
           <p className={styles.stepLabel}>Morning · {sample.label}</p>
-          <h1>{page === 'try' ? 'Four steps. Then one move.' : 'One move every morning.'}</h1>
-          <p className={styles.lede}>
-            {page === 'try'
-              ? 'This is a sample restaurant. Invoices, then the menu, then sales, then one thing to do in the morning.'
-              : 'Action Shift turns yesterday into one thing to do. One restaurant. One seat. Free.'}
-          </p>
-          <h2>One thing to get ahead of</h2>
+          {page === 'try' ? <h1>Here&apos;s a sample morning.</h1> : <h2>One thing to get ahead of</h2>}
           <p className={styles.move}>{MOVE}</p>
           <p className={styles.why}>
-            {sample.item} went from ${sample.priorCase} to ${sample.currentCase} a case.
-            That is ${sample.perPizza.toFixed(2)} more on each pizza. You sold {sample.sold}.
-            That is ${sample.week} more this week.
+            {sample.item} went from <Unit value={sample.priorCase} /> to <Unit value={sample.currentCase} /> a case.
+            {' '}40 pizzas a case (sample). That is <Unit value={ACTION_SHIFT_CASE_DELTA} /> a case,{' '}
+            <Unit value={sample.perPizza} cents /> a pizza. You sold {sample.sold}. That is <Unit value={sample.week} /> this week.
           </p>
           <p className={styles.money}>
-            <strong>${sample.week}</strong>
+            <strong><Unit value={sample.week} /></strong>
             <Chip label="Sample" note="Example data" />
           </p>
-          <p className={styles.delta}>Up ${ACTION_SHIFT_CASE_DELTA} a case</p>
           <p className={styles.note}>Week stays open. This example has the cheese invoice and no nightly close.</p>
+          <div className={styles.mobileMissing}>
+            <h2>What&apos;s missing</h2>
+            <ul>
+              {MISSING.map((line) => (
+                <li key={line}>
+                  <Chip label="Missing" />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </article>
 
-        <article hidden={section !== 'ask'}>
+        <article data-panel="ask">
           <h2>Ask</h2>
           <div className={styles.thread}>
             <p className={styles.bubble}>What changed on the cheese?</p>
@@ -165,7 +192,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </form>
         </article>
 
-        <article hidden={section !== 'sales'}>
+        <article data-panel="sales">
           <h2>Sales reports</h2>
           <p>
             {sample.sold} pizzas sold in this example. There is no close report here, so a sales total stays Missing.
@@ -176,7 +203,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           <p>No close file is in this example.</p>
         </article>
 
-        <article data-section="labor" hidden={section !== 'labor'}>
+        <article data-panel="labor" data-section="labor">
           <h2>Labor</h2>
           <p className={styles.stepLabel}>Labor · {sample.label}</p>
           <h3>The schedule and the clock.</h3>
@@ -190,7 +217,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </p>
         </article>
 
-        <article id="invoices" hidden={section !== 'invoices'}>
+        <article id="invoices" data-panel="invoices">
           <h2>Invoices</h2>
           <div className={styles.filters} aria-label="Invoice category">
             {(['All', 'Food', 'Beer', 'Liquor', 'Wine'] as const).map((item) => (
@@ -212,12 +239,12 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               <div className={styles.prices}>
                 <div>
                   <small>Was</small>
-                  <b>${sample.priorCase}</b>
+                  <b><Unit value={sample.priorCase} /></b>
                 </div>
                 <span aria-hidden="true">→</span>
                 <div>
                   <small>Now</small>
-                  <b>${sample.currentCase}</b>
+                  <b><Unit value={sample.currentCase} /></b>
                 </div>
               </div>
               <p className={styles.money}>
@@ -229,13 +256,16 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           )}
         </article>
 
-        <article hidden={section !== 'recipes'}>
+        <article data-panel="recipes">
           <h2>Recipe cards</h2>
           <p className={styles.stepLabel}>Menu · {sample.label}</p>
           <h3>Twenty cents more on a pizza.</h3>
-          <p>The higher case price adds ${sample.perPizza.toFixed(2)} to each pizza.</p>
+          <p>
+            The higher case price adds <Unit value={sample.perPizza} cents /> to each pizza.
+            40 pizzas a case (sample).
+          </p>
           <p className={styles.money}>
-            <strong>${sample.perPizza.toFixed(2)}</strong>
+            <strong><Unit value={sample.perPizza} cents /></strong>
             <Chip label="Sample" note="Example data" />
           </p>
           <p className={styles.money}>
@@ -244,7 +274,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </p>
         </article>
 
-        <article hidden={section !== 'knowledge'}>
+        <article data-panel="knowledge">
           <h2>Restaurant knowledge</h2>
           <ul>
             <li>
@@ -252,13 +282,13 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               <span className={styles.source}>Source: example</span>
             </li>
             <li>
-              A price change is something to check, not money recovered.
+              A price change is something to check. The cash is still in the same drawer.
               <span className={styles.source}>Source: example</span>
             </li>
           </ul>
         </article>
 
-        <article hidden={section !== 'actions'}>
+        <article id="actions" data-panel="actions">
           <h2>My actions</h2>
           <p>{MOVE}</p>
           <p>
@@ -277,17 +307,19 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </div>
         </article>
 
-        <article hidden={section !== 'missing'}>
+        <article data-panel="missing">
           <h2>What&apos;s missing</h2>
-          <ul>
-            <li>No time clock in this example. Upload a time-clock report on your own seat.</li>
-            <li>No wage on file. Enter the wage before a labor amount.</li>
-            <li>No menu price in this example. Add the plate price before a plate cost.</li>
-            <li>No nightly close in this example. The week stays open.</li>
+          <ul className={styles.missingList}>
+            {MISSING.map((line) => (
+              <li key={line}>
+                <Chip label="Missing" />
+                <span>{line}</span>
+              </li>
+            ))}
           </ul>
         </article>
 
-        <article hidden={section !== 'files'}>
+        <article data-panel="files">
           <h2>All files</h2>
           <ul>
             <li>
@@ -305,10 +337,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </p>
           <nav aria-label="Footer">
             <a href={ACTION_SHIFT_APP_URL}>app.never86.app</a>
-            <Link href="/contact">Claim the free seat</Link>
-            <a href={`mailto:${ACTION_SHIFT_CONTACT}`}>{ACTION_SHIFT_CONTACT}</a>
-            <Link href="/legacy">Previous homepage</Link>
-            <Link href="/legacy/try">Previous try page</Link>
+            <Link href="/onboard">Start my free seat</Link>
           </nav>
         </footer>
       </main>
