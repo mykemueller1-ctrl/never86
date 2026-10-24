@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { ActionShiftDoor } from '@/components/ActionShiftDoor';
 import { trackEvent } from '@/lib/track';
 
 type VoidResult = {
@@ -411,6 +412,23 @@ export default function TrialPage() {
     ? Math.max(0, voidResult.networkVoids - voidResult.medianStoreVoidRate * voidResult.networkNet) * 3
     : 0;
 
+  if (phase === 'start') {
+    return (
+      <ActionShiftDoor
+        extra={(
+          <>
+            <p className="as-start-note">
+              <button type="button" className="as-quiet" onClick={startTrial} disabled={starting}>
+                {starting ? 'Starting…' : 'Or run a timed CSV check on this page'}
+              </button>
+            </p>
+            {errMsg ? <p className="as-error">{errMsg}</p> : null}
+          </>
+        )}
+      />
+    );
+  }
+
   return (
     <main className="compass min-h-screen">
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
@@ -419,9 +437,9 @@ export default function TrialPage() {
             <span className="compass-mark">N</span>
             <span>
               <p className="font-serif text-[24px] leading-none text-ink-800">
-                Never 86&apos;d <span className="italic text-ink-600">· live trial</span>
+                Never 86&apos;d <span className="italic text-ink-600">· free owner seat</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">60 free minutes · real numbers from your restaurant</p>
+              <p className="compass-eyebrow-dim mt-2">One restaurant · one login · claim the seat</p>
             </span>
           </Link>
           {phase === 'active' && (
@@ -434,30 +452,6 @@ export default function TrialPage() {
           )}
         </div>
       </div>
-
-      {phase === 'start' && (
-        <section className="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-16 text-center">
-          <p className="compass-eyebrow mb-6">— Free trial · 60 minutes</p>
-          <h1 className="compass-display text-5xl md:text-7xl mb-6">
-            One hour. <em>Your real numbers.</em>
-          </h1>
-          <p className="compass-body text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Two checks ready. Send a sales report and see what&apos;s really happening on your floor. No card. No salesperson.
-          </p>
-          <button onClick={startTrial} disabled={starting} className="btn-primary text-base disabled:opacity-50" style={{ background: '#0066ff' }}>
-            {starting ? 'Starting…' : 'Start the hour →'}
-          </button>
-          {errMsg && <p className="text-[#ff453a] text-sm mt-4">{errMsg}</p>}
-          <p className="compass-eyebrow-dim mt-6">— Works now with Toast, Square, Clover, and PDQ exports · direct connections to Toast, Lightspeed, and Aloha on the way</p>
-          <p className="mt-4 text-sm text-[#86868b]">
-            Prefer the phone?{' '}
-            <Link href="/operator" className="text-[#0066ff] underline-offset-4 hover:underline">
-              Ask first — talk, type, photo, or file
-            </Link>
-            . Files stay on that phone. Sample answers stay fictional.
-          </p>
-        </section>
-      )}
 
       {phase === 'active' && (
         <>
@@ -1103,8 +1097,7 @@ export default function TrialPage() {
         </section>
       )}
 
-      {phase !== 'start' && (
-        <section className="border-t border-[#e8e8ed] py-16 px-6">
+      <section className="border-t border-[#e8e8ed] py-16 px-6">
           <div className="max-w-xl mx-auto">
             <p className="compass-eyebrow mb-4 text-center">— Save your read · wire it to live data</p>
             {leadSaved ? (
@@ -1125,7 +1118,6 @@ export default function TrialPage() {
             )}
           </div>
         </section>
-      )}
 
       <footer className="border-t border-[#e8e8ed] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[#6e6e73] text-[12px]">
