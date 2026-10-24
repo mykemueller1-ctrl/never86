@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { OwnerSeatForm } from '@/components/owner-seat-form';
+import { SiteHeader } from '@/components/site-header';
 
 export default function TrialPage() {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-12">
+    <div className="min-h-screen bg-[#0c1412] text-[#f4f1ea]">
+      <SiteHeader tone="board" />
+    <main className="px-6 py-12">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-start">
         <section>
           <Link href="/" className="text-sm text-dark-300 transition-colors hover:text-gold-500">
@@ -13,12 +16,11 @@ export default function TrialPage() {
             Free owner seat
           </p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-white md:text-6xl">
-            Start with the owner seat. Pay only when you add more seats.
+            Start with the owner seat.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-dark-200">
-            This trial is built for restaurant and hospitality owners who want the operator OS
-            first. One location and the owner seat are free. Seat 2, seat 3, and later seats
-            become paid when you bring in the rest of the team.
+            This trial is the owner seat for one location. That seat is free. Pricing for more
+            seats and more units is TBD.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -47,8 +49,8 @@ export default function TrialPage() {
               Pricing rule
             </p>
             <p className="mt-3 text-base leading-7 text-dark-100">
-              One location plus seat 1 is free. The first seat is always the owner seat. Added
-              seats are paid seats because they expand the workflow beyond the owner.
+              One location plus seat 1 is free. The first seat is the owner seat. Pricing for
+              more seats and more units is TBD.
             </p>
           </div>
         </section>
@@ -60,5 +62,6 @@ export default function TrialPage() {
         />
       </div>
     </main>
+    </div>
   );
 }

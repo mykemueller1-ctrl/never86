@@ -1,137 +1,108 @@
-import Link from 'next/link';
-import { OwnerSeatForm } from '@/components/owner-seat-form';
+import Link from "next/link";
+import { OwnerSeatForm } from "@/components/owner-seat-form";
+import { SiteHeader } from "@/components/site-header";
+
+const CONCEPTS = [
+  {
+    kicker: "Yesterday's close, one move",
+    title: "Close is done. Now what?",
+    body: "A close summary goes in. Never86.ai ranks it. One card rises with the move, the owner, and the proof you can check tonight.",
+    asset: "Action Shift V3 - Vertical - 30 seconds.mp4",
+    source: "Promo kit video, Drive file 1Z6eA5fFCi0J4vZQnJtbm6E0aNSeK0F6f",
+  },
+  {
+    kicker: "Off at five. Stayed till seven.",
+    title: "Just a question: rush, prep, or a handoff nobody owned?",
+    body: "Scheduled off at 5:00, out at 7:00. The move names the shift lead and asks for coverage before the next handoff. The person stays capable.",
+    asset: "Action Shift - Labor Coaching 30s - V4.mp4",
+    source: "Promo kit video, Drive file 1oqyixiVFF-8yrDIwcWsFJg_jaXbFqUmo",
+  },
+  {
+    kicker: "Same case, two invoices",
+    title: "Confirm the quote before the next order.",
+    body: "Same item, same spec, same pack. The move has an owner and a checklist. The dollar shows only when the file has it.",
+    asset: "No matching video file in the promo kit yet",
+    source: "Concept 3 from the 2026-10-24 promo README. Mood still needs an upload.",
+  },
+];
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-12">
-      <div className="mx-auto flex max-w-6xl flex-col gap-16">
-        <section className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+    <div className="min-h-screen bg-[#0c1412] text-[#f4f1ea]">
+      <SiteHeader tone="board" />
+      <main className="mx-auto flex max-w-6xl flex-col gap-16 px-4 py-12">
+        <section className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
           <div>
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-gold-500">
-              Operator OS for hospitality
-            </p>
-            <h1 className="max-w-4xl text-5xl font-bold tracking-tight text-white md:text-7xl">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f0c94a]">Operator OS for 1 to 5 units</p>
+            <h1 className="mt-3 max-w-4xl text-5xl font-semibold tracking-tight md:text-6xl">
               Find the leak. Assign the fix. Keep the receipt.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-dark-200 md:text-xl">
-              Never 86&apos;d is the operator OS for restaurants and hospitality groups. It reads
-              the proof from invoices, Z reports, labor, tips, vendors, beverage, catering, and
-              3P so the owner sees the one action that matters before the shift starts.
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#d5ddd8]">
+              Never86.ai reads yesterday&apos;s close for a small group, up to 9 units. You get a week tally, a prime cost, and at most three moves. Each figure is Verified, Estimated, or Missing.
             </p>
-            <div className="mt-8 rounded-2xl border border-gold-700/60 bg-gold-500/10 p-6">
-              <p className="text-lg font-semibold text-white">
-                One location + one owner seat is free.
-              </p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-dark-200">
-                Seat 1 belongs to the owner. That first seat stays free for a single location.
-                When you add seat 2, seat 3, or more people, those become paid seats.
+            <div className="mt-8 rounded-2xl border border-[#f0c94a]/40 bg-[#f0c94a]/10 p-6">
+              <p className="text-lg font-semibold">One location and the owner seat are free.</p>
+              <p className="mt-2 text-sm leading-6 text-[#d5ddd8]">
+                Pricing for more units is TBD. Action Shift stays the free one-seat product for a single store. This board is the multi-unit build.
               </p>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/trial"
-                className="inline-flex items-center justify-center rounded-lg bg-gold-500 px-6 py-3 font-semibold text-dark-900 transition-colors hover:bg-gold-600"
-              >
-                Claim free owner seat
+              <Link href="/close" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#f0c94a] px-6 font-semibold text-[#1a1404]">
+                Open the board
               </Link>
-              <Link
-                href="/audit"
-                className="inline-flex items-center justify-center rounded-lg border border-dark-500 px-6 py-3 font-semibold text-white transition-colors hover:border-gold-500 hover:text-gold-500"
-              >
+              <Link href="/audit" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#3d5349] px-6 font-semibold">
                 See the 3P audit
               </Link>
             </div>
-            <div className="mt-8 grid gap-4 text-sm text-dark-300 sm:grid-cols-3">
-              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
-                <p className="font-semibold text-white">Homepage = operator OS</p>
-                <p className="mt-2">The owner sees the full operating system, not just a fee chart.</p>
-              </div>
-              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
-                <p className="font-semibold text-white">3P is the Google door</p>
-                <p className="mt-2">DoorDash and Uber Eats proof brings operators in through the audit.</p>
-              </div>
-              <div className="rounded-xl border border-dark-600 bg-dark-700 p-4">
-                <p className="font-semibold text-white">Human approves the action</p>
-                <p className="mt-2">Never 86&apos;d finds the leak, assigns the fix, and keeps the receipt.</p>
-              </div>
-            </div>
           </div>
-
-          <OwnerSeatForm />
+          <OwnerSeatForm
+            title="Reserve the owner seat"
+            subtitle="One location and the owner seat are free. Pricing for more seats and more units is TBD."
+            buttonLabel="Reserve owner seat"
+          />
         </section>
 
-        <section className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
-            <div className="mb-3 text-2xl text-gold-500">📄</div>
-            <h2 className="text-xl font-semibold text-white">Vendor + invoice truth</h2>
-            <p className="mt-3 text-sm leading-6 text-dark-300">
-              OCR reads line items, price moves, pack changes, and invoice gaps so the owner knows
-              whether COGS drift came from the vendor, the mix, or the count.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
-            <div className="mb-3 text-2xl text-gold-500">📊</div>
-            <h2 className="text-xl font-semibold text-white">Shift proof, not guesses</h2>
-            <p className="mt-3 text-sm leading-6 text-dark-300">
-              Z/POS, voids, labor, tips, beverage, and catering are normalized into a single
-              operating picture, so POS does not get confused with payout and incomplete weeks stay open.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-dark-600 bg-dark-700 p-6">
-            <div className="mb-3 text-2xl text-gold-500">☀️</div>
-            <h2 className="text-xl font-semibold text-white">Yesterday to one action</h2>
-            <p className="mt-3 text-sm leading-6 text-dark-300">
-              The morning brief turns yesterday into the next action, the owner approves it, and
-              the night proof closes the loop.
-            </p>
-          </div>
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            ["Drop", "POS, invoices, payroll, and delivery statements land together."],
+            ["Sort", "Each file gets a type and a unit. You can correct the sort."],
+            ["Move", "At most three actions, each with an owner, a due date, and an outcome."],
+          ].map(([title, body]) => (
+            <article key={title} className="rounded-2xl border border-[#24332d] bg-[#13201c] p-5">
+              <h2 className="text-xl font-semibold">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-[#d5ddd8]">{body}</p>
+            </article>
+          ))}
         </section>
 
-        <section className="rounded-3xl border border-dark-600 bg-dark-700/70 p-8">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-500">
-                Who this is for
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold text-white">
-                Built for owners first, then the rest of the floor.
-              </h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-dark-300">
-                Start with the owner seat so the person carrying the P&amp;L gets the cleanest signal
-                first. After that, add paid seats for GMs, chefs, finance, or multi-unit leaders
-                when you want the workflow shared across the operation.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-gold-700 bg-dark-800 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-500">
-                  Seat 1
-                </p>
-                <p className="mt-2 text-lg font-semibold text-white">Owner</p>
-                <p className="mt-2 text-sm text-dark-300">Free for one location.</p>
-              </div>
-              <div className="rounded-xl border border-dark-600 bg-dark-800 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-dark-300">
-                  Seat 2
-                </p>
-                <p className="mt-2 text-lg font-semibold text-white">GM or operator</p>
-                <p className="mt-2 text-sm text-dark-300">Paid when you expand the team.</p>
-              </div>
-              <div className="rounded-xl border border-dark-600 bg-dark-800 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-dark-300">
-                  Seat 3
-                </p>
-                <p className="mt-2 text-lg font-semibold text-white">Chef or finance</p>
-                <p className="mt-2 text-sm text-dark-300">Paid seat with shared proof.</p>
-              </div>
-            </div>
+        <section className="grid gap-6">
+          <h2 className="text-3xl font-semibold">Three ways to see the week</h2>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {CONCEPTS.map((concept) => (
+              <figure key={concept.kicker} className="flex flex-col gap-3 rounded-2xl border border-[#24332d] bg-[#13201c] p-4">
+                <div
+                  role="img"
+                  aria-label={`Placeholder for ${concept.asset}. The file is not in this repo.`}
+                  className="grid min-h-48 place-items-center rounded-xl border border-dashed border-[#3d5349] bg-[#0c1412] p-4 text-center"
+                >
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f0c94a]">Needs upload</p>
+                    <p className="mt-2 text-sm">{concept.asset}</p>
+                  </div>
+                </div>
+                <figcaption>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f0c94a]">{concept.kicker}</p>
+                  <h3 className="mt-2 text-xl font-semibold">{concept.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#d5ddd8]">{concept.body}</p>
+                  <p className="mt-3 text-xs leading-5 text-[#9aada4]">{concept.source}</p>
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </section>
 
-        <p className="text-center text-xs text-dark-400">
-          Never 86&apos;d · Built by an operator, for operators · never86.ai
-        </p>
-      </div>
-    </main>
+        <p className="text-center text-xs text-[#9aada4]">Never86.ai · Built by an operator, for operators</p>
+      </main>
+    </div>
   );
 }

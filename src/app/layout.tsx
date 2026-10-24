@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Never 86\'d — Operator OS for Hospitality',
+  title: 'Never86.ai | Operator OS for 1 to 5 units',
   description:
-    'One location plus the owner seat is free. Never 86\'d is the operator OS for hospitality: invoices, Z/POS, 3P, labor, and morning briefs with proof.',
+    'One location and the owner seat are free. Never86.ai turns yesterday\'s close into a week tally and at most three moves for up to 9 units.',
   openGraph: {
     title: 'Never 86\'d',
     description:

@@ -10,7 +10,7 @@ type OwnerSeatFormProps = {
 
 export function OwnerSeatForm({
   title = 'Claim your free owner seat',
-  subtitle = 'One location and the owner seat are free. Add paid seats later when your team is ready.',
+  subtitle = 'One location and the owner seat are free. Pricing for more seats and more units is TBD.',
   buttonLabel = 'Claim free owner seat',
 }: OwnerSeatFormProps) {
   const [email, setEmail] = useState('');
@@ -93,8 +93,8 @@ export function OwnerSeatForm({
         <div className="rounded-lg border border-dark-600 bg-dark-800 px-4 py-3 text-sm text-dark-200">
           <p className="font-medium text-white">Seat policy</p>
           <p className="mt-1">
-            Seat 1 is the owner and it is free for one location. Seats 2 and 3 become paid seats
-            when you add more people.
+            Seat 1 is the owner and it is free for one location. Pricing for more seats and more
+            units is TBD.
           </p>
         </div>
 

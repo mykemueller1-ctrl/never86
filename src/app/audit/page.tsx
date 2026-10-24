@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import { SiteHeader } from '@/components/site-header';
 
 export default function AuditPage() {
   return (
-    <main className="min-h-screen bg-dark-800 px-6 py-12">
+    <div className="min-h-screen bg-[#0c1412] text-[#f4f1ea]">
+      <SiteHeader tone="board" />
+    <main className="px-6 py-12">
       <div className="mx-auto max-w-5xl">
         <Link href="/" className="text-sm text-dark-300 transition-colors hover:text-gold-500">
           ← Back to Never 86&apos;d
@@ -52,14 +55,15 @@ export default function AuditPage() {
               Claim the free owner seat
             </Link>
             <Link
-              href="/"
+              href="/close"
               className="inline-flex items-center justify-center rounded-lg border border-dark-500 px-6 py-3 font-semibold text-white transition-colors hover:border-gold-500 hover:text-gold-500"
             >
-              Back to operator OS
+              Open the board
             </Link>
           </div>
         </section>
       </div>
     </main>
+    </div>
   );
 }
