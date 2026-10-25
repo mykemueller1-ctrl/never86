@@ -71,10 +71,14 @@ export function calloutFor(input: {
 
   if (targetPct === null) {
     const verb = category === "delivery" ? "are" : "is";
+    const ask =
+      category === "other"
+        ? "Set a target for other"
+        : `Set a ${name.toLowerCase()} target`;
     return {
       category,
       label,
-      text: `${name} ${verb} ${money(spendWhole)} ${dayWord}, ${pct}% of sales. Set a ${name.toLowerCase()} target if you want an over or under.`,
+      text: `${name} ${verb} ${money(spendWhole)} ${dayWord}, ${pct}% of sales. ${ask} if you want an over or under.`,
       variance: null,
       absVariance: Math.abs(spendWhole),
       miss: false,

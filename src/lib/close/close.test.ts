@@ -83,6 +83,9 @@ test("Harbor callouts use whole dollars and the operator target", () => {
   assert.equal(harbor.strip[0]?.text, labor?.note);
   assert.equal(harbor.strip[1]?.text, food?.note);
   assert.match(harbor.strip[2]?.text ?? "", /Set a delivery fees target/);
+  const other = harbor.tiles.find((tile) => tile.category === "other");
+  assert.match(other?.note ?? "", /Set a target for other/);
+  assert.equal(other?.note.includes("a other"), false);
   assert.equal(JSON.stringify(harbor).includes("\u2014"), false);
   assert.equal(JSON.stringify(harbor.actions).includes("Alex"), false);
 });

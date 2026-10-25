@@ -583,7 +583,6 @@ function TileCard({
       <p className="text-sm leading-6">
         <Chip label={tile.noteLabel} /> <span className="ml-2">{tile.note}</span>
       </p>
-      {tile.spend.missing ? <p className="text-sm text-[#f3d48a]">{tile.spend.missing}</p> : null}
       <label className="mt-auto grid gap-1 text-sm font-semibold">
         Target percent for {CATEGORY_TITLE[tile.category]}
         <input
