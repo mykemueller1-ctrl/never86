@@ -62,8 +62,8 @@ describe('Grok-native One Seat public door', () => {
     expect(config).toMatch(/source: '\/communities'/);
     expect(config).toMatch(/destination: '\/portal'/);
     expect(config).not.toContain("source: '/seat'");
-    expect(read('src/app/seat/page.tsx')).toMatch(/OneSeatPanels/);
-    expect(read('src/app/seat/page.tsx')).toMatch(/OperatorGoldLinks/);
+    expect(read('src/app/seat/page.tsx')).toMatch(/ActionShiftMorning/);
+    expect(read('src/app/seat/page.tsx')).not.toMatch(/chatgpt\.site/);
     for (const path of ['/check/invoices', '/check/labor', '/check/menu', '/login', '/onboard']) {
       expect(config).not.toContain(`source: '${path}'`);
     }
@@ -163,6 +163,7 @@ describe('Grok-native One Seat public door', () => {
       expect(html).not.toMatch(/\bdesk\b/i);
       expect(html).not.toMatch(/chatgpt\.site/);
     }
+    expect(invoices).toContain('Action Shift is the product');
   });
 
   it('keeps labor and recipe samples disclosed and formula-honest', () => {

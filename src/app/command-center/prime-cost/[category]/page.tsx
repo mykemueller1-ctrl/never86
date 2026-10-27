@@ -5,7 +5,7 @@ import { buildPrimeCostBoard, getPrimeCostDesk, isPrimeCostCategory, PRIME_COST_
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const metadata = {
-  title: "Prime cost desk | Command Center | Never 86'd",
+  title: "Prime cost desk | Action Shift | Never 86'd",
   robots: { index: false, follow: false },
 };
 

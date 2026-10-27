@@ -5,7 +5,7 @@ import { OneSeatPublicShell } from '@/components/OneSeatPublicShell';
 import { PapersChatIntake } from '@/components/PapersChatIntake';
 
 export const metadata: Metadata = {
-  title: 'Ask Never86’d | One Seat',
+  title: 'Ask | Action Shift | Never86’d',
   description:
     'Ask maps invoices, labor, menu, and what is still Missing. A sentence is not a price. Gmail stays Missing until a pull lands.',
   alternates: { canonical: 'https://www.never86.ai/chat' },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ChatPage() {
   return (
     <OneSeatPublicShell
-      eyebrow="ONE SEAT · ASK"
+      eyebrow="ACTION SHIFT · ASK"
       title="Ask what is still Missing."
       lede="Ask routes to a paper. Name a file or drop a PDF. A typed dollar is Estimated. It is not a SKU price. Honesty stays Verified, Estimated, or Missing."
     >

@@ -16,10 +16,10 @@ export function OneSeatPublicShell({
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link className={styles.brand} href="/" aria-label="Never86 home">
-          <b>86</b> Never86’d
+        <Link className={styles.brand} href="/" aria-label="Action Shift home">
+          <b>86</b> Action Shift
         </Link>
-        <nav className={styles.nav} aria-label="One Seat">
+        <nav className={styles.nav} aria-label="Action Shift">
           <Link href={ONE_SEAT_PATHS.seat}>Seat</Link>
           <Link href={ONE_SEAT_PATHS.try}>Try the sample</Link>
           <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
@@ -43,7 +43,7 @@ export function OneSeatPublicShell({
         <Link href={ONE_SEAT_PATHS.chat}>Missing map</Link>
         <Link href={ONE_SEAT_PATHS.login}>Sign in</Link>
         <Link href="/privacy">Privacy</Link>
-        <p>One free owner seat. Operators stay on never86.ai. The formula decides the number.</p>
+        <p>Action Shift. One free owner seat. Operators stay on never86.ai. The formula decides the number.</p>
       </footer>
     </main>
   );

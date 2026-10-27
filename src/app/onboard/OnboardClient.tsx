@@ -88,7 +88,7 @@ export default function OnboardPage() {
               <p className="font-serif text-[24px] leading-none text-ink-800">
                 Never 86&apos;d <span className="italic text-ink-600">· 1–3 unit owner seat</span>
               </p>
-              <p className="compass-eyebrow-dim mt-2">Seat 1 free · seats 2–3 paid later · not Command Center</p>
+              <p className="compass-eyebrow-dim mt-2">One seat free. Extra seats paid. Action Shift.</p>
             </span>
           </Link>
           <Link href="/login" className="compass-pill"><span className="avatar">↗</span><span>Sign in</span></Link>

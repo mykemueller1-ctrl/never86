@@ -2,7 +2,7 @@ import UnifiedCommandCenter from '@/components/UnifiedCommandCenter';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const metadata = { title: "Command Center | Never 86'd" };
+export const metadata = { title: "Action Shift — stores | Never 86'd" };
 
 // Consolidated: all five role lenses (CEO · CFO · COO · CTO · Data) render in
 // a single long-scroll screen with anchor nav. Operator id hardcoded to 3

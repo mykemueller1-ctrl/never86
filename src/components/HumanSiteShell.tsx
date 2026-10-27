@@ -81,7 +81,7 @@ export function HumanSiteFooter() {
           <Link href="/contact" className="human-nav-link">Request the free owner seat</Link>
           <Link href={ONE_SEAT_PATHS.onboard} className="human-nav-link">Claim the free owner seat</Link>
           <Link href="/product" className="human-nav-link">Product story</Link>
-          <Link href={ONE_SEAT_PATHS.operator} className="human-nav-link">Open One Seat</Link>
+          <Link href="/action-shift" className="human-nav-link">Open Action Shift</Link>
           <Link href="/check/invoices" className="human-nav-link">Check invoices</Link>
           <Link href="/check/labor" className="human-nav-link">Check labor</Link>
           <Link href="/check/menu" className="human-nav-link">Check menu</Link>

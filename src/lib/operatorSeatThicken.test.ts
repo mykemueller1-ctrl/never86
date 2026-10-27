@@ -41,12 +41,14 @@ describe('operator seat thicken', () => {
     expect(page).toMatch(/HonestyLegend/);
     expect(page).not.toMatch(/\bdesk\b/i);
     const seat = read('src/app/seat/page.tsx');
-    expect(seat).toMatch(/OneSeatPanels/);
-    expect(seat).toMatch(/PapersChatIntake/);
-    expect(seat).toMatch(/OperatorGoldLinks/);
+    expect(seat).toMatch(/ActionShiftMorning/);
+    expect(seat).not.toMatch(/OneSeatPanels/);
+    expect(seat).not.toMatch(/chatgpt\.site/);
     expect(seat).not.toMatch(/\bdesk\b/i);
     const gold = read('src/components/OperatorGoldLinks.tsx');
-    expect(gold).toMatch(/CHATGPT_ONE_SEAT_GOLD_URL/);
+    expect(gold).toMatch(/Action Shift is the product/);
+    expect(gold).toMatch(/\/llm-shells/);
+    expect(gold).not.toMatch(/chatgpt\.site/);
     expect(gold).toMatch(/NEVER86_TRY_URL/);
     const sites = read('src/lib/selectedSites.ts');
     expect(sites).toMatch(/https:\/\/action-shift-one-seat-v2\.never86-d-9722\.chatgpt\.site\/seat/);

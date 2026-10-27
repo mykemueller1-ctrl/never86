@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getOperatorCommandCenter, type CommandCenter as CC } from '@/lib/toastReports';
 import { opsDbConfigured } from '@/lib/opsDb';
 
@@ -13,8 +14,11 @@ function Shell({ title, subtitle, children }: { title: string; subtitle?: string
   return (
     <main className="min-h-screen bg-dark-800 px-6 py-12">
       <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-sm uppercase tracking-wider mb-1">Never 86&apos;d · Command Center</p>
+        <p className="text-dark-300 text-sm uppercase tracking-wider mb-1">Never 86&apos;d · Action Shift</p>
         <h1 className="text-4xl font-bold text-gold-500 mb-1">{title}</h1>
+        <p className="mb-4 text-sm text-dark-200">
+          <Link href="/action-shift" className="underline underline-offset-4">Open the seat</Link>
+        </p>
         {subtitle ? <p className="text-dark-200 mb-8">{subtitle}</p> : <div className="mb-8" />}
         {children}
       </div>
@@ -50,7 +54,7 @@ export default async function CommandCenter({
 }) {
   if (!opsDbConfigured()) {
     return (
-      <Shell title="Command Center">
+      <Shell title="Action Shift">
         <Notice
           title="Your live data isn’t connected yet."
           body={<>If you’re seeing this, contact the team and we’ll bring you online.</>}
@@ -65,7 +69,7 @@ export default async function CommandCenter({
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return (
-      <Shell title="Command Center">
+      <Shell title="Action Shift">
         <Notice title="Couldn’t reach your live data." body={<span className="font-mono text-xs break-all">{msg}</span>} />
       </Shell>
     );
@@ -73,7 +77,7 @@ export default async function CommandCenter({
 
   if (cc.storesLoaded === 0) {
     return (
-      <Shell title={cc.operatorName} subtitle="Command Center">
+      <Shell title={cc.operatorName} subtitle="Action Shift">
         <Notice
           title="Awaiting clean ingest."
           body="No de-duplicated dining-option data has landed for this operator yet. The moment the weekly backfill arrives, this screen fills in automatically — store by store."

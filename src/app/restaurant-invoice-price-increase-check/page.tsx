@@ -7,7 +7,7 @@ import { INVOICE_CAPTURE } from '@/lib/captureLandings';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: `${INVOICE_CAPTURE.title} | Never86’d One Seat`,
+  title: `${INVOICE_CAPTURE.title} | Action Shift`,
   description: INVOICE_CAPTURE.description,
   alternates: { canonical: INVOICE_CAPTURE.canonical },
   openGraph: {

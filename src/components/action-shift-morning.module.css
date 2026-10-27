@@ -194,6 +194,7 @@
 .seat[data-section='recipes'] [data-panel='recipes'],
 .seat[data-section='knowledge'] [data-panel='knowledge'],
 .seat[data-section='actions'] [data-panel='actions'],
+.seat[data-section='night'] [data-panel='night'],
 .seat[data-section='missing'] [data-panel='missing'],
 .seat[data-section='files'] [data-panel='files'] {
   display: block;

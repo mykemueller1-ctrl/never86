@@ -15,6 +15,7 @@ import {
   CircleAlert,
   Clock,
   FolderOpen,
+  ClipboardCheck,
   LayoutDashboard,
   ListChecks,
   MessageSquare,
@@ -52,6 +53,7 @@ const NAV = [
   { id: 'recipes', label: 'Recipe cards', icon: UtensilsCrossed },
   { id: 'knowledge', label: 'Restaurant knowledge', icon: BookOpen },
   { id: 'actions', label: 'My actions', icon: ListChecks, keep: true },
+  { id: 'night', label: 'Night proof', icon: ClipboardCheck },
   { id: 'missing', label: "What's missing", icon: CircleAlert },
   { id: 'files', label: 'All files', icon: FolderOpen },
 ] as const;
@@ -165,7 +167,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           <header className={styles.hero}>
             <h1>Find the leak. Assign the fix. Keep the receipt.</h1>
             <p className={styles.lede}>
-              Last night&apos;s close, turned into one move. One owner. One receipt.
+              Last night&apos;s close, turned into one move. One product. One owner. One receipt.
             </p>
             <div className={styles.heroActions}>
               <Link className={styles.primary} href="/onboard">
@@ -231,6 +233,9 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             <Tag label="Sample" note="Example data" />
           </p>
           <p className={styles.note}>Week stays open. This example has the cheese invoice and no nightly close.</p>
+          <p className={styles.note}>
+            Night proof is the next invoice, or the menu price. Saying the move is done does not close the week.
+          </p>
           <div className={styles.mobileMissing}>
             <h2>What&apos;s missing</h2>
             <MissingTable />
@@ -386,7 +391,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               <tr>
                 <th scope="row">Seat</th>
                 <td>
-                  One owner. One restaurant. The first seat is free.
+                  One product. One owner. One restaurant. The first seat is free.
                   <span className={styles.source}>Source: example</span>
                 </td>
               </tr>
@@ -430,6 +435,27 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </div>
         </article>
 
+        <article id="night" data-panel="night">
+          <h2>Night proof</h2>
+          <p className={styles.stepLabel}>Night · {sample.label}</p>
+          <h3>The receipt for the morning move.</h3>
+          <p>
+            Proof is the next cheese invoice, or the menu price. A spoken yes does not write a new dollar.
+          </p>
+          <table className={styles.sheet}>
+            <tbody>
+              <tr>
+                <th scope="row">Proof</th>
+                <td>Next invoice, or the menu price.</td>
+              </tr>
+              <tr>
+                <th scope="row">Week</th>
+                <td>Stays open. This example has no nightly close.</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
         <article data-panel="missing">
           <h2>What&apos;s missing</h2>
           <MissingTable />
@@ -454,11 +480,13 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
         <footer className={styles.footer}>
           <p>
             {sample.label} only. Example data. A sample price change, not money you got back.
-            One restaurant. One seat. Free.
+            One product. One restaurant. One seat. Free.
+            ChatGPT, Gemini, and Grok open this seat.
           </p>
           <nav aria-label="Footer">
             <a href={ACTION_SHIFT_APP_URL}>app.never86.app</a>
             <Link href="/onboard">Start my free seat</Link>
+            <Link href="/llm-shells">ChatGPT, Gemini, Grok</Link>
           </nav>
         </footer>
       </main>

@@ -4,7 +4,7 @@ import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSea
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: 'Watch One Seat work | Never86’d',
+  title: 'Watch Action Shift | Never86’d',
   description: '68-second product walk. Fictional sample documents. Then try the two-invoice check on never86.ai.',
   alternates: { canonical: 'https://www.never86.ai/try/watch' },
 };

@@ -27,8 +27,11 @@ export function PrimeCostDeskHub({ board }: { board: PrimeCostBoard }) {
             <span className="ml-1 text-[12px] font-medium text-ink-500">· Prime cost</span>
           </Link>
           <nav className="flex items-center gap-2 text-[13px] text-ink-600">
+            <Link href="/action-shift" className="rounded-full px-3 py-1.5 hover:bg-black/[0.04]">
+              The seat
+            </Link>
             <Link href="/command-center" className="rounded-full px-3 py-1.5 hover:bg-black/[0.04]">
-              Command Center
+              Stores
             </Link>
             <Link href="/command-center/sales-labor" className="rounded-full px-3 py-1.5 hover:bg-black/[0.04]">
               Sales · Labor

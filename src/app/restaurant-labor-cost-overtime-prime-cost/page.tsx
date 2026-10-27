@@ -8,7 +8,7 @@ import { LAST_WEEK_PRIME_FAMILIES } from '@/lib/lastWeekPrimeCost';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: `${LABOR_CAPTURE.title} | Never86’d One Seat`,
+  title: `${LABOR_CAPTURE.title} | Action Shift`,
   description: LABOR_CAPTURE.description,
   alternates: { canonical: LABOR_CAPTURE.canonical },
   openGraph: {

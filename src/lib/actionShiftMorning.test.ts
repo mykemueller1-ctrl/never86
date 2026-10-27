@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { GOLD_MOZZARELLA } from './oneSeatPublicWin';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -17,6 +18,8 @@ function dollars(html: string): string[] {
 
 describe('public Action Shift morning page', () => {
   it('keeps the sample chain to the published /try figures', () => {
+    expect(ACTION_SHIFT_SAMPLE.priorCase).toBe(GOLD_MOZZARELLA.priorPrice);
+    expect(ACTION_SHIFT_SAMPLE.currentCase).toBe(GOLD_MOZZARELLA.currentPrice);
     expect(ACTION_SHIFT_SAMPLE.priorCase).toBe(48);
     expect(ACTION_SHIFT_SAMPLE.currentCase).toBe(56);
     expect(ACTION_SHIFT_CASE_DELTA).toBe(8);
@@ -34,8 +37,13 @@ describe('public Action Shift morning page', () => {
     expect(html).toContain('Find the leak. Assign the fix. Keep the receipt.');
     expect(html).toContain('Last night');
     expect(html).toContain('one move');
+    expect(html).toContain('One product');
     expect(html).toContain('One owner');
     expect(html).toContain('One receipt');
+    expect(html).toContain('Night proof');
+    expect(html).toContain('ChatGPT, Gemini, and Grok open this seat.');
+    expect(html).toContain('href="/llm-shells"');
+    expect(html).not.toContain('chatgpt.site');
     expect(html).toContain('Start my free seat');
     expect(html).toContain('See a sample morning');
     expect(html).toContain('href="/onboard"');
@@ -92,5 +100,21 @@ describe('public Action Shift morning page', () => {
     const css = readFileSync(new URL('../components/action-shift-morning.module.css', import.meta.url), 'utf8');
     expect(css).toContain('tabular-nums');
     expect(css).not.toMatch(/#f3f0ea|#f6e7c1|#3b2a12|#e7e4fb|#f3e4e1|#8a4b2f|999px|Iowan/);
+  });
+
+  it('keeps the seat, the store read, and the model connectors on one Action Shift product', () => {
+    const seat = readFileSync(new URL('../app/seat/page.tsx', import.meta.url), 'utf8');
+    const command = readFileSync(new URL('../components/UnifiedCommandCenter.tsx', import.meta.url), 'utf8');
+    const gold = readFileSync(new URL('../components/OperatorGoldLinks.tsx', import.meta.url), 'utf8');
+    expect(seat).toContain('ActionShiftMorning');
+    expect(seat).not.toContain('OneSeatPanels');
+    expect(seat).not.toContain('chatgpt.site');
+    expect(command).toContain('· Action Shift');
+    expect(command).toContain('href="/action-shift"');
+    expect(command).toContain('One seat.');
+    expect(command).not.toContain('Command Center');
+    expect(gold).toContain('Action Shift is the product');
+    expect(gold).toContain('/llm-shells');
+    expect(gold).not.toContain('chatgpt.site');
   });
 });
