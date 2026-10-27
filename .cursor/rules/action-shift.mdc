@@ -1,0 +1,64 @@
+---
+description: Action Shift logic and the Never86.ai multi-unit board
+alwaysApply: true
+---
+
+# Action Shift and Never86.ai
+
+Action Shift is the free one-seat, one-store product. Never call it Pulse. Do not add a multi-store view, a roll-up, or Command Center pricing to Action Shift.
+
+Never86.ai, this repo, is the separate multi-unit build for 1 to 5 units, stretching to 9. It has per-unit views and one all-units roll-up. Pricing for extra units stays TBD unless a price is already approved in this repo. Do not invent one. Do not use the Command Center name.
+
+never86d-beta-ctap, never86-action-shift-live, and app.never86.app are read-only. Do not push, branch, comment, redirect, or change DNS for them.
+
+## Flow
+1. Operator names 1 to 9 units.
+2. One drop: POS exports, invoices, payroll, delivery statements (DoorDash, Uber Eats, Grubhub), CSV, Excel, PDF, or photos. Paste is allowed.
+3. Sort each file by type and by unit. Show the sorting summary so a wrong sort can be fixed.
+4. Tally board, then daily numbers, then weekly prime cost.
+5. At most 3 ranked actions. Each has an owner, a due date (2 days out), an expected outcome, and a label.
+
+The tally opens with a short "How today went" strip. Biggest dollar misses first. Each category tile carries the same kind of one-line note.
+
+## Labels
+Verified, Estimated, or Missing. Sample data is marked on the page. The figure itself still uses those three labels.
+
+- Blank, dash, or unreadable is Missing. Never treat a blank as $0.
+- A zero that is written on the file stays zero.
+- Hours times a wage on the file is Estimated. A labor dollar column is Verified.
+- Quantity times price, with no printed extension, is Estimated.
+- A category guessed from the item name is Estimated.
+- PDF and photos keep a sort slot. Amounts stay Missing until the rows are CSV or Excel.
+- Roll up a dollar only when every unit in the view has that figure. Otherwise the roll-up is Missing and names the unit and the file.
+- Do not average percents. Percent is summed dollars divided by summed sales.
+- Round callouts to whole dollars and whole percents.
+
+## Tally
+Categories: food/COGS, beverage, paper/packaging, labor, delivery fees, other.
+
+Week-to-date dollars and percent of week-to-date sales sit side by side. The board updates as each file lands.
+
+Targets are operator-set percents. No default targets. An empty target stays empty. Zero is a real target only after the operator enters it.
+
+Daily callout, per category, per unit, and for all units:
+
+- Dollars over or under = actual spend minus (target percent times that day's sales).
+- Show that dollar next to actual spend as a percent of the day's sales.
+- Over: "Labor ran $200 over today. That's 40% of sales, and your target is 30%."
+- Under: "Food came in $85 under. Nice, that's 27% of sales."
+- No target: say so and ask them to set one.
+- Missing sales or spend: name the file. Do not guess.
+
+## Truth
+- POS is not payout. Delivery payout is not the fee. Commission, marketing, and error charges stay separate. A missing fee is not zero.
+- Invoice is not COGS. Food cost and prime cost need a count (beginning plus purchases minus ending) or a food-cost column on the file.
+- Prime cost is COGS plus labor, in dollars and as a percent of sales. If either part is Missing, prime cost is Missing.
+- An incomplete week stays Open.
+- No count, no food cost. Purchases may still show on the food tile as spend, with that note.
+- Labor copy asks what kept the role over the plan. Use the role, not a staff name. No theft or skimming claims.
+- Do not say a specific operator uses Toast.
+- No em dashes in copy. No desk wording. No portal login. No auto-send.
+- Human approves the move. The model ranks. It does not send.
+
+## Checks inside the 3 actions
+Invoice: same pack, price change. Labor: schedule against the clock. Menu: plate cost, blank ingredient is not free. Statement: review the fee lines. Dollar misses from the tally outrank those checks. Cap the list at 3.

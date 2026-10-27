@@ -10,7 +10,7 @@ type OwnerSeatFormProps = {
 
 export function OwnerSeatForm({
   title = 'Claim your free owner seat',
-  subtitle = 'One location and the owner seat are free. Add paid seats later when your team is ready.',
+  subtitle = 'One location and the owner seat are free. Pricing for more seats and more units is TBD.',
   buttonLabel = 'Claim free owner seat',
 }: OwnerSeatFormProps) {
   const [email, setEmail] = useState('');
@@ -50,9 +50,9 @@ export function OwnerSeatForm({
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border border-gold-700 bg-dark-700 p-8 text-left shadow-xl shadow-black/20">
-        <p className="mb-2 text-xl font-semibold text-gold-500">{message}</p>
-        <p className="text-sm text-dark-300">
+      <div className="n86-card p-6 text-left">
+        <p className="mb-2 text-xl font-semibold text-[#963c1c]">{message}</p>
+        <p className="text-sm text-[#616b71]">
           Check your email for the welcome note and next step for your free owner seat.
         </p>
       </div>
@@ -60,10 +60,10 @@ export function OwnerSeatForm({
   }
 
   return (
-    <div className="rounded-2xl border border-dark-600 bg-dark-700 p-8 text-left shadow-xl shadow-black/20">
+    <div className="n86-card p-6 text-left">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-white">{title}</h2>
-        <p className="mt-2 text-sm leading-6 text-dark-300">{subtitle}</p>
+        <h2 className="text-2xl font-bold tracking-[-0.03em]">{title}</h2>
+        <p className="mt-2 text-sm leading-6 text-[#616b71]">{subtitle}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -72,7 +72,7 @@ export function OwnerSeatForm({
           placeholder="Owner name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-dark-600 bg-dark-800 px-4 py-3 text-white placeholder-dark-400 focus:border-gold-500 focus:outline-none transition-colors"
+          className="n86-field placeholder:text-[#8a8478]"
         />
         <input
           type="email"
@@ -80,28 +80,28 @@ export function OwnerSeatForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded-lg border border-dark-600 bg-dark-800 px-4 py-3 text-white placeholder-dark-400 focus:border-gold-500 focus:outline-none transition-colors"
+          className="n86-field placeholder:text-[#8a8478]"
         />
         <input
           type="text"
           placeholder="Restaurant or hospitality group"
           value={restaurantName}
           onChange={(e) => setRestaurantName(e.target.value)}
-          className="w-full rounded-lg border border-dark-600 bg-dark-800 px-4 py-3 text-white placeholder-dark-400 focus:border-gold-500 focus:outline-none transition-colors"
+          className="n86-field placeholder:text-[#8a8478]"
         />
 
-        <div className="rounded-lg border border-dark-600 bg-dark-800 px-4 py-3 text-sm text-dark-200">
-          <p className="font-medium text-white">Seat policy</p>
+        <div className="rounded-lg border border-[#d8d5cd] bg-[#fafaf9] px-4 py-3 text-sm text-[#44403c]">
+          <p className="font-medium text-[#25262a]">Seat policy</p>
           <p className="mt-1">
-            Seat 1 is the owner and it is free for one location. Seats 2 and 3 become paid seats
-            when you add more people.
+            Seat 1 is the owner and it is free for one location. Pricing for more seats and more
+            units is TBD.
           </p>
         </div>
 
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="w-full rounded-lg bg-gold-500 px-4 py-3 font-semibold text-dark-900 transition-colors hover:bg-gold-600 disabled:opacity-50"
+          className="n86-btn-primary w-full disabled:opacity-50"
         >
           {status === 'loading' ? 'Saving your seat...' : buttonLabel}
         </button>
