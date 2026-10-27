@@ -3,12 +3,126 @@
 @tailwind utilities;
 
 :root {
-  --gold: #d4a017;
-  --dark: #121212;
+  --page: #f8f6f2;
+  --card: #fffefa;
+  --ink: #25262a;
+  --muted: #657078;
+  --line: #d8d5cd;
+  --rust: #b84322;
+  --rust-btn: #af3e22;
+  --rust-edge: #d97552;
+  --rust-ink: #963c1c;
+  --signal: #d46743;
+  --sidebar: #18232b;
+  --sidebar-active: #2c3c48;
+  --chip-over: #f8e9e1;
+  --focus: #ac4729;
 }
 
 body {
-  background: var(--dark);
-  color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.n86-card {
+  background: var(--card);
+  border: 1px solid #d6d3d1;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.n86-field {
+  min-height: 44px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.n86-btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 8px;
+  padding: 0 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.n86-btn-primary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid var(--rust-edge);
+  background: var(--rust-btn);
+  padding: 0 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  transition: background-color 150ms ease;
+}
+
+.n86-btn-primary:hover {
+  background: #963c1c;
+}
+
+.n86-btn-secondary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #cdd6dd;
+  background: #fff;
+  padding: 0 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.n86-btn-secondary:hover {
+  background: #f4f1ea;
+}
+
+.n86-link {
+  color: var(--rust-ink);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.n86-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.n86-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .n86-drawer,
+  .n86-btn,
+  .n86-btn-primary,
+  .n86-btn-secondary {
+    transition: none;
+  }
 }

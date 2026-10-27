@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { SiteHeader } from "@/components/site-header";
+import { useState, useMemo } from "react";
+import { HonestyChip } from "@/components/honesty-chip";
+import { Shell } from "@/components/shell";
 import type { Move, ScopeView, Tile } from "@/lib/close/build";
 import { buildBoard } from "@/lib/close/build";
 import { slicesFromTable, type Slice, type UnitRef } from "@/lib/close/classify";
@@ -31,14 +32,8 @@ const EMPTY_TARGETS: Record<Category, string> = {
   other: "",
 };
 
-function chipClass(label: EvidenceLabel) {
-  if (label === "Verified") return "bg-[#12382c] text-[#b7f0d2]";
-  if (label === "Estimated") return "bg-[#3a2e10] text-[#f3d48a]";
-  return "bg-[#24302c] text-[#d5ddd8]";
-}
-
 function Chip({ label }: { label: EvidenceLabel }) {
-  return <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${chipClass(label)}`}>{label}</span>;
+  return <HonestyChip label={label} />;
 }
 
 function showMoney(figure: Figure) {
@@ -144,13 +139,40 @@ export function CloseBoard() {
     setSlices((current) => current.map((slice) => (slice.id === id ? { ...slice, ...patch } : slice)));
   }
 
+  const through = board.latestDay ? formatDay(board.latestDay) : null;
   return (
-    <div className="min-h-screen bg-[#0c1412] text-[#f4f1ea]">
-      <a href="#today" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:bg-[#f0c94a] focus:px-3 focus:py-2 focus:text-[#1a1404]">
+    <>
+      <a href="#today" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-3 focus:py-2">
         Skip to how today went
       </a>
-      <SiteHeader tone="board" />
-      <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8">
+      <Shell
+        active="close"
+        title={phase === "board" ? groupName || "The close" : "Name the units"}
+        meta={through ? `Business date: ${through}. Reports through ${through}.` : "Drop a file to set the business date."}
+        location={
+          phase === "board" && scope ? (
+            <label className="grid min-w-[10rem] text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">
+              Unit
+              <select className="n86-field mt-1" aria-label="Unit" value={scope.id} onChange={(event) => setFocus(event.target.value)}>
+                {board.scopes.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null
+        }
+        action={
+          phase === "board" ? (
+            <label htmlFor="close-files" className="n86-btn-primary cursor-pointer">
+              Add my records
+            </label>
+          ) : null
+        }
+        aside={phase === "board" ? <FileRail slices={slices} /> : null}
+      >
+        <div className="mx-auto flex max-w-3xl flex-col gap-8">
         {phase === "setup" ? (
           <Setup
             groupName={groupName}
@@ -178,12 +200,9 @@ export function CloseBoard() {
             slices={slices}
             units={namedUnits}
             scope={scope}
-            scopes={board.scopes}
-            focus={focus}
             targets={targets}
             paste={paste}
             pasteName={pasteName}
-            onFocus={setFocus}
             onFiles={addFiles}
             onPaste={setPaste}
             onPasteName={setPasteName}
@@ -193,8 +212,9 @@ export function CloseBoard() {
             onSample={loadSample}
           />
         ) : null}
-      </main>
-    </div>
+        </div>
+      </Shell>
+    </>
   );
 }
 
@@ -210,10 +230,10 @@ function Setup(props: {
   onSample: () => void;
 }) {
   return (
-    <section className="mx-auto grid w-full max-w-xl gap-6">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f0c94a]">Never86.ai</p>
-      <h1 className="text-4xl font-semibold tracking-tight">Name the units. Then drop the week.</h1>
-      <p className="text-base leading-7 text-[#d5ddd8]">
+    <section className="grid w-full gap-6">
+      <p className="n86-eyebrow text-[#963c1c]">Never86.ai</p>
+      <h2 className="text-[clamp(2rem,3vw,2.6rem)] font-bold leading-[1.1] tracking-[-0.045em]">Name the units. Then drop the week.</h2>
+      <p className="text-base leading-7 text-[#616b71]">
         Built for operators with 1 to 5 units, with room for 9. One drop covers every store. Pricing for more units is TBD.
       </p>
       <form
@@ -229,7 +249,7 @@ function Setup(props: {
             required
             value={props.groupName}
             onChange={(event) => props.onGroup(event.target.value)}
-            className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#13201c] px-3 text-base font-normal"
+            className="n86-field"
           />
         </label>
         <label className="grid gap-2 text-sm font-semibold">
@@ -238,7 +258,7 @@ function Setup(props: {
             value={props.owner}
             onChange={(event) => props.onOwner(event.target.value)}
             placeholder="Owner"
-            className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#13201c] px-3 text-base font-normal"
+            className="n86-field"
           />
         </label>
         <fieldset className="grid gap-3">
@@ -253,13 +273,13 @@ function Setup(props: {
                     props.onUnits(props.units.map((item) => (item.id === unit.id ? { ...item, name: event.target.value } : item)))
                   }
                   placeholder={index === 0 ? "Harbor Grill" : "Second unit"}
-                  className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#13201c] px-3 text-base"
+                  className="n86-field"
                 />
               </label>
               {props.units.length > 1 ? (
                 <button
                   type="button"
-                  className="min-h-12 rounded-xl border border-[#2a3b34] px-3 text-sm"
+                  className="n86-btn-secondary"
                   onClick={() => props.onUnits(props.units.filter((item) => item.id !== unit.id))}
                 >
                   Remove
@@ -270,17 +290,17 @@ function Setup(props: {
           <button
             type="button"
             disabled={props.units.length >= 9}
-            className="min-h-12 rounded-xl border border-dashed border-[#3d5349] text-sm disabled:opacity-40"
+            className="n86-btn-secondary border-dashed disabled:opacity-40"
             onClick={() => props.onUnits([...props.units, newUnit(props.units.length + 1)])}
           >
             {props.units.length >= 9 ? "9 units is the stretch" : "Add a unit"}
           </button>
         </fieldset>
-        <button type="submit" disabled={!props.ready} className="min-h-12 rounded-full bg-[#f0c94a] font-semibold text-[#1a1404] disabled:opacity-40">
+        <button type="submit" disabled={!props.ready} className="n86-btn-primary disabled:opacity-40">
           Open the board
         </button>
       </form>
-      <button type="button" onClick={props.onSample} className="text-left text-sm text-[#f0c94a] underline-offset-4 hover:underline">
+      <button type="button" onClick={props.onSample} className="n86-link w-fit text-left">
         Use fictional sample data instead
       </button>
     </section>
@@ -298,12 +318,9 @@ function BoardView(props: {
   slices: Slice[];
   units: UnitRef[];
   scope: ScopeView;
-  scopes: ScopeView[];
-  focus: string;
   targets: Record<Category, string>;
   paste: string;
   pasteName: string;
-  onFocus: (id: string) => void;
   onFiles: (files: FileList | File[]) => void;
   onPaste: (value: string) => void;
   onPasteName: (value: string) => void;
@@ -316,17 +333,17 @@ function BoardView(props: {
   return (
     <>
       <section className="grid gap-3">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f0c94a]">{props.groupName}</p>
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">Yesterday, across the units.</h1>
-        <p className="max-w-2xl text-[#d5ddd8]">
+        <p className="n86-eyebrow text-[#963c1c]">{props.groupName}</p>
+        <h2 className="max-w-3xl text-[clamp(1.8rem,3vw,2.4rem)] font-bold tracking-[-0.045em]">Yesterday, across the units.</h2>
+        <p className="max-w-2xl text-[#616b71]">
           Drop the close, the invoices, payroll, and the delivery statements. The board sorts them, then keeps at most three moves.
         </p>
         {props.sampleOn ? (
-          <p className="rounded-2xl border border-[#f0c94a]/40 bg-[#f0c94a]/10 p-4 text-sm leading-6">
+          <p className="border-l-[3px] border-[#b84322] bg-white px-4 py-3 text-sm leading-6">
             Sample data. Fictional restaurants. These numbers are not your close. Labor and food targets are filled in so you can see an over and an under. Clear a target to get the prompt.
           </p>
         ) : (
-          <button type="button" onClick={props.onSample} className="w-fit text-sm text-[#f0c94a] underline-offset-4 hover:underline">
+          <button type="button" onClick={props.onSample} className="n86-link w-fit">
             Load fictional sample data
           </button>
         )}
@@ -335,7 +352,7 @@ function BoardView(props: {
       <DropZone busy={props.busy} onFiles={props.onFiles} />
 
       <form
-        className="grid gap-3 rounded-2xl border border-[#24332d] bg-[#13201c] p-4"
+        className="n86-card grid gap-3 p-4"
         onSubmit={(event) => {
           event.preventDefault();
           props.onAddPaste();
@@ -347,7 +364,7 @@ function BoardView(props: {
             value={props.paste}
             onChange={(event) => props.onPaste(event.target.value)}
             rows={4}
-            className="rounded-xl border border-[#2a3b34] bg-[#0c1412] p-3 font-mono text-sm font-normal"
+            className="n86-field min-h-28 py-3 font-mono text-sm"
           />
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -356,10 +373,10 @@ function BoardView(props: {
             <input
               value={props.pasteName}
               onChange={(event) => props.onPasteName(event.target.value)}
-              className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#0c1412] px-3 font-normal"
+              className="n86-field"
             />
           </label>
-          <button type="submit" className="min-h-12 rounded-full bg-[#f4f1ea] px-5 font-semibold text-[#0c1412] sm:self-end">
+          <button type="submit" className="n86-btn-primary sm:self-end">
             Add rows
           </button>
         </div>
@@ -369,23 +386,23 @@ function BoardView(props: {
         <h2 id="sort-heading" className="text-2xl font-semibold">
           Sorting summary
         </h2>
-        <p className="text-sm text-[#d5ddd8]">Each file lands in a type and a unit. Change either one if the sort is wrong. The tally updates with the correction.</p>
+        <p className="text-sm text-[#616b71]">Each file lands in a type and a unit. Change either one if the sort is wrong. The tally updates with the correction.</p>
         {props.slices.length === 0 ? (
-          <p className="text-sm text-[#d5ddd8]">Awaiting files.</p>
+          <p className="text-sm text-[#616b71]">Awaiting files.</p>
         ) : (
           <ul className="grid gap-3">
             {props.slices.map((slice) => (
-              <li key={slice.id} className="grid gap-3 rounded-2xl border border-[#24332d] bg-[#13201c] p-4 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
+              <li key={slice.id} className="n86-card grid gap-3 p-4 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
                 <div>
                   <p className="font-semibold">{slice.fileName}</p>
-                  <p className="mt-1 text-sm text-[#d5ddd8]">{slice.detail}</p>
+                  <p className="mt-1 text-sm text-[#616b71]">{slice.detail}</p>
                 </div>
                 <label className="grid gap-1 text-sm font-semibold">
                   Type
                   <select
                     value={slice.kind}
                     onChange={(event) => props.onSlice(slice.id, { kind: event.target.value as FileKind })}
-                    className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#0c1412] px-2 font-normal"
+                    className="n86-field"
                   >
                     {(Object.keys(KIND_LABEL) as FileKind[]).map((kind) => (
                       <option key={kind} value={kind}>
@@ -399,7 +416,7 @@ function BoardView(props: {
                   <select
                     value={slice.unitId ?? ""}
                     onChange={(event) => props.onSlice(slice.id, { unitId: event.target.value || null })}
-                    className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#0c1412] px-2 font-normal"
+                    className="n86-field"
                   >
                     <option value="">Unassigned</option>
                     {props.units.map((unit) => (
@@ -415,45 +432,44 @@ function BoardView(props: {
         )}
       </section>
 
-      <div role="radiogroup" aria-label="Unit" className="flex gap-2 overflow-x-auto pb-1">
-        {props.scopes.map((item) => {
-          const selected = item.id === props.scope.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              onClick={() => props.onFocus(item.id)}
-              className={`min-h-12 shrink-0 rounded-full px-4 text-sm font-semibold ${selected ? "bg-[#f0c94a] text-[#1a1404]" : "border border-[#3d5349] text-[#f4f1ea]"}`}
-            >
-              {item.name}
-            </button>
-          );
-        })}
-      </div>
-
       <section id="today" aria-live="polite" className="grid gap-4">
-        <div className="rounded-3xl border border-[#f0c94a]/50 bg-[#18241f] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f0c94a]">{kicker}</p>
-          <h2 className="mt-2 text-2xl font-semibold">{props.scope.name}</h2>
-          {props.scope.strip.length === 0 ? (
-            <p className="mt-3 text-[#d5ddd8]">Awaiting a day with sales and spend.</p>
-          ) : (
-            <ul className="mt-4 grid gap-3">
-              {props.scope.strip.map((line) => (
-                <li key={`${line.category}-${line.text}`} className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <p className="max-w-3xl text-base leading-7">{line.text}</p>
-                  <Chip label={line.label} />
-                </li>
-              ))}
-            </ul>
-          )}
+        <div>
+          <p className="n86-eyebrow text-[#963c1c]">{kicker}</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-[-0.03em]">{props.scope.name}</h2>
         </div>
+        {props.scope.strip.length === 0 ? (
+          <p className="text-sm text-[#616b71]">Awaiting a day with sales and spend.</p>
+        ) : (
+          <ul className="grid gap-3">
+            {props.scope.strip.map((line) => {
+              const over = line.variance !== null && line.variance > 0;
+              const under = line.variance !== null && line.variance < 0;
+              const chip = over ? `${money(line.variance)} over` : under ? `${money(Math.abs(line.variance ?? 0))} under` : line.label;
+              return (
+                <li key={`${line.category}-${line.text}`} className="n86-card p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <p className="n86-eyebrow text-[#657078]">Finding</p>
+                    <span className={`rounded-md px-2 py-1 font-mono text-xs ${over ? "bg-[#f8e9e1] text-[#92432a]" : under ? "bg-[#e7f7ee] text-[#166534]" : "bg-[#f5f5f4] text-[#44403c]"}`}>
+                      {chip}
+                    </span>
+                  </div>
+                  <hr className="my-3 border-[#e7e5e4]" />
+                  <p className="text-lg font-bold leading-7 tracking-[-0.02em]">{line.text}</p>
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e5e4] pt-3">
+                    <Chip label={line.label} />
+                    <a href={`#tile-${line.category}`} className="n86-link">
+                      View the math →
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
 
         <div className="flex items-end justify-between gap-3">
-          <h2 className="text-2xl font-semibold">Week tally</h2>
-          <p className="text-sm text-[#d5ddd8]">{props.boardWeek ? `Week of ${formatDay(props.boardWeek)}` : "No dated rows yet"}</p>
+          <h2 className="text-2xl font-bold tracking-[-0.03em]">Week tally</h2>
+          <p className="text-sm text-[#657078]">{props.boardWeek ? `Week of ${formatDay(props.boardWeek)}` : "No dated rows yet"}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {props.scope.tiles.map((tile) => (
@@ -461,7 +477,7 @@ function BoardView(props: {
           ))}
         </div>
         {props.notes.map((note) => (
-          <p key={note} className="text-sm text-[#d5ddd8]">
+          <p key={note} className="text-sm text-[#616b71]">
             {note}
           </p>
         ))}
@@ -472,11 +488,11 @@ function BoardView(props: {
           Daily numbers
         </h2>
         {props.scope.days.length === 0 ? (
-          <p className="text-sm text-[#d5ddd8]">No dates on the files yet.</p>
+          <p className="text-sm text-[#616b71]">No dates on the files yet.</p>
         ) : (
           <ul className="grid gap-3">
             {props.scope.days.map((day) => (
-              <li key={day.date} className="rounded-2xl border border-[#24332d] bg-[#13201c] p-4">
+              <li key={day.date} className="n86-card p-4">
                 <h3 className="font-semibold">{formatDay(day.date)}</h3>
                 <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   <DailyFact label="Sales" figure={day.sales} kind="money" />
@@ -491,27 +507,27 @@ function BoardView(props: {
         )}
       </section>
 
-      <section className="grid gap-3 rounded-3xl border border-[#24332d] bg-[#13201c] p-5" aria-labelledby="prime-heading">
+      <section className="n86-card grid gap-3 p-5" aria-labelledby="prime-heading">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id="prime-heading" className="text-2xl font-semibold">
             Weekly prime cost
           </h2>
           <Chip label={props.scope.prime.dollars.label} />
-          <span className="rounded-full border border-[#3d5349] px-2 py-1 text-[11px] font-bold uppercase tracking-[0.14em]">
+          <span className="rounded-full border border-[#d6d3d1] bg-[#fafaf9] px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.07em] text-[#44403c]">
             {props.scope.prime.weekStatus === "closed" ? "Closed week" : "Open week"}
           </span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#d5ddd8]">Dollars</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">Dollars</p>
             <p className="mt-1 font-mono text-4xl">{showMoney(props.scope.prime.dollars)}</p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#d5ddd8]">Of sales</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">Of sales</p>
             <p className="mt-1 font-mono text-4xl">{showPercent(props.scope.prime.percent)}</p>
           </div>
         </div>
-        <p className="text-sm leading-6 text-[#d5ddd8]">{props.scope.prime.note}</p>
+        <p className="text-sm leading-6 text-[#616b71]">{props.scope.prime.note}</p>
       </section>
 
       <section className="grid gap-3" aria-labelledby="moves-heading">
@@ -527,7 +543,8 @@ function BoardView(props: {
 function DropZone({ busy, onFiles }: { busy: boolean; onFiles: (files: FileList | File[]) => void }) {
   return (
     <div
-      className="relative rounded-3xl border border-dashed border-[#f0c94a] bg-[#13201c] p-6"
+      id="drop"
+      className="relative rounded-xl border border-dashed border-[#d97552] bg-white p-6"
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
@@ -535,6 +552,7 @@ function DropZone({ busy, onFiles }: { busy: boolean; onFiles: (files: FileList 
       }}
     >
       <input
+        id="close-files"
         aria-label="Drop POS exports, invoices, payroll, delivery statements, CSV, Excel, PDF, or photos"
         type="file"
         multiple
@@ -545,9 +563,9 @@ function DropZone({ busy, onFiles }: { busy: boolean; onFiles: (files: FileList 
           event.target.value = "";
         }}
       />
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f0c94a]">One drop</p>
-      <p className="mt-2 text-2xl font-semibold">{busy ? "Reading files..." : "Drop yesterday's close"}</p>
-      <p className="mt-2 max-w-xl text-sm leading-6 text-[#d5ddd8]">
+      <p className="n86-eyebrow text-[#963c1c]">One drop</p>
+      <p className="mt-2 text-2xl font-bold tracking-[-0.03em]">{busy ? "Reading files..." : "Drop yesterday's close"}</p>
+      <p className="mt-2 max-w-xl text-sm leading-6 text-[#616b71]">
         POS exports, invoices, payroll, DoorDash, Uber Eats, Grubhub. CSV, Excel, PDF, or a photo. A photo keeps its place in the sort. The dollars stay Missing until the rows can be read.
       </p>
     </div>
@@ -564,22 +582,22 @@ function TileCard({
   onTarget: (category: Category, value: string) => void;
 }) {
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-[#24332d] bg-[#13201c] p-4">
+    <article id={`tile-${tile.category}`} className="n86-card flex flex-col gap-3 p-4">
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-lg font-semibold">{tile.title}</h3>
         <Chip label={tile.spend.label} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#d5ddd8]">Week dollars</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">Week dollars</p>
           <p className="mt-1 font-mono text-3xl">{showMoney(tile.spend)}</p>
         </div>
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#d5ddd8]">Of sales</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">Of sales</p>
           <p className="mt-1 font-mono text-3xl">{showPercent(tile.percent)}</p>
         </div>
       </div>
-      {tile.spend.label === "Missing" ? null : <p className="text-sm leading-6 text-[#d5ddd8]">{tile.sourceNote}</p>}
+      {tile.spend.label === "Missing" ? null : <p className="text-sm leading-6 text-[#616b71]">{tile.sourceNote}</p>}
       <p className="text-sm leading-6">
         <Chip label={tile.noteLabel} /> <span className="ml-2">{tile.note}</span>
       </p>
@@ -590,7 +608,7 @@ function TileCard({
           value={target}
           placeholder="No target yet"
           onChange={(event) => onTarget(tile.category, event.target.value)}
-          className="min-h-12 rounded-xl border border-[#2a3b34] bg-[#0c1412] px-3 font-normal"
+          className="n86-field"
         />
       </label>
     </article>
@@ -600,36 +618,78 @@ function TileCard({
 function DailyFact({ label, figure, kind }: { label: string; figure: Figure; kind: "money" | "percent" }) {
   return (
     <div>
-      <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#d5ddd8]">{label}</dt>
+      <dt className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#657078]">{label}</dt>
       <dd className="mt-1 font-mono text-xl">{kind === "money" ? showMoney(figure) : showPercent(figure)}</dd>
       <dd className="mt-1">
         <Chip label={figure.label} />
       </dd>
-      {figure.missing ? <dd className="mt-1 text-xs leading-5 text-[#d5ddd8]">{figure.missing}</dd> : null}
+      {figure.missing ? <dd className="mt-1 text-xs leading-5 text-[#616b71]">{figure.missing}</dd> : null}
     </div>
   );
 }
 
 function ActionList({ actions }: { actions: Move[] }) {
+  const [accepted, setAccepted] = useState<Record<string, boolean>>({});
   if (!actions.length) {
-    return <p className="text-sm text-[#d5ddd8]">Nothing to move on yet. Add a file, or set a target if you want an over or under.</p>;
+    return <p className="text-sm text-[#616b71]">Nothing to move on yet. Add a file, or set a target if you want an over or under.</p>;
   }
   return (
     <ol className="grid gap-3">
-      {actions.slice(0, 3).map((action, index) => (
-        <li key={action.id} className="rounded-2xl border border-[#24332d] bg-[#13201c] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f0c94a]">Next action {index + 1}</p>
-          <h3 className="mt-2 text-xl font-semibold">{action.title}</h3>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <Chip label={action.label} />
-            <p className="font-mono text-3xl">{action.amount === null || action.label === "Missing" ? "Missing" : money(action.amount)}</p>
-          </div>
-          <p className="mt-3 text-sm">Owner: {action.owner}</p>
-          <p className="text-sm">Due: {formatDay(action.due)}</p>
-          <p className="mt-2 text-sm leading-6">Expected outcome: {action.outcome}</p>
-          <p className="mt-2 text-sm text-[#d5ddd8]">Source: {action.source}</p>
-        </li>
-      ))}
+      {actions.slice(0, 3).map((action, index) => {
+        const done = Boolean(accepted[action.id]);
+        return (
+          <li key={action.id} className="n86-card p-5">
+            <p className="n86-eyebrow text-[#963c1c]">Next action {index + 1} · Due {formatDay(action.due)}</p>
+            <h3 className="mt-2 text-lg font-bold tracking-[-0.02em]">{action.title}</h3>
+            <ol className="mt-4 grid gap-2">
+              <li className="flex gap-3 rounded-lg border border-[#e7e5e4] bg-[#fafaf9] px-3 py-2 text-sm">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#25262a] text-xs font-bold text-white">1</span>
+                <span>{action.outcome}</span>
+              </li>
+              <li className="flex gap-3 rounded-lg border border-[#e7e5e4] bg-[#fafaf9] px-3 py-2 text-sm">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#25262a] text-xs font-bold text-white">2</span>
+                <span>
+                  Owner {action.owner}. Due {formatDay(action.due)}. Source: {action.source}.
+                </span>
+              </li>
+            </ol>
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[#e7e5e4] pt-4">
+              <Chip label={action.label} />
+              <p className="font-mono text-3xl">{action.amount === null || action.label === "Missing" ? "Missing" : money(action.amount)}</p>
+              <button type="button" className="n86-btn-primary ml-auto" disabled={done} onClick={() => setAccepted((current) => ({ ...current, [action.id]: true }))}>
+                {done ? "Accepted" : "Accept move"}
+              </button>
+            </div>
+            {done ? <p className="mt-2 text-xs text-[#616b71]">Accepted on this board. Nothing was sent.</p> : null}
+          </li>
+        );
+      })}
     </ol>
+  );
+}
+
+function FileRail({ slices }: { slices: Slice[] }) {
+  const kinds: Array<{ kind: FileKind; hint: string }> = [
+    { kind: "pos", hint: "Net sales for the day." },
+    { kind: "labor", hint: "Hours or labor dollars." },
+    { kind: "invoice", hint: "Purchases, not a count." },
+    { kind: "statement", hint: "Fees, not the payout." },
+  ];
+  return (
+    <div className="grid gap-3">
+      <p className="n86-eyebrow text-[#5a6a75]">Files in this drop</p>
+      {kinds.map((item) => {
+        const found = slices.filter((slice) => slice.kind === item.kind);
+        return (
+          <article key={item.kind} className="rounded-[10px] border border-[#dbe1e5] bg-white p-3">
+            <p className="text-sm font-semibold">{KIND_LABEL[item.kind]}</p>
+            <p className="mt-1 text-xs leading-5 text-[#5a6a75]">{found.length ? `${found.length} file${found.length === 1 ? "" : "s"} sorted` : item.hint}</p>
+            <a href="#drop" className="n86-link mt-2 inline-flex min-h-9 items-center text-xs">
+              Add my reports →
+            </a>
+          </article>
+        );
+      })}
+    </div>
   );
 }

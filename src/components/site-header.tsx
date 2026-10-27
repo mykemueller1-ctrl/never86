@@ -1,24 +1,19 @@
 import Link from "next/link";
+import { Wordmark } from "@/components/wordmark";
 
-export function SiteHeader({ tone = "dark" }: { tone?: "dark" | "board" }) {
-  const bar = tone === "board" ? "border-[#24332d]" : "border-white/10";
+export function SiteHeader() {
   return (
-    <header className={`border-b ${bar}`}>
+    <header className="border-b border-[#d8d5cd] bg-[#fffefa]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="text-lg font-semibold tracking-tight text-white">
-          Never<span className="text-[#f0c94a]">86</span>.ai
-        </Link>
+        <Wordmark />
         <nav className="flex items-center gap-1 text-sm" aria-label="Primary">
-          <Link href="/close" className="inline-flex min-h-11 items-center rounded-full px-3 text-[#d5ddd8] hover:text-white">
+          <Link href="/close" className="inline-flex min-h-11 items-center rounded-md px-3 font-semibold text-[#25262a]">
             Board
           </Link>
-          <Link href="/audit" className="inline-flex min-h-11 items-center rounded-full px-3 text-[#d5ddd8] hover:text-white">
+          <Link href="/audit" className="inline-flex min-h-11 items-center rounded-md px-3 font-semibold text-[#25262a]">
             3P audit
           </Link>
-          <Link
-            href="/trial"
-            className="inline-flex min-h-11 items-center rounded-full bg-[#f0c94a] px-4 font-semibold text-[#1a1404] hover:bg-[#e2b93a]"
-          >
+          <Link href="/trial" className="n86-btn-primary">
             Free seat
           </Link>
         </nav>
