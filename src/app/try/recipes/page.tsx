@@ -6,7 +6,7 @@ import { GOLD_MOZZARELLA, GOLD_RECIPE, money, pctLabel } from '@/lib/oneSeatPubl
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: 'Try the plate-cost sample | Never86’d One Seat',
+  title: 'Try the plate-cost sample | Action Shift',
   description: 'Fictional plate cost $4 on a $16 menu. No count → no food cost.',
   alternates: { canonical: 'https://www.never86.ai/try/recipes' },
 };

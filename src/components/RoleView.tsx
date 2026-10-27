@@ -70,7 +70,7 @@ function Shell({ role, children }: { role: Role; children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-dark-800 px-6 py-10">
       <div className="max-w-5xl mx-auto">
-        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">Never 86&apos;d · Command Center</p>
+        <p className="text-dark-300 text-xs uppercase tracking-widest mb-3">Never 86&apos;d · Action Shift</p>
         <nav className="flex flex-wrap gap-2 mb-8">
           {NAV.map((t) => (
             <Link

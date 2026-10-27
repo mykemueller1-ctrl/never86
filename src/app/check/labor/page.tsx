@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HonestyLegend } from '@/components/HonestyLegend';
+import { OperatorGoldLinks } from '@/components/OperatorGoldLinks';
 import { PublicPaperDrop } from '@/components/PublicPaperDrop';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { GOLD_LABOR } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: 'Check labor drift | Never86’d One Seat',
+  title: 'Check labor drift | Action Shift',
   description: 'Compare scheduled hours with the time clock. Sample 1.50 h is fictional. First owner seat free.',
   alternates: { canonical: 'https://www.never86.ai/check/labor' },
 };
@@ -15,10 +16,11 @@ export const metadata: Metadata = {
 export default function CheckLaborPage() {
   return (
     <OneSeatPublicShell
-      eyebrow="ONE SEAT · LABOR DRIFT"
+      eyebrow="ACTION SHIFT · LABOR DRIFT"
       title="Why did the shift run over?"
       lede="Compare the posted schedule with the matching time clock. Punch ≠ schedule. Missing clock stays Missing. Operators stay on never86.ai."
     >
+      <OperatorGoldLinks />
       <article className={styles.card}>
         <p className={styles.eyebrow}>FICTIONAL SAMPLE</p>
         <div className={styles.prices}>

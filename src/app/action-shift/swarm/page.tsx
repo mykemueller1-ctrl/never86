@@ -3,7 +3,7 @@ import { CommandCenterSwarmDashboard } from '@/components/CommandCenterSwarmDash
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const metadata = {
-  title: "Command Center Swarm | Never 86'd",
+  title: "Action Shift swarm | Never 86'd",
   robots: { index: false, follow: false },
 };
 

@@ -3,11 +3,12 @@ import Link from 'next/link';
 import { HashScroll } from '@/components/HashScroll';
 import { InvoiceCompareClient } from '@/components/InvoiceCompareClient';
 import { InvoiceWinCard } from '@/components/InvoiceWinCard';
+import { OperatorGoldLinks } from '@/components/OperatorGoldLinks';
 import { OneSeatPublicShell, oneSeatStyles as styles } from '@/components/OneSeatPublicShell';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: 'Check invoice prices | Never86’d One Seat',
+  title: 'Check invoice prices | Action Shift',
   description: 'Compare the same vendor SKU and pack across two invoices. Sample mozzarella $48 → $56 is fictional. First owner seat free.',
   alternates: { canonical: 'https://www.never86.ai/check/invoices' },
 };
@@ -15,10 +16,11 @@ export const metadata: Metadata = {
 export default function CheckInvoicesPage() {
   return (
     <OneSeatPublicShell
-      eyebrow="ONE SEAT · VENDOR PRICES"
+      eyebrow="ACTION SHIFT · VENDOR PRICES"
       title="What went up on my invoice?"
       lede="Bring two invoices from the same vendor. The formula flags the same SKU and pack when unit price jumps more than 5%. A price increase is not money recovered. No ChatGPT sign-in."
     >
+      <OperatorGoldLinks />
       <div id="pdf" style={{ scrollMarginTop: 24 }}>
         <HashScroll id="pdf" />
         <InvoiceCompareClient />

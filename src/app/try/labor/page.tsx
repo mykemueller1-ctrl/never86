@@ -6,7 +6,7 @@ import { GOLD_LABOR } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: 'Try the labor drift sample | Never86’d One Seat',
+  title: 'Try the labor drift sample | Action Shift',
   description: 'Fictional schedule vs clock sample. 1.50 extra hours. Not recovered cash.',
   alternates: { canonical: 'https://www.never86.ai/try/labor' },
 };

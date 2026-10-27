@@ -146,12 +146,13 @@ function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2 group">
             <span className="brand-monogram" style={{ width: '1.4rem', height: '1.4rem', fontSize: '0.55rem' }}>N86</span>
             <span className="font-semibold tracking-tighter text-ink-800 text-[15px]">Never 86&apos;d</span>
-            <span className="text-ink-500 text-[12px] font-medium ml-1">· Command Center</span>
+            <span className="text-ink-500 text-[12px] font-medium ml-1">· Action Shift</span>
           </Link>
           <nav className="flex items-center gap-0.5 text-[13px] text-ink-600">
             {NAV.map((t) => (
               <a key={t.id} href={`#${t.id}`} className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">{t.label}</a>
             ))}
+            <Link href="/action-shift" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">The seat</Link>
             <Link href="/command-center/prime-cost" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">Prime cost</Link>
             <Link href="/command-center/sales-labor" className="px-3 py-1.5 rounded-full hover:text-ink-800 hover:bg-black/[0.04]">Sales · Labor</Link>
             <Link href="/admin/never86" className="px-3 py-1.5 rounded-full text-ink-800 hover:bg-black/[0.04] font-medium ml-2">Admin</Link>
@@ -193,8 +194,14 @@ export default async function UnifiedCommandCenter({ operatorId, displayName }: 
     <Shell>
       {/* Hero summary line */}
       <div className="mb-12">
-        <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-2">{d.operatorName ?? 'Network'} · last synced {prettyDate(d.lastIngest)}</p>
-        <h1 className="display text-4xl md:text-6xl">One screen.</h1>
+        <p className="text-ink-500 text-[12px] font-semibold uppercase tracking-widest mb-2">Action Shift · {d.operatorName ?? 'Network'} · last synced {prettyDate(d.lastIngest)}</p>
+        <h1 className="display text-4xl md:text-6xl">One seat.</h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-600">
+          Stores and exceptions are the read. The morning move and the night proof are the seat.
+        </p>
+        <Link href="/action-shift" className="mt-6 inline-flex text-sm font-semibold text-ink-800 underline underline-offset-4">
+          Open the seat
+        </Link>
       </div>
 
       {/* CEO */}

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export const metadata = {
-  title: "Command Center | Never 86'd",
+  title: "Action Shift — stores | Never 86'd",
 };
 
 export default async function CommandCenterPage({ params }: { params: Promise<{ operatorId: string }> }) {

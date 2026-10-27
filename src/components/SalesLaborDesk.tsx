@@ -112,8 +112,11 @@ export function SalesLaborDesk({ desk }: { desk: SalesLaborDesk }) {
             <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${completenessClass(desk.completeness)}`}>
               {desk.completeness}
             </span>
+            <Link href="/action-shift" className="rounded-full px-3 py-1.5 hover:bg-black/[0.04]">
+              The seat
+            </Link>
             <Link href="/command-center" className="rounded-full px-3 py-1.5 hover:bg-black/[0.04]">
-              Command Center
+              Stores
             </Link>
           </nav>
         </div>

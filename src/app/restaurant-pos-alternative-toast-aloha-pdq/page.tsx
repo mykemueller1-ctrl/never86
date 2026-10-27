@@ -7,7 +7,7 @@ import { ONE_SEAT_CLAIM, ONE_SEAT_ICP } from '@/lib/oneSeatPublicWin';
 import { ONE_SEAT_PATHS } from '@/lib/selectedSites';
 
 export const metadata: Metadata = {
-  title: `${POS_CAPTURE.title} | Never86’d One Seat`,
+  title: `${POS_CAPTURE.title} | Action Shift`,
   description: POS_CAPTURE.description,
   alternates: { canonical: POS_CAPTURE.canonical },
   openGraph: {
@@ -34,7 +34,7 @@ export default function RestaurantPosAlternativePage() {
         <h2>The floor still runs on Toast, Aloha, or PDQ. The leak is in the papers.</h2>
         <p className={styles.note}>
           Another tab will not close last night. You already have a close, a CSV, or a paper Z.
-          Keep that POS. Export-first. One Seat names the next move for {ONE_SEAT_ICP}.
+          Keep that POS. Export-first. Action Shift names the next move for {ONE_SEAT_ICP}.
         </p>
         <HonestyLegend
           active="Missing"
@@ -44,7 +44,7 @@ export default function RestaurantPosAlternativePage() {
           <small>ONE NEXT MOVE</small>
           <p>Drop the export or paper you already have. We label the evidence and name one action for tonight.</p>
         </div>
-        <p className={styles.note}>{ONE_SEAT_CLAIM} This is free One Seat, not a second operating system.</p>
+        <p className={styles.note}>{ONE_SEAT_CLAIM} This is Action Shift. One free seat.</p>
       </article>
 
       <article className={styles.card}>

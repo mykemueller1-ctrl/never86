@@ -4,7 +4,7 @@ import { MCP_PUBLIC_ENDPOINT } from '@/lib/mcpPublicContract';
 import { CopyMcpUrl } from './CopyMcpUrl';
 
 export const metadata: Metadata = {
-  title: "Use Never86'd in ChatGPT, Claude, Perplexity, Grok & Gemini",
+  title: "Action Shift in ChatGPT, Gemini, and Grok | Never86'd",
   description:
     "Connect the public, read-only Never86'd MCP to supported AI clients for payroll, invoice-price, and restaurant-process analysis. Private owner data stays in the authenticated Never86'd Operator app.",
   alternates: { canonical: 'https://www.never86.ai/llm-shells' },
@@ -82,8 +82,8 @@ export default function LlmShellsPage() {
         <Link href="/" className="flex items-start gap-4 group">
           <span className="compass-mark">N</span>
           <span>
-            <p className="font-serif text-[24px] leading-none text-ink-800">Never86&apos;d · AI connectors</p>
-            <p className="compass-eyebrow-dim mt-2">Payroll · Prices · Process</p>
+            <p className="font-serif text-[24px] leading-none text-ink-800">Action Shift</p>
+            <p className="compass-eyebrow-dim mt-2">One seat · ChatGPT, Gemini, and Grok</p>
           </span>
         </Link>
         <Link href="/" className="compass-pill"><span>Home</span></Link>
@@ -95,7 +95,7 @@ export default function LlmShellsPage() {
           One public connector. <em>Multiple AI clients.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
-          The public operator door is One Seat on never86.ai. Operators claim the free owner seat here, not on ChatGPT.
+          The product is Action Shift on never86.ai. ChatGPT, Gemini, and Grok open that same seat. Operators claim the free owner seat here, not on ChatGPT.
           Grok can explain a card after the formula runs. It does not invent the dollars. This is not a Grok-resale product.
           The public MCP still reads only the numbers or CSV you deliberately send. It cannot log into a POS or move money.
         </p>

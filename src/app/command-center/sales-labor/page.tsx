@@ -4,7 +4,7 @@ import { buildBambaSalesLaborDesk } from '@/lib/bambaSalesLabor';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const metadata = {
-  title: "Sales · Labor | Command Center | Never 86'd",
+  title: "Sales · Labor | Action Shift | Never 86'd",
   robots: { index: false, follow: false },
 };
 

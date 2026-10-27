@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
-  title: "Command Center Swarm (archived) | Never 86'd",
+  title: "Action Shift swarm (archived) | Never 86'd",
   robots: { index: false, follow: false },
 };
 
