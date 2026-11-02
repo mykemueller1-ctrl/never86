@@ -39,7 +39,7 @@ describe('public Action Shift morning page', () => {
     expect(html).toContain('Start my free seat');
     expect(html).toContain('See a sample morning');
     expect(html).toContain('href="/onboard"');
-    expect(html).toContain('href="#morning"');
+    expect(html).toContain('href="#sample"');
     expect(html).toContain('One thing to get ahead of');
     expect(html).toContain('40 pizzas a case (sample)');
     expect(html).toContain('Call your cheese rep, or change the pizza price.');
