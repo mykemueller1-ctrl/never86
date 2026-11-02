@@ -23,6 +23,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import styles from './action-shift-morning.module.css';
+import { ActionShiftSampleCard } from './ActionShiftSampleCard';
 
 export const ACTION_SHIFT_APP_URL = 'https://app.never86.app';
 
@@ -168,12 +169,12 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
               Last night&apos;s close, turned into one move. One owner. One receipt.
             </p>
             <div className={styles.heroActions}>
-              <Link className={styles.primary} href="/onboard">
-                Start my free seat
-              </Link>
-              <a className={styles.secondary} href="#morning">
+              <a className={styles.primary} href="#sample">
                 See a sample morning
               </a>
+              <Link className={styles.secondary} href="/onboard">
+                Start my free seat
+              </Link>
             </div>
           </header>
         ) : null}
@@ -181,6 +182,8 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
         <p className={styles.banner} role="status">
           Example data
         </p>
+
+        <ActionShiftSampleCard />
 
         <article id="morning" data-panel="desk">
           <p className={styles.stepLabel}>Morning · {sample.label}</p>
