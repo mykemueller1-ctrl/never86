@@ -23,7 +23,7 @@ const faq = [
  ['Do I need to connect my POS?', 'Start with reports and invoices you already have. No POS connection is required to try the checks. When a source is unclear, we ask for the specific missing detail.'],
  ['What can one invoice tell me?', 'One readable invoice can give you an organized summary. A price comparison needs another comparable invoice. Unknown pack sizes stay unresolved until you confirm them.'],
  ['Will you guess a number?', 'No. Honesty is Verified, Estimated, or Missing. Matching papers make a number Verified. A disclosed sample stays Estimated. One invoice or an unknown pack stays Missing — not $0. We do not invent dollars.'],
- ['Is the first seat really free?', 'The first owner seat is free for one restaurant, with pilot usage limits. Additional manager seats are planned as paid options. We will explain availability and pricing before you commit.'],
+ ['Is the first seat really free?', 'The first owner seat is free for one restaurant and one login. A second location or a second seat stays closed until it is paid. We explain that price before you commit.'],
  ['Who sees my restaurant files?', 'Sign in to One Seat on never86.ai before uploading private documents. Keep employee and customer details out of public examples. Our privacy policy explains how information is handled.'],
  ['Do I have to start in ChatGPT?', 'No. The public operator door and the free owner seat live on never86.ai. Grok can explain a card after the formula runs. This is not a Grok-resale product and not a ChatGPT onboarding path.'],
 ];

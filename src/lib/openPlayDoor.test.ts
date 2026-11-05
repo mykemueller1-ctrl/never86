@@ -7,7 +7,8 @@ describe('never86.ai open play front door', () => {
     const html = readFileSync(resolve('public/demo/action-shift.html'), 'utf8');
     expect(html).toMatch(/Never 86'd/);
     expect(html).toMatch(/never86\.ai/);
-    expect(html).toMatch(/Seat 1 · Community Tap/);
+    expect(html).toMatch(/Seat 1 · Your restaurant/);
+    expect(html).not.toMatch(/Community Tap/);
     expect(html).toMatch(/Any operator · no login/);
     expect(html).toMatch(/Open play for any operator|Sample shop only/);
     expect(html).not.toMatch(/\bPIN\b/);
@@ -30,9 +31,10 @@ describe('never86.ai open play front door', () => {
     expect(page).toMatch(/HomePage/);
   });
 
-  it('marks Community Tap as seat 1 on /action-shift', () => {
+  it('keeps the public Action Shift seat generic', () => {
     const page = readFileSync(resolve('src/app/action-shift/page.tsx'), 'utf8');
-    expect(page).toMatch(/Community Tap · first store · assigned/);
+    expect(page).toMatch(/Your restaurant · one store · free/);
+    expect(page).not.toMatch(/Community Tap/);
     expect(page).toMatch(/href="\/play"/);
   });
 });
