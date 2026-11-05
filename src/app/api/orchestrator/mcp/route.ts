@@ -120,7 +120,7 @@ function authorize(req: NextRequest): { ok: true } | { ok: false; status: number
 function authFailure(auth: { status: number; message: string }) {
   return NextResponse.json({ error: auth.message }, {
     status: auth.status,
-    ...(auth.status === 401 ? { headers: { 'WWW-Authenticate': 'Bearer resource_metadata="https://www.never86.ai/.well-known/oauth-protected-resource"' } } : {}),
+    ...(auth.status === 401 ? { headers: { 'WWW-Authenticate': 'Bearer resource_metadata="https://www.never86.ai/.well-known/oauth-protected-resource/api/orchestrator/mcp"' } } : {}),
   });
 }
 
