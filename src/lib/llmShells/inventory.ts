@@ -17,7 +17,7 @@ export const EXISTING_NEVER86_ARTIFACTS = {
     oauth: 'src/lib/orchestratorOAuth.ts',
     wellKnown: [
       'src/app/.well-known/oauth-authorization-server/route.ts',
-      'src/app/.well-known/oauth-protected-resource/route.ts',
+      'src/app/.well-known/oauth-protected-resource/api/orchestrator/mcp/route.ts',
     ],
     owns: ['Grok → Cursor factory dispatch'],
     excludedFromPublicShells: true,
