@@ -50,6 +50,9 @@ describe('private orchestrator MCP route', () => {
     const response = await POST(request({ jsonrpc: '2.0', id: 1, method: 'tools/list' }));
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ error: 'Unauthorized.' });
+    expect(response.headers.get('WWW-Authenticate')).toBe(
+      'Bearer resource_metadata="https://www.never86.ai/.well-known/oauth-protected-resource/api/orchestrator/mcp"',
+    );
   });
 
   it('lists private tools for the configured Grok connector', async () => {
