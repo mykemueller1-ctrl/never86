@@ -5,7 +5,7 @@ import { trackEvent } from '@/lib/track';
 import { useState } from 'react';
 
 const PILLARS = [
-  { name: 'Shift Pulse',     tag: 'Tonight', body: "Tonight's shift in one screen. Covers vs forecast, station median, the goal, the streak.", href: '/demo/shift-pulse', status: 'live' as const },
+  { name: 'Shift Card',     tag: 'Tonight', body: "Tonight's shift in one screen. Covers vs forecast, station median, the goal, the streak.", href: '/demo/shift-pulse', status: 'live' as const },
   { name: 'Knowledge Brain', tag: 'Recipes', body: 'Recipes, specs, service rules, the answers your line asks every shift.', status: 'coming' as const },
   { name: 'Achievements',    tag: 'Streaks', body: 'Streaks that mean something. Voids under the line. Upsell records. Zero-comp shifts.', status: 'coming' as const },
 ];

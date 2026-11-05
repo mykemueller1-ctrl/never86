@@ -1,7 +1,7 @@
 /**
  * Public Action Shift door on never86.ai.
  * Sample chain only: mozzarella $48 to $56, $0.20 per pizza, 385 sold, $77 a week.
- * Previous homepage: /legacy. Previous /try: /legacy/try.
+ * Company home (never86.ai) vs product app (app.never86.app).
  */
 import Link from 'next/link';
 import styles from './action-shift-morning.module.css';
@@ -41,6 +41,12 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             Never86<span>&apos;d</span>
           </Link>
           <p className={styles.product}>Action Shift</p>
+          <nav className={styles.headerNav} aria-label="Company">
+            <Link href="/story">Story</Link>
+            <Link href="/llm-shells">AI shells</Link>
+            <Link href="/mcp">MCP</Link>
+            <Link href="/pricing">Pricing</Link>
+          </nav>
           <a className={styles.primary} href={ACTION_SHIFT_APP_URL}>
             Open the app
           </a>
@@ -140,7 +146,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             <p className={styles.unit}>{sample.sold} pizzas sold</p>
           </article>
 
-          <article className={styles.panel} data-section="labor" id="labor">
+          <article className={styles.panel} id="labor">
             <p className={styles.stepLabel}>Labor · {sample.label}</p>
             <h3>The schedule and the clock.</h3>
             <p>
@@ -150,15 +156,46 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
           </article>
         </section>
 
+        <section className={styles.doors} aria-label="Never86 company doors">
+          <p className={styles.eyebrow}>Never86&apos;d · the company</p>
+          <h2 className={styles.doorsTitle}>Three ways in.</h2>
+          <p className={styles.doorsLede}>
+            never86.ai is the company home. app.never86.app is the live Action Shift product.
+          </p>
+          <div className={styles.doorsGrid}>
+            <a className={styles.door} href={ACTION_SHIFT_APP_URL}>
+              <p className={styles.stepLabel}>Product</p>
+              <h3>Open Action Shift</h3>
+              <p>The live seat. One restaurant. One morning move.</p>
+              <strong>app.never86.app →</strong>
+            </a>
+            <Link className={styles.door} href="/llm-shells">
+              <p className={styles.stepLabel}>Free AI shells</p>
+              <h3>ChatGPT, Claude, Gemini, Grok</h3>
+              <p>Same Action Shift rules inside the AI tools you already use.</p>
+              <strong>Try the shells →</strong>
+            </Link>
+            <Link className={styles.door} href="/mcp">
+              <p className={styles.stepLabel}>Public MCP</p>
+              <h3>Connect over MCP</h3>
+              <p>https://www.never86.ai/api/mcp · read-only tools, no invented dollars.</p>
+              <strong>MCP details →</strong>
+            </Link>
+          </div>
+        </section>
+
         <footer className={styles.footer}>
           <p>
             {sample.label} only. A sample price change, not money you got back. One restaurant.
-            One seat. Free.
+            One seat. Free. never86.ai is the company · app.never86.app is the product.
           </p>
           <nav aria-label="Footer">
-            <a href={ACTION_SHIFT_APP_URL}>app.never86.app</a>
-            <Link href="/legacy">Previous homepage</Link>
-            <Link href="/legacy/try">Previous try page</Link>
+            <a href={ACTION_SHIFT_APP_URL}>Open the app</a>
+            <Link href="/llm-shells">AI shells</Link>
+            <Link href="/mcp">MCP</Link>
+            <Link href="/story">Story</Link>
+            <Link href="/support">Support</Link>
+            <Link href="/pricing">Pricing</Link>
           </nav>
         </footer>
       </div>

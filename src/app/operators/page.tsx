@@ -10,7 +10,7 @@ const FREE_AGENTS = [
   { name: 'Labor Leak',     href: '/demo/labor-leak',     tag: 'Labor' },
   { name: 'Tip Variance',   href: '/demo/tip-variance',   tag: 'Tips' },
   { name: 'Catering Leak',  href: '/demo/catering-leak',  tag: 'Catering' },
-  { name: 'Shift Pulse',    href: '/demo/shift-pulse',    tag: 'Shift' },
+  { name: 'Shift Card',    href: '/demo/shift-pulse',    tag: 'Shift' },
 ];
 
 export default function OperatorsLanding() {
