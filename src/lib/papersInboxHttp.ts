@@ -32,7 +32,7 @@ import {
   parseSeatInvoiceBytes,
   type PapersInvoiceRecord,
 } from '@/lib/papersInvoicePath';
-import { hydratePapersSku, replacePapersSkuDocument } from '@/lib/papersSkuStore';
+import { hydratePapersSku, papersContentHash, replaceUnreviewedPaperDocument } from '@/lib/papersSkuStore';
 
 export type PapersStoredConnection = {
   accessToken: string;
@@ -313,7 +313,12 @@ export async function pullLastWeekPapers(input: {
       invoices.push(parsed);
       honesty = parsed.honesty;
       if (parsed.skuRows.length) {
-        await replacePapersSkuDocument(input.operatorId, `${item.provider}:${item.filename}`, parsed.skuRows);
+        await replaceUnreviewedPaperDocument(
+          input.operatorId,
+          papersContentHash(item.bytes),
+          parsed.skuRows,
+          [`${item.provider}:${item.filename}`],
+        );
       }
     }
     pulled.push({

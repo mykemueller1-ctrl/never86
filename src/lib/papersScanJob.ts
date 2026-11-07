@@ -1,18 +1,24 @@
 /**
- * Background papers scan. Idempotent on source id + content hash.
+ * Background papers scan. Review identity stays source + message id + hash.
+ * Compare identity is paper:<sha256>, the same key a pull uses.
  * Bounded to 90 days and an 8MB file cap. Read-only Google calls.
  */
 
-import { createHash } from 'node:crypto';
 import { neon } from '@neondatabase/serverless';
 import { draftFromCandidateText, type PapersExtractDraft } from '@/lib/papersScanExtract';
 import { calendarFromEditedDate, parsePapersSkuLines, skuRowToLineItem, type PapersSkuRow } from '@/lib/papersSkuParse';
 import {
   commitReviewedDocument,
+  dropUnreviewedPaperCopies,
   loadPapersReviewRows,
+  papersContentHash,
+  papersSkuDocumentKey,
   papersSkuRowsForStore,
+  reviewExistsForContentHash,
   type StoredSkuRow,
 } from '@/lib/papersSkuStore';
+
+export { papersContentHash, papersSkuDocumentKey };
 import { listDriveScanCandidates, listGmailScanCandidates } from '@/lib/papersScanSources';
 import { paperTextFromBytes } from '@/lib/papersScanText';
 import {
@@ -66,10 +72,6 @@ function enqueueScanEdit<T>(storeId: string, work: () => Promise<T>): Promise<T>
   const run = previous.then(work, work);
   editQueue.set(storeId, run.then(() => undefined, () => undefined));
   return run;
-}
-
-export function papersContentHash(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 function nowIso(): string {
@@ -331,7 +333,19 @@ async function applyPapersScanEditNow(operatorId: string, edit: PapersScanEdit):
   return structuredClone(row);
 }
 
-function skuRowsAfterReview(row: PapersScanRow, existing: StoredSkuRow[], datesEdited: boolean): PapersSkuRow[] {
+function skuDocumentKeyFor(row: PapersScanRow): string {
+  const hash = row.contentHash?.trim().toLowerCase() ?? '';
+  if (/^[a-f0-9]{64}$/.test(hash)) return papersSkuDocumentKey(hash);
+  return row.skuDocumentKey || row.dedupeKey;
+}
+
+function skuRowsAfterReview(
+  row: PapersScanRow,
+  existing: StoredSkuRow[],
+  datesEdited: boolean,
+  documentKey: string,
+  sourceHash: string | null,
+): PapersSkuRow[] {
   const indexes = new Set<number>();
   existing.forEach((line) => indexes.add(line.lineIndex));
   row.lineItems.forEach((_, index) => indexes.add(index));
@@ -352,22 +366,42 @@ function skuRowsAfterReview(row: PapersScanRow, existing: StoredSkuRow[], datesE
       documentNumber: row.invoiceNumber,
       category: item?.category ?? prior?.category ?? missingField(),
       isoWeek: moveWeek ? calendar?.isoWeek ?? null : (prior?.isoWeek ?? null),
-      documentKey: row.dedupeKey,
+      documentKey,
+      sourceHash,
     };
   });
 }
 
 async function syncReviewedSku(operatorId: string, row: PapersScanRow, datesEdited: boolean): Promise<void> {
-  const existing = papersSkuRowsForStore(operatorId).filter((line) => line.documentKey === row.dedupeKey);
+  const documentKey = skuDocumentKeyFor(row);
+  row.skuDocumentKey = documentKey;
+  const hash = /^[a-f0-9]{64}$/.test(row.contentHash?.trim().toLowerCase() ?? '')
+    ? row.contentHash.trim().toLowerCase()
+    : '';
+  const existing = papersSkuRowsForStore(operatorId).filter((line) =>
+    line.documentKey === documentKey
+    || line.documentKey === row.dedupeKey
+    || (hash !== '' && line.sourceHash === hash));
   const next = existing.length || row.lineItems.length
-    ? skuRowsAfterReview(row, existing, datesEdited)
+    ? skuRowsAfterReview(row, existing, datesEdited, documentKey, hash || null)
     : [];
   if (next.length) {
     const weeks = [...new Set(next.map((line) => line.isoWeek).filter((week): week is string => Boolean(week)))];
     row.isoWeek = weeks.length ? weeks.join(', ') : null;
   }
   const ownerId = existing.find((line) => line.ownerId)?.ownerId ?? null;
-  await commitReviewedDocument(operatorId, row.dedupeKey, next, { dedupeKey: row.dedupeKey, rowJson: row }, ownerId);
+  await commitReviewedDocument(
+    operatorId,
+    documentKey,
+    next,
+    { dedupeKey: row.dedupeKey, rowJson: row },
+    ownerId,
+    {
+      sourceHash: hash || null,
+      legacyKeys: row.filename ? [`${row.source}:${row.filename}`] : [],
+      replaceHashSiblings: hash !== '',
+    },
+  );
 }
 
 async function ingest(
@@ -389,7 +423,16 @@ async function ingest(
     const bytes = candidate.bytes ?? new Uint8Array();
     const contentHash = papersContentHash(bytes);
     const dedupeKey = `${candidate.source}:${candidate.externalId}:${contentHash}`;
+    const legacyKey = `${candidate.source}:${candidate.filename}`;
     if (seen.has(dedupeKey)) {
+      await dropUnreviewedPaperCopies(operatorId, contentHash, [legacyKey]);
+      job.deduped += 1;
+      continue;
+    }
+    const blocked = rows.some((row) => row.contentHash === contentHash)
+      || await reviewExistsForContentHash(operatorId, contentHash);
+    if (blocked) {
+      await dropUnreviewedPaperCopies(operatorId, contentHash, [legacyKey]);
       job.deduped += 1;
       continue;
     }
@@ -414,21 +457,30 @@ async function ingest(
       source: candidate.source,
       externalId: candidate.externalId,
       contentHash,
+      skuDocumentKey: papersSkuDocumentKey(contentHash),
       confirmed: false,
       fixture: false,
       note: draft.note,
     };
     try {
       // operatorId here is the selected store seat (`seat:<id>`), not the person email.
+      const skuKey = row.skuDocumentKey ?? papersSkuDocumentKey(contentHash);
+      const identity = {
+        sourceHash: contentHash,
+        legacyKeys: [legacyKey],
+        replaceHashSiblings: true,
+      };
       if (sku.lines.length) {
         await commitReviewedDocument(
           operatorId,
-          dedupeKey,
-          sku.lines.map((line) => ({ ...line, documentKey: dedupeKey })),
+          skuKey,
+          sku.lines.map((line) => ({ ...line, documentKey: skuKey, sourceHash: contentHash })),
           { dedupeKey, rowJson: row },
+          null,
+          identity,
         );
       } else {
-        await commitReviewedDocument(operatorId, dedupeKey, [], { dedupeKey, rowJson: row });
+        await commitReviewedDocument(operatorId, skuKey, [], { dedupeKey, rowJson: row }, null, identity);
       }
     } catch (error) {
       job.error = error instanceof Error && error.message
