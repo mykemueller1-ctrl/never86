@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
-import { OAUTH_SCOPES } from '../../../lib/orchestratorOAuth';
+import { OAUTH_SCOPES } from '../../../../../lib/orchestratorOAuth';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * RFC 8414 path-inserted Authorization Server metadata for the private
+ * orchestrator only. Kept off the host root so OpenAI / public MCP clients
+ * do not treat https://www.never86.ai/api/mcp as OAuth-protected.
+ */
 export async function GET() {
   return NextResponse.json({
-    issuer: 'https://www.never86.ai',
+    issuer: 'https://www.never86.ai/api/orchestrator',
     authorization_endpoint: 'https://www.never86.ai/api/orchestrator/oauth/authorize',
     token_endpoint: 'https://www.never86.ai/api/orchestrator/oauth/token',
     response_types_supported: ['code'],
@@ -15,4 +20,3 @@ export async function GET() {
     scopes_supported: OAUTH_SCOPES,
   });
 }
-

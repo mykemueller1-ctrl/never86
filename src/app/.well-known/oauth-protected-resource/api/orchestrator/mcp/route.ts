@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   return NextResponse.json({
     resource: 'https://www.never86.ai/api/orchestrator/mcp',
-    authorization_servers: ['https://www.never86.ai'],
+    authorization_servers: ['https://www.never86.ai/api/orchestrator'],
     bearer_methods_supported: ['header'],
     scopes_supported: OAUTH_SCOPES,
   });
