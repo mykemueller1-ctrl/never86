@@ -9,7 +9,7 @@
 // - Excessive OT per employee per week
 // - Schedule-vs-actual gap concentration (one name owns most of the drift)
 
-import { parseCsv, findColumn, num, parseDate } from './csv/core';
+import { parseCsv, findColumn, norm, num, parseDate } from './csv/core';
 
 export type EmpDrift = {
   store: string;
@@ -36,7 +36,35 @@ export type LaborDriftReport = {
 
 export type LaborError = { ok: false; error: string; hint?: string; detectedColumns?: string[] };
 
+type StraightTimeReport = Omit<LaborDriftReport, 'totalDriftDollars'> & {
+  totalDriftDollars: number | null;
+  pricedDriftDollars: number | null;
+  unpricedDriftMinutes: number;
+};
+
 const NOT_A_COUNT = ['count', 'qty', 'quantity', 'items'];
+// Prefer an explicitly labeled base rate. A fuzzy match could pick an overtime rate.
+const BASE_RATE_HEADERS = [
+  'basehourlyrate', 'basewagerate', 'basepayrate', 'baserate',
+  'regularhourlyrate', 'regularpayrate', 'regularrate',
+  'hourlyrate', 'wagerate', 'payrate', 'hourlywage', 'wage',
+];
+
+function baseRateColumn(headers: string[]): number {
+  const normalized = headers.map(norm);
+  for (const name of BASE_RATE_HEADERS) {
+    const index = normalized.indexOf(name);
+    if (index >= 0) return index;
+  }
+  return -1;
+}
+
+function suppliedHourlyRate(cell: string | undefined): number | null {
+  const amount = cell?.trim().replace(/^\$\s*/, '') ?? '';
+  if (!/^(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?|\.\d+)$/.test(amount)) return null;
+  const rate = Number(amount.replace(/,/g, ''));
+  return Number.isFinite(rate) ? rate : null;
+}
 
 // findColumn, num, parseDate come from ./csv/core. This thin wrapper keeps
 // Labor's own NOT_A_COUNT list and its excludeNeg call sites unchanged.
@@ -44,7 +72,9 @@ function findCol(headers: string[], aliases: string[], excludeNeg = false): numb
   return findColumn(headers, aliases, excludeNeg ? NOT_A_COUNT : []);
 }
 
-export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
+export function runLaborDrift(csv: string): LaborDriftReport | LaborError;
+export function runLaborDrift(csv: string, pricing: 'straight-time'): StraightTimeReport | LaborError;
+export function runLaborDrift(csv: string, pricing?: 'straight-time'): LaborDriftReport | StraightTimeReport | LaborError {
   const { headers, rows } = parseCsv(csv);
   if (!headers.length || !rows.length) {
     return { ok: false, error: 'CSV looked empty', hint: 'Timesheet export with header row required.' };
@@ -57,7 +87,9 @@ export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
   const iClockIn     = findCol(headers, ['ClockIn', 'ClockedIn', 'ActualStart', 'PunchIn', 'TimeIn']);
   const iClockOut    = findCol(headers, ['ClockOut', 'ClockedOut', 'ActualEnd', 'PunchOut', 'TimeOut']);
   const iNetSales    = findCol(headers, ['NetSales', 'Net', 'Sales', 'ShiftSales', 'Total'], true);
-  const iWage        = findCol(headers, ['WageRate', 'HourlyRate', 'PayRate', 'Wage']);
+  const iWage = pricing === 'straight-time'
+    ? baseRateColumn(headers)
+    : findCol(headers, ['WageRate', 'HourlyRate', 'PayRate', 'Wage']);
 
   const missing: string[] = [];
   if (iStore < 0) missing.push('Location / Store');
@@ -77,6 +109,8 @@ export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
   const ghosts: Array<{ store: string; name: string; clockedMinutes: number; netSales: number; shiftStart: string }> = [];
   let totalDriftMinutes = 0;
   let totalDriftDollars = 0;
+  let unpricedDriftMinutes = 0;
+  let hasPricedDrift = false;
   let totalScheduledMinutes = 0;
   let shiftsCount = 0;
   const stores = new Set<string>();
@@ -119,8 +153,18 @@ export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
     agg.totalOtMinutes += otMin;
 
     totalDriftMinutes += otMin;
-    const wage = iWage >= 0 ? num(r[iWage]) : 15;
-    totalDriftDollars += (otMin / 60) * wage * 1.5; // OT rate
+    if (pricing === 'straight-time') {
+      const rate = suppliedHourlyRate(r[iWage]);
+      if (rate === null) {
+        unpricedDriftMinutes += otMin;
+      } else if (otMin > 0) {
+        totalDriftDollars += (otMin / 60) * rate;
+        hasPricedDrift = true;
+      }
+    } else {
+      const wage = iWage >= 0 ? num(r[iWage]) : 15;
+      totalDriftDollars += (otMin / 60) * wage * 1.5;
+    }
 
     if (iNetSales >= 0) {
       const sales = num(r[iNetSales]);
@@ -140,7 +184,7 @@ export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
 
   const perEmployee = Array.from(empMap.values()).sort((a, b) => b.totalOtMinutes - a.totalOtMinutes);
 
-  return {
+  const report = {
     rowsParsed: rows.length,
     shifts: shiftsCount,
     employees: perEmployee.length,
@@ -151,4 +195,15 @@ export function runLaborDrift(csv: string): LaborDriftReport | LaborError {
     perEmployee: perEmployee.slice(0, 20),
     ghostShifts: ghosts.slice(0, 25),
   };
+  if (pricing === 'straight-time') {
+    const cents = totalDriftDollars * 100;
+    const dollars = Math.round(cents + Number.EPSILON * cents) / 100;
+    return {
+      ...report,
+      totalDriftDollars: unpricedDriftMinutes === 0 ? dollars : null,
+      pricedDriftDollars: hasPricedDrift || totalDriftMinutes === 0 ? dollars : null,
+      unpricedDriftMinutes,
+    };
+  }
+  return report;
 }

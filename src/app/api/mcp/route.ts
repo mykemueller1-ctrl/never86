@@ -176,11 +176,14 @@ async function handle(req: JsonRpcReq): Promise<Response> {
       if (name === 'analyze_labor') {
         const input = operatorCsv(args);
         if (!input.ok) return textResult(req.id, input.error, true);
-        const report = runLaborDrift(input.csv);
+        const report = runLaborDrift(input.csv, 'straight-time');
         if ('ok' in report && report.ok === false) return textResult(req.id, report, true);
         return textResult(req.id, {
           evidenceState: 'Unverified',
           warning: 'Patterns are review leads, not proof of theft, time fraud, or employee misconduct.',
+          estimateBasis: 'Employee totalOtMinutes measures time above schedule. Overtime requires separate evidence. ' +
+            'Estimates use supplied straight-time hourly rates. If any drift minutes lack a valid rate, totalDriftDollars is null ' +
+            'and pricedDriftDollars covers only drift minutes with valid rates.',
           report,
         });
       }

@@ -163,7 +163,24 @@ describe('public MCP route', () => {
     expect(text).toContain('"driftPct": 0.08');
   });
 
-  it('analyzes operator-provided labor without alleging misconduct', async () => {
+  const laborHeader = 'Location,Employee,ScheduledStart,ScheduledEnd,ClockIn,ClockOut';
+  const lateBy30 = 'Main,Sam,2026-08-27 09:00,2026-08-27 12:00,2026-08-27 09:00,2026-08-27 12:30';
+  const extra45 = 'Main,Sam,2026-08-27 09:00,2026-08-27 17:00,2026-08-27 08:45,2026-08-27 17:30';
+  const onTime = 'Main,Sam,2026-08-27 09:00,2026-08-27 12:00,2026-08-27 09:00,2026-08-27 12:00';
+
+  it.each([
+    { scenario: '30 extra minutes at $18', column: 'WageRate', rows: [lateBy30 + ',18'], minutes: 30, total: 9, priced: 9, unpriced: 0 },
+    { scenario: '45 extra minutes at $18', column: 'Hourly Rate', rows: [extra45 + ',$18.00'], minutes: 45, total: 13.5, priced: 13.5, unpriced: 0 },
+    { scenario: 'rounding half a cent', column: 'Pay Rate', rows: [lateBy30 + ',20.15'], minutes: 30, total: 10.08, priced: 10.08, unpriced: 0 },
+    { scenario: 'an explicit base rate', column: 'Wage,Base Hourly Rate', rows: [lateBy30 + ',100,18'], minutes: 30, total: 9, priced: 9, unpriced: 0 },
+    { scenario: 'no rate column', column: '', rows: [lateBy30], minutes: 30, total: null, priced: null, unpriced: 30 },
+    { scenario: 'a premium rate alone', column: 'Overtime Wage Rate', rows: [extra45 + ',27'], minutes: 45, total: null, priced: null, unpriced: 45 },
+    { scenario: 'invalid and negative rates', column: 'WageRate', rows: [lateBy30 + ',abc', extra45 + ',-5'], minutes: 75, total: null, priced: null, unpriced: 75 },
+    { scenario: 'only some rows priced', column: 'WageRate', rows: [lateBy30 + ',18', extra45 + ','], minutes: 75, total: null, priced: 9, unpriced: 45 },
+    { scenario: 'explicit zero rate', column: 'WageRate', rows: [lateBy30 + ',0'], minutes: 30, total: 0, priced: 0, unpriced: 0 },
+    { scenario: 'zero drift without a rate', column: '', rows: [onTime], minutes: 0, total: 0, priced: 0, unpriced: 0 },
+  ])('estimates straight-time drift for $scenario', async ({ column, rows, minutes, total, priced, unpriced }) => {
+    const header = column ? laborHeader + ',' + column : laborHeader;
     const response = await POST(new NextRequest('http://localhost/api/mcp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -173,20 +190,23 @@ describe('public MCP route', () => {
         method: 'tools/call',
         params: {
           name: 'analyze_labor',
-          arguments: {
-            csv: [
-              'Location,Employee,ScheduledStart,ScheduledEnd,ClockIn,ClockOut,WageRate',
-              'Main,Sam,2026-08-27 09:00,2026-08-27 17:00,2026-08-27 08:45,2026-08-27 17:30,18',
-            ].join('\n'),
-          },
+          arguments: { csv: [header, ...rows].join('\n') },
         },
       }),
     }));
     const body = await response.json();
-    const text = body.result.content[0].text as string;
-    expect(text).toContain('Unverified');
-    expect(text).toContain('review leads');
-    expect(text).toContain('"employees": 1');
+    expect(body.result.isError).toBeUndefined();
+    const result = JSON.parse(body.result.content[0].text);
+    expect(result.evidenceState).toBe('Unverified');
+    expect(result.warning).toContain('review leads');
+    expect(result.estimateBasis).toContain('Overtime requires separate evidence');
+    expect(result.report).toMatchObject({
+      employees: 1,
+      totalDriftMinutes: minutes,
+      totalDriftDollars: total,
+      pricedDriftDollars: priced,
+      unpricedDriftMinutes: unpriced,
+    });
   });
 
   it('costs drink recipes from per-unit house pour — blocks until asked', async () => {
