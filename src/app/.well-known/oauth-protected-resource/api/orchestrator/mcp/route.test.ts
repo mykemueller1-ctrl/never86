@@ -7,7 +7,7 @@ describe('orchestrator oauth-protected-resource metadata', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       resource: 'https://www.never86.ai/api/orchestrator/mcp',
-      authorization_servers: ['https://www.never86.ai'],
+      authorization_servers: ['https://www.never86.ai/api/orchestrator'],
       bearer_methods_supported: ['header'],
       scopes_supported: ['cursor:read', 'cursor:dispatch'],
     });
