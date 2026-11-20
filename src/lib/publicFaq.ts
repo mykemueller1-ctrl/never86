@@ -24,6 +24,6 @@ export const PUBLIC_FAQ = [
   {
     question: 'What does Never86 cost?',
     answer:
-      'The first owner seat is free. No card to start. Extra seats and extra locations are planned as paid options. That price is not finalized. We explain it before you commit.',
+      'The first owner seat is free for one restaurant and one login. No card to start. A second location or a second seat stays closed until it is paid. That price is not finalized. We explain it before you commit.',
   },
 ] as const;

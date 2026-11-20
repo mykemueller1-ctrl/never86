@@ -68,11 +68,18 @@ describe('operatorActivation pure helpers', () => {
     expect(refuseSecondFreeStore(0).ok).toBe(true);
   });
 
-  it('creates an isolated second store under the same email instead of 409', () => {
+  it('refuses a second free store and still reopens the store this email already has', () => {
     expect(
       decideSeatClaim({
         claimedStore: 'New American Grill',
         existingStores: ['Community Tap'],
+        resetOnly: false,
+      }),
+    ).toEqual({ action: 'second-store' });
+    expect(
+      decideSeatClaim({
+        claimedStore: 'First Grill',
+        existingStores: [],
         resetOnly: false,
       }),
     ).toEqual({ action: 'create-isolated' });
@@ -107,6 +114,9 @@ describe('operatorActivation pure helpers', () => {
     const source = readFileSync(resolve('src/lib/operatorActivation.ts'), 'utf8');
     expect(source).toContain('const restaurantName = restaurantNameForSeatClaim(email, row.restaurantName)');
     expect(source).toContain('decideSeatClaim');
+    expect(source).toContain("claim.action === 'second-store'");
+    expect(source).toContain('refuseSecondFreeStore(emailOps.length)');
+    expect(source).toContain("code: 'second_store'");
     expect(source).toContain("action !== 'create-isolated'");
     expect(source).toMatch(/insert\(seatOperators\)[\s\S]*restaurantName,/);
     expect(source).toMatch(/insert\(seatLocations\)[\s\S]*name: restaurantName/);

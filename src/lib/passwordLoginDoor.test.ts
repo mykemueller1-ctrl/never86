@@ -58,10 +58,13 @@ describe('email+password live door', () => {
     expect(read('src/app/portal/login/page.tsx')).toContain('readOperatorSession');
   });
 
-  it('kills the 1-store-per-email 409 and refuses plus-alias seats', () => {
+  it('refuses a second free store on the claim path and refuses plus-alias seats', () => {
     const activation = read('src/lib/operatorActivation.ts');
     const schema = read('src/lib/ensureFreeSeatSchema.ts');
     expect(activation).toContain('decideSeatClaim');
+    expect(activation).toContain("claim.action === 'second-store'");
+    expect(activation).toContain('refuseSecondFreeStore(existing.length)');
+    expect(activation).toContain("code: 'second_store'");
     expect(activation).toContain("action !== 'create-isolated'");
     expect(activation).not.toContain('refuseExistingSeatStoreMismatch(restaurantName, existingName)');
     expect(schema).toContain('drop constraint if exists seat_operators_email_key');

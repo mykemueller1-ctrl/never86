@@ -100,12 +100,17 @@ export type SeatClaimDecision =
   | { action: 'reuse'; store: string }
   | { action: 'reopen-first' }
   | { action: 'create-isolated' }
+  | { action: 'second-store' }
   | { action: 'no-seat' };
 
+export const SECOND_FREE_STORE_ERROR =
+  'The free plan is one store. Extra locations are paid expansion.';
+
 /**
- * One email may own many isolated stores. Same store name reopens.
- * A different store name creates a new operator — never paints CTAP as Max.
- * Reset links never mint a store.
+ * Free plan is one store and one login.
+ * The same store name reopens that store.
+ * A different store name fails closed. It does not paint the first store as the new name.
+ * Stores that already exist stay reachable. Reset links never mint a store.
  */
 export function decideSeatClaim(input: {
   claimedStore: string;
@@ -121,6 +126,7 @@ export function decideSeatClaim(input: {
     return { action: 'reopen-first' };
   }
   if (match) return { action: 'reuse', store: match };
+  if (existing.length >= 1) return { action: 'second-store' };
   return { action: 'create-isolated' };
 }
 
@@ -154,7 +160,8 @@ export type ActivationRequestCode =
   | 'activation_email_unavailable'
   | 'invalid_recipient'
   | 'neon_unavailable'
-  | 'rate_limited';
+  | 'rate_limited'
+  | 'second_store';
 
 export type ActivationEmailFailure = {
   status: 400 | 503;
@@ -264,6 +271,24 @@ export async function requestOperatorActivation(
         error: 'Too many activation emails. Try again in an hour.',
         status: 429,
         code: 'rate_limited',
+      };
+    }
+  }
+
+  if (!isResetActivationSource(input.sourcePage)) {
+    const existing = await listNeonOperatorsForEmail(email);
+    const claim = decideSeatClaim({
+      claimedStore: restaurantName,
+      existingStores: existing.map((row) => row.restaurantName),
+      resetOnly: false,
+    });
+    if (claim.action === 'second-store') {
+      const refused = refuseSecondFreeStore(existing.length);
+      return {
+        ok: false,
+        error: refused.ok ? SECOND_FREE_STORE_ERROR : refused.error,
+        status: 409,
+        code: 'second_store',
       };
     }
   }
@@ -449,6 +474,15 @@ export async function activateOperatorSeat(
         });
       }
 
+      if (claim.action === 'second-store') {
+        const refused = refuseSecondFreeStore(emailOps.length);
+        throw new SeatActivationAbort({
+          ok: false,
+          error: refused.ok ? SECOND_FREE_STORE_ERROR : refused.error,
+          status: 409,
+        });
+      }
+
       const reuseStore =
         claim.action === 'reuse'
           ? claim.store
@@ -614,15 +648,14 @@ export function refuseSecondFreeStore(existingLocationCount: number): {
   ok: true;
 } | { ok: false; error: string } {
   if (existingLocationCount >= 1) {
-    return { ok: false, error: 'The free plan is one store. Extra locations are paid expansion.' };
+    return { ok: false, error: SECOND_FREE_STORE_ERROR };
   }
   return { ok: true };
 }
 
 /**
- * @deprecated The 1-store-per-email 409 is the product gap that was closed.
- * Same email + a new store name now create-isolated (decideSeatClaim).
- * Kept so old call sites compile; it no longer blocks a second store.
+ * @deprecated Live claims use decideSeatClaim action "second-store".
+ * Kept so older call sites compile. A name mismatch does not reuse the first store.
  */
 export function refuseExistingSeatStoreMismatch(
   tokenRestaurantName: string,

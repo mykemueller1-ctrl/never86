@@ -51,9 +51,9 @@ export async function GET() {
 - [Refunds and adjustments review](https://www.never86.ai/audit/refunds-adjustments) — quantify the statement effect before tracing order evidence
 - [High delivery cost calculator](https://www.never86.ai/audit/high-delivery-cost) — calculate effective marketplace cost from the entered statement lines
 - [Delivery marketplace reconciliation evidence center](https://www.never86.ai/delivery-marketplace-reconciliation) — public field guides for statements, fees, promotions, refunds, payouts, and deposits
-- [60-minute live trial](https://www.never86.ai/trial) — drop a CSV, see the leak, no card
+- [Seat door](https://www.never86.ai/trial) — same free seat. One restaurant, one login. A timed CSV check sits on this page after the claim.
 - [30-second connect](https://www.never86.ai/connect) — Void Hunter on your CSV
-- [Pricing](https://www.never86.ai/pricing) — Independent / Operator / Multi-unit / Enterprise
+- [Pricing](https://www.never86.ai/pricing) — first owner seat free. A second location or seat stays closed until the price is explained.
 
 ## Connect AI clients
 - [Provider-specific Never86'd connector guide](https://www.never86.ai/llm-shells)
