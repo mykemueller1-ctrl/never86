@@ -22,7 +22,7 @@ const PROVIDERS = [
     name: 'Grok',
     status: 'Preferred explain path · remote MCP. Grok explains after the formula.',
     steps: [
-      'The free owner seat is on never86.ai. Do not onboard operators on ChatGPT.',
+      'For saved restaurant records, create your free account at app.never86.app/signup.',
       'Grok can explain a formula card after the formula runs. It does not invent the dollars.',
       'Or open grok.com/connectors → New Connector → Custom and enter the public MCP URL.',
     ],
@@ -31,14 +31,14 @@ const PROVIDERS = [
   },
   {
     name: 'ChatGPT',
-    status: 'Remote MCP · developer mode',
+    status: 'Public ChatGPT app',
     steps: [
-      'Enable developer mode if your ChatGPT plan/workspace requires it.',
-      'Go to Settings / Workspace settings → Apps → Create.',
-      'Enter the Never86’d public MCP endpoint, scan the tools, and create the draft app.',
+      'Open Action Shift in ChatGPT using the link below.',
+      'Choose the public tool and share the report or numbers you want checked.',
+      'Your private restaurant records remain in the separately authorized owner app.',
     ],
-    href: 'https://help.openai.com/en/articles/12584461',
-    linkLabel: 'OpenAI setup guide',
+    href: 'https://chatgpt.com/plugins/plugin_asdk_app_6aec26141b508191860961e34bd524d1',
+    linkLabel: 'Open Action Shift in ChatGPT',
   },
   {
     name: 'Claude',
@@ -95,7 +95,7 @@ export default function LlmShellsPage() {
           One public connector. <em>Multiple AI clients.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
-          Try supported payroll and invoice checks with the numbers or CSV you choose to share. Public checks need no account.
+          Try supported payroll and invoice checks with the numbers or CSV you choose to share. You can run public checks without a Never86 owner account.
           For saved restaurant records, start free at app.never86.app with one restaurant per verified email.
           The public connector cannot read your private restaurant workspace, log into a POS, or move money.
         </p>
@@ -124,6 +124,15 @@ export default function LlmShellsPage() {
             <CopyMcpUrl url={MCP_PUBLIC_ENDPOINT} />
           </div>
         </div>
+
+        <details className="mt-5 text-sm">
+          <summary className="cursor-pointer">Advanced ChatGPT connector setup</summary>
+          <p className="mt-3">
+            For a custom connection, see the{' '}
+            <a className="underline" href="https://help.openai.com/en/articles/12584461">Remote MCP · developer mode guide</a>.
+            The public app link below is the simpler starting point.
+          </p>
+        </details>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 mt-5">
           {PROVIDERS.map((provider) => (
