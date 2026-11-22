@@ -388,12 +388,27 @@
   font-weight: 700;
 }
 
+.headerActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.policyNote {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  color: #c9d7d1;
+}
+
 @media (max-width: 860px) {
   .header {
     flex-wrap: wrap;
   }
 
-  .header .primary {
+  .header .primary,
+  .headerActions {
     margin-left: 0;
   }
 
