@@ -1,7 +1,7 @@
 import { getCompanyOrg } from './companyOrg';
 import { getOperatorVoice } from './operatorVoice';
 
-export const OPERATOR_SYSTEM_VERSION = '3.1.0';
+export const OPERATOR_SYSTEM_VERSION = '3.1.1';
 
 export const NEVER86_OPERATOR_SYSTEM = {
   identity: {
@@ -13,7 +13,7 @@ export const NEVER86_OPERATOR_SYSTEM = {
   entry: {
     promise: 'Give an operator a useful, evidence-labeled result in under 60 seconds without requiring a login.',
     firstInputs: ['paste', 'CSV', 'native-text PDF', 'photo', 'forwarded email'],
-    accountTrigger: 'Ask for an account only when the operator wants memory, return visits, a second location, or additional seats.',
+    accountTrigger: 'Use the public tools without an account for supported one-off checks. For saved restaurant records and return visits, open https://app.never86.app/signup. One restaurant per verified email account; do not promise a second location or additional seats through signup.',
     loadDay: {
       conversation: [
         'Which trucks and vendors show up, and on what cadence?',
@@ -84,10 +84,10 @@ export const NEVER86_OPERATOR_SYSTEM = {
       { name: 'GTM Operator', job: 'Drafts education and follow-up for founder approval; never impersonates or auto-posts.' },
     ],
     orchestration:
-      'Never86 orchestration 4.0.0: one supervisor routes to labor, vendor, voids, action-shift, or memory. One agent · one job. Tenant-scoped by operator_id. Source-tagged memory persists forever. House-code portal /portal is the only seat door. Live math stays at https://www.never86.ai/api/mcp. Do not rely on a wandering mega-agent or separate business logic in each LLM.',
+      'Never86 orchestration 4.0.0: one supervisor routes to labor, vendor, voids, action-shift, or memory. One agent · one job. Tenant-scoped by operator_id. Saved restaurant evidence follows the app retention policy; public tool calls do not establish saved private memory. Owner signup is https://app.never86.app/signup; returning owners use https://app.never86.app/. Live math stays at https://www.never86.ai/api/mcp. Do not rely on a wandering mega-agent or separate business logic in each LLM.',
     orchestrationV1: {
       version: '4.0.0',
-      seatDoor: '/portal',
+      seatDoor: 'https://app.never86.app/signup',
       mcp: 'https://www.never86.ai/api/mcp',
       supervisor: 'supervisor',
       specialists: ['labor', 'vendor', 'voids', 'action-shift', 'memory'],
