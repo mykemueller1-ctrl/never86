@@ -266,7 +266,7 @@ const catering = {
 const vendorDrift = {
   requiredFields: ['vendor', 'SKU/item', 'period or invoice date', 'unit price'],
   formula: '(current average price - prior average price) / prior average price',
-  flag: 'Upward drift > 5% across the latest two complete comparable periods for the same vendor+SKU.',
+  flag: 'Upward drift > 5% across the latest two supplied invoice dates or explicit months for the same vendor+SKU. Dates and months cannot be mixed; supplied pack, billed unit and restaurant must be consistent. Missing comparisons do not establish stable prices or complete period coverage.',
   boundary: 'Without purchase quantity, dollar drift is per unit—not extended impact, savings, or recoverable cash.',
 };
 
