@@ -95,12 +95,27 @@ export default function LlmShellsPage() {
           One public connector. <em>Multiple AI clients.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
-          The public operator door is One Seat on never86.ai. Operators claim the free owner seat here, not on ChatGPT.
-          Grok can explain a card after the formula runs. It does not invent the dollars. This is not a Grok-resale product.
-          The public MCP still reads only the numbers or CSV you deliberately send. It cannot log into a POS or move money.
+          Try supported payroll and invoice checks with the numbers or CSV you choose to share. Public checks need no account.
+          For saved restaurant records, start free at app.never86.app with one restaurant per verified email.
+          The public connector cannot read your private restaurant workspace, log into a POS, or move money.
         </p>
 
-        <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mt-10">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            href="https://app.never86.app/signup"
+            className="inline-flex items-center rounded-lg bg-[#0066ff] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0052cc]"
+          >
+            Start free →
+          </a>
+          <a
+            href="https://app.never86.app/"
+            className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1d1d1f] hover:border-slate-500"
+          >
+            Sign in →
+          </a>
+        </div>
+
+        <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mt-8">
           <p className="compass-card-label" style={{ color: '#0066ff' }}>Public MCP endpoint · read-only</p>
           <p className="compass-body mt-4 max-w-3xl">
             Use this endpoint for public operator methods and analysis you explicitly provide to the AI client. It is intentionally separate from the authenticated Never86&apos;d Operator app, which holds each restaurant&apos;s private evidence and requires its own authorization.
