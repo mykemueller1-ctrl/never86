@@ -34,7 +34,7 @@ export const SUPERVISOR_SEAT: OrchestrationSeat = {
   evidenceNotes: [
     'Call get_operator_system first. Then list_specialists. Then one specialist tool.',
     'POS ≠ payout. Invoice ≠ COGS. No count → no food or beverage cost. Incomplete week stays Open.',
-    'House-code portal /portal is the only tenant seat door. Public MCP stays read-only.',
+    'Owner signup is https://app.never86.app/signup; returning owners use https://app.never86.app/. One restaurant per verified email account. Public MCP does not grant private restaurant access.',
     `Live math stays at ${MCP_PUBLIC_ENDPOINT}. Do not fork formulas into this seat.`,
   ],
 };
@@ -192,8 +192,8 @@ export function isSpecialistId(id: string): id is SpecialistId {
 export function orchestrationRule(): string {
   return [
     `Never86 orchestration ${ORCHESTRATION_VERSION}: one supervisor routes to labor, vendor, voids, action-shift, or memory.`,
-    'One agent · one job. Tenant-scoped by operator_id. Source-tagged memory persists forever.',
-    'Email /onboard is the free owner-seat door. House-code /portal stays fail-closed. Live math stays on https://www.never86.ai/api/mcp.',
+    'One agent · one job. Tenant-scoped by operator_id. Saved restaurant evidence follows the app retention policy; public tool calls do not establish saved private memory.',
+    'Owner signup is https://app.never86.app/signup. One restaurant per verified email account. Live math stays on https://www.never86.ai/api/mcp.',
     'Do not rely on a wandering mega-agent or separate business logic in each LLM.',
   ].join(' ');
 }
