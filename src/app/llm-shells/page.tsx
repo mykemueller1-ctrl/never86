@@ -22,7 +22,7 @@ const PROVIDERS = [
     name: 'Grok',
     status: 'Preferred explain path · remote MCP. Grok explains after the formula.',
     steps: [
-      'The free owner seat is on never86.ai. Do not onboard operators on ChatGPT.',
+      'For saved restaurant records, create your free account at app.never86.app/signup.',
       'Grok can explain a formula card after the formula runs. It does not invent the dollars.',
       'Or open grok.com/connectors → New Connector → Custom and enter the public MCP URL.',
     ],
@@ -31,14 +31,14 @@ const PROVIDERS = [
   },
   {
     name: 'ChatGPT',
-    status: 'Remote MCP · developer mode',
+    status: 'Public ChatGPT app',
     steps: [
-      'Enable developer mode if your ChatGPT plan/workspace requires it.',
-      'Go to Settings / Workspace settings → Apps → Create.',
-      'Enter the Never86’d public MCP endpoint, scan the tools, and create the draft app.',
+      'Open Action Shift in ChatGPT using the link below.',
+      'Choose the public tool and share the report or numbers you want checked.',
+      'Your private restaurant records remain in the separately authorized owner app.',
     ],
-    href: 'https://help.openai.com/en/articles/12584461',
-    linkLabel: 'OpenAI setup guide',
+    href: 'https://chatgpt.com/plugins/plugin_asdk_app_6aec26141b508191860961e34bd524d1',
+    linkLabel: 'Open Action Shift in ChatGPT',
   },
   {
     name: 'Claude',
@@ -95,12 +95,27 @@ export default function LlmShellsPage() {
           One public connector. <em>Multiple AI clients.</em>
         </h1>
         <p className="compass-body text-lg md:text-xl max-w-3xl">
-          The public operator door is One Seat on never86.ai. Operators claim the free owner seat here, not on ChatGPT.
-          Grok can explain a card after the formula runs. It does not invent the dollars. This is not a Grok-resale product.
-          The public MCP still reads only the numbers or CSV you deliberately send. It cannot log into a POS or move money.
+          Try supported payroll and invoice checks with the numbers or CSV you choose to share. You can run public checks without a Never86 owner account.
+          For saved restaurant records, start free at app.never86.app with one restaurant per verified email.
+          The public connector cannot read your private restaurant workspace, log into a POS, or move money.
         </p>
 
-        <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mt-10">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            href="https://app.never86.app/signup"
+            className="inline-flex items-center rounded-lg bg-[#0066ff] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0052cc]"
+          >
+            Start free →
+          </a>
+          <a
+            href="https://app.never86.app/"
+            className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1d1d1f] hover:border-slate-500"
+          >
+            Sign in →
+          </a>
+        </div>
+
+        <div className="compass-card border-[#b8d2ff] bg-[#f2f7ff] p-6 md:p-8 mt-8">
           <p className="compass-card-label" style={{ color: '#0066ff' }}>Public MCP endpoint · read-only</p>
           <p className="compass-body mt-4 max-w-3xl">
             Use this endpoint for public operator methods and analysis you explicitly provide to the AI client. It is intentionally separate from the authenticated Never86&apos;d Operator app, which holds each restaurant&apos;s private evidence and requires its own authorization.
@@ -109,6 +124,15 @@ export default function LlmShellsPage() {
             <CopyMcpUrl url={MCP_PUBLIC_ENDPOINT} />
           </div>
         </div>
+
+        <details className="mt-5 text-sm">
+          <summary className="cursor-pointer">Advanced ChatGPT connector setup</summary>
+          <p className="mt-3">
+            For a custom connection, see the{' '}
+            <a className="underline" href="https://help.openai.com/en/articles/12584461">Remote MCP · developer mode guide</a>.
+            The public app link below is the simpler starting point.
+          </p>
+        </details>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 mt-5">
           {PROVIDERS.map((provider) => (
