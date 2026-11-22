@@ -97,7 +97,7 @@ export function handleListAgentJobs(teamRaw?: unknown) {
 
 export function handleListSpecialists() {
   return {
-    discovery: 'get_operator_system → list_specialists → one specialist tool. Supervisor routes. House-code /portal is the only seat door.',
+    discovery: 'get_operator_system → list_specialists → one specialist tool. Supervisor routes. Owner signup is https://app.never86.app/signup; returning owners use https://app.never86.app/. One restaurant per verified email account.',
     orchestration: orchestrationRule(),
     specialists: listSpecialists().map((pack) => ({
       id: pack.id,
