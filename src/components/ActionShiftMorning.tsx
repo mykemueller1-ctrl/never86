@@ -7,6 +7,7 @@ import Link from 'next/link';
 import styles from './action-shift-morning.module.css';
 
 export const ACTION_SHIFT_APP_URL = 'https://app.never86.app';
+export const ACTION_SHIFT_SIGNUP_URL = 'https://app.never86.app/signup';
 
 /** /try sample values. $8 is $56 − $48. $77 is 385 × $0.20. */
 export const ACTION_SHIFT_SAMPLE = {
@@ -41,9 +42,14 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             Never86<span>&apos;d</span>
           </Link>
           <p className={styles.product}>Action Shift</p>
-          <a className={styles.primary} href={ACTION_SHIFT_APP_URL}>
-            Open the app
-          </a>
+          <div className={styles.headerActions}>
+            <a className={styles.textLink} href={ACTION_SHIFT_APP_URL}>
+              Open the app
+            </a>
+            <a className={styles.primary} href={ACTION_SHIFT_SIGNUP_URL}>
+              Start free
+            </a>
+          </div>
         </header>
 
         <section className={styles.hero}>
@@ -58,13 +64,19 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
                 : 'Action Shift turns yesterday into one thing to do. One restaurant. One seat. Free.'}
             </p>
             <div className={styles.heroActions}>
-              <a className={styles.primary} href={ACTION_SHIFT_APP_URL}>
-                Open the app
+              <a className={styles.primary} href={ACTION_SHIFT_SIGNUP_URL}>
+                Start free
+              </a>
+              <a className={styles.textLink} href={ACTION_SHIFT_APP_URL}>
+                Sign in
               </a>
               <a className={styles.textLink} href="#invoices">
                 See the four steps
               </a>
             </div>
+            <p className={styles.policyNote}>
+              One restaurant per verified email account. Public checks need no login.
+            </p>
           </div>
 
           <article className={styles.card} id="morning" aria-labelledby="morning-title">
@@ -156,6 +168,7 @@ export function ActionShiftMorning({ page = 'home' }: Props) {
             One seat. Free.
           </p>
           <nav aria-label="Footer">
+            <a href={ACTION_SHIFT_SIGNUP_URL}>Sign up free</a>
             <a href={ACTION_SHIFT_APP_URL}>app.never86.app</a>
             <Link href="/legacy">Previous homepage</Link>
             <Link href="/legacy/try">Previous try page</Link>
