@@ -1,5 +1,5 @@
 import { PUBLIC_LOGIC_DOMAINS } from './publicOperatorLogic';
-import { OPERATOR_SYSTEM_VERSION } from './operatorSystem';
+import { NEVER86_OPERATOR_SYSTEM, OPERATOR_SYSTEM_VERSION } from './operatorSystem';
 import { KNOWLEDGE_TOOL_NAMES } from './agentGovernance/knowledge';
 
 export const MCP_PUBLIC_ENDPOINT = 'https://www.never86.ai/api/mcp';
@@ -111,7 +111,7 @@ export const MCP_PUBLIC_TOOLS: readonly McpPublicTool[] = [
   {
     name: 'list_specialists',
     description:
-      'List domain specialists (labor, vendor, voids, action-shift, memory) with one job each, allowed tools, and MCP resource URIs. Supervisor routes; house-code /portal is the only seat door.',
+      `List domain specialists (labor, vendor, voids, action-shift, memory) with one job each, allowed tools, and MCP resource URIs. The supervisor routes each request. Supported one-off checks are public. To save restaurant records, new owners can sign up at ${NEVER86_OPERATOR_SYSTEM.agents.orchestrationV1.seatDoor}`,
     inputSchema: emptyObjectSchema,
     annotations: MCP_READ_ONLY_ANNOTATIONS,
   },
